@@ -4,7 +4,7 @@ import re
 import warnings
 from abc import ABC
 from dataclasses import dataclass
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional, Union, Any, TYPE_CHECKING
 from pint import UnitRegistry, Quantity as PintQuantity
 from fhircraft.fhir.path.exceptions import FhirPathWarning
@@ -249,8 +249,7 @@ class Date(FHIRPathLiteralType):
 class Time(FHIRPathLiteralType):
     hour: int
     minute: Optional[int]
-    second: Optional[int]
-    millisecond: Optional[int]
+    second: Optional[float]
     hour_shift: Optional[int]
     minute_shift: Optional[int]
 
@@ -262,17 +261,24 @@ class Time(FHIRPathLiteralType):
             )
             if match:
                 groups = match.groups()
-                (
-                    self.hour,  # type: ignore
-                    self.minute,
-                    self.second,
-                    self.millisecond,
-                    self.hour_shift,
-                    self.minute_shift,
-                ) = [
-                    int(group) if group else None
-                    for group in list(groups) + [None for _ in range(6 - len(groups))]
-                ]
+                self.hour = int(groups[0]) if groups[0] else None  # type: ignore
+                self.minute = int(groups[1]) if groups[1] else None
+                second_int = int(groups[2]) if groups[2] is not None else None
+                millisecond_int = int(groups[3]) if groups[3] is not None else None
+                self.second = (
+                    (
+                        second_int
+                        + (
+                            millisecond_int / 1000
+                            if millisecond_int is not None
+                            else 0.0
+                        )
+                    )
+                    if second_int is not None
+                    else None
+                )
+                self.hour_shift = int(groups[4]) if groups[4] else None
+                self.minute_shift = int(groups[5]) if groups[5] else None
                 if valuestring.endswith("Z"):
                     self.hour_shift = 0
                     self.minute_shift = 0
@@ -281,8 +287,7 @@ class Time(FHIRPathLiteralType):
         elif value_time:
             self.hour = value_time.hour
             self.minute = value_time.minute
-            self.second = value_time.second
-            self.millisecond = value_time.microsecond // 1000
+            self.second = value_time.second + value_time.microsecond / 1_000_000
             self.hour_shift = None
             self.minute_shift = None
             if value_time.tzinfo:
@@ -293,11 +298,13 @@ class Time(FHIRPathLiteralType):
                     self.minute_shift = total_minutes % 60
 
     def to_time(self):
+        second_int = int(self.second) if self.second is not None else 0
+        microsecond = round(((self.second or 0.0) % 1) * 1_000_000)
         return time(
             self.hour,
             self.minute or 0,
-            self.second or 0,
-            self.millisecond or 0,
+            second_int,
+            microsecond,
             tzinfo=(
                 timezone(
                     timedelta(
@@ -319,7 +326,6 @@ class Time(FHIRPathLiteralType):
                         "hour",
                         "minute",
                         "second",
-                        "millisecond",
                         "hour_shift",
                         "minute_shift",
                     ]
@@ -359,8 +365,7 @@ class DateTime(FHIRPathLiteralType):
     day: Optional[int]
     hour: Optional[int]
     minute: Optional[int]
-    second: Optional[int]
-    millisecond: Optional[int]
+    second: Optional[float]
     hour_shift: Optional[int]
     minute_shift: Optional[int]
 
@@ -374,20 +379,28 @@ class DateTime(FHIRPathLiteralType):
             )
             if match:
                 groups = match.groups()
-                (
-                    self.year,  # type: ignore
-                    self.month,
-                    self.day,
-                    self.hour,
-                    self.minute,
-                    self.second,
-                    self.millisecond,
-                    self.hour_shift,
-                    self.minute_shift,
-                ) = [
-                    int(group) if group else None
-                    for group in list(groups) + [None for _ in range(9 - len(groups))]
-                ]
+                padded = list(groups) + [None] * (9 - len(groups))
+                self.year = int(padded[0]) if padded[0] else None  # type: ignore
+                self.month = int(padded[1]) if padded[1] else None
+                self.day = int(padded[2]) if padded[2] else None
+                self.hour = int(padded[3]) if padded[3] else None
+                self.minute = int(padded[4]) if padded[4] else None
+                second_int = int(padded[5]) if padded[5] is not None else None
+                millisecond_int = int(padded[6]) if padded[6] is not None else None
+                self.second = (
+                    (
+                        second_int
+                        + (
+                            millisecond_int / 1000
+                            if millisecond_int is not None
+                            else 0.0
+                        )
+                    )
+                    if second_int is not None
+                    else None
+                )
+                self.hour_shift = int(padded[7]) if padded[7] else None
+                self.minute_shift = int(padded[8]) if padded[8] else None
                 if valuestring.endswith("Z"):
                     self.hour_shift = 0
                     self.minute_shift = 0
@@ -401,8 +414,7 @@ class DateTime(FHIRPathLiteralType):
             self.day = value_datetime.day
             self.hour = value_datetime.hour
             self.minute = value_datetime.minute
-            self.second = value_datetime.second
-            self.millisecond = value_datetime.microsecond // 1000
+            self.second = value_datetime.second + value_datetime.microsecond / 1_000_000
             self.hour_shift = None
             self.minute_shift = None
             if value_datetime.tzinfo:
@@ -413,14 +425,16 @@ class DateTime(FHIRPathLiteralType):
                     self.minute_shift = total_minutes % 60
 
     def to_datetime(self):
+        second_int = int(self.second) if self.second is not None else 0
+        microsecond = round(((self.second or 0.0) % 1) * 1_000_000)
         return datetime(
             self.year,
             self.month or 1,
             self.day or 1,
             self.hour or 0,
             self.minute or 0,
-            self.second or 0,
-            self.millisecond or 0,
+            second_int,
+            microsecond,
             tzinfo=(
                 timezone(
                     timedelta(
@@ -431,11 +445,28 @@ class DateTime(FHIRPathLiteralType):
                 else None
             ),
         )
+
+    def __comparison__(self, other, op):
+        if isinstance(other, DateTime):
+            if all(
+                [
+                    (getattr(self, part) is not None)
+                    == (getattr(other, part) is not None)
+                    for part in [
+                        "year",
+                        "month",
+                        "day",
+                        "hour",
+                        "minute",
+                        "second",
+                        "hour_shift",
+                        "minute_shift",
+                    ]
+                ]
+            ):
+                return op(self.to_datetime(), other.to_datetime())
+            else:
                 return []
-        elif isinstance(other, datetime):
-            return op(self.to_datetime(), other)
-        else:
-            raise TypeError("Comparisons only supported between Date objects")
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
