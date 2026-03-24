@@ -1,5 +1,7 @@
 """The equality module contains the object representations of the equality FHIRPath operators."""
 
+import re
+
 from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import (
@@ -201,7 +203,9 @@ class Equivalent(FHIRPath):
 
         # String equivalence: case-insensitive and normalized whitespace
         if isinstance(left_value, str):
-            return left_value.lower().strip() == right_value.lower().strip()
+            left_value = re.sub(r"\s+", " ", left_value).strip().lower()
+            right_value = re.sub(r"\s+", " ", right_value).strip().lower()
+            return left_value == right_value
 
         # Numeric equivalence
         elif isinstance(left_value, (int, float)):
