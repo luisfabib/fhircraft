@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 from pydantic import BaseModel
 
 from fhircraft.config import get_config
-from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
+from fhircraft.utils import ensure_list, get_all_models_from_field, is_dict_subset
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
@@ -261,16 +261,15 @@ def validate_FHIR_element_pattern(
     if isinstance(pattern, list):
         pattern = pattern[0]
     _element = element[0] if isinstance(element, list) else element
+    _element = (
+        _element.model_dump() if isinstance(_element, FHIRBaseModel) else _element
+    )
+    _pattern = pattern.model_dump() if isinstance(pattern, FHIRBaseModel) else pattern
     try:
-        if isinstance(_element, FHIRBaseModel):
-            assert (
-                merge_dicts(_element.model_dump(), pattern.model_dump())
-                == _element.model_dump()
-            )
-        elif isinstance(_element, dict) and isinstance(pattern, dict):
-            assert merge_dicts(_element, pattern) == _element
+        if isinstance(_pattern, dict):
+            assert is_dict_subset(_pattern, _element)
         else:
-            assert _element == pattern
+            assert _element == _pattern
     except AssertionError:
         error = f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2) if isinstance(pattern, FHIRBaseModel) else pattern}"
         if config.mode == "lenient":

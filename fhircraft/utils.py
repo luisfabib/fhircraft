@@ -357,55 +357,27 @@ def get_fhir_model_from_field(field: FieldInfo) -> type[BaseModel] | None:
     return next(get_all_models_from_field(field), None)
 
 
-def merge_dicts(dict1: dict, dict2: dict) -> dict:
-    """
-    Merge two dictionaries recursively, merging lists element by element and dictionaries at the same index.
-
-    If a key exists in both dictionaries, the values are merged based on their types. If a key exists only in one dictionary, it is added to the merged dictionary.
-
-    Args:
-        dict1 (dict): The first dictionary to merge.
-        dict2 (dict): The second dictionary to merge.
-
-    Returns:
-        dict: The merged dictionary.
-
-    Example:
-        >>> dict1 = {'a': 1, 'b': {'c': 2, 'd': [3, 4]}, 'e': [5, 6]}
-        >>> dict2 = {'b': {'c': 3, 'd': [4, 5]}, 'e': [6, 7], 'f': 8}
-        >>> merge_dicts(dict1, dict2)
-        {'a': 1, 'b': {'c': 3, 'd': [3, 4, 5]}, 'e': [5, 6, 7], 'f': 8}
-    """
-
-    def merge_lists(list1, list2):
-        # Merge two lists element by element
-        merged_list = []
-        for idx in range(max(len(list1), len(list2))):
-            if idx < len(list1) and idx < len(list2):
-                if isinstance(list1[idx], dict) and isinstance(list2[idx], dict):
-                    # Merge dictionaries at the same index
-                    merged_list.append(merge_dicts(list1[idx], list2[idx]))
-                else:
-                    # If they are not dictionaries, choose the element from the first list
-                    merged_list.append(list1[idx])
-            elif idx < len(list1):
-                merged_list.append(list1[idx])
-            else:
-                merged_list.append(list2[idx])
-        return merged_list
-
-    merged_dict = dict1.copy()
-    for key, value in dict2.items():
-        if key in merged_dict:
-            if isinstance(merged_dict[key], list) and isinstance(value, list):
-                merged_dict[key] = merge_lists(merged_dict[key], value)
-            elif isinstance(merged_dict[key], dict) and isinstance(value, dict):
-                merged_dict[key] = merge_dicts(merged_dict[key], value)
-            else:
-                merged_dict[key] = value
-        else:
-            merged_dict[key] = value
-    return merged_dict
+def is_dict_subset(subset: dict, superset: dict) -> bool:
+    """Return True if all keys/values in subset are present in superset."""
+    for key, value in subset.items():
+        if key not in superset:
+            return False
+        sup_value = superset[key]
+        if isinstance(value, dict) and isinstance(sup_value, dict):
+            if not is_dict_subset(value, sup_value):
+                return False
+        elif isinstance(value, list) and isinstance(sup_value, list):
+            if len(value) > len(sup_value):
+                return False
+            for sub_item, sup_item in zip(value, sup_value):
+                if isinstance(sub_item, dict) and isinstance(sup_item, dict):
+                    if not is_dict_subset(sub_item, sup_item):
+                        return False
+                elif sub_item != sup_item:
+                    return False
+        elif value != sup_value:
+            return False
+    return True
 
 
 def get_FHIR_release_from_version(
