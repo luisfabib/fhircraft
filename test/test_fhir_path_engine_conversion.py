@@ -8,7 +8,10 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.existence import Empty, Exists
 from fhircraft.fhir.path.engine.literals import Quantity
-from fhircraft.fhir.resources.datatypes.R4.complex import Quantity as R4_Quantity, Age as R4_Age
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Quantity as R4_Quantity,
+    Age as R4_Age,
+)
 
 
 env = dict()
@@ -225,6 +228,7 @@ def test_tointeger_returns_empty_for_invalid_type():
 
 
 tointeger_cases = (
+    ("+14", 14),
     ("14", 14),
     (14, 14),
     ("-14", -14),
@@ -270,6 +274,7 @@ def test_convertstointeger_returns_empty_for_invalid_type():
 
 
 convertstointeger_cases = (
+    ("+14"),
     ("14"),
     (14),
     ("-14"),
@@ -315,6 +320,8 @@ def test_todecimal_returns_empty_for_invalid_type():
 
 
 todecimal_cases = (
+    ("-14.5", -14.5),
+    ("+14.5", 14.5),
     ("14.5", 14.5),
     ("14", 14.0),
     (14.5, 14.5),
@@ -360,6 +367,8 @@ def test_convertstodecimal_returns_empty_for_invalid_type():
 
 
 convertstodecimal_cases = (
+    ("-14.5"),
+    ("+14.5"),
     ("14.5"),
     ("14"),
     (14.5),
@@ -590,7 +599,10 @@ toquantity_cases = (
     (False, Quantity(value=0.0, unit="")),
     (Quantity(value=12.5, unit="mg"), Quantity(value=12.5, unit="mg")),
     (R4_Quantity(value=12.5, unit="mg"), Quantity(value=12.5, unit="mg")),
-    (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"), Quantity(value=12.5, unit="a")),
+    (
+        R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"),
+        Quantity(value=12.5, unit="a"),
+    ),
 )
 
 

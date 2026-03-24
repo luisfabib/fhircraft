@@ -487,7 +487,7 @@ class ToDecimal(FHIRTypeConversionFunction):
         if isinstance(value, (int, float, bool)):
             return [FHIRPathCollectionItem.wrap(float(value))]
         elif isinstance(value, str):
-            if re.match(r"(\\+|-)?\d+(\.\d+)?", value):
+            if re.match(r"(\+|-)?\d+(\.\d+)?", value):
                 return [FHIRPathCollectionItem.wrap(float(value))]
             else:
                 return []
