@@ -6,7 +6,7 @@ that require a function in this section to be called explicitly.
 import re
 from datetime import datetime, date, time
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity
+from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
@@ -760,6 +760,10 @@ class ToTime(FHIRTypeConversionFunction):
                 return [FHIRPathCollectionItem.wrap(value)]
             else:
                 return []
+        elif isinstance(value, time):
+            return [FHIRPathCollectionItem.wrap(value.isoformat())]
+        elif isinstance(value, Time):
+            return [FHIRPathCollectionItem.wrap(value.to_time().isoformat())]
         else:
             return []
 

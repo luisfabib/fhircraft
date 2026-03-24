@@ -25,7 +25,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
 )
 from fhircraft.fhir.path.engine.existence import Empty, Exists
-from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity
+from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity as R4_Quantity,
     Age as R4_Age,
@@ -825,6 +825,8 @@ totime_cases = (
     ("2014-02-01", "2014-02-01"),
     ("2014-02-01T:12:25", "2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
+    (time(12, 25), "12:25:00"),
+    (Time("@T12:25"), "12:25:00"),
 )
 
 
@@ -869,6 +871,8 @@ convertstotime_cases = (
     ("2014-02-01"),
     ("2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z"),
+    (time(12, 25)),
+    (Time("@T12:25")),
 )
 
 
