@@ -267,13 +267,15 @@ class NotEquals(FHIRPath):
         Returns:
             FHIRPathCollection: The output collection
         """
-        return [
-            FHIRPathCollectionItem.wrap(
-                not Equals(self.left, self.right)
-                .evaluate(collection, environment, create)[0]
-                .value
-            )
-        ]
+        equals = (
+            Equals(self.left, self.right)
+            .evaluate(collection, environment, create)[0]
+            .value
+        )
+        if isinstance(equals, bool):
+            return [FHIRPathCollectionItem.wrap(not equals)]
+        else:
+            return []
 
     def __str__(self):
         return f"{self.left} != {self.right}"

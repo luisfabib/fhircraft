@@ -62,7 +62,13 @@ def test_notequals_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(collection, env)
-    assert result != [FHIRPathCollectionItem(value=expected)]
+    expected = (
+        [FHIRPathCollectionItem(value=not expected)]
+        if isinstance(expected, bool)
+        else expected
+    )
+
+    assert result == expected
 
 
 def test_notequals_string_representation():
