@@ -131,8 +131,8 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
                 "minutes",
                 "second",
                 "seconds",
-                "miliseond",
-                "miliseconds",
+                "millisecond",
+                "milliseconds",
             ]
         },
         #  FHIRPath Root Names (http://hl7.org/fhirpath/N1/#path-selection)
