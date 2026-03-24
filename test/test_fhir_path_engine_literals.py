@@ -188,9 +188,12 @@ def test_fhirpath_type_date_le():
 
 
 def test_fhirpath_type_date_different_precision():
-    assert (Date("@2015-05") <= Date("@2015-05-01")) == []
-    assert (Date("@2015") <= Date("@2015-05")) == []
-    assert (Date("@2015-05") <= Date("@2015")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = Date("@2015-05") <= Date("@2015-05-01")
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = Date("@2015") <= Date("@2015-05")
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = Date("@2015-05") <= Date("@2015")
 
 
 def test_fhirpath_type_time_string_init():
@@ -198,8 +201,7 @@ def test_fhirpath_type_time_string_init():
     assert isinstance(value, Time)
     assert value.hour == 12
     assert value.minute == 15
-    assert value.second == 20
-    assert value.millisecond == 345
+    assert value.second == 20.345
     assert value.hour_shift == 2
     assert value.minute_shift == 30
 
@@ -213,8 +215,7 @@ def test_fhirpath_type_time_native_init():
     assert isinstance(value, Time)
     assert value.hour == 12
     assert value.minute == 15
-    assert value.second == 20
-    assert value.millisecond == 345
+    assert value.second == 20.345
     assert value.hour_shift == 2
     assert value.minute_shift == 30
 
@@ -224,8 +225,7 @@ def test_fhirpath_type_time_utc_init():
     assert isinstance(value, Time)
     assert value.hour == 12
     assert value.minute == 15
-    assert value.second == 20
-    assert value.millisecond == 345
+    assert value.second == 20.345
     assert value.hour_shift == 0
     assert value.minute_shift == 0
 
@@ -233,7 +233,11 @@ def test_fhirpath_type_time_utc_init():
 def test_fhirpath_type_time_eq():
     assert Time("@T12:15:20.345Z") == Time("@T12:15:20.345+00:00")
     assert Time("@T12:15:20.345+02:30") == Time("@T12:15:20.345+02:30")
+    assert Time("@T12:15:20.345+02:30") == Time("@T12:15:20.345+02:30")
     assert Time("@T12:15:20.345") == Time("@T12:15:20.345")
+    assert Time("@T12:15:20.34") == Time("@T12:15:20.34")
+    assert Time("@T12:15:20.3") == Time("@T12:15:20.3")
+    assert Time("@T12:15:20.0") == Time("@T12:15:20")
     assert Time("@T12:15:20") == Time("@T12:15:20")
     assert Time("@T12:15") == Time("@T12:15")
     assert Time("@T12") == Time("@T12")
@@ -270,22 +274,23 @@ def test_fhirpath_type_time_le():
 
 
 def test_fhirpath_type_time_different_precision():
-    assert (Time("@T12:15:20.345") >= Time("@T12:15:20.345+02:30")) == []
-    assert (Time("@T12:15:20") >= Time("@T12:15:20.345")) == []
-    assert (Time("@T12:15") >= Time("@T12:15:20")) == []
-    assert (Time("@T12") >= Time("@T12:15")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        assert (Time("@T12:15:20.345") >= Time("@T12:15:20.345+02:30")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        assert (Time("@T12:15") >= Time("@T12:15:20")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        assert (Time("@T12") >= Time("@T12:15")) == []
 
 
 def test_fhirpath_type_datetime_string_init():
-    value = DateTime("@2015-04-01T12:15:20.345+02:30")
+    value = DateTime("@2015-04-01T12:15:20.7+02:30")
     assert isinstance(value, DateTime)
     assert value.year == 2015
     assert value.month == 4
     assert value.day == 1
     assert value.hour == 12
     assert value.minute == 15
-    assert value.second == 20
-    assert value.millisecond == 345
+    assert value.second == 20.7
     assert value.hour_shift == 2
     assert value.minute_shift == 30
 
@@ -309,8 +314,7 @@ def test_fhirpath_type_datetime_native_init():
     assert value.day == 1
     assert value.hour == 12
     assert value.minute == 15
-    assert value.second == 20
-    assert value.millisecond == 345
+    assert value.second == 20.345
     assert value.hour_shift == 2
     assert value.minute_shift == 30
 
@@ -325,8 +329,7 @@ def test_fhirpath_type_datetime_utc_init():
     assert value.day == 1
     assert value.hour == 12
     assert value.minute == 15
-    assert value.second == 20
-    assert value.millisecond == 345
+    assert value.second == 20.345
     assert value.hour_shift == 0
     assert value.minute_shift == 0
 
@@ -339,6 +342,9 @@ def test_fhirpath_type_datetime_eq():
         "@2015-04-01T12:15:20.345+02:30"
     )
     assert DateTime("@2015-04-01T12:15:20.345") == DateTime("@2015-04-01T12:15:20.345")
+    assert DateTime("@2015-04-01T12:15:20.12") == DateTime("@2015-04-01T12:15:20.12")
+    assert DateTime("@2015-04-01T12:15:20.1") == DateTime("@2015-04-01T12:15:20.1")
+    assert DateTime("@2015-04-01T12:15:20.0") == DateTime("@2015-04-01T12:15:20")
     assert DateTime("@2015-04-01T12:15:20") == DateTime("@2015-04-01T12:15:20")
     assert DateTime("@2015-04-01T12:15") == DateTime("@2015-04-01T12:15")
     assert DateTime("@2015-04-01T12") == DateTime("@2015-04-01T12")
@@ -394,12 +400,11 @@ def test_fhirpath_type_datetime_le():
 
 
 def test_fhirpath_type_datetime_different_precision():
-    assert (
-        DateTime("@2015-04-01T12:15:20.345")
-        >= DateTime("@2015-04-01T12:15:20.345+02:30")
-    ) == []
-    assert (
-        DateTime("@2015-04-01T12:15:20") >= DateTime("@2015-04-01T12:15:20.345")
-    ) == []
-    assert (DateTime("@2015-04-01T12:15") >= DateTime("@2015-04-01T12:15:20")) == []
-    assert (DateTime("@2015-04-01T12") >= DateTime("@2015-04-01T12:15")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = DateTime("@2015-04-01T12:15:20.345") >= DateTime(
+            "@2015-04-01T12:15:20.345+02:30"
+        )
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = DateTime("@2015-04-01T12:15") >= DateTime("@2015-04-01T12:15:20")
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = DateTime("@2015-04-01T12") >= DateTime("@2015-04-01T12:15")

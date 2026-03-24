@@ -46,7 +46,9 @@ def test_equals_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(collection, env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    if isinstance(expected, bool):
+        expected = [FHIRPathCollectionItem(value=expected)]
+    assert result == expected
 
 
 def test_equals_string_representation():
@@ -62,7 +64,10 @@ def test_notequals_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(collection, env)
-    assert result != [FHIRPathCollectionItem(value=expected)]
+    if isinstance(expected, bool):
+        expected = [FHIRPathCollectionItem(value=not expected)]
+
+    assert result == expected
 
 
 def test_notequals_string_representation():
@@ -78,6 +83,9 @@ equivalent_boolean_logic_cases = (
     ("ABC", "ABC", True),
     ("ABC", "DEF", False),
     ("ABC", "abc", True),
+    ("ABC def", "abc def", True),
+    ("ABC   def", "abc def", True),
+    ("ABC       def", "abc  def", True),
     ("ABC", "def", False),
     (123, 123, True),
     (123, 456, False),
@@ -93,7 +101,9 @@ equivalent_boolean_logic_cases = (
     (Date("@2012-01"), Date("@2012"), False),
     (DateTime("@2012-01-01T10:30"), DateTime("@2012-01-01T10:30"), True),
     (DateTime("@2012-01-01T10:30"), DateTime("@2012-01-01T10:31"), False),
-    (DateTime("@2012-01-01T10:30.312"), DateTime("@2012-01-01T10"), False),
+    (DateTime("@2012-01-01T10:30:31"), DateTime("@2012-01-01T10:30"), False),
+    (DateTime("@2012-01-01T10:30:31.0"), DateTime("@2012-01-01T10:30:31"), True),
+    (DateTime("@2012-01-01T10:30:31.1"), DateTime("@2012-01-01T10:30:31"), False),
     ("1 year", "1 year", True),
     ("1 cm", "1 m", False),
     ("ABC", [], False),

@@ -174,7 +174,7 @@ def test_cast_transform_explicit(scope, value, type_specifier, expected):
     "value,expected",
     [
         ("2014-02", "2014-02"),
-        ("12.5", fp.Quantity(value=12.5, unit="")),
+        ("12.5", 12.5),
     ],
 )
 def test_cast_transform_implicit(scope, value, expected):

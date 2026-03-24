@@ -4,7 +4,7 @@ import re
 import warnings
 from abc import ABC
 from dataclasses import dataclass
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional, Union, Any, TYPE_CHECKING
 from pint import UnitRegistry, Quantity as PintQuantity
 from fhircraft.fhir.path.exceptions import FhirPathWarning
@@ -23,6 +23,10 @@ if TYPE_CHECKING:
 # Load the Pint unit registry with UCUM definitions
 ureg = UnitRegistry(autoconvert_offset_to_baseunit=True)
 ureg.load_definitions(Path(__file__).resolve().parent / "ucum_to_pint.txt")
+
+
+class TypePrecisionError(TypeError):
+    pass
 
 
 class FHIRPathLiteralType(ABC):
@@ -107,7 +111,7 @@ class Quantity(FHIRPathLiteralType):
         elif isinstance(other, (int, float)) and not self.unit:
             return op(self.value, other)
         else:
-            return False
+            raise TypeError("Comparisons only supported between Quantity objects")
 
     def __math__(self, other, op) -> PintQuantity:
         if isinstance(other, Quantity):
@@ -123,7 +127,10 @@ class Quantity(FHIRPathLiteralType):
         return Quantity(abs(self.value), self.unit)
 
     def __eq__(self, other):
-        return self.__comparison__(other, operator.eq)
+        if isinstance(other, Quantity):
+            return self.__comparison__(other, operator.eq)
+        else:
+            return False
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
@@ -209,7 +216,7 @@ class Date(FHIRPathLiteralType):
     def to_date(self):
         return date(self.year, self.month or 1, self.day or 1)
 
-    def __comparison__(self, other, op):
+    def __comparison__(self, other, op) -> bool:
         if isinstance(other, Date):
             if all(
                 [
@@ -220,11 +227,13 @@ class Date(FHIRPathLiteralType):
             ):
                 return op(self.to_date(), other.to_date())
             else:
-                return []
+                raise TypePrecisionError(
+                    "Comparison cannot be performed between Date values with different levels of precision"
+                )
         elif isinstance(other, date):
             return op(self.to_date(), other)
         else:
-            raise TypeError("Comparisons only supported between Date objects")
+            raise TypeError("Comparisons only supported between Date or date objects")
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
@@ -249,30 +258,36 @@ class Date(FHIRPathLiteralType):
 class Time(FHIRPathLiteralType):
     hour: int
     minute: Optional[int]
-    second: Optional[int]
-    millisecond: Optional[int]
+    second: Optional[float]
     hour_shift: Optional[int]
     minute_shift: Optional[int]
 
     def __init__(self, valuestring: str | None = None, value_time: time | None = None):
         if valuestring:
             match = re.match(
-                r"\@T(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?",
+                r"\@T(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{1,3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?",
                 valuestring,
             )
             if match:
                 groups = match.groups()
-                (
-                    self.hour,  # type: ignore
-                    self.minute,
-                    self.second,
-                    self.millisecond,
-                    self.hour_shift,
-                    self.minute_shift,
-                ) = [
-                    int(group) if group else None
-                    for group in list(groups) + [None for _ in range(6 - len(groups))]
-                ]
+                self.hour = int(groups[0]) if groups[0] else None  # type: ignore
+                self.minute = int(groups[1]) if groups[1] else None
+                second_int = int(groups[2]) if groups[2] is not None else None
+                millisecond_int = int(groups[3]) if groups[3] is not None else None
+                self.second = (
+                    (
+                        second_int
+                        + (
+                            millisecond_int / (10 ** len(str(millisecond_int)))
+                            if millisecond_int is not None
+                            else 0.0
+                        )
+                    )
+                    if second_int is not None
+                    else None
+                )
+                self.hour_shift = int(groups[4]) if groups[4] else None
+                self.minute_shift = int(groups[5]) if groups[5] else None
                 if valuestring.endswith("Z"):
                     self.hour_shift = 0
                     self.minute_shift = 0
@@ -281,8 +296,7 @@ class Time(FHIRPathLiteralType):
         elif value_time:
             self.hour = value_time.hour
             self.minute = value_time.minute
-            self.second = value_time.second
-            self.millisecond = value_time.microsecond // 1000
+            self.second = value_time.second + value_time.microsecond / 1_000_000
             self.hour_shift = None
             self.minute_shift = None
             if value_time.tzinfo:
@@ -293,11 +307,25 @@ class Time(FHIRPathLiteralType):
                     self.minute_shift = total_minutes % 60
 
     def to_time(self):
+        second_int = int(self.second) if self.second is not None else 0
+        microsecond = round(((self.second or 0.0) % 1) * 1_000_000)
         return time(
-            self.hour, self.minute or 0, self.second or 0, self.millisecond or 0
+            self.hour,
+            self.minute or 0,
+            second_int,
+            microsecond,
+            tzinfo=(
+                timezone(
+                    timedelta(
+                        hours=self.hour_shift or 0, minutes=self.minute_shift or 0
+                    )
+                )
+                if self.hour_shift is not None and self.minute_shift is not None
+                else None
+            ),
         )
 
-    def __comparison__(self, other, op):
+    def __comparison__(self, other, op) -> bool:
         if isinstance(other, Time):
             if all(
                 [
@@ -307,7 +335,6 @@ class Time(FHIRPathLiteralType):
                         "hour",
                         "minute",
                         "second",
-                        "millisecond",
                         "hour_shift",
                         "minute_shift",
                     ]
@@ -315,11 +342,15 @@ class Time(FHIRPathLiteralType):
             ):
                 return op(self.to_time(), other.to_time())
             else:
-                return []
+                raise TypePrecisionError(
+                    "Comparison cannot be performed between Time values with different levels of precision"
+                )
         elif isinstance(other, time):
             return op(self.to_time(), other)
         else:
-            raise TypeError("Comparisons only supported between Date objects")
+            raise TypeError(
+                "Comparison can only be performed between Time objects or time instances"
+            )
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
@@ -347,8 +378,7 @@ class DateTime(FHIRPathLiteralType):
     day: Optional[int]
     hour: Optional[int]
     minute: Optional[int]
-    second: Optional[int]
-    millisecond: Optional[int]
+    second: Optional[float]
     hour_shift: Optional[int]
     minute_shift: Optional[int]
 
@@ -357,25 +387,33 @@ class DateTime(FHIRPathLiteralType):
     ):
         if valuestring:
             match = re.match(
-                r"\@([0-9]{4})(?:-([0-9]{2})(?:-?([0-9]{2})T(?:(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?)?)?)?",
+                r"\@([0-9]{4})(?:-([0-9]{2})(?:-?([0-9]{2})T(?:(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{1,3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?)?)?)?",
                 valuestring,
             )
             if match:
                 groups = match.groups()
-                (
-                    self.year,  # type: ignore
-                    self.month,
-                    self.day,
-                    self.hour,
-                    self.minute,
-                    self.second,
-                    self.millisecond,
-                    self.hour_shift,
-                    self.minute_shift,
-                ) = [
-                    int(group) if group else None
-                    for group in list(groups) + [None for _ in range(9 - len(groups))]
-                ]
+                padded = list(groups) + [None] * (9 - len(groups))
+                self.year = int(padded[0]) if padded[0] else None  # type: ignore
+                self.month = int(padded[1]) if padded[1] else None
+                self.day = int(padded[2]) if padded[2] else None
+                self.hour = int(padded[3]) if padded[3] else None
+                self.minute = int(padded[4]) if padded[4] else None
+                second_int = int(padded[5]) if padded[5] is not None else None
+                millisecond_int = int(padded[6]) if padded[6] is not None else None
+                self.second = (
+                    (
+                        second_int
+                        + (
+                            millisecond_int / (10 ** len(str(millisecond_int)))
+                            if millisecond_int is not None
+                            else 0.0
+                        )
+                    )
+                    if second_int is not None
+                    else None
+                )
+                self.hour_shift = int(padded[7]) if padded[7] else None
+                self.minute_shift = int(padded[8]) if padded[8] else None
                 if valuestring.endswith("Z"):
                     self.hour_shift = 0
                     self.minute_shift = 0
@@ -389,8 +427,7 @@ class DateTime(FHIRPathLiteralType):
             self.day = value_datetime.day
             self.hour = value_datetime.hour
             self.minute = value_datetime.minute
-            self.second = value_datetime.second
-            self.millisecond = value_datetime.microsecond // 1000
+            self.second = value_datetime.second + value_datetime.microsecond / 1_000_000
             self.hour_shift = None
             self.minute_shift = None
             if value_datetime.tzinfo:
@@ -401,17 +438,28 @@ class DateTime(FHIRPathLiteralType):
                     self.minute_shift = total_minutes % 60
 
     def to_datetime(self):
+        second_int = int(self.second) if self.second is not None else 0
+        microsecond = round(((self.second or 0.0) % 1) * 1_000_000)
         return datetime(
             self.year,
             self.month or 1,
             self.day or 1,
             self.hour or 0,
             self.minute or 0,
-            self.second or 0,
-            self.millisecond or 0,
+            second_int,
+            microsecond,
+            tzinfo=(
+                timezone(
+                    timedelta(
+                        hours=self.hour_shift or 0, minutes=self.minute_shift or 0
+                    )
+                )
+                if self.hour_shift is not None and self.minute_shift is not None
+                else None
+            ),
         )
 
-    def __comparison__(self, other, op):
+    def __comparison__(self, other, op) -> bool:
         if isinstance(other, DateTime):
             if all(
                 [
@@ -424,7 +472,6 @@ class DateTime(FHIRPathLiteralType):
                         "hour",
                         "minute",
                         "second",
-                        "millisecond",
                         "hour_shift",
                         "minute_shift",
                     ]
@@ -432,11 +479,15 @@ class DateTime(FHIRPathLiteralType):
             ):
                 return op(self.to_datetime(), other.to_datetime())
             else:
-                return []
+                raise TypePrecisionError(
+                    "Comparison cannot be performed between DateTime values with different levels of precision"
+                )
         elif isinstance(other, datetime):
             return op(self.to_datetime(), other)
         else:
-            raise TypeError("Comparisons only supported between Date objects")
+            raise TypeError(
+                "Comparison can only be performed between DateTime objects or datetime instances"
+            )
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
