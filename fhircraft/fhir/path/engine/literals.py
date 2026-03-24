@@ -25,6 +25,10 @@ ureg = UnitRegistry(autoconvert_offset_to_baseunit=True)
 ureg.load_definitions(Path(__file__).resolve().parent / "ucum_to_pint.txt")
 
 
+class TypePrecisionError(TypeError):
+    pass
+
+
 class FHIRPathLiteralType(ABC):
     pass
 
@@ -107,7 +111,7 @@ class Quantity(FHIRPathLiteralType):
         elif isinstance(other, (int, float)) and not self.unit:
             return op(self.value, other)
         else:
-            return False
+            raise TypeError("Comparisons only supported between Quantity objects")
 
     def __math__(self, other, op) -> PintQuantity:
         if isinstance(other, Quantity):
@@ -123,7 +127,10 @@ class Quantity(FHIRPathLiteralType):
         return Quantity(abs(self.value), self.unit)
 
     def __eq__(self, other):
-        return self.__comparison__(other, operator.eq)
+        if isinstance(other, Quantity):
+            return self.__comparison__(other, operator.eq)
+        else:
+            return False
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
@@ -209,7 +216,7 @@ class Date(FHIRPathLiteralType):
     def to_date(self):
         return date(self.year, self.month or 1, self.day or 1)
 
-    def __comparison__(self, other, op):
+    def __comparison__(self, other, op) -> bool:
         if isinstance(other, Date):
             if all(
                 [
@@ -220,11 +227,13 @@ class Date(FHIRPathLiteralType):
             ):
                 return op(self.to_date(), other.to_date())
             else:
-                return []
+                raise TypePrecisionError(
+                    "Comparison cannot be performed between Date values with different levels of precision"
+                )
         elif isinstance(other, date):
             return op(self.to_date(), other)
         else:
-            raise TypeError("Comparisons only supported between Date objects")
+            raise TypeError("Comparisons only supported between Date or date objects")
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
@@ -316,7 +325,7 @@ class Time(FHIRPathLiteralType):
             ),
         )
 
-    def __comparison__(self, other, op):
+    def __comparison__(self, other, op) -> bool:
         if isinstance(other, Time):
             if all(
                 [
@@ -333,11 +342,15 @@ class Time(FHIRPathLiteralType):
             ):
                 return op(self.to_time(), other.to_time())
             else:
-                return []
+                raise TypePrecisionError(
+                    "Comparison cannot be performed between Time values with different levels of precision"
+                )
         elif isinstance(other, time):
             return op(self.to_time(), other)
         else:
-            raise TypeError("Comparisons only supported between Date objects")
+            raise TypeError(
+                "Comparison can only be performed between Time objects or time instances"
+            )
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
@@ -446,7 +459,7 @@ class DateTime(FHIRPathLiteralType):
             ),
         )
 
-    def __comparison__(self, other, op):
+    def __comparison__(self, other, op) -> bool:
         if isinstance(other, DateTime):
             if all(
                 [
@@ -466,7 +479,15 @@ class DateTime(FHIRPathLiteralType):
             ):
                 return op(self.to_datetime(), other.to_datetime())
             else:
-                return []
+                raise TypePrecisionError(
+                    "Comparison cannot be performed between DateTime values with different levels of precision"
+                )
+        elif isinstance(other, datetime):
+            return op(self.to_datetime(), other)
+        else:
+            raise TypeError(
+                "Comparison can only be performed between DateTime objects or datetime instances"
+            )
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)

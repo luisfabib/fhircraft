@@ -75,6 +75,7 @@ class Iif(FHIRPathFunction):
 
         criterion = self.criterion.single(
             collection,
+            default=False,
             environment=eval_context(collection),
         )
         if not isinstance(criterion, bool):

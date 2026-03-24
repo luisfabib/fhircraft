@@ -9,6 +9,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
 )
+from fhircraft.fhir.path.engine.literals import TypePrecisionError
 from fhircraft.fhir.path.utils import evaluate_left_right_expressions
 
 
@@ -61,13 +62,19 @@ class Equals(FHIRPath):
             self.left, self.right, collection, environment, create
         )
         if len(left_collection) == 0 or len(right_collection) == 0:
-            equals = []
+            return []
         elif len(left_collection) == 1 and len(right_collection) == 1:
-            equals = left_collection[0] == right_collection[0]
+            try:
+                equals = left_collection[0] == right_collection[0]
+            except TypePrecisionError:
+                return []
         elif len(left_collection) != len(right_collection):
             equals = False
         else:
-            equals = all(l == r for l, r in zip(left_collection, right_collection))
+            try:
+                equals = all(l == r for l, r in zip(left_collection, right_collection))
+            except TypePrecisionError:
+                return []
         return [FHIRPathCollectionItem.wrap(equals)]
 
     def __str__(self):
@@ -237,7 +244,10 @@ class Equivalent(FHIRPath):
             if isinstance(left_value, dict):
                 left_value.pop("id", None)
                 right_value.pop("id", None)
-            return left_value == right_value
+            try:
+                return left_value == right_value
+            except TypePrecisionError:
+                return False
 
 
 class NotEquals(FHIRPath):
@@ -271,13 +281,11 @@ class NotEquals(FHIRPath):
         Returns:
             FHIRPathCollection: The output collection
         """
-        equals = (
-            Equals(self.left, self.right)
-            .evaluate(collection, environment, create)[0]
-            .value
-        )
-        if isinstance(equals, bool):
-            return [FHIRPathCollectionItem.wrap(not equals)]
+        if equals_collection := Equals(self.left, self.right).evaluate(
+            collection, environment, create
+        ):
+            equality = equals_collection[0].value
+            return [FHIRPathCollectionItem.wrap(not equality)]
         else:
             return []
 

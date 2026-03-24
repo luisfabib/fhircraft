@@ -113,11 +113,12 @@ class All(FHIRPathFunction):
                 all(
                     [
                         (
-                            self.criteria.evaluate(
+                            self.criteria.single(
                                 [item],
-                                get_expression_context(environment, item, index),
-                                create,
-                            )[0].value
+                                environment=get_expression_context(
+                                    environment, item, index
+                                ),
+                            )
                             if isinstance(self.criteria, FHIRPath)
                             else item.value == self.criteria
                         )

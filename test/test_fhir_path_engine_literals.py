@@ -188,9 +188,12 @@ def test_fhirpath_type_date_le():
 
 
 def test_fhirpath_type_date_different_precision():
-    assert (Date("@2015-05") <= Date("@2015-05-01")) == []
-    assert (Date("@2015") <= Date("@2015-05")) == []
-    assert (Date("@2015-05") <= Date("@2015")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = Date("@2015-05") <= Date("@2015-05-01")
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = Date("@2015") <= Date("@2015-05")
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = Date("@2015-05") <= Date("@2015")
 
 
 def test_fhirpath_type_time_string_init():
@@ -271,10 +274,12 @@ def test_fhirpath_type_time_le():
 
 
 def test_fhirpath_type_time_different_precision():
-    assert (Time("@T12:15:20.345") >= Time("@T12:15:20.345+02:30")) == []
-    assert (Time("@T12:15:20") >= Time("@T12:15:20.345")) == False
-    assert (Time("@T12:15") >= Time("@T12:15:20")) == []
-    assert (Time("@T12") >= Time("@T12:15")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        assert (Time("@T12:15:20.345") >= Time("@T12:15:20.345+02:30")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        assert (Time("@T12:15") >= Time("@T12:15:20")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        assert (Time("@T12") >= Time("@T12:15")) == []
 
 
 def test_fhirpath_type_datetime_string_init():
@@ -395,12 +400,11 @@ def test_fhirpath_type_datetime_le():
 
 
 def test_fhirpath_type_datetime_different_precision():
-    assert (
-        DateTime("@2015-04-01T12:15:20.345")
-        >= DateTime("@2015-04-01T12:15:20.345+02:30")
-    ) == []
-    assert (
-        DateTime("@2015-04-01T12:15:20") >= DateTime("@2015-04-01T12:15:20.345")
-    ) == False
-    assert (DateTime("@2015-04-01T12:15") >= DateTime("@2015-04-01T12:15:20")) == []
-    assert (DateTime("@2015-04-01T12") >= DateTime("@2015-04-01T12:15")) == []
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = DateTime("@2015-04-01T12:15:20.345") >= DateTime(
+            "@2015-04-01T12:15:20.345+02:30"
+        )
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = DateTime("@2015-04-01T12:15") >= DateTime("@2015-04-01T12:15:20")
+    with pytest.raises(TypePrecisionError, match="different levels of precision"):
+        fails = DateTime("@2015-04-01T12") >= DateTime("@2015-04-01T12:15")

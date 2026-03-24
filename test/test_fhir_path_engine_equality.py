@@ -46,7 +46,9 @@ def test_equals_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(collection, env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    if isinstance(expected, bool):
+        expected = [FHIRPathCollectionItem(value=expected)]
+    assert result == expected
 
 
 def test_equals_string_representation():
@@ -62,11 +64,8 @@ def test_notequals_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(collection, env)
-    expected = (
-        [FHIRPathCollectionItem(value=not expected)]
-        if isinstance(expected, bool)
-        else expected
-    )
+    if isinstance(expected, bool):
+        expected = [FHIRPathCollectionItem(value=not expected)]
 
     assert result == expected
 
