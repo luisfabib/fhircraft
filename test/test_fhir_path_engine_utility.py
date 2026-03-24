@@ -60,9 +60,11 @@ def test_today_string_representation():
 # -------------
 
 
-def test_now_returns_current_datetime():
+def test_now_returns_datetime_with_timezone_offset():
     result = Now().evaluate([], env)
     assert isinstance(result[0].value, DateTime)
+    assert result[0].value.hour_shift is not None
+    assert result[0].value.minute_shift is not None
 
 
 def test_now_string_representation():

@@ -254,9 +254,7 @@ class Time(FHIRPathLiteralType):
     hour_shift: Optional[int]
     minute_shift: Optional[int]
 
-    def __init__(
-        self, valuestring: str | None = None, value_time: datetime | None = None
-    ):
+    def __init__(self, valuestring: str | None = None, value_time: time | None = None):
         if valuestring:
             match = re.match(
                 r"\@T(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?",
@@ -275,6 +273,9 @@ class Time(FHIRPathLiteralType):
                     int(group) if group else None
                     for group in list(groups) + [None for _ in range(6 - len(groups))]
                 ]
+                if valuestring.endswith("Z"):
+                    self.hour_shift = 0
+                    self.minute_shift = 0
             else:
                 raise ValueError(f'Invalid string format "{valuestring}" for Time type')
         elif value_time:
@@ -284,6 +285,12 @@ class Time(FHIRPathLiteralType):
             self.millisecond = value_time.microsecond // 1000
             self.hour_shift = None
             self.minute_shift = None
+            if value_time.tzinfo:
+                offset = value_time.utcoffset()
+                if offset is not None:
+                    total_minutes = int(offset.total_seconds() // 60)
+                    self.hour_shift = total_minutes // 60
+                    self.minute_shift = total_minutes % 60
 
     def to_time(self):
         return time(
@@ -369,6 +376,9 @@ class DateTime(FHIRPathLiteralType):
                     int(group) if group else None
                     for group in list(groups) + [None for _ in range(9 - len(groups))]
                 ]
+                if valuestring.endswith("Z"):
+                    self.hour_shift = 0
+                    self.minute_shift = 0
             else:
                 raise ValueError(
                     f'Invalid string format "{valuestring}" for DateTime type'
@@ -383,6 +393,12 @@ class DateTime(FHIRPathLiteralType):
             self.millisecond = value_datetime.microsecond // 1000
             self.hour_shift = None
             self.minute_shift = None
+            if value_datetime.tzinfo:
+                offset = value_datetime.utcoffset()
+                if offset is not None:
+                    total_minutes = int(offset.total_seconds() // 60)
+                    self.hour_shift = total_minutes // 60
+                    self.minute_shift = total_minutes % 60
 
     def to_datetime(self):
         return datetime(
