@@ -25,7 +25,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
 )
 from fhircraft.fhir.path.engine.existence import Empty, Exists
-from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity as R4_Quantity,
     Age as R4_Age,
@@ -433,6 +433,8 @@ todate_cases = (
     ("2014-02-01T00:00:00.000Z", "2014-02-01"),
     (date(2014, 2, 1), "2014-02-01"),
     (datetime(2014, 2, 1, 0, 0), "2014-02-01"),
+    (Date("@2014-02-01"), "2014-02-01"),
+    (DateTime("@2014-02-01T00:00:00.000Z"), "2014-02-01"),
 )
 
 
@@ -479,6 +481,8 @@ convertstodate_cases = (
     ("2014-02-01T00:00:00.000Z"),
     (date(2000, 1, 1)),
     (datetime(2000, 1, 1)),
+    (Date("@2014-02-01")),
+    (DateTime("@2014-02-01T00:00:00.000Z")),
 )
 
 
@@ -523,6 +527,10 @@ todatetime_cases = (
     ("2014-02-01", "2014-02-01"),
     ("2014-02-01T:12:25", "2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
+    (date(2014, 2, 1), "2014-02-01"),
+    (datetime(2014, 2, 1), "2014-02-01T00:00:00"),
+    (Date("@2014-02-01"), "2014-02-01"),
+    (DateTime("@2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00"),
 )
 
 
@@ -530,6 +538,7 @@ todatetime_cases = (
 def test_todatetime_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDateTime().evaluate(collection, env)
+    print(result[0].value, expected)
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
@@ -567,6 +576,10 @@ convertstodatetime_cases = (
     ("2014-02-01"),
     ("2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z"),
+    (date(2014, 2, 1)),
+    (datetime(2014, 2, 1)),
+    (Date("@2014-02-01")),
+    (DateTime("@2014-02-01T00:00:00.000Z")),
 )
 
 

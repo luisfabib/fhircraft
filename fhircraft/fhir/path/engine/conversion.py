@@ -6,7 +6,7 @@ that require a function in this section to be called explicitly.
 import re
 from datetime import datetime, date, time
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
@@ -324,8 +324,14 @@ class ToDate(FHIRTypeConversionFunction):
                 return [FHIRPathCollectionItem.wrap(datetime_match.group(1))]
             else:
                 return []
-        elif isinstance(value, (date, datetime)):
+        elif isinstance(value, datetime):
             return [FHIRPathCollectionItem.wrap(value.date().isoformat())]
+        elif isinstance(value, date):
+            return [FHIRPathCollectionItem.wrap(value.isoformat())]
+        elif isinstance(value, DateTime):
+            return [FHIRPathCollectionItem.wrap(value.to_datetime().date().isoformat())]
+        elif isinstance(value, Date):
+            return [FHIRPathCollectionItem.wrap(value.to_date().isoformat())]
         else:
             return []
 
@@ -413,6 +419,12 @@ class ToDateTime(FHIRTypeConversionFunction):
                 return [FHIRPathCollectionItem.wrap(value)]
             else:
                 return []
+        elif isinstance(value, (datetime, date)):
+            return [FHIRPathCollectionItem.wrap(value.isoformat())]
+        elif isinstance(value, DateTime):
+            return [FHIRPathCollectionItem.wrap(value.to_datetime().isoformat())]
+        elif isinstance(value, Date):
+            return [FHIRPathCollectionItem.wrap(value.to_date().isoformat())]
         else:
             return []
 
