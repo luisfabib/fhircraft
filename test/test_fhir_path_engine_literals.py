@@ -1,8 +1,19 @@
+from datetime import timedelta, timezone
+
+import pytest
+
 from fhircraft.fhir.path.engine.literals import *
 
-from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
-from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
-from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
+from fhircraft.fhir.resources.datatypes.R4.complex.quantity import (
+    Quantity as R4_Quantity,
+)
+from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import (
+    Quantity as R4B_Quantity,
+)
+from fhircraft.fhir.resources.datatypes.R5.complex.quantity import (
+    Quantity as R5_Quantity,
+)
+
 
 def test_fhirpath_type_quantity_init():
     value = Quantity(value=1, unit="m")
@@ -26,13 +37,18 @@ def test_fhirpath_type_quantity_parse_quantity():
 
 def test_fhirpath_type_quantity_is_compatible_with():
     assert Quantity(value=1, unit="m").is_compatible_with(Quantity(value=1, unit="m"))
-    assert not Quantity(value=1, unit="m").is_compatible_with(Quantity(value=1, unit="s"))
+    assert not Quantity(value=1, unit="m").is_compatible_with(
+        Quantity(value=1, unit="s")
+    )
+
 
 def test_fhirpath_type_quantity_eq():
     assert Quantity(value=1, unit="m") == Quantity(value=1, unit="m")
     assert Quantity(value=1, unit="m") == Quantity(value=100, unit="cm")
     assert Quantity(value=1, unit="km") == Quantity(value=100000, unit="cm")
-    assert Quantity(value=10, unit="{mutations}") == Quantity(value=1, unit="da{mutations}")
+    assert Quantity(value=10, unit="{mutations}") == Quantity(
+        value=1, unit="da{mutations}"
+    )
     assert Quantity(value=10, unit="mm[Hg]") == Quantity(value=10, unit="mm[Hg]")
     assert Quantity(value=10, unit="[arb'U]") == Quantity(value=10, unit="[arb'U]")
 
@@ -70,9 +86,10 @@ def test_fhirpath_type_quantity_add():
     assert Quantity(value=1, unit="g") + Quantity(value=1, unit="kg") == Quantity(
         value=1001, unit="g"
     )
-    assert Quantity(value=1, unit="{mutations}") + Quantity(value=1, unit="k{mutations}") == Quantity(
-        value=1001, unit="{mutations}"
-    )
+    assert Quantity(value=1, unit="{mutations}") + Quantity(
+        value=1, unit="k{mutations}"
+    ) == Quantity(value=1001, unit="{mutations}")
+
 
 def test_fhirpath_type_quantity_sub():
     assert Quantity(value=2, unit="m") - Quantity(value=2, unit="m") == Quantity(
@@ -84,9 +101,9 @@ def test_fhirpath_type_quantity_sub():
     assert Quantity(value=1, unit="kg") - Quantity(value=500, unit="g") == Quantity(
         value=0.5, unit="kg"
     )
-    assert Quantity(value=10, unit="k{mutations}") - Quantity(value=100, unit="da{mutations}") == Quantity(
-        value=9, unit="k{mutations}"
-    )
+    assert Quantity(value=10, unit="k{mutations}") - Quantity(
+        value=100, unit="da{mutations}"
+    ) == Quantity(value=9, unit="k{mutations}")
 
 
 def test_fhirpath_type_quantity_prod():
@@ -96,18 +113,18 @@ def test_fhirpath_type_quantity_prod():
     assert Quantity(value=3, unit="m") * Quantity(value=2, unit="m") == Quantity(
         value=6, unit="m*m"
     )
-    assert Quantity(value=2, unit="{mutations}") * Quantity(value=10, unit="{mutations}") == Quantity(
-        value=20, unit="{mutations}"
-    )
+    assert Quantity(value=2, unit="{mutations}") * Quantity(
+        value=10, unit="{mutations}"
+    ) == Quantity(value=20, unit="{mutations}")
 
 
 def test_fhirpath_type_quantity_div():
     assert Quantity(value=6, unit="m") / Quantity(value=2, unit="s") == Quantity(
         value=3, unit="m/s"
     )
-    assert Quantity(value=2, unit="{mutations}") / Quantity(value=10, unit="k{mutations}") == Quantity(
-        value=0.2, unit="{mutations}/k{mutations}"
-    )
+    assert Quantity(value=2, unit="{mutations}") / Quantity(
+        value=10, unit="k{mutations}"
+    ) == Quantity(value=0.2, unit="{mutations}/k{mutations}")
 
 
 def test_fhirpath_type_quantity_div_same_unit():
@@ -120,8 +137,24 @@ def test_fhirpath_type_quantity_abs():
     assert abs(Quantity(value=-3, unit="m")) == Quantity(value=3, unit="m")
 
 
-def test_fhirpath_type_date_init():
-    value = Date("@2015-05-01")
+def test_fhirpath_type_date_string_init():
+    value = Date(valuestring="@2015-05-01")
+    assert isinstance(value, Date)
+    assert value.year == 2015
+    assert value.month == 5
+    assert value.day == 1
+
+
+def test_fhirpath_type_date_date_init():
+    value = Date(value_date=date(2015, 5, 1))
+    assert isinstance(value, Date)
+    assert value.year == 2015
+    assert value.month == 5
+    assert value.day == 1
+
+
+def test_fhirpath_type_date_datetime_init():
+    value = Date(value_date=datetime(2015, 5, 1))
     assert isinstance(value, Date)
     assert value.year == 2015
     assert value.month == 5
@@ -160,8 +193,8 @@ def test_fhirpath_type_date_different_precision():
     assert (Date("@2015-05") <= Date("@2015")) == []
 
 
-def test_fhirpath_type_time_init():
-    value = Time("@T12:15:20.345+02:30")
+def test_fhirpath_type_time_string_init():
+    value = Time(valuestring="@T12:15:20.345+02:30")
     assert isinstance(value, Time)
     assert value.hour == 12
     assert value.minute == 15
@@ -171,7 +204,34 @@ def test_fhirpath_type_time_init():
     assert value.minute_shift == 30
 
 
+def test_fhirpath_type_time_native_init():
+    value = Time(
+        value_time=time(
+            12, 15, 20, 345000, tzinfo=timezone(timedelta(hours=2, minutes=30))
+        )
+    )
+    assert isinstance(value, Time)
+    assert value.hour == 12
+    assert value.minute == 15
+    assert value.second == 20
+    assert value.millisecond == 345
+    assert value.hour_shift == 2
+    assert value.minute_shift == 30
+
+
+def test_fhirpath_type_time_utc_init():
+    value = Time(value_time=time(12, 15, 20, 345000, tzinfo=timezone.utc))
+    assert isinstance(value, Time)
+    assert value.hour == 12
+    assert value.minute == 15
+    assert value.second == 20
+    assert value.millisecond == 345
+    assert value.hour_shift == 0
+    assert value.minute_shift == 0
+
+
 def test_fhirpath_type_time_eq():
+    assert Time("@T12:15:20.345Z") == Time("@T12:15:20.345+00:00")
     assert Time("@T12:15:20.345+02:30") == Time("@T12:15:20.345+02:30")
     assert Time("@T12:15:20.345") == Time("@T12:15:20.345")
     assert Time("@T12:15:20") == Time("@T12:15:20")
@@ -216,7 +276,7 @@ def test_fhirpath_type_time_different_precision():
     assert (Time("@T12") >= Time("@T12:15")) == []
 
 
-def test_fhirpath_type_datetime_init():
+def test_fhirpath_type_datetime_string_init():
     value = DateTime("@2015-04-01T12:15:20.345+02:30")
     assert isinstance(value, DateTime)
     assert value.year == 2015
@@ -230,7 +290,51 @@ def test_fhirpath_type_datetime_init():
     assert value.minute_shift == 30
 
 
+def test_fhirpath_type_datetime_native_init():
+    value = DateTime(
+        value_datetime=datetime(
+            2015,
+            4,
+            1,
+            12,
+            15,
+            20,
+            345000,
+            tzinfo=timezone(timedelta(hours=2, minutes=30)),
+        )
+    )
+    assert isinstance(value, DateTime)
+    assert value.year == 2015
+    assert value.month == 4
+    assert value.day == 1
+    assert value.hour == 12
+    assert value.minute == 15
+    assert value.second == 20
+    assert value.millisecond == 345
+    assert value.hour_shift == 2
+    assert value.minute_shift == 30
+
+
+def test_fhirpath_type_datetime_utc_init():
+    value = DateTime(
+        value_datetime=datetime(2015, 4, 1, 12, 15, 20, 345000, tzinfo=timezone.utc)
+    )
+    assert isinstance(value, DateTime)
+    assert value.year == 2015
+    assert value.month == 4
+    assert value.day == 1
+    assert value.hour == 12
+    assert value.minute == 15
+    assert value.second == 20
+    assert value.millisecond == 345
+    assert value.hour_shift == 0
+    assert value.minute_shift == 0
+
+
 def test_fhirpath_type_datetime_eq():
+    assert DateTime("@2015-04-01T12:15:20.345Z") == DateTime(
+        "@2015-04-01T12:15:20.345+00:00"
+    )
     assert DateTime("@2015-04-01T12:15:20.345+02:30") == DateTime(
         "@2015-04-01T12:15:20.345+02:30"
     )
