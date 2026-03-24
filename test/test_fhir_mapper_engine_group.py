@@ -25,7 +25,7 @@ from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
 
 
 # ============================================================================
-# TEST MODELS
+# Helpers & Fixtures
 # ============================================================================
 
 
@@ -45,9 +45,9 @@ class PersonModel(BaseModel):
     lastName: str = ""
 
 
-# ============================================================================
-# FIXTURES
-# ============================================================================
+def _gdef(name, inputs, rules=None, extends=None):
+    """Convenience builder for a StructureMapGroup definition."""
+    return StructureMapGroup(name=name, input=inputs, rule=rules or [], extends=extends)
 
 
 @pytest.fixture
@@ -151,12 +151,11 @@ def mock_regular_rule():
 
 
 # ============================================================================
-# Group.__init__() Tests
+# Group.__init__()
 # ============================================================================
 
 
-def test_init_minimal_group(minimal_group_definition, mock_parent_group):
-    """Test initialization with minimal group definition."""
+def test_init__minimal_group_definition(minimal_group_definition, mock_parent_group):
     group = Group(minimal_group_definition, mock_parent_group)
 
     assert group.definition == minimal_group_definition
@@ -167,8 +166,7 @@ def test_init_minimal_group(minimal_group_definition, mock_parent_group):
     assert group.inputs[0].name == "src"
 
 
-def test_init_group_without_name(mock_parent_group):
-    """Test initialization generates name when none provided."""
+def test_init__without_name(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name=None, input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -177,10 +175,9 @@ def test_init_group_without_name(mock_parent_group):
     assert group.definition == definition
 
 
-def test_init_with_multiple_inputs(
+def test_init__with_multiple_inputs(
     group_definition_with_multiple_inputs, mock_parent_group
 ):
-    """Test initialization with multiple input definitions."""
     group = Group(group_definition_with_multiple_inputs, mock_parent_group)
 
     assert len(group.inputs) == 2
@@ -190,8 +187,7 @@ def test_init_with_multiple_inputs(
     assert group.inputs[1].mode == "target"
 
 
-def test_init_with_rules(group_definition_with_rules, mock_parent_group):
-    """Test initialization creates Rule objects from rule definitions."""
+def test_init__with_rules(group_definition_with_rules, mock_parent_group):
     group = Group(group_definition_with_rules, mock_parent_group)
 
     assert len(group.rules) == 1
@@ -199,10 +195,9 @@ def test_init_with_rules(group_definition_with_rules, mock_parent_group):
     assert group.rules[0].parent_group == group
 
 
-def test_init_without_inputs_raises_error(
+def test_init__without_inputs_raises_error(
     group_definition_without_inputs, mock_parent_group
 ):
-    """Test initialization fails when group lacks input definitions."""
     with pytest.raises(
         MappingDigestionError, match="Group 'no-inputs-group' has no input definitions"
     ):
@@ -210,11 +205,11 @@ def test_init_without_inputs_raises_error(
 
 
 # ============================================================================
-# Group._organize_rules() Tests
+# Group._organize_rules()
 # ============================================================================
 
 
-def test_organize_rules_empty_list(minimal_group_definition, mock_parent_group):
+def test_organize_rules__without_rules(minimal_group_definition, mock_parent_group):
     """Test organizing rules when no rules are present."""
     group = Group(minimal_group_definition, mock_parent_group)
 
@@ -222,8 +217,7 @@ def test_organize_rules_empty_list(minimal_group_definition, mock_parent_group):
     assert len(group.rules) == 0
 
 
-def test_organize_rules_regular_rules_only(mock_parent_group):
-    """Test organizing rules with only regular rules."""
+def test_organize_rules__only_regular_rules(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -243,8 +237,7 @@ def test_organize_rules_regular_rules_only(mock_parent_group):
     assert group.rules == [rule1, rule2]
 
 
-def test_organize_rules_with_first_and_last(mock_parent_group):
-    """Test organizing rules with first, regular, and last rules."""
+def test_organize_rules__with_first_and_last(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -271,7 +264,7 @@ def test_organize_rules_with_first_and_last(mock_parent_group):
     assert group.rules == [first_rule, regular_rule, last_rule]
 
 
-def test_organize_rules_multiple_first_rules_raises_error(mock_parent_group):
+def test_organize_rules__multiple_first_rules_raises_error(mock_parent_group):
     """Test error when multiple rules have 'first' target list mode."""
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
@@ -294,7 +287,7 @@ def test_organize_rules_multiple_first_rules_raises_error(mock_parent_group):
         group._organize_rules()
 
 
-def test_organize_rules_multiple_last_rules_raises_error(mock_parent_group):
+def test_organize_rules__multiple_last_rules_raises_error(mock_parent_group):
     """Test error when multiple rules have 'last' target list mode."""
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
@@ -318,14 +311,13 @@ def test_organize_rules_multiple_last_rules_raises_error(mock_parent_group):
 
 
 # ============================================================================
-# Group.bind_parameters() Tests
+# Group.bind_parameters()
 # ============================================================================
 
 
-def test_bind_parameters_success(
+def test_bind_parameters__basic(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
-    """Test successful parameter binding."""
     group = Group(minimal_group_definition, None)
 
     group.bind_parameters(mapping_scope, [sample_fhirpath], is_dependent=False)
@@ -335,10 +327,9 @@ def test_bind_parameters_success(
     assert mapping_scope.variables["src"] == sample_fhirpath
 
 
-def test_bind_parameters_parameter_count_mismatch(
+def test_bind_parameters__parameter_count_mismatch(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
-    """Test error when parameter count doesn't match input count."""
     group = Group(minimal_group_definition, None)
 
     with pytest.raises(MappingError, match="Expected 1 parameters, got 2"):
@@ -347,8 +338,7 @@ def test_bind_parameters_parameter_count_mismatch(
         )
 
 
-def test_bind_parameters_target_input_missing_type_non_dependent(mock_parent_group):
-    """Test error when target input lacks type for non-dependent call."""
+def test_bind_parameters__target_input_missing_type_non_dependent(mock_parent_group):
     input_def = StructureMapGroupInput(name="tgt", type=None, mode="target")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -363,8 +353,7 @@ def test_bind_parameters_target_input_missing_type_non_dependent(mock_parent_gro
         group.bind_parameters(mapping_scope, [sample_fhirpath], is_dependent=False)
 
 
-def test_bind_parameters_target_input_no_type_dependent_allowed(mock_parent_group):
-    """Test that target input without type is allowed for dependent calls."""
+def test_bind_parameters__target_input_no_type_dependent_allowed(mock_parent_group):
     input_def = StructureMapGroupInput(name="tgt", type=None, mode="target")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -377,8 +366,7 @@ def test_bind_parameters_target_input_no_type_dependent_allowed(mock_parent_grou
     assert "tgt" in mapping_scope.variables
 
 
-def test_bind_parameters_unknown_input_type(mock_parent_group):
-    """Test error when input has unknown type."""
+def test_bind_parameters__unknown_input_type(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="UnknownType", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -394,11 +382,11 @@ def test_bind_parameters_unknown_input_type(mock_parent_group):
 
 
 # ============================================================================
-# Group.process() Tests
+# Group.process()
 # ============================================================================
 
 
-def test_process_success_minimal(
+def test_process__success_minimal(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
     """Test successful processing with minimal configuration."""
@@ -408,7 +396,7 @@ def test_process_success_minimal(
     group.process(mapping_scope, [sample_fhirpath], is_dependent=False)
 
 
-def test_process_creates_group_scope(
+def test_process__creates_group_scope(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
     """Test that process creates a group scope with correct parent."""
@@ -426,7 +414,7 @@ def test_process_creates_group_scope(
         )
 
 
-def test_process_calls_bind_parameters(
+def test_process__calls_bind_parameters(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
     """Test that process calls bind_parameters with correct arguments."""
@@ -440,7 +428,7 @@ def test_process_calls_bind_parameters(
         assert mock_bind.call_args[0][2] == True  # is_dependent parameter
 
 
-def test_process_executes_all_rules(
+def test_process__executes_all_rules(
     group_definition_with_rules, mapping_scope, sample_fhirpath
 ):
     """Test that process executes all rules in the group."""
@@ -455,7 +443,7 @@ def test_process_executes_all_rules(
     group.rules[0].process.assert_called_once()
 
 
-def test_process_with_multiple_rules_execution_order(mock_parent_group):
+def test_process__with_multiple_rules_execution_order(mock_parent_group):
     """Test that rules are executed in the correct order."""
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
@@ -493,3 +481,154 @@ def test_process_with_multiple_rules_execution_order(mock_parent_group):
 
     # Verify order by checking that rules are in expected sequence
     assert group.rules == [first_rule, regular_rule, last_rule]
+
+
+def test_process__with_extends_runs_parent_rules_first(mapping_scope, sample_fhirpath):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+
+    parent = Group(_gdef("Parent", [inp]))
+    call_order = []
+    parent_rule = Mock()
+    parent_rule.has_first_target = False
+    parent_rule.has_last_target = False
+    parent_rule.process = Mock(side_effect=lambda _: call_order.append("parent"))
+    parent.rules = [parent_rule]
+
+    child = Group(_gdef("Child", [inp], extends="Parent"))
+    child_rule = Mock()
+    child_rule.has_first_target = False
+    child_rule.has_last_target = False
+    child_rule.process = Mock(side_effect=lambda _: call_order.append("child"))
+    child.rules = [child_rule]
+
+    mapping_scope.groups["Parent"] = parent
+
+    child.process(mapping_scope, [sample_fhirpath], is_dependent=False)
+
+    assert call_order == ["parent", "child"]
+
+
+def test_process__raises_error_for_unresolvable_extends(mapping_scope, sample_fhirpath):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+    child = Group(_gdef("Child", [inp], extends="NonExistent"))
+    with pytest.raises(MappingError):
+        child.process(mapping_scope, [sample_fhirpath], is_dependent=False)
+
+
+# ============================================================================
+# Group._collect_rules
+# ============================================================================
+
+
+def test_collect_rules__without_extends_returns_own_rules(mapping_scope):
+    """Without extends, _collect_rules returns a copy of own rules."""
+    inp = StructureMapGroupInput(name="src", mode="source")
+    group = Group(_gdef("G", [inp]))
+    own_rule = Mock()
+    own_rule.has_first_target = False
+    own_rule.has_last_target = False
+    group.rules = [own_rule]
+    assert group._collect_rules(mapping_scope) == [own_rule]
+
+
+def test_collect_rules__parent_rules_before_child_rules(mapping_scope):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+
+    parent = Group(_gdef("Parent", [inp]))
+    parent_rule = Mock()
+    parent_rule.has_first_target = False
+    parent_rule.has_last_target = False
+    parent.rules = [parent_rule]
+
+    child = Group(_gdef("Child", [inp], extends="Parent"))
+    child_rule = Mock()
+    child_rule.has_first_target = False
+    child_rule.has_last_target = False
+    child.rules = [child_rule]
+
+    mapping_scope.groups["Parent"] = parent
+
+    rules = child._collect_rules(mapping_scope)
+    assert rules == [parent_rule, child_rule]
+
+
+def test_collect_rules__chained_extension_inheritance(mapping_scope):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+
+    grandparent = Group(_gdef("Grandparent", [inp]))
+    gp_rule = Mock()
+    gp_rule.has_first_target = False
+    gp_rule.has_last_target = False
+    grandparent.rules = [gp_rule]
+
+    parent = Group(_gdef("Parent", [inp], extends="Grandparent"))
+    p_rule = Mock()
+    p_rule.has_first_target = False
+    p_rule.has_last_target = False
+    parent.rules = [p_rule]
+
+    child = Group(_gdef("Child", [inp], extends="Parent"))
+    c_rule = Mock()
+    c_rule.has_first_target = False
+    c_rule.has_last_target = False
+    child.rules = [c_rule]
+
+    mapping_scope.groups["Grandparent"] = grandparent
+    mapping_scope.groups["Parent"] = parent
+
+    assert child._collect_rules(mapping_scope) == [gp_rule, p_rule, c_rule]
+
+
+# ============================================================================
+# Group._check_extends_compatibility
+# ============================================================================
+
+
+def test_check_compatibility__all_valid(mapping_scope):
+    inp = StructureMapGroupInput(name="src", mode="source")
+    parent = Group(_gdef("Parent", [inp]))
+    child = Group(_gdef("Child", [inp]))
+    child._check_extends_compatibility(parent, mapping_scope)  # must not raise
+
+
+def test_check_compatibility__allows_extra_child_inputs(mapping_scope):
+    inp_src = StructureMapGroupInput(name="src", mode="source")
+    inp_extra = StructureMapGroupInput(name="extra", mode="source")
+    parent = Group(_gdef("Parent", [inp_src]))
+    child = Group(_gdef("Child", [inp_src, inp_extra]))
+    child._check_extends_compatibility(parent, mapping_scope)  # must not raise
+
+
+def test_check_compatibility__raises_error_for_missing_parent_input(mapping_scope):
+    inp_src = StructureMapGroupInput(name="src", mode="source")
+    inp_tgt = StructureMapGroupInput(name="tgt", mode="target")
+    parent = Group(_gdef("Parent", [inp_src, inp_tgt]))
+    child = Group(_gdef("Child", [inp_src]))  # tgt is missing
+    with pytest.raises(MappingError, match="missing required input 'tgt'"):
+        child._check_extends_compatibility(parent, mapping_scope)
+
+
+def test_check_compatibility__raises_error_for_mode_mismatch(mapping_scope):
+    inp_parent = StructureMapGroupInput(name="x", mode="source")
+    inp_child = StructureMapGroupInput(name="x", mode="target")
+    parent = Group(_gdef("Parent", [inp_parent]))
+    child = Group(_gdef("Child", [inp_child]))
+    with pytest.raises(MappingError, match="mode"):
+        child._check_extends_compatibility(parent, mapping_scope)
+
+
+def test_check_compatibility__raises_error_for_type_mismatch(mapping_scope):
+    inp_parent = StructureMapGroupInput(name="src", mode="source", type="Patient")
+    inp_child = StructureMapGroupInput(name="src", mode="source", type="Person")
+    parent = Group(_gdef("Parent", [inp_parent]))
+    child = Group(_gdef("Child", [inp_child]))
+    with pytest.raises(MappingError, match="type"):
+        child._check_extends_compatibility(parent, mapping_scope)
+
+
+def test_check_compatibility__untyped_parent_allows_typed_child(mapping_scope):
+    inp_parent = StructureMapGroupInput(name="src", mode="source")  # no type
+    inp_child = StructureMapGroupInput(name="src", mode="source", type="Patient")
+    parent = Group(_gdef("Parent", [inp_parent]))
+    child = Group(_gdef("Child", [inp_child]))
+    child._check_extends_compatibility(parent, mapping_scope)  # must not raise

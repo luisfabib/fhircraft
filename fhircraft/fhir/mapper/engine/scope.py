@@ -28,6 +28,10 @@ from .exceptions import MappingError
 
 if TYPE_CHECKING:
     from .group import Group
+    from fhircraft.fhir.mapper.engine.registry import (
+        StructureMapRegistry,
+        StructureMapUnion,
+    )
 
 # Type variable for generic lookups
 T = TypeVar("T")
@@ -64,6 +68,12 @@ class MappingScope:
 
     default_groups: Dict[str, "Group"] = field(default_factory=dict)
     """Registry of default mapping groups by type signature"""
+
+    imported_maps: "List[StructureMapUnion]" = field(default_factory=list)
+    """StructureMaps imported into this scope via the 'import' statement"""
+
+    structure_map_registry: "Optional[StructureMapRegistry]" = None
+    """Reference to the StructureMapRegistry for resolving imported map groups"""
 
     processing_rules: Set[str] = field(default_factory=set)
     """Set of currently processing rules"""
@@ -233,9 +243,70 @@ class MappingScope:
             except MappingError:
                 pass
 
+        # Fall through: try resolving as a group from imported StructureMaps
+        try:
+            return self.resolve_group(identifier)
+        except MappingError:
+            pass
+
         raise MappingError(
             f"Symbol '{identifier}' not found in current or parent scopes."
         )
+
+    def resolve_group(self, group_name: str) -> "Group":
+        """
+        Resolve a group by name, searching in order:
+
+        1. Local groups defined in this scope (or parent scopes).
+        2. Groups from StructureMaps imported into this scope via ``import``.
+
+        Args:
+            group_name: The ``name`` of the group to resolve.
+
+        Returns:
+            The matching :class:`Group` instance.
+
+        Raises:
+            MappingError: If the group cannot be found in local scope or any
+                imported StructureMap, or if the name is ambiguous.
+        """
+        from .group import Group as GroupClass
+
+        # 1. Check local scope (and parents)
+        if group_name in self.groups:
+            return self.groups[group_name]
+
+        if self.parent:
+            try:
+                return self.parent.resolve_group(group_name)
+            except MappingError:
+                pass
+
+        # 2. Search groups from imported StructureMaps
+        matches = []
+        for sm in self.imported_maps:
+            for group_def in sm.group or []:
+                if str(group_def.name) == group_name:
+                    matches.append((GroupClass(group_def), sm.url))
+
+        if len(matches) == 0:
+            raise MappingError(
+                f"Group '{group_name}' not found in local scope or any imported StructureMap."
+            )
+        if len(matches) > 1:
+            urls = [str(url) for _, url in matches]
+            raise MappingError(
+                f"Ambiguous group '{group_name}': found in multiple imported StructureMaps: {urls}."
+            )
+        return matches[0][0]
+
+    def _get_structure_map_registry(self) -> "Optional[StructureMapRegistry]":
+        """Walk up the scope chain to find the StructureMapRegistry."""
+        if self.structure_map_registry is not None:
+            return self.structure_map_registry
+        if self.parent:
+            return self.parent._get_structure_map_registry()
+        return None
 
     def has_symbol(self, identifier: str) -> bool:
         """

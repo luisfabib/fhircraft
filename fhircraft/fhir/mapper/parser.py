@@ -259,47 +259,94 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_error(self, t):
         if t is None:
             raise FhirMappingLanguageParserError(
-                f'FHIR Mapping Language parser error near the end of string "{self.string}"!'
+                f'FHIR Mapping Language parser error at EOF "{self.string}"'
             )
         raise FhirMappingLanguageParserError(
             f'FHIR Mapping Language parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col, t.lineno)}'
         )
 
     def p_mapper_structureMap(self, p):
-        """structureMap : m_metadata m_mapId m_conceptmap m_structure_list m_imports_list m_const_list m_group_mapper_list"""
-        # Initialize the structure map with the map id
-        self.structureMap.url = p[2]["url"]
-        self.structureMap.name = p[2]["name"]
+        """structureMap : m_structureMap_sections"""
+        sections = p[1] or {}
+
+        map_id = sections.get("mapId") or {}
+        self.structureMap.url = map_id.get("url")
+        self.structureMap.name = map_id.get("name")
         self.structureMap.status = "draft"  # Default status
 
-        for attr, value in p[1].items():
+        for attr, value in (sections.get("metadata") or {}).items():
             setattr(self.structureMap, attr, value)
 
-        if p[3]:
-            self.structureMap.contained = [p[3]]  # type: ignore
+        if conceptmap := sections.get("conceptmap"):
+            self.structureMap.contained = [conceptmap]  # type: ignore
 
-        # Add structures, imports, constants, and groups
-        if p[4]:
-            self.structureMap.structure = p[4]
-        if p[5]:
-            self.structureMap.import_ = p[5]
-        if p[6]:
-            self.structureMap.const = p[6]
-        if p[7]:
-            self.structureMap.group = p[7]
+        if structures := sections.get("structures"):
+            self.structureMap.structure = structures
+        if imports := sections.get("imports"):
+            self.structureMap.import_ = imports
+        if consts := sections.get("consts"):
+            self.structureMap.const = consts
+        if groups := sections.get("groups"):
+            self.structureMap.group = groups
 
         p[0] = self.structureMap
 
-    def p_mapper_metadata(self, p):
+    def p_mapper_structureMap_sections(self, p):
         """
-        m_metadata : m_metadata m_metadata_entry
-                   | m_metadata_entry
-                   | m_empty
+        m_structureMap_sections : m_structureMap_sections m_structureMap_section
+                                | m_empty
         """
         if len(p) == 2:
-            p[0] = p[1] if p[1] else {}
+            p[0] = {}
         else:
-            p[0] = {**(p[1] or {}), **p[2]}
+            p[0] = p[1] or {}
+            section_type, section_value = p[2]
+            if section_type == "metadata":
+                p[0]["metadata"] = {
+                    **(p[0].get("metadata") or {}),
+                    **(section_value or {}),
+                }
+            elif section_type in ("structures", "imports", "consts", "groups"):
+                if section_value is not None:
+                    p[0].setdefault(section_type, [])
+                    if isinstance(section_value, list):
+                        p[0][section_type].extend(section_value)
+                    else:
+                        p[0][section_type].append(section_value)
+            elif section_type == "mapId" and "mapId" in p[0]:
+                raise FhirMappingLanguageParserError(
+                    "The 'map' statement can be declared only once per map."
+                )
+            else:
+                p[0][section_type] = section_value
+
+    def p_mapper_structureMap_section_metadata(self, p):
+        """m_structureMap_section : m_metadata_entry"""
+        p[0] = ("metadata", p[1] or {})
+
+    def p_mapper_structureMap_section_mapId(self, p):
+        """m_structureMap_section : m_mapId"""
+        p[0] = ("mapId", p[1])
+
+    def p_mapper_structureMap_section_conceptmap(self, p):
+        """m_structureMap_section : m_conceptmap"""
+        p[0] = ("conceptmap", p[1])
+
+    def p_mapper_structureMap_section_structure(self, p):
+        """m_structureMap_section : m_structure"""
+        p[0] = ("structures", p[1])
+
+    def p_mapper_structureMap_section_imports(self, p):
+        """m_structureMap_section : m_imports"""
+        p[0] = ("imports", p[1])
+
+    def p_mapper_structureMap_section_const(self, p):
+        """m_structureMap_section : m_const"""
+        p[0] = ("consts", p[1])
+
+    def p_mapper_structureMap_section_group(self, p):
+        """m_structureMap_section : m_group"""
+        p[0] = ("groups", p[1])
 
     def p_mapper_metadata_entry(self, p):
         """
@@ -321,40 +368,32 @@ class FhirMappingLanguageParser(FhirPathParser):
         """
         m_mapId : MAP m_url EQUAL m_identifier
                 | MAP m_url EQUAL STRING
-                | m_empty
         """
-        if len(p) == 5:
-            p[0] = {"url": p[2], "name": p[4]}
-        else:
-            p[0] = {"url": None, "name": None}
+        p[0] = {"url": p[2], "name": p[4]}
 
     def p_conceptmap(self, p):
         """
         m_conceptmap : CONCEPTMAP m_conceptmap_name '{' m_conceptmap_prefix_list  m_conceptmap_mapping_list '}'
-                     | m_empty
         """
-        if len(p) == 2:
-            p[0] = None
-        elif len(p[4]) != 2:
+        if len(p[4]) != 2:
             raise FhirMappingLanguageParserError(
                 f"Invalid concept map prefix definition at {p.lineno}:{p.col}"
             )
-        else:
-            source = p[4][0]
-            target = p[4][1]
-            p[0] = self.ConceptMap.model_validate(
-                dict(
-                    status="draft",
-                    id=p[2],
-                    group=[
-                        self.ConceptMapGroup(
-                            source=source,
-                            target=target,
-                            element=p[5],
-                        )
-                    ],
-                )
+        source = p[4][0]
+        target = p[4][1]
+        p[0] = self.ConceptMap.model_validate(
+            dict(
+                status="draft",
+                id=p[2],
+                group=[
+                    self.ConceptMapGroup(
+                        source=source,
+                        target=target,
+                        element=p[5],
+                    )
+                ],
             )
+        )
 
     def p_conceptmap_name(self, p):
         """
@@ -430,38 +469,6 @@ class FhirMappingLanguageParser(FhirPathParser):
                 raise FhirMappingLanguageParserError(
                     f"Invalid concept map operator '{p[1]}'"
                 )
-
-    def p_mapper_structure_list(self, p):
-        """
-        m_structure_list : m_structure_list m_structure
-                         | m_structure
-                         | m_empty
-        """
-        self._parse_list_tokens(p)
-
-    def p_mapper_imports_list(self, p):
-        """
-        m_imports_list : m_imports_list m_imports
-                          | m_imports
-                          | m_empty
-        """
-        self._parse_list_tokens(p)
-
-    def p_mapper_const_list(self, p):
-        """
-        m_const_list : m_const_list m_const
-                     | m_const
-                     | m_empty
-        """
-        self._parse_list_tokens(p)
-
-    def p_mapper_group_mapper_list(self, p):
-        """
-        m_group_mapper_list : m_group_mapper_list m_group
-                            | m_group
-                            | m_empty
-        """
-        self._parse_list_tokens(p)
 
     def p_mapper_structure(self, p):
         """
@@ -605,6 +612,15 @@ class FhirMappingLanguageParser(FhirPathParser):
         m_rules : '{' m_rule_list '}'
         """
         p[0] = p[2]
+
+    def p_mapper_rule_list_error(self, p):
+        """
+        m_rule_list : m_rule
+                    | m_rule_list m_rule
+        """
+        raise FhirMappingLanguageParserError(
+            f"A rule was not properly closed. Did you forget a ';' at the end of a rule?",
+        )
 
     def p_mapper_rule_list(self, p):
         """

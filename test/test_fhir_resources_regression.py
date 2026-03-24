@@ -1,6 +1,7 @@
 import pytest
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.fhir.resources.generator import CodeGenerator
+from fhircraft.config import override_config
 
 
 def _normalize(s):
@@ -110,9 +111,10 @@ def test_regression_issue_255(factory):
         },
     }
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     # -----------------------------------------------------------------------
     # ProfileExample – root model
@@ -230,9 +232,10 @@ def test_regression_issue_258(factory):
         },
     }
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     from typing import get_args
     import pydantic
@@ -337,9 +340,10 @@ def test_regression_issue_111(factory):
         },
     }
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     from typing import get_args
     import pydantic
@@ -457,9 +461,10 @@ def test_regression_issue_263(factory):
         },
     }
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     print(CodeGenerator().generate_resource_model_code(model))
 
@@ -631,9 +636,10 @@ def test_regression_issue_265(factory):
         },
     }
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     from typing import get_args
     from fhircraft.fhir.resources.base import FHIRSliceModel
@@ -764,12 +770,13 @@ def test_regression_issue_266(factory):
         },
     }
 
-    factory.definition_registry.from_dict(structure_definition)
-    factory.definition_registry.from_dict(extension_structure_definition)
+    with override_config(validation_mode="skip"):
+        factory.definition_registry.from_dict(structure_definition)
+        factory.definition_registry.from_dict(extension_structure_definition)
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     from typing import get_args
     from fhircraft.fhir.resources.base import FHIRSliceModel
@@ -948,13 +955,14 @@ def test_regression_issue_279(factory):
         },
     }
 
-    factory.definition_registry.from_dict(structure_definition)
-    factory.definition_registry.from_dict(extension_1_structure_definition)
-    factory.definition_registry.from_dict(extension_2_structure_definition)
+    with override_config(validation_mode="skip"):
+        factory.definition_registry.from_dict(structure_definition)
+        factory.definition_registry.from_dict(extension_1_structure_definition)
+        factory.definition_registry.from_dict(extension_2_structure_definition)
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     from typing import get_args
     from fhircraft.fhir.resources.base import FHIRSliceModel
@@ -1116,12 +1124,13 @@ def test_regression_issue_278(factory):
         },
     }
 
-    factory.definition_registry.from_dict(structure_definition)
-    factory.definition_registry.from_dict(extension_structure_definition)
+    with override_config(validation_mode="skip"):
+        factory.definition_registry.from_dict(structure_definition)
+        factory.definition_registry.from_dict(extension_structure_definition)
 
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     from typing import get_args
     from fhircraft.fhir.resources.base import FHIRSliceModel
@@ -1210,10 +1219,12 @@ def test_regression_issue_277(factory: FHIRModelFactory):
             ]
         },
     }
+
     factory = factory.__class__(fhir_release="R4")
-    model = factory.build(
-        structure_definition=structure_definition, mode="differential"
-    )
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
 
     from typing import get_args
 

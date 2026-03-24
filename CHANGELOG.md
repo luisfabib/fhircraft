@@ -7,18 +7,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.7.0 - 2026-03-20
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.0...0.6.5)
+
+
+
+### Added
+
+-  Implemented a new modular factory architecture ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+     * Added a new `factory` package with dedicated sub-modules: `element_node`, `index`, `resolver`, `context`, `assembler`, `core`, and `exceptions` replacing the previous monolithic `factory.py`.
+     * Added Specialised field builders `BaseFieldBuilder`, `SimpleFieldBuilder`, `BackboneFieldBuilder`, `SlicedFieldBuilder`, and `TypeChoiceFieldBuilder`, each responsible for compiling field information for a specific class of FHIR element.
+     * Implemented a new `StructureDefinitionRegistry` dedicated registry for loading, storing, and resolving FHIR `StructureDefinition` resources, including dependency resolution via FHIR packages.
+     * Cleaned and streamlined the public API for `FHIRModelFactory` for long-term stability  
+        - Renamed `construct_resource_model` to `build`
+        - Renamed `load_package` to `register_package`
+        - Renamed `add_structure_definition` to `register`
+        - Renamed `clear_cache` to `reset_cache`
+        - Added new methods `get_registered_definition`, `has_registered_definition`, `unregister`, `list_registered_definitions`, `rebuild`, `is_built`, `list_built`, `evict`
+
+- Implemented a `FHIRTypeRegistry` centralised registry for resolving FHIR type names and canonical URLs across all FHIR releases (R4, R4B, R5) ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- Added support for to correctly handle slicing rules, particularly `closed` slicing ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- Introduced FHIRPath expression parse caching so that identical expressions (common for FHIR invariant constraints) are compiled by PLY only once per process lifetime rather than on every constraint evaluation significantly reducing computation times ([#299](https://github.com/luisfabib/fhircraft/pull/299))
+ Added a `StructureMapRegistry` that operates offline by default. StructureMaps must be registered before execution; the engine raises a clear error if an imported URL is not found. An optional internet fallback can be enabled to resolve canonical URLs at runtime ([#300](https://github.com/luisfabib/fhircraft/pull/300))
+- Added support for the `import` clause: the engine now resolves canonical URLs declared in a StructureMap's `import` section, making groups defined in those maps available during execution. Wildcard URLs (e.g. `http://example.org/maps/*`) are supported and matched against all registered maps ([#300](https://github.com/luisfabib/fhircraft/pull/300), fixes [#37](https://github.com/luisfabib/fhircraft/pull/37))
+- Added support for the `extends` clause, including: multi-level inheritance chains and cross-map inheritance ([#300](https://github.com/luisfabib/fhircraft/pull/300), fixes [#33](https://github.com/luisfabib/fhircraft/pull/33))
+- Added a specific FHIR Mapping Language parser error message for the common scenario when a rule was not closed with a semicolon, providing a clear hint ([#302](https://github.com/luisfabib/fhircraft/pull/302))
+- Added support the FHIRPath `System` type namespace ([#303](https://github.com/luisfabib/fhircraft/pull/303))
+
+### Changed
+
+- Consolidated the FHIR type utilities; all type lookups now go through a single `get_fhir_type` function backed by `FHIRTypeRegistry` ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- Set the `ElementDefinition.id` field set as a `String` primitive rather than an `Id` primitive to avoid the inconsistency between the `Id` primitive regex constraints and the functional meaning for the `ElementDefinition` (namely the use of colon `:`) ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- The resource factory no longer injects `meta.profile` with default values into constructed models ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- - Renamed several of the configuration parameters for clarity and precision ([#298](https://github.com/luisfabib/fhircraft/pull/298))
+    - Renamed `disable_warnings` to `disable_validation_warnings`
+    - Renamed `disable_warning_severity` to `disable_fhir_warnings`
+    - Renamed `disable_errors` to `disable_fhir_errors`
+    - Renamed `disabled_constraints` to `disabled_fhir_constraints`
+- Renamed `with_config()` context manager to `override_config()` for clarity and consistency ([#298](https://github.com/luisfabib/fhircraft/pull/298))
+- Froze `FhircraftConfig` to raise an error upon direct attribute mutation ([#298](https://github.com/luisfabib/fhircraft/pull/298))
+- Extended all constraint, pattern, fixed-value, type-choice, and cardinality validators to respect configuration `mode = 'skip'` by returning immediately ([#299](https://github.com/luisfabib/fhircraft/pull/299))
+- Extended all assert-based validators (pattern, fixed-value, type-choice, cardinality) to respect configuration `mode = 'lenient'` by issuing warnings instead of raising errors, consistent with how FHIRPath constraint validators already behaved ([#299](https://github.com/luisfabib/fhircraft/pull/299))
+- Switched resource context computation in FHIR models and lists to be lazy, deferring work until the context is actually accessed rather than computing it at construction time ([#299](https://github.com/luisfabib/fhircraft/pull/299))
+- Renamed the `repository` attribute on `FHIRMappingEngine` to `structure_definition_registry` to better reflect its purpose and distinguish it from the new `structure_map_registry` ([#300](https://github.com/luisfabib/fhircraft/pull/300))
+- Introduced `FHIRStructureMapper` as the new public interface for the FHIR Mapping Language. The old `FHIRMapper` is replaced by `FHIRStructureMapper` ([#318](https://github.com/luisfabib/fhircraft/pull/318))
+
+### Fixed
+
+- Enhanced the factory builder type resolver to detect elements with primitive FHIRPath-types and, consequently, to not generate extension placeholder elements (`*_ext`) and to use the `structuredefiniton-fhir-type` to determine the proper FHIR-native primitive type to use. ([#296](https://github.com/luisfabib/fhircraft/pull/296), fixes [#290](https://github.com/luisfabib/fhircraft/pull/290))
+- Removed primitive extension placeholder elements from built-in model fields with FHIRPath types (`Element.id_ext`, `Extension.url_ext`, `Xhtml.value_ext`, and all downstream models) and updated their type of `Extension.url` (`String` to `Uri`) and of `Element.id` (`String` to `Id`) across all releases (R4, R4B , R5) ([#296](https://github.com/luisfabib/fhircraft/pull/296), fixes [#288](https://github.com/luisfabib/fhircraft/pull/288))
+- Ensured that sliced field type unions and their referenced slice models use concrete base element types  (e.g. `ObservationComponent`) rather than base types (e.g. `BackboneElement`) when constructing sliced elements in differential mode ([#296](https://github.com/luisfabib/fhircraft/pull/296), fixes [#292](https://github.com/luisfabib/fhircraft/pull/292) and [#293](https://github.com/luisfabib/fhircraft/pull/293))
+- Fixed sliced field construction to correctly inherit slices already defined on the parent model's field when constructing sliced in differential mode ([#296](https://github.com/luisfabib/fhircraft/pull/296), fixes [#294](https://github.com/luisfabib/fhircraft/pull/294))
+- Fixed multiple issues related to differential resolution including ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+     * Ensured that intermediate-node path lookups not defined in the differential are accounted.
+     * Fixed the resolution so that a differential is always resolved agains a snapshot and not against a partially resolved differential.
+     * Enabled support for recursive resolution against a sequence of base definitions. 
+- Fixed `Dosage.doseAndRate`  (R4, R4B, R5) polymorphic fields (`doseQuantity`, `rateQuantity`) to now correctly reference `Quantity` instead of `SimpleQuantity` in the validator and correctly validate values ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- Fixed the `validate_slicing_cardinalities` validator to correctly handle `None` values in the `max` cardinality ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- Updated the slice cardinality validator to only validate cardinalities when at least one slice instance is present, consistent with how element cardinalities are handled and avoiding false violations when a discriminator cannot be evaluated (e.g. value-set binding slices) ([#296](https://github.com/luisfabib/fhircraft/pull/296), fixes [#295](https://github.com/luisfabib/fhircraft/pull/295))
+- Replaced `**kwargs` in `configure()` and `override_config()` with explicit keyword-only typed parameters; unrecognized arguments now raise `TypeError` at call time ([#298](https://github.com/luisfabib/fhircraft/pull/298), fixes [#208](https://github.com/luisfabib/fhircraft/pull/208))
+- Fixed parser to allow declarations in any order within FHIR Mapping Language scripts, rather than requiring a strict fixed sequence. ([#302](https://github.com/luisfabib/fhircraft/pull/302), fixes [#301](https://github.com/luisfabib/fhircraft/pull/301)).
+- Updated the parser to raise `FhirMappingLanguageParserError` when the `map` statement appears more than once in a single script ([#302](https://github.com/luisfabib/fhircraft/pull/302))
+
+
+### Removed
+
+- Replaced the monolithic `factory.py` (2,200+ lines) by the new `factory/` package ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- Replaced the `StructureDefinitionRepository` module and its associated tests, now superseded by `StructureDefinitionRegistry` ([#296](https://github.com/luisfabib/fhircraft/pull/296))
+- Removed `ValidationConfig` dataclass and merged its fields directly into `FhircraftConfig` ([#298](https://github.com/luisfabib/fhircraft/pull/298))
+
+----------------- 
+
 ## v0.6.5 - 2026-02-26
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.5...0.6.4)
 
 ### Added
 
-- Added an "AI Tools and Human Attribution" info box to the contributing guidelines, outlining acceptable and unacceptable types of AI-assisted contributions, and emphasizing the requirement for human review and responsibility ([286](https://github.com/luisfabib/fhircraft/pull/286))
-- Implemented a manifest-based FHIR resource `StructureDefinition` lookup system for factory model construction based on canonical URL and name for performance and stability ([281](https://github.com/luisfabib/fhircraft/pull/281))
+- Added an "AI Tools and Human Attribution" info box to the contributing guidelines, outlining acceptable and unacceptable types of AI-assisted contributions, and emphasizing the requirement for human review and responsibility ([#286](https://github.com/luisfabib/fhircraft/pull/286))
+- Implemented a manifest-based FHIR resource `StructureDefinition` lookup system for factory model construction based on canonical URL and name for performance and stability ([#281](https://github.com/luisfabib/fhircraft/pull/281))
 
 ### Changed
 
-- Splited the `definitions/R{x}/profiles-resources.json` and `definitions/R{x}/profiles-types.json` files into individual files containing just the bundled `StructureDefinition` resources, largely decreasing the overall package size ([281](https://github.com/luisfabib/fhircraft/pull/281))
+- Splited the `definitions/R{x}/profiles-resources.json` and `definitions/R{x}/profiles-types.json` files into individual files containing just the bundled `StructureDefinition` resources, largely decreasing the overall package size ([#281](https://github.com/luisfabib/fhircraft/pull/281))
 
 ### Fixed
 

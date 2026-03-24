@@ -55,22 +55,30 @@ class FHIRTypesOperator(FHIRPath):
         from fhircraft.fhir.resources.datatypes import utils as type_utils
 
         type_: type = self.type_specifier.evaluate([], environment, create)[0].value
-        # Handle the FHIRPath literal types as special cases
-        if isinstance(value, fhirpath_literals.Quantity):
-            return type_.__name__ == "Quantity"
-        elif isinstance(value, fhirpath_literals.Date):
-            return type_.__name__ == "Date"
-        elif isinstance(value, fhirpath_literals.DateTime):
-            return type_.__name__ == "DateTime"
-        elif isinstance(value, fhirpath_literals.Time):
-            return type_.__name__ == "Time"
+        namespace = self.type_specifier.namespace or "FHIR"
+        if namespace == "FHIR":
+            # Handle the FHIRPath literal types as special cases
+            if isinstance(value, fhirpath_literals.Quantity):
+                return type_.__name__ == "Quantity"
+            elif isinstance(value, fhirpath_literals.Date):
+                return type_.__name__ == "Date"
+            elif isinstance(value, fhirpath_literals.DateTime):
+                return type_.__name__ == "DateTime"
+            elif isinstance(value, fhirpath_literals.Time):
+                return type_.__name__ == "Time"
+            else:
+                try:
+                    return type_utils.is_fhir_primitive_type(value, type_)
+                except type_utils.FHIRTypeError:
+                    return type_utils.is_fhir_complex_type(
+                        value, type_
+                    ) or type_utils.is_fhir_resource_type(value, type_)
+        elif namespace == "System":
+            return isinstance(value, type_)
         else:
-            try:
-                return type_utils.is_fhir_primitive_type(value, type_)
-            except type_utils.FHIRTypeError:
-                return type_utils.is_fhir_complex_type(
-                    value, type_
-                ) or type_utils.is_fhir_resource_type(value, type_)
+            raise FHIRPathRuntimeError(
+                f"Invalid type specifier namespace '{self.type_specifier.namespace}' in operator {self.__str__()}. Expected 'FHIR' or 'System'."
+            )
 
     def __str__(self):
         raise NotImplementedError("Subclasses must implement __str__ method.")

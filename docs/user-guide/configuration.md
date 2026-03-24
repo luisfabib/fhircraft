@@ -37,16 +37,16 @@ This approach works well for production deployments where you want clean logs an
 
 Sometimes you need different validation settings for specific operations while keeping your global configuration unchanged. Context managers provide temporary configuration that automatically restores previous settings when the operation completes. This pattern is useful when processing external data, running specific tests, or performing operations that you know will trigger benign warnings.
 
-The context manager `with_config` creates an isolated configuration scope. Any validation setting changes within the context block only affect operations inside that block. Once execution leaves the block, either normally or through an exception, the previous configuration restores automatically:
+The context manager `override_config` creates an isolated configuration scope. Any validation setting changes within the context block only affect operations inside that block. Once execution leaves the block, either normally or through an exception, the previous configuration restores automatically:
 
 ```python
-from fhircraft import with_config
+from fhircraft import override_config
 from fhircraft.fhir.resources import get_fhir_type
 
 Patient = get_fhir_type("Patient", "R5")
 
 # Temporarily disable warnings for importing external data
-with with_config(disable_validation_warnings=True):
+with override_config(disable_validation_warnings=True):
     # Warnings are disabled only within this block
     external_patient = Patient(name=[{"given": ["Alice"]}])
     
@@ -167,30 +167,18 @@ This pattern works well with container orchestration systems like Docker and Kub
 
 ## Working with Configuration Objects
 
-The configuration system uses structured objects that you can inspect, modify, and manage programmatically. This provides flexibility for advanced scenarios where you need to query current settings, create custom configurations, or implement configuration management logic:
+The configuration system uses structured `FhircraftConfig` objects that you can inspect, modify, and manage programmatically. This provides flexibility for advanced scenarios where you need to query current settings, create custom configurations, or implement configuration management logic:
 
 ```python
-from fhircraft import get_config, FhircraftConfig, ValidationConfig, set_config
+from fhircraft import get_config
 
 # Get the current active configuration
 config = get_config()
 
 # Inspect current validation settings
-print(f"Warnings disabled: {config.validation.disable_warnings}")
-print(f"Validation mode: {config.validation.mode}")
-print(f"Disabled constraints: {config.validation.disabled_constraints}")
-
-# Create a custom configuration object
-custom_config = FhircraftConfig(
-    validation=ValidationConfig(
-        disable_warnings=True,
-        disabled_constraints={'dom-6'},
-        mode='lenient'
-    )
-)
-
-# Apply the custom configuration
-set_config(custom_config)
+print(f"Warnings disabled: {config.disable_validation_warnings}")
+print(f"Validation mode: {config.mode}")
+print(f"Disabled constraints: {config.disabled_fhir_constraints}")
 ```
 
 Configuration objects are immutable after creation, ensuring thread safety and preventing accidental modifications that could affect concurrent operations.
@@ -218,8 +206,8 @@ Resetting proves useful in test suites where each test should start with clean c
 | Problem | Solution |
 |---------|----------|
 | Warnings still appear after disabling them | Check that you called configure before creating resources. Configuration does not affect resources already created. Restart your application if using environment variables. |
-| Configuration changes do not persist | Use configure() for global changes, not with_config(). Context managers reset configuration after the block ends. |
+| Configuration changes do not persist | Use configure() for global changes, not override_config(). Context managers reset configuration after the block ends. |
 | Different validation behavior in tests versus production | Ensure test suites call reset_config() before each test. Check that environment variables match between environments. |
-| Concurrent operations have wrong validation settings | Verify you are using with_config() context managers to isolate configuration. Avoid modifying global configuration in concurrent code. |
+| Concurrent operations have wrong validation settings | Verify you are using override_config() context managers to isolate configuration. Avoid modifying global configuration in concurrent code. |
 | Cannot find constraint key to disable | Check validation error messages for constraint keys. Refer to [:material-fire: FHIR StructureDefinition snapshots](https://www.hl7.org/fhir/structuredefinition.html) for resource-specific constraints. |
 

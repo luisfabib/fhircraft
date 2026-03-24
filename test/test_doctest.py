@@ -4,6 +4,7 @@ import json
 from unittest.mock import patch, MagicMock, mock_open
 from pathlib import Path
 
+from fhircraft.config import override_config
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.fhir.resources.datatypes.R5.core import (
     Patient,
@@ -19,23 +20,31 @@ _original_factory_build = FHIRModelFactory.build
 
 def mock_load_package(self, package_name, version=None):
     """Mock load_package to load local test files instead of downloading from internet."""
-    if package_name == "hl7.fhir.us.mcode":
-        # Load the local mcode cancer patient profile
-        test_files_dir = Path(__file__).parent / "static" / "fhir-profiles-definitions"
-        mcode_file = test_files_dir / "mcode-cancer-patient.json"
-        with open(mcode_file, "r") as f:
-            data = json.load(f)
-        self.definition_registry.from_dict(data)
-    elif package_name == "hl7.fhir.us.core":
-        # Load the local mcode cancer patient profile
-        test_files_dir = Path(__file__).parent / "static" / "fhir-profiles-definitions"
-        mcode_file = test_files_dir / "us-core-patient.json"
-        with open(mcode_file, "r") as f:
-            data = json.load(f)
-        self.definition_registry.from_dict(data)
-    else:
-        # For other packages, raise an error since we don't have mocks for them
-        raise NotImplementedError(f"Mock not implemented for package: {package_name}")
+
+    with override_config(validation_mode="skip"):
+        if package_name == "hl7.fhir.us.mcode":
+            # Load the local mcode cancer patient profile
+            test_files_dir = (
+                Path(__file__).parent / "static" / "fhir-profiles-definitions"
+            )
+            mcode_file = test_files_dir / "mcode-cancer-patient.json"
+            with open(mcode_file, "r") as f:
+                data = json.load(f)
+            self.definition_registry.from_dict(data)
+        elif package_name == "hl7.fhir.us.core":
+            # Load the local mcode cancer patient profile
+            test_files_dir = (
+                Path(__file__).parent / "static" / "fhir-profiles-definitions"
+            )
+            mcode_file = test_files_dir / "us-core-patient.json"
+            with open(mcode_file, "r") as f:
+                data = json.load(f)
+                self.definition_registry.from_dict(data)
+        else:
+            # For other packages, raise an error since we don't have mocks for them
+            raise NotImplementedError(
+                f"Mock not implemented for package: {package_name}"
+            )
 
 
 def mock_factory_build(
@@ -76,32 +85,15 @@ def mock_factory_build(
             "http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure"
         ):
             return Procedure
-    return _original_factory_build(
-        self,
-        canonical_url=canonical_url,
-        structure_definition=structure_definition,
-        mode=mode or "snapshot",
-        **kwargs,
-    )
 
-
-def mock_load_structure_map(self, source):
-    """Mock load_structure_map to load local test files instead of downloading from internet."""
-    if source in [
-        "patient-mapping.json",
-        "https://example.org/fhir/StructureMap/PatientMapping",
-    ]:
-        test_file = (
-            Path(__file__).parent
-            / "static"
-            / "fhir-mapping-language"
-            / "patient-mapping-example.json"
+    with override_config(validation_mode="skip"):
+        return _original_factory_build(
+            self,
+            canonical_url=canonical_url,
+            structure_definition=structure_definition,
+            mode=mode or "snapshot",
+            **kwargs,
         )
-        with open(test_file, "r") as f:
-            return json.load(f)
-    else:
-        # For other sources, raise an error since we don't have mocks for them
-        raise NotImplementedError(f"Mock not implemented for package: {source}")
 
 
 def mock_load_file(filepath):
@@ -116,7 +108,18 @@ def mock_load_file(filepath):
         )
         with open(test_file, "r") as f:
             return json.load(f)
-
+    elif filepath in [
+        "patient-mapping.json",
+        "https://example.org/fhir/StructureMap/PatientMapping",
+    ]:
+        test_file = (
+            Path(__file__).parent
+            / "static"
+            / "fhir-mapping-language"
+            / "patient-mapping-example.json"
+        )
+        with open(test_file, "r") as f:
+            return json.load(f)
     elif (
         filepath == "patient.profile.json" or filepath == "custom-patient.profile.json"
     ):
@@ -160,7 +163,6 @@ def mock_open_func(file, mode="r", *args, **kwargs):
     "fhircraft.fhir.resources.factory.FHIRModelFactory.register_package",
     mock_load_package,
 )
-@patch("fhircraft.fhir.mapper.FHIRMapper.load_structure_map", mock_load_structure_map)
 @patch(
     "fhircraft.fhir.resources.factory.FHIRModelFactory.build",
     mock_factory_build,

@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel
 import pytest
 
-from fhircraft.config import with_config
+from fhircraft.config import override_config
 from fhircraft.fhir.resources.factory import (
     FHIRModelFactory,
 )
@@ -59,7 +59,7 @@ fhir_resources_test_cases = {
 
 def _assert_construct_core_resource(fhir_release, resource_label, filename):
     factory = FHIRModelFactory(fhir_release=fhir_release)
-    with with_config(validation_mode="skip"):
+    with override_config(validation_mode="skip"):
         # Disable internet access to ensure we use local definitions
         factory.definition_registry.disable_internet_access()
         # Load the FHIR resource definition from local files
@@ -94,7 +94,6 @@ def _assert_construct_core_resource(fhir_release, resource_label, filename):
     with tempfile.TemporaryDirectory() as d:
 
         source_code = CodeGenerator().generate_resource_model_code(resource)
-        print(f"Generated code for {resource_label}:\n{source_code}")
         # Store source code in a file
         temp_file_name = os.path.join(d, "temp_test.py")
         with open(temp_file_name, "w") as test_file:
@@ -359,7 +358,7 @@ def test_construct_profiled_resource(mode, release, example_filename, definition
 
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
-        with with_config(validation_mode="skip"):
+        with override_config(validation_mode="skip"):
             # Load the FHIR resource definition from local files
             for file in definition_files:
                 with open(
@@ -368,13 +367,12 @@ def test_construct_profiled_resource(mode, release, example_filename, definition
                     struct_def = json.load(def_file)
                     factory.definition_registry.from_dict(struct_def)
             factory.reset_cache()
-        # Generate source code for Pydantic FHIR model
-        resource = factory.build(
-            canonical_url=fhir_resource["meta"]["profile"][0],
-            mode=mode,
-        )
+            # Generate source code for Pydantic FHIR model
+            resource = factory.build(
+                canonical_url=fhir_resource["meta"]["profile"][0],
+                mode=mode,
+            )
         source_code = CodeGenerator().generate_resource_model_code(resource)
-        print(source_code)
         assert (
             json.loads(resource.model_validate(fhir_resource).model_dump_json())
             == fhir_resource

@@ -142,7 +142,7 @@ Healthcare organizations often have legacy systems with data in non-FHIR formats
 The FHIR Mapper uses the [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html) to transform data between different structures:
 
 ```python
-from fhircraft.fhir.mapper import FHIRMapper
+from fhircraft.fhir.mapper import FHIRStructureMapper
 
 # Some legacy patient data
 legacy_patient = {
@@ -171,8 +171,8 @@ group main(source legacy, target patient: Patient) {
 """ # (2)!
 
 # Run the transformation
-mapper = FHIRMapper()
-targets = mapper.execute_mapping(mapping_script, legacy_patient)  # (3)!
+mapper = FHIRStructureMapper()
+targets = mapper.map(mapping_script, legacy_patient)  # (3)!
 patient = targets[0]
 
 print(patient.model_dump(exclude={'meta','resourceType'}))

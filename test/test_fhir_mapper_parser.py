@@ -28,6 +28,11 @@ def add_rules_to_basic_map(rules, documentation=None):
     )
 
 
+@pytest.fixture(scope="module")
+def parser():
+    return FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
+
+
 # Format: (string, expected_object)
 parser_test_cases = (
     # ----------------- METADATA DECLARATION  -----------------
@@ -38,6 +43,10 @@ parser_test_cases = (
     (
         """/// title = 'Example map'""",
         StructureMap.model_construct(title="Example map"),
+    ),
+    (
+        """/// description = 'A test map'""",
+        StructureMap.model_construct(description="A test map"),
     ),
     # ----------------- MAP DECLARATION  -----------------
     (
@@ -97,6 +106,18 @@ parser_test_cases = (
             ]
         ),
     ),
+    (
+        """uses 'http://example.org' as source
+        uses 'http://another.org' alias another as target""",
+        StructureMap.model_construct(
+            structure=[
+                StructureMapStructure(url="http://example.org", mode="source"),
+                StructureMapStructure(
+                    url="http://another.org", mode="target", alias="another"
+                ),
+            ]
+        ),
+    ),
     # ----------------- IMPORTS DECLARATION  -----------------
     (
         """imports 'http://example.org'""",
@@ -108,6 +129,15 @@ parser_test_cases = (
         imports 'http://example1.org' \n imports 'http://example2.org'""",
         StructureMap.model_construct(
             import_=["http://example1.org", "http://example2.org"]
+        ),
+    ),
+    (
+        """
+        imports 'http://example.org'
+        imports 'http://another.org'
+        imports 'http://third.org'""",
+        StructureMap.model_construct(
+            import_=["http://example.org", "http://another.org", "http://third.org"]
         ),
     ),
     # ----------------- CONSTANT DECLARATION  -----------------
@@ -141,6 +171,20 @@ parser_test_cases = (
             const=[
                 StructureMapConst(name="myConst1", value="1"),
                 StructureMapConst(name="myConst2", value="2"),
+            ]
+        ),
+    ),
+    (
+        """
+        let const1 = 42;
+        let const2 = 'foo';
+        let const3 = true;
+        """,
+        StructureMap.model_construct(
+            const=[
+                StructureMapConst(name="const1", value="42"),
+                StructureMapConst(name="const2", value="'foo'"),
+                StructureMapConst(name="const3", value="true"),
             ]
         ),
     ),
@@ -752,43 +796,6 @@ parser_test_cases = (
             ]
         ),
     ),
-    # ----------------- EDGE CASES & ADDITIONAL SYNTAX -----------------
-    (
-        """/// description = 'A test map'""",
-        StructureMap.model_construct(description="A test map"),
-    ),
-    (
-        """uses 'http://example.org' as source
-        uses 'http://another.org' alias another as target""",
-        StructureMap.model_construct(
-            structure=[
-                StructureMapStructure(url="http://example.org", mode="source"),
-                StructureMapStructure(
-                    url="http://another.org", mode="target", alias="another"
-                ),
-            ]
-        ),
-    ),
-    (
-        """imports 'http://example.org'
-        imports 'http://another.org'
-        imports 'http://third.org'""",
-        StructureMap.model_construct(
-            import_=["http://example.org", "http://another.org", "http://third.org"]
-        ),
-    ),
-    (
-        """let const1 = 42;
-        let const2 = 'foo';
-        let const3 = true;""",
-        StructureMap.model_construct(
-            const=[
-                StructureMapConst(name="const1", value="42"),
-                StructureMapConst(name="const2", value="'foo'"),
-                StructureMapConst(name="const3", value="true"),
-            ]
-        ),
-    ),
     (
         """group mapExample(source src, target tgt) extends baseGroup <<types>> {}""",
         StructureMap.model_construct(
@@ -1062,15 +1069,60 @@ parser_test_cases = (
 )
 
 
-@pytest.fixture(scope="module")
-def parser():
-    return FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
-
-
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(parser, string, expected_object):
     parsed_map = parser.parse(string).model_dump(exclude=("text", "status", "meta"))
     expected_map = expected_object.model_dump(exclude=("text", "status", "meta"))
+    if parsed_map != expected_map:
+        print("\nParsed:\n---------------------------")
+        pprint(parsed_map)
+        print("\nExpected:\n---------------------------")
+        pprint(expected_map)
+    assert parsed_map == expected_map
+
+
+@pytest.mark.parametrize(
+    "s1,s2,s3,s4,s5",
+    [
+        ("map", "uses", "imports", "let", "group"),
+        ("uses", "imports", "let", "group", "map"),
+        ("imports", "let", "group", "map", "uses"),
+        ("let", "group", "map", "uses", "imports"),
+        ("group", "map", "uses", "imports", "let"),
+    ],
+)
+def test_parser_declarations_ordering(parser, s1, s2, s3, s4, s5):
+    statements = {
+        "map": "map 'http://example.org/map' = 'map'",
+        "uses": "uses 'http://example.org' as target",
+        "imports": "imports 'http://example.org'",
+        "let": "let testconst = 'foo';",
+        "group": "group mapExample(source src, target tgt){}",
+    }
+    parsed_map = parser.parse(
+        "\n".join(statements[stmt] for stmt in (s1, s2, s3, s4, s5))
+    ).model_dump(exclude=("text", "status", "meta"))
+    expected_map = StructureMap.model_construct(
+        name="map",
+        url="http://example.org/map",
+        const=[
+            StructureMapConst(name="testconst", value="'foo'"),
+        ],
+        import_=["http://example.org"],
+        structure=[
+            StructureMapStructure(url="http://example.org", mode="target"),
+        ],
+        group=[
+            StructureMapGroup(
+                name="mapExample",
+                input=[
+                    StructureMapGroupInput(name="src", mode="source"),
+                    StructureMapGroupInput(name="tgt", mode="target"),
+                ],
+                rule=None,
+            )
+        ],
+    ).model_dump(exclude=("text", "status", "meta"))
     if parsed_map != expected_map:
         print("\nParsed:\n---------------------------")
         pprint(parsed_map)

@@ -13,10 +13,15 @@ from fhircraft.utils import capitalize, ensure_list, get_FHIR_release_from_versi
 # Use lazy imports for main components to avoid circular dependencies
 def __getattr__(name):
     """Lazy loading of main components to avoid circular import issues."""
-    if name == "FHIRMapper":
-        from fhircraft.fhir.mapper import FHIRMapper
+    if name == "FHIRStructureMapper":
+        from fhircraft.fhir.mapper import FHIRStructureMapper
 
-        return FHIRMapper
+        return FHIRStructureMapper
+    elif name == "FHIRMapper":
+        # Backward-compat alias — use FHIRStructureMapper instead.
+        from fhircraft.fhir.mapper import FHIRStructureMapper
+
+        return FHIRStructureMapper
     elif name == "FHIRModelFactory":
         from fhircraft.fhir.resources.factory import FHIRModelFactory
 
@@ -43,31 +48,20 @@ def __getattr__(name):
         from fhircraft.fhir.path import FHIRPathCollectionItem
 
         return FHIRPathCollectionItem
+
     # Configuration system
-    elif name == "ValidationConfig":
-        from fhircraft.config import ValidationConfig
-
-        return ValidationConfig
-    elif name == "FhircraftConfig":
-        from fhircraft.config import FhircraftConfig
-
-        return FhircraftConfig
     elif name == "get_config":
         from fhircraft.config import get_config
 
         return get_config
-    elif name == "set_config":
-        from fhircraft.config import set_config
-
-        return set_config
     elif name == "configure":
         from fhircraft.config import configure
 
         return configure
-    elif name == "with_config":
-        from fhircraft.config import with_config
+    elif name == "override_config":
+        from fhircraft.config import override_config
 
-        return with_config
+        return override_config
     elif name == "disable_constraint":
         from fhircraft.config import disable_constraint
 
