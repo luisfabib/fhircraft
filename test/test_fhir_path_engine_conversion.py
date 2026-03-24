@@ -246,6 +246,7 @@ def test_tointeger_returns_empty_for_invalid_type():
 
 
 tointeger_cases = (
+    ("+14", 14),
     ("14", 14),
     (14, 14),
     ("-14", -14),
@@ -291,6 +292,7 @@ def test_convertstointeger_returns_empty_for_invalid_type():
 
 
 convertstointeger_cases = (
+    ("+14"),
     ("14"),
     (14),
     ("-14"),
@@ -336,6 +338,8 @@ def test_todecimal_returns_empty_for_invalid_type():
 
 
 todecimal_cases = (
+    ("-14.5", -14.5),
+    ("+14.5", 14.5),
     ("14.5", 14.5),
     ("14", 14.0),
     (14.5, 14.5),
@@ -381,6 +385,8 @@ def test_convertstodecimal_returns_empty_for_invalid_type():
 
 
 convertstodecimal_cases = (
+    ("-14.5"),
+    ("+14.5"),
     ("14.5"),
     ("14"),
     (14.5),

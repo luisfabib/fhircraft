@@ -81,7 +81,7 @@ class Now(FHIRPathFunction):
         Returns:
             DateTime: The current date and time, including timezone offset.
         """
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
         return [FHIRPathCollectionItem(DateTime(value_datetime=now))]
 
 
@@ -99,7 +99,7 @@ class TimeOfDay(FHIRPathFunction):
         Returns:
             Time: The current time.
         """
-        return [FHIRPathCollectionItem(Time(value_time=datetime.datetime.now()))]
+        return [FHIRPathCollectionItem(Time(value_time=datetime.datetime.now().time()))]
 
 
 class Today(FHIRPathFunction):
