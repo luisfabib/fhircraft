@@ -398,7 +398,6 @@ def deep_index():
 def test_get_subtree_includes_root_and_descendants(deep_index: DefinitionIndex):
     subtree_index = deep_index.get_subtree("Observation.component")
     ids = {n.id for n in subtree_index}
-    print(ids)
     assert subtree_index.root() is not None
     assert ids == {
         "Component",

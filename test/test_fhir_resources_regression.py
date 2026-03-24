@@ -466,8 +466,6 @@ def test_regression_issue_263(factory):
             structure_definition=structure_definition, mode="differential"
         )
 
-    print(CodeGenerator().generate_resource_model_code(model))
-
     from typing import get_args
     import pydantic
     from fhircraft.fhir.resources.base import FHIRSliceModel
@@ -494,7 +492,6 @@ def test_regression_issue_263(factory):
     # -----------------------------------------------------------------------
     coding_annotation = code_model.model_fields["coding"].annotation
     list_type = next(a for a in get_args(coding_annotation) if a is not type(None))
-    print(coding_annotation)
     annotated_item = get_args(list_type)[0]
     union_type = get_args(annotated_item)[0]
     union_members = get_args(union_type)
@@ -981,7 +978,6 @@ def test_regression_issue_279(factory):
     cs_model = next(a for a in get_args(cs_annotation) if a is not type(None))
 
     assert cs_model.__name__ == "MyConditionClinicalStatus"
-    print(cs_model.__bases__)
     assert issubclass(cs_model, CodeableConcept)
     assert "extension" in cs_model.model_fields
 

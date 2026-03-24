@@ -14,7 +14,6 @@ from fhircraft.utils import (
     load_env_variables,
     load_file,
     load_url,
-    merge_dicts,
     remove_none_dicts,
     replace_nth,
 )
@@ -302,57 +301,6 @@ class TestLoadEnvVariables:
         result = load_env_variables("nonexistent.env")
         mock_dotenv_values.assert_called_once_with("nonexistent.env")
         assert result == {}
-
-
-class TestMergeDicts:
-
-    # Merging two dictionaries with non-overlapping keys
-    def test_non_overlapping_keys(self):
-        dict1 = {"a": 1, "b": 2}
-        dict2 = {"c": 3, "d": 4}
-        result = merge_dicts(dict1, dict2)
-        expected = {"a": 1, "b": 2, "c": 3, "d": 4}
-        assert result == expected
-
-    # Merging two dictionaries with overlapping keys and non-conflicting values
-    def test_overlapping_keys_non_conflicting_values(self):
-        dict1 = {"a": 1, "b": {"x": 10}}
-        dict2 = {"b": {"y": 20}, "c": 3}
-        result = merge_dicts(dict1, dict2)
-        expected = {"a": 1, "b": {"x": 10, "y": 20}, "c": 3}
-        assert result == expected
-
-    # Merging dictionaries where values are lists of equal length
-    def test_lists_of_equal_length(self):
-        dict1 = {"a": [1, 2], "b": [3, 4]}
-        dict2 = {"a": [5, 6], "b": [7, 8]}
-        result = merge_dicts(dict1, dict2)
-        expected = {"a": [1, 2], "b": [3, 4]}
-        assert result == expected
-
-    # Merging dictionaries where one dictionary is empty
-    def test_one_empty_dictionary(self):
-        dict1 = {}
-        dict2 = {"a": 1, "b": 2}
-        result = merge_dicts(dict1, dict2)
-        expected = {"a": 1, "b": 2}
-        assert result == expected
-
-    # Merging dictionaries where both dictionaries are empty
-    def test_both_empty_dictionaries(self):
-        dict1 = {}
-        dict2 = {}
-        result = merge_dicts(dict1, dict2)
-        expected = {}
-        assert result == expected
-
-    # Merging dictionaries with deeply nested structures
-    def test_deeply_nested_structures(self):
-        dict1 = {"a": {"b": {"c": 1}}}
-        dict2 = {"a": {"b": {"d": 2}}}
-        result = merge_dicts(dict1, dict2)
-        expected = {"a": {"b": {"c": 1, "d": 2}}}
-        assert result == expected
 
 
 class TestReplaceNth:
