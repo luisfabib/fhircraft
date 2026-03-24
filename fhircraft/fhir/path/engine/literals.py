@@ -256,7 +256,7 @@ class Time(FHIRPathLiteralType):
     def __init__(self, valuestring: str | None = None, value_time: time | None = None):
         if valuestring:
             match = re.match(
-                r"\@T(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?",
+                r"\@T(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{1,3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?",
                 valuestring,
             )
             if match:
@@ -269,7 +269,7 @@ class Time(FHIRPathLiteralType):
                     (
                         second_int
                         + (
-                            millisecond_int / 1000
+                            millisecond_int / (10 ** len(str(millisecond_int)))
                             if millisecond_int is not None
                             else 0.0
                         )
@@ -374,7 +374,7 @@ class DateTime(FHIRPathLiteralType):
     ):
         if valuestring:
             match = re.match(
-                r"\@([0-9]{4})(?:-([0-9]{2})(?:-?([0-9]{2})T(?:(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?)?)?)?",
+                r"\@([0-9]{4})(?:-([0-9]{2})(?:-?([0-9]{2})T(?:(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{1,3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?)?)?)?",
                 valuestring,
             )
             if match:
@@ -391,7 +391,7 @@ class DateTime(FHIRPathLiteralType):
                     (
                         second_int
                         + (
-                            millisecond_int / 1000
+                            millisecond_int / (10 ** len(str(millisecond_int)))
                             if millisecond_int is not None
                             else 0.0
                         )
