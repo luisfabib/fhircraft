@@ -294,7 +294,19 @@ class Time(FHIRPathLiteralType):
 
     def to_time(self):
         return time(
-            self.hour, self.minute or 0, self.second or 0, self.millisecond or 0
+            self.hour,
+            self.minute or 0,
+            self.second or 0,
+            self.millisecond or 0,
+            tzinfo=(
+                timezone(
+                    timedelta(
+                        hours=self.hour_shift or 0, minutes=self.minute_shift or 0
+                    )
+                )
+                if self.hour_shift is not None and self.minute_shift is not None
+                else None
+            ),
         )
 
     def __comparison__(self, other, op):
@@ -409,29 +421,16 @@ class DateTime(FHIRPathLiteralType):
             self.minute or 0,
             self.second or 0,
             self.millisecond or 0,
+            tzinfo=(
+                timezone(
+                    timedelta(
+                        hours=self.hour_shift or 0, minutes=self.minute_shift or 0
+                    )
+                )
+                if self.hour_shift is not None and self.minute_shift is not None
+                else None
+            ),
         )
-
-    def __comparison__(self, other, op):
-        if isinstance(other, DateTime):
-            if all(
-                [
-                    (getattr(self, part) is not None)
-                    == (getattr(other, part) is not None)
-                    for part in [
-                        "year",
-                        "month",
-                        "day",
-                        "hour",
-                        "minute",
-                        "second",
-                        "millisecond",
-                        "hour_shift",
-                        "minute_shift",
-                    ]
-                ]
-            ):
-                return op(self.to_datetime(), other.to_datetime())
-            else:
                 return []
         elif isinstance(other, datetime):
             return op(self.to_datetime(), other)
