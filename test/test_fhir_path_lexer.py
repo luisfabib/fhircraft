@@ -130,6 +130,10 @@ token_test_cases = (
     ("month", (("month", "CALENDAR_DURATION"),)),
     ("week", (("week", "CALENDAR_DURATION"),)),
     ("day", (("day", "CALENDAR_DURATION"),)),
+    ("hour", (("hour", "CALENDAR_DURATION"),)),
+    ("minute", (("minute", "CALENDAR_DURATION"),)),
+    ("second", (("second", "CALENDAR_DURATION"),)),
+    ("millisecond", (("millisecond", "CALENDAR_DURATION"),)),
     # -------------  Root Nodes --------------
     ("Observation", (("Observation", "ROOT_NODE"),)),
     ("Patient", (("Patient", "ROOT_NODE"),)),
