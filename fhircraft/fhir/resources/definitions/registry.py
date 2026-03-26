@@ -316,7 +316,7 @@ class StructureDefinitionRegistry:
                     raise e
                 else:
                     warnings.warn(
-                        f"Skipping invalid structure definition {sd.get('url', 'unknown')} in package {package_name} version {version}: {e}"
+                        f"Skipping invalid structure definition {sd.get('url', 'unknown')} in package {package_name} version {version}:\n{e}"
                     )
 
     def set_registry_base_url(self, base_url: str) -> None:
