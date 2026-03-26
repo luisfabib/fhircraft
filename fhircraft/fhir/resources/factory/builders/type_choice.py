@@ -54,7 +54,9 @@ class TypeChoiceFieldBuilder(Builder):
 
             # Add primitive extension field if applicable
             if field_type_info.requires_primitive_extension:
-                placeholder = self.build_primitive_extension_placeholder(node)
+                placeholder = self.build_primitive_extension_placeholder(
+                    node, name=safe_name
+                )
                 build.fields.append(placeholder)
 
         # Type-choice validator & property go on the first FieldBuild
