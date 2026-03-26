@@ -445,7 +445,9 @@ def test_register_package__delegates_to_registry():
     registry = make_registry()
     factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     factory.register_package("hl7.fhir.us.core", "5.0.1")
-    registry.download_package.assert_called_once_with("hl7.fhir.us.core", "5.0.1")
+    registry.download_package.assert_called_once_with(
+        "hl7.fhir.us.core", "5.0.1", False
+    )
 
 
 # ===========================================================================

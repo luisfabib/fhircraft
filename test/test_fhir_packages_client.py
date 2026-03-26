@@ -398,6 +398,7 @@ class TestLoadResourcesFromPackageDependencies:
 
         def _download(name, version, extract=False):
             tf = tars[name]
+            assert tf.fileobj is not None, "TarFile must have fileobj for mock to work"
             # Re-open the same buffer for each download call
             tf.fileobj.seek(0)
             return tarfile.open(fileobj=tf.fileobj, mode="r:gz")
@@ -462,6 +463,6 @@ class TestLoadResourcesFromPackageDependencies:
         urls = [r["url"] for r in results]
 
         assert pkg_sd_url in urls, "Top-level package SD must be in results"
-        assert dep_sd_url in urls, (
-            "Dependency SD must also be in results (regression: was silently dropped)"
-        )
+        assert (
+            dep_sd_url in urls
+        ), "Dependency SD must also be in results (regression: was silently dropped)"

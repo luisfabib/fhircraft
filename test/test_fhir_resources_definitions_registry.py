@@ -386,6 +386,78 @@ def test_download_package__adds_each_validated_sd():
     assert "http://example.org/B" in reg.structure_definitions_by_url
 
 
+def test_download_package__raises_on_invalid_sd_by_default():
+    reg = make_registry()
+    reg._package_client = MagicMock()
+    reg._package_client.load_resources_from_package.return_value = [
+        {"url": "http://example.org/Bad"}
+    ]
+
+    with patch.object(
+        reg,
+        "_validate_structure_definition",
+        side_effect=ValueError("invalid SD"),
+    ):
+        with pytest.raises(ValueError, match="invalid SD"):
+            reg.download_package("pkg", "1.0")
+
+
+def test_download_package__skip_invalid_true_does_not_raise():
+    reg = make_registry()
+    reg._package_client = MagicMock()
+    reg._package_client.load_resources_from_package.return_value = [
+        {"url": "http://example.org/Bad"}
+    ]
+
+    with patch.object(
+        reg,
+        "_validate_structure_definition",
+        side_effect=ValueError("invalid SD"),
+    ):
+        # Should not raise
+        reg.download_package("pkg", "1.0", skip_invalid=True)
+
+
+def test_download_package__skip_invalid_true_emits_warning():
+    reg = make_registry()
+    reg._package_client = MagicMock()
+    reg._package_client.load_resources_from_package.return_value = [
+        {"url": "http://example.org/Bad"}
+    ]
+
+    with patch.object(
+        reg,
+        "_validate_structure_definition",
+        side_effect=ValueError("invalid SD"),
+    ):
+        with pytest.warns(UserWarning, match="http://example.org/Bad"):
+            reg.download_package("pkg", "1.0", skip_invalid=True)
+
+
+def test_download_package__skip_invalid_skips_bad_registers_good():
+    reg = make_registry()
+    sd_good = make_sd(url="http://example.org/Good")
+    reg._package_client = MagicMock()
+    reg._package_client.load_resources_from_package.return_value = [
+        {"url": "http://example.org/Bad"},
+        {"url": "http://example.org/Good"},
+    ]
+
+    with patch.object(
+        reg,
+        "_validate_structure_definition",
+        side_effect=[ValueError("invalid SD"), sd_good],
+    ):
+        import warnings as _warnings
+
+        with _warnings.catch_warnings():
+            _warnings.simplefilter("ignore")
+            reg.download_package("pkg", "1.0", skip_invalid=True)
+
+    assert "http://example.org/Good" in reg.structure_definitions_by_url
+    assert "http://example.org/Bad" not in reg.structure_definitions_by_url
+
+
 # ===========================================================================
 # StructureDefinitionRegistry.from_dict
 # ===========================================================================
