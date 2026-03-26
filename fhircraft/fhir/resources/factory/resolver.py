@@ -278,7 +278,10 @@ class SnapshotResolver:
         matching element definition from its snapshot.
 
         Args:
-            datatypes: A sequence of datatype names to expand. Must contain exactly one type.
+            datatypes: A sequence of datatype names to expand. When multiple types are
+                       provided (e.g. for a polymorphic ``value[x]`` element), each type
+                       is tried in order and the first one that contains a matching
+                       sub-element is used.
             id: The unique identifier for the element node to be created.
             base_index: A DefinitionIndex used to check for existing elements.
 
@@ -290,7 +293,8 @@ class SnapshotResolver:
 
         Notes:
             - This method is used during differential StructureDefinition resolution.
-            - Only complex types are supported for expansion.
+            - Only complex types are supported for expansion; primitive and FHIRPath types
+              are skipped when iterating over multiple candidates.
             - The generated element id is checked against the base index to prevent conflicts.
         """
         if not self._registry:
@@ -298,51 +302,57 @@ class SnapshotResolver:
                 "Repository is required for type expansion during differential resolution."
             )
 
-        if len(datatypes) != 1:
+        if not datatypes:
             raise DefinitionResolutionError(
-                "Type expansion is only supported for elements with a single type."
-            )
-        datatype = datatypes[0]
-        if datatype.startswith(FHIRPATH_TYPE_PREFIX):
-            raise DefinitionResolutionError(
-                f"Type expansion is not supported for FHIRPath types. Found type '{datatype}'."
+                f"Type expansion failed for element '{id}'. No type codes provided."
             )
 
-        type_structure_definition = self._registry.get(f"{FHIR_TYPE_PREFIX}{datatype}")
-        if type_structure_definition.kind != "complex-type":
-            raise DefinitionResolutionError(
-                f"Type expansion is only supported for complex types. Type '{datatype}' has kind '{type_structure_definition.kind}'."
-            )
-        if not type_structure_definition:
-            raise DefinitionResolutionError(
-                f"Type expansion failed: StructureDefinition for type '{datatype}' not found in repository."
-            )
-        snapshot = type_structure_definition.snapshot
-        if not snapshot or not snapshot.element:
-            raise DefinitionResolutionError(
-                f"Type expansion failed: StructureDefinition for type '{datatype}' has no snapshot or snapshot elements."
-            )
         local_id = id.rsplit(".", 1)[-1]
-        matching_node = next(
-            (n for e in snapshot.element if (n := ElementNode(e)).local_id == local_id),
-            None,
-        )
-        if not matching_node:
-            raise DefinitionResolutionError(
-                f"Type expansion failed: no matching element with local id '{local_id}' found in snapshot of type '{datatype}'."
-            )
         id_path = ".".join([seg.split(":")[0] for seg in id.split(".")])
         if id in base_index:
             raise DefinitionResolutionError(
                 f"Type expansion failed: generated intermediate node id '{id}' already exists in base index."
             )
-        # Determine unsliced path for newly synthesised element
-        return ElementNode(
-            definition=matching_node.definition.__class__(
-                id=id,
-                path=id_path,
-                **matching_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+
+        # Iterate over all candidate types and return the first one that contains
+        # a matching sub-element. This supports polymorphic elements (e.g. value[x])
+        # which may carry multiple type codes.
+        for datatype in datatypes:
+            if datatype.startswith(FHIRPATH_TYPE_PREFIX):
+                continue
+            try:
+                type_structure_definition = self._registry.get(
+                    f"{FHIR_TYPE_PREFIX}{datatype}"
+                )
+            except FileNotFoundError:
+                continue
+            if type_structure_definition.kind != "complex-type":
+                continue
+            snapshot = type_structure_definition.snapshot
+            if not snapshot or not snapshot.element:
+                continue
+            matching_node = next(
+                (
+                    n
+                    for e in snapshot.element
+                    if (n := ElementNode(e)).local_id == local_id
+                ),
+                None,
             )
+            if matching_node is None:
+                continue
+            # Determine unsliced path for newly synthesised element
+            return ElementNode(
+                definition=matching_node.definition.__class__(
+                    id=id,
+                    path=id_path,
+                    **matching_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+                )
+            )
+
+        raise DefinitionResolutionError(
+            f"Type expansion failed for element '{id}'. No matching element with local id "
+            f"'{local_id}' found in any of the provided types: {list(datatypes)}."
         )
 
     def _merge_node_with_base(

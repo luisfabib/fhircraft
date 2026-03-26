@@ -168,6 +168,67 @@ def test_build_type_node__ignores_fhirpath_type_nodes(base_index, resolver, type
         resolver._build_type_node([type], "Observation.value", base_index)
 
 
+def test_build_type_node__raises_error_for_empty_datatypes(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node([], "Observation.value", base_index)
+
+
+def test_build_type_node__returns_first_matching_for_multiple_types(
+    base_index, resolver
+):
+    node = resolver._build_type_node(
+        ["Quantity", "CodeableConcept"],
+        "Observation.value.coding",
+        base_index,
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.value.coding"
+    assert node.path == "Observation.value.coding"
+
+
+def test_build_type_node__skips_non_matching_first_type_for_multiple_types(
+    base_index, resolver
+):
+    node = resolver._build_type_node(
+        ["Quantity", "CodeableConcept"],
+        "Observation.value.coding",
+        base_index,
+    )
+    # coding is defined on CodeableConcept — verify cardinality comes from that definition
+    assert node.min_cardinality == 0
+    assert node.max_cardinality is None  # max="*" on CodeableConcept.coding
+
+
+def test_build_type_node__raises_error_for_all_fhirpath_types(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node(
+            [
+                "http://hl7.org/fhirpath/System.String",
+                "http://hl7.org/fhirpath/System.Integer",
+            ],
+            "Observation.value",
+            base_index,
+        )
+
+
+def test_build_type_node__raises_error_for_all_primitive_types(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node(
+            ["string", "integer", "boolean"],
+            "Observation.value.text",
+            base_index,
+        )
+
+
+def test_build_type_node__raises_error_for_no_type_matches(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node(
+            ["Quantity", "CodeableConcept"],
+            "Observation.value.nonExistentField",
+            base_index,
+        )
+
+
 # ------------------------------------------------------------------
 # SnapshotResolver._build_intermediate_node
 # ------------------------------------------------------------------
@@ -236,6 +297,32 @@ def test_build_intermediate_node__return_inherited_from_type(resolver, base_inde
     assert node.min_cardinality == 0
     assert node.max_cardinality == 1
     assert node.definition.short == "Unique id for inter-element referencing"
+
+
+def test_build_intermediate_node__polymorphic_parent_expands_via_first_matching_type(
+    resolver,
+):
+    # Build a base_index that contains a polymorphic value[x] parent
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            short="Measurement value",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x].coding", base_index_with_poly
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.value[x].coding"
+    assert node.path == "Observation.value[x].coding"
 
 
 def test_build_intermediate_node__path_lookup_ignores_slices(resolver, base_index):
