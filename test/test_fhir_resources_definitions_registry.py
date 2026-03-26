@@ -365,8 +365,47 @@ def test_download_package__calls_load_resources_from_package():
         reg.download_package("hl7.fhir.r4b.core", "4.3.0")
 
     reg._package_client.load_resources_from_package.assert_called_once_with(
-        "StructureDefinition", "hl7.fhir.r4b.core", "4.3.0"
+        "StructureDefinition", "hl7.fhir.r4b.core", "4.3.0", install_dependencies=True
     )
+
+
+def test_download_package__include_dependencies_true_passes_flag():
+    reg = make_registry()
+    sd = make_sd()
+    reg._package_client = MagicMock()
+    reg._package_client.load_resources_from_package.return_value = [{"url": SD_URL}]
+
+    with patch.object(reg, "_validate_structure_definition", return_value=sd):
+        reg.download_package("pkg", "1.0", include_dependencies=True)
+
+    _, kwargs = reg._package_client.load_resources_from_package.call_args
+    assert kwargs["install_dependencies"] is True
+
+
+def test_download_package__include_dependencies_false_passes_flag():
+    reg = make_registry()
+    sd = make_sd()
+    reg._package_client = MagicMock()
+    reg._package_client.load_resources_from_package.return_value = [{"url": SD_URL}]
+
+    with patch.object(reg, "_validate_structure_definition", return_value=sd):
+        reg.download_package("pkg", "1.0", include_dependencies=False)
+
+    _, kwargs = reg._package_client.load_resources_from_package.call_args
+    assert kwargs["install_dependencies"] is False
+
+
+def test_download_package__include_dependencies_defaults_to_true():
+    reg = make_registry()
+    sd = make_sd()
+    reg._package_client = MagicMock()
+    reg._package_client.load_resources_from_package.return_value = [{"url": SD_URL}]
+
+    with patch.object(reg, "_validate_structure_definition", return_value=sd):
+        reg.download_package("pkg", "1.0")
+
+    _, kwargs = reg._package_client.load_resources_from_package.call_args
+    assert kwargs["install_dependencies"] is True
 
 
 def test_download_package__adds_each_validated_sd():

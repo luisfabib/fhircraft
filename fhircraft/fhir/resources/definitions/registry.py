@@ -295,11 +295,18 @@ class StructureDefinitionRegistry:
         return response.json()
 
     def download_package(
-        self, package_name: str, version: str, skip_invalid: bool = False
+        self,
+        package_name: str,
+        version: str,
+        skip_invalid: bool = False,
+        include_dependencies: bool = True,
     ) -> None:
         """Download a package from the registry and add its structure definitions to the registry."""
         for sd in self._package_client.load_resources_from_package(
-            "StructureDefinition", package_name, version
+            "StructureDefinition",
+            package_name,
+            version,
+            install_dependencies=include_dependencies,
         ):
             try:
                 structure_definition = self._validate_structure_definition(sd)
