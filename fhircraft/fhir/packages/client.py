@@ -263,8 +263,8 @@ class FHIRPackageRegistryClient:
         Args:
             tar_file: Opened tar file containing the package
         """
-        results_count = 0
         errors = []
+        results = []
 
         # First, look for package.json to find dependencies
         if install_dependencies:
@@ -287,12 +287,13 @@ class FHIRPackageRegistryClient:
                             if f"{dependency}@{version}" in self.history:
                                 continue
                             try:
-                                self.load_resources_from_package(
+                                dependency_results = self.load_resources_from_package(
                                     target_resource,
                                     dependency,
                                     version,
                                     fail_if_exists=False,
                                 )
+                                results.extend(dependency_results)
                             except Exception as e:
                                 errors.append(
                                     f"Failed to download and load dependency {dependency}: {e}"
@@ -301,7 +302,6 @@ class FHIRPackageRegistryClient:
                     errors.append(
                         f"Error processing package.json looking for dependencies: {e}"
                     )
-        results = []
         for member in tar_file.getmembers():
             if not member.isfile():
                 continue
@@ -324,7 +324,6 @@ class FHIRPackageRegistryClient:
                         # Check if it's a StructureDefinition resource
                         if json_data.get("resourceType") == target_resource:
                             results.append(json_data)
-                            results_count += 1
 
                 except Exception as e:
                     errors.append(f"Error processing {member.name}: {e}")
