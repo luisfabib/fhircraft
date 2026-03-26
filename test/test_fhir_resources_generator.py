@@ -445,7 +445,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         expected_block = """
         class Slice(FHIRSliceModel):
             min_cardinality: ClassVar[int] = 0
-            max_cardinality: ClassVar[int] = 2
+            max_cardinality: ClassVar[int | None] = 2
 
             valueString: str = Field(
                 description="A string value",
@@ -472,7 +472,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         expected_block = """
         class ExtensionSlice(Extension, FHIRSliceModel):
             min_cardinality: ClassVar[int] = 1
-            max_cardinality: ClassVar[int] = 1
+            max_cardinality: ClassVar[int | None] = 1
             
             url: str = Field(
                 description="Extension URL",

@@ -16,7 +16,7 @@ class {{ model.__name__ }}({% for base in model.__bases__ %}{{ base.__name__ }}{
     {% endif %}
     {% if model.__bases__ | selectattr("__name__", "equalto", "FHIRSliceModel") | list | length > 0 %}
     min_cardinality: ClassVar[int] = {{model.min_cardinality}}
-    max_cardinality: ClassVar[int] = {{model.max_cardinality}}
+    max_cardinality: ClassVar[int | None] = {{model.max_cardinality}}
     {% endif %}
 
     {% if model._fhir_release and (model.__bases__|selectattr("_fhir_release", "eq", model._fhir_release) | list | length == 0) %}
