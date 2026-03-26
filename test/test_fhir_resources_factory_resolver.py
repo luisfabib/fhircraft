@@ -325,6 +325,89 @@ def test_build_intermediate_node__polymorphic_parent_expands_via_first_matching_
     assert node.path == "Observation.value[x].coding"
 
 
+def test_build_intermediate_node__type_choice_id_returns_element_node(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            short="Measurement value",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.value[x]:valueQuantity"
+
+
+def test_build_intermediate_node__type_choice_id_has_correct_path(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert node.path == "Observation.value[x]"
+
+
+def test_build_intermediate_node__type_choice_id_narrows_type_list(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert node.type_codes == ["Quantity"]
+
+
+def test_build_intermediate_node__type_choice_id_is_not_polymorphic(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert node.is_polymorphic_type is False
+    assert node.is_type_choice_slice is True
+
+
 def test_build_intermediate_node__path_lookup_ignores_slices(resolver, base_index):
     base_index.add(
         make_node(id="BaseResource.component:sliceA", path="BaseResource.component")

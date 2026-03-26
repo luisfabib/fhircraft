@@ -139,14 +139,35 @@ class ElementNode:
         return self.depth == 0
 
     @property
+    def is_type_choice_slice(self) -> bool:
+        """
+        True when this element is a type-choice type-slice.
+
+        Per the FHIR spec, when a polymorphic element (path ends in ``[x]``) is
+        constrained to a specific type, the id reflects that type with a colon
+        suffix directly after the ``[x]``, e.g.
+        ``Patient.deceased[x]:deceasedBoolean``.
+
+        This is distinct from a named list-slice such as
+        ``Observation.component:systolic`` where the colon follows a plain
+        element name.
+        """
+        return bool(re.search(r"\[x\]:[A-Za-z]", self.local_id))
+
+    @property
     def is_slice(self) -> bool:
         """
         True when this element *is* a named slice definition.
 
-        A named slice has a colon in its :attr:`local_id`, e.g.
+        A named slice has a colon in its :attr:`local_id` that is **not**
+        immediately preceded by ``[x]``, e.g.
         ``Observation.component:systolic`` → ``local_id = "component:systolic"``.
+
+        Type-choice type-slices such as ``Patient.deceased[x]:deceasedBoolean``
+        are **not** considered named slices; use :attr:`is_type_choice_slice` for
+        those.
         """
-        return ":" in self.local_id
+        return ":" in self.local_id and not self.is_type_choice_slice
 
     @property
     def is_slice_entry(self) -> bool:
@@ -157,9 +178,16 @@ class ElementNode:
 
     @property
     def is_slice_child(self) -> bool:
-        """True when *any* ancestor segment of the id contains ``:`` — this element lives
-        inside a slice sub-tree."""
-        return any(":" in seg for seg in self.id.split("."))
+        """True when *any* ancestor segment of the id contains a **named-slice**
+        colon — this element lives inside a named-slice sub-tree.
+
+        Type-choice colon suffixes (``[x]:TypeName``) are excluded; they are not
+        a slice ancestry boundary.
+        """
+        return any(
+            ":" in seg and not re.search(r"\[x\]:", seg)
+            for seg in self.id.split(".")
+        )
 
     @property
     def is_content_reference(self) -> bool:
@@ -174,10 +202,10 @@ class ElementNode:
     def slice_name(self) -> str | None:
         """
         The slice name (part after ``:`` in :attr:`local_id`), or ``None`` if this
-        element is not itself a named slice.
+        element is not a named slice or type-choice type-slice.
         """
-        if not self.is_slice:
-            raise ValueError("Only slices have slice names")
+        if not self.is_slice and not self.is_type_choice_slice:
+            raise ValueError("Only slices and type-choice slices have slice names")
         return self.definition.sliceName or self.local_id.split(":", 1)[1]
 
     @property
@@ -209,11 +237,14 @@ class ElementNode:
     @property
     def slice_ancestry(self) -> list[str]:
         """
-        Names of all ancestor slices in outermost-first order.
+        Names of all **named** ancestor slices in outermost-first order.
+
+        Type-choice colon suffixes (``[x]:TypeName``) are excluded because they
+        denote a type specialisation, not a named list-slice boundary.
         """
         names: list[str] = []
         for seg in self.id.split("."):
-            if ":" in seg:
+            if ":" in seg and not re.search(r"\[x\]:", seg):
                 names.append(seg.split(":", 1)[1])
         return names
 
@@ -287,7 +318,13 @@ class ElementNode:
 
         Note: If the element is polymorphic (has more than one datatype), then the end of the
         path for the element SHALL be "[x]" to designate that the name of the element may vary when serialized.
+
+        Type-choice slice nodes (e.g. ``Patient.deceased[x]:deceasedBoolean``) are
+        **not** considered polymorphic — they represent a single concrete type
+        constraint and must not trigger type-choice synthesis in the index.
         """
+        if self.is_type_choice_slice:
+            return False
         return self.path.endswith(POLYMORPHIC_PATH_SUFFIX) or len(self.type_codes) > 1
 
     @property

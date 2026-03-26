@@ -19,6 +19,7 @@ class DefinitionIndex:
     def __init__(self, nodes: list[ElementNode]) -> None:
         self._nodes_by_id: dict[str, ElementNode] = {}
         self._nodes_by_path: dict[str, List[ElementNode]] = {}
+        self._synthetic_ids: set[str] = set()
         for node in nodes:
             self.add(node, replace=True)
 
@@ -63,10 +64,12 @@ class DefinitionIndex:
                             "id": node.id.replace("[x]", capitalize(type_code)),
                             "path": node.path.replace("[x]", capitalize(type_code)),
                             "type": [node.definition.type[0].model_copy(update={"code": type_code})],  # type: ignore
+                            "slicing": None,
                         }
                     )
                 )
                 if type_node.id not in self:
+                    self._synthetic_ids.add(type_node.id)
                     self.add(type_node)
 
     def update(self, nodes: list[ElementNode], replace: bool = False) -> None:
@@ -150,7 +153,7 @@ class DefinitionIndex:
         else:
             nodes = self._nodes_by_path.get(path, [])
         if nodes and ignore_slices:
-            nodes = [n for n in nodes if not n.is_slice]
+            nodes = [n for n in nodes if not n.is_slice and not n.is_type_choice_slice]
         if not nodes:
             raise DefinitionIndexError(f"Element path {path!r} not found in index.")
         return nodes
@@ -222,8 +225,20 @@ class DefinitionIndex:
     def get_children(self, id: str) -> list[ElementNode]:
         """
         Return immediate non-slice children of *id*.
+
+        Synthetic type-expansion nodes (e.g. ``Observation.valueQuantity``
+        generated from ``Observation.value[x]``) are excluded — the
+        :class:`TypeChoiceFieldBuilder` already handles the canonical
+        ``value[x]`` element and emits one typed field per type.
         """
-        return [n for n in self.nodes if n.parent_id == id and not n.is_slice]
+        return [
+            n
+            for n in self.nodes
+            if n.parent_id == id
+            and not n.is_slice
+            and not n.is_type_choice_slice
+            and n.id not in self._synthetic_ids
+        ]
 
     def get_slices(self, id: str) -> list[ElementNode]:
         """
@@ -286,6 +301,8 @@ class DefinitionIndex:
         subtree_nodes = []
         for node in self.nodes:
             node_id = node.id
+            if node_id in self._synthetic_ids:
+                continue
             if (
                 node_id != id
                 and not node_id.startswith(prefix_dot)

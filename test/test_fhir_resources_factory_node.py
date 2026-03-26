@@ -221,13 +221,31 @@ def test_element_node_is_root(element, path, expected):
         ("Resource.name", False),
         ("Resource.name:surname", True),
         ("Resource.value[x]", False),
-        ("Resource.value[x]:valueString", True),
+        ("Resource.value[x]:valueString", False),
+        ("Resource.component.value[x]:valueQuantity", False),
     ],
 )
 def test_element_node_is_slice(element, id, expected):
     element.id = id
     node = ElementNode(definition=element)
     assert node.is_slice == expected
+
+
+@pytest.mark.parametrize(
+    "id, expected",
+    [
+        ("Resource.name", False),
+        ("Resource.name[x]", False),
+        ("Resource.value[x]:valueString", True),
+        ("Resource.component.value[x]:valueQuantity", True),
+        ("Resource.name:surname", False),
+        ("Patient.deceased[x]:deceasedBoolean", True),
+    ],
+)
+def test_element_node_is_type_choice_slice(element, id, expected):
+    element.id = id
+    node = ElementNode(definition=element)
+    assert node.is_type_choice_slice == expected
 
 
 @pytest.mark.parametrize(
@@ -241,6 +259,24 @@ def test_element_node_is_slice_entry(element, slicing, expected):
     element.slicing = slicing
     node = ElementNode(definition=element)
     assert node.is_slice_entry == expected
+
+
+@pytest.mark.parametrize(
+    "id, expected",
+    [
+        ("Observation.component:systolic.code", True),
+        ("Observation.component:systolic", True),
+        ("Observation.value[x]:valueQuantity", False),
+        ("Observation.component.value[x]:valueBoolean", False),
+        ("Observation.component:slice.value[x]:valueQuantity", True),
+        ("Observation.code", False),
+        ("Observation.component.value[x]", False),
+    ],
+)
+def test_element_node_is_slice_child_type_choice(element, id, expected):
+    element.id = id
+    node = ElementNode(definition=element)
+    assert node.is_slice_child == expected
 
 
 @pytest.mark.parametrize(
@@ -279,9 +315,9 @@ def test_element_node_slice_name(element, id, expected):
     "id, expected",
     [
         ("Resource.name:surname", ["surname"]),
-        ("Resource.value[x]:valueString", ["valueString"]),
-        ("Resource.extension.value[x]:valueString", ["valueString"]),
-        ("Resource.extension:slice.value[x]:valueString", ["slice", "valueString"]),
+        ("Resource.value[x]:valueString", []),
+        ("Resource.extension.value[x]:valueString", []),
+        ("Resource.extension:slice.value[x]:valueString", ["slice"]),
     ],
 )
 def test_element_node_slice_ancestry(element, id, expected):
@@ -396,6 +432,27 @@ def test_cardinality_is_array(element, expected):
     ],
 )
 def test_element_node_is_polymorphic_type(element, path, expected):
+    element.path = path
+    node = ElementNode(definition=element)
+    assert node.is_polymorphic_type == expected
+
+
+@pytest.mark.parametrize(
+    "id, path, expected",
+    [
+        ("Observation.value[x]:valueQuantity", "Observation.value[x]", False),
+        ("Patient.deceased[x]:deceasedBoolean", "Patient.deceased[x]", False),
+        (
+            "Observation.component.value[x]:valueCodeableConcept",
+            "Observation.component.value[x]",
+            False,
+        ),
+    ],
+)
+def test_element_node_is_polymorphic_type_false_for_type_choice_slice(
+    element, id, path, expected
+):
+    element.id = id
     element.path = path
     node = ElementNode(definition=element)
     assert node.is_polymorphic_type == expected

@@ -258,10 +258,30 @@ class SnapshotResolver:
             if root_name
             else base_node.path
         )
+        merge_fields = base_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS))
+        # For type-choice type-slices (e.g. value[x]:valueQuantity) narrow the
+        # inherited type list to the single concrete type indicated by the suffix.
+        candidate = ElementNode(
+            definition=base_node.definition.__class__(
+                id=id, path=new_path, **merge_fields
+            )
+        )
+        if candidate.is_type_choice_slice and base_node.types:
+            concrete_suffix = id.rsplit(":", 1)[1].lower()
+            matched_type = next(
+                (
+                    t
+                    for t in base_node.types
+                    if t.code and concrete_suffix.endswith(str(t.code).lower())
+                ),
+                None,
+            )
+            if matched_type is not None:
+                merge_fields["type"] = [matched_type]
         new_definition = base_node.definition.__class__(
             id=id,
             path=new_path,
-            **base_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+            **merge_fields,
         )
         return ElementNode(definition=new_definition)
 
@@ -314,9 +334,6 @@ class SnapshotResolver:
                 f"Type expansion failed: generated intermediate node id '{id}' already exists in base index."
             )
 
-        # Iterate over all candidate types and return the first one that contains
-        # a matching sub-element. This supports polymorphic elements (e.g. value[x])
-        # which may carry multiple type codes.
         for datatype in datatypes:
             if datatype.startswith(FHIRPATH_TYPE_PREFIX):
                 continue
@@ -346,7 +363,9 @@ class SnapshotResolver:
                 definition=matching_node.definition.__class__(
                     id=id,
                     path=id_path,
-                    **matching_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+                    **matching_node.definition.model_dump(
+                        include=set(_BASE_MERGE_FIELDS)
+                    ),
                 )
             )
 
