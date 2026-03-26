@@ -442,6 +442,7 @@ class Builder(ABC):
     def build_primitive_extension_placeholder(
         self,
         node: ElementNode,
+        name: str | None = None,
     ) -> FieldInformation:
         """
         Build a placeholder field information for primitive type extensions.
@@ -450,14 +451,16 @@ class Builder(ABC):
 
         Args:
             node: ElementNode representing the primitive FHIR element for which to create an extension placeholder.
+            name: When provided, use this name instead of ``node.name``
 
         Returns:
             FieldInformation: Field information for the extension placeholder
         """
 
         # Process the name for the placeholder field
-        original_name = f"_{node.name}"
-        placeholder_name = f"{node.name}_ext"
+        name = name if name is not None else node.name
+        original_name = f"_{name}"
+        placeholder_name = f"{name}_ext"
         safe_placeholder_name, ext_alias = self.handle_python_keyword(placeholder_name)
 
         # Get the appropriate Element type for the placeholder field
@@ -470,7 +473,7 @@ class Builder(ABC):
             default=None,
             alias=original_name,
             validation_alias=ext_alias,
-            description=f"Placeholder element for {node.name} extensions",
+            description=f"Placeholder element for {name} extensions",
         )
         return info
 

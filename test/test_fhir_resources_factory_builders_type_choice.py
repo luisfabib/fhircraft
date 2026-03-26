@@ -214,7 +214,7 @@ def test_build__primitive_type_adds_ext_placeholder(builder, index):
     node = make_node("value", type_codes=["string"])
     result = builder.build(node, index)
     names = [f.name for f in result.fields]
-    assert "value_ext" in names
+    assert "valueString_ext" in names
 
 
 def test_build__non_primitive_type_does_not_add_placeholder(builder, index):
@@ -229,8 +229,51 @@ def test_build__non_primitive_type_does_not_add_placeholder(builder, index):
 def test_build__primitive_placeholder_alias_is_underscore_name(builder, index):
     node = make_node("value", type_codes=["string"])
     result = builder.build(node, index)
-    placeholder = next(f for f in result.fields if f.name == "value_ext")
-    assert placeholder.alias == "_value"
+    placeholder = next(f for f in result.fields if f.name == "valueString_ext")
+    assert placeholder.alias == "_valueString"
+
+
+def test_build__primitive_type_ext_placeholder_does_not_use_base_name(builder, index):
+    """No base-name _ext placeholder should be emitted for a type-choice element."""
+    node = make_node("value", type_codes=["string"])
+    result = builder.build(node, index)
+    names = [f.name for f in result.fields]
+    assert "value_ext" not in names
+
+
+def test_build__primitive_type_ext_placeholder_uses_typed_name(builder, index):
+    """Ext placeholder for a type-choice primitive must use the full typed field name."""
+    node = make_node("value", type_codes=["string"])
+    result = builder.build(node, index)
+    names = [f.name for f in result.fields]
+    assert "valueString_ext" in names
+
+
+def test_build__primitive_type_ext_placeholder_alias_uses_typed_name(builder, index):
+    """Ext placeholder alias must be the underscore-prefixed typed field name."""
+    node = make_node("value", type_codes=["string"])
+    result = builder.build(node, index)
+    placeholder = next(f for f in result.fields if f.name == "valueString_ext")
+    assert placeholder.alias == "_valueString"
+
+
+def test_build__two_primitives_ext_placeholders_use_typed_names(builder, index):
+    """Each primitive type choice variant gets its own correctly named _ext placeholder."""
+    node = make_node("value", type_codes=["string", "boolean"])
+    result = builder.build(node, index)
+    ext_names = [f.name for f in result.fields if f.name.endswith("_ext")]
+    assert "valueString_ext" in ext_names
+    assert "valueBoolean_ext" in ext_names
+    assert "value_ext" not in ext_names
+
+
+def test_build__different_base_name_primitive_ext_uses_typed_name(builder, index):
+    """The correctly-typed _ext placeholder is generated regardless of the base name."""
+    node = make_node("effective", type_codes=["dateTime"])
+    result = builder.build(node, index)
+    names = [f.name for f in result.fields]
+    assert "effectiveDateTime_ext" in names
+    assert "effective_ext" not in names
 
 
 def test_build__two_types_one_primitive_adds_exactly_one_placeholder(builder, index):
