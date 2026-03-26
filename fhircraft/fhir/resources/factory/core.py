@@ -108,15 +108,25 @@ class FHIRModelFactory:
 
         return self._build(structure_definition, mixins=mixins, mode=mode)
 
-    def register_package(self, package_name: str, version: str) -> None:
+    def register_package(
+        self,
+        package_name: str,
+        version: str,
+        skip_invalid: bool = False,
+        include_dependencies: bool = True,
+    ) -> None:
         """
         Download and register all StructureDefinitions from a FHIR npm package.
 
         Args:
             package_name: Package identifier (e.g. ``"hl7.fhir.us.mcode"``).
             version: Package version string (e.g. ``"1.0.0"``).
+            skip_invalid: Whether to skip invalid StructureDefinitions.
+            include_dependencies: Whether to include dependencies when downloading the package.
         """
-        self.definition_registry.download_package(package_name, version)
+        self.definition_registry.download_package(
+            package_name, version, skip_invalid, include_dependencies
+        )
 
     def register(
         self,

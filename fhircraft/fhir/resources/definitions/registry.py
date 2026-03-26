@@ -9,6 +9,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
+import warnings
 
 import requests
 from pydantic import BaseModel
@@ -293,13 +294,30 @@ class StructureDefinitionRegistry:
         response.raise_for_status()
         return response.json()
 
-    def download_package(self, package_name: str, version: str) -> None:
+    def download_package(
+        self,
+        package_name: str,
+        version: str,
+        skip_invalid: bool = False,
+        include_dependencies: bool = True,
+    ) -> None:
         """Download a package from the registry and add its structure definitions to the registry."""
         for sd in self._package_client.load_resources_from_package(
-            "StructureDefinition", package_name, version
+            "StructureDefinition",
+            package_name,
+            version,
+            install_dependencies=include_dependencies,
         ):
-            structure_definition = self._validate_structure_definition(sd)
-            self.add(structure_definition)
+            try:
+                structure_definition = self._validate_structure_definition(sd)
+                self.add(structure_definition)
+            except ValueError as e:
+                if not skip_invalid:
+                    raise e
+                else:
+                    warnings.warn(
+                        f"Skipping invalid structure definition {sd.get('url', 'unknown')} in package {package_name} version {version}:\n{e}"
+                    )
 
     def set_registry_base_url(self, base_url: str) -> None:
         """Change the package registry base URL."""
