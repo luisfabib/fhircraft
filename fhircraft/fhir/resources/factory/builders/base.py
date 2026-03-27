@@ -282,12 +282,6 @@ class Builder(ABC):
         effective_is_array = (
             node.base_is_array if node.base_is_array is not None else node.is_array
         )
-        print(
-            "Effective is_array for field '{}': {}, base_is_array: {}, is_array: {}".format(
-                name, effective_is_array, node.base_is_array, node.is_array
-            )
-        )
-
         if effective_is_array and default is not None:
             default = ensure_list(default)
 
