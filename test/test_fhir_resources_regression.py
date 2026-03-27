@@ -1319,3 +1319,70 @@ def test_regression_issue_331__narrowing_cardinality_preserves_list_type(factory
 
     with pytest.raises(ValidationError):
         original.model_validate(invalid_payload)
+
+def test_regression_issue_334__chained_profile_differential_resolves_all_base_elements(
+    factory,
+):
+    structure_definition_1 = {
+        "resourceType": "StructureDefinition",
+        "id": "example-chained-profile-1",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-chained-profile-1",
+        "version": "5.0.0",
+        "name": "ExampleChainedProfile1",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation"},
+                {"id": "Observation.id", "path": "Observation.id", "min": 1},
+            ]
+        },
+    }
+
+    structure_definition_2 = {
+        "resourceType": "StructureDefinition",
+        "id": "example-chained-profile-2",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-chained-profile-2",
+        "version": "5.0.0",
+        "name": "ExampleChainedProfile2",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/example-chained-profile-1",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation"},
+                {"id": "Observation.category", "path": "Observation.category"},
+            ]
+        },
+    }
+
+    factory.definition_registry.from_dict(structure_definition_1)
+    factory.definition_registry.from_dict(structure_definition_2)
+
+    with override_config(validation_mode="skip"):
+        # This must not raise TypeResolutionError / AssemblerError
+        model = factory.build(
+            structure_definition=structure_definition_2, mode="differential"
+        )
+
+    from typing import get_args
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept
+
+    assert (
+        "category" in model.model_fields
+    ), "Observation.category missing from the built model."
+
+    annotation = model.model_fields["category"].annotation
+    inner_list = next(a for a in get_args(annotation) if a is not type(None))
+    item_type = get_args(inner_list)[0]
+
+    assert issubclass(item_type, CodeableConcept)

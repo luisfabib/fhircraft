@@ -126,7 +126,13 @@ class SnapshotResolver:
                 )
                 base_index.update(partial_base_index.nodes, replace=True)
             else:
-                base_index = partial_base_index
+
+                ancestor_base_index = self._build_full_ancestor_index(base_definition)
+                if ancestor_base_index.root().id == partial_base_index.root().id:
+                    ancestor_base_index.update(partial_base_index.nodes, replace=True)
+                    base_index = ancestor_base_index
+                else:
+                    base_index = partial_base_index
             # Merge differential over base snapshot to produce a synthetic snapshot
             resolved_index = self._resolve_differential(
                 sd.differential.element, base_index
@@ -145,6 +151,41 @@ class SnapshotResolver:
     # ------------------------------------------------------------------
     # Differential resolution
     # ------------------------------------------------------------------
+
+    def _build_full_ancestor_index(
+        self,
+        sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition",
+    ) -> DefinitionIndex:
+        """
+        Walk the ``baseDefinition`` chain of *sd* until an ancestor with a complete
+        snapshot is found, and return a :class:`DefinitionIndex` built from that snapshot.
+
+        This is used when an intermediate base ``StructureDefinition`` carries no snapshot
+        of its own (i.e. it is a differential-only custom profile).  The caller is
+        responsible for subsequently applying the intermediate profile's own resolved
+        differential nodes on top of the returned index via :meth:`DefinitionIndex.update`.
+
+        Args:
+            sd: The differential-only StructureDefinition whose ancestor chain should be walked.
+
+        Returns:
+            DefinitionIndex: Index built from the nearest ancestor snapshot.
+
+        Raises:
+            DefinitionResolutionError: If the ancestor chain is exhausted without finding
+                                       a definition that has a snapshot.
+        """
+        current = sd
+        while True:
+            if not current.baseDefinition:
+                raise DefinitionResolutionError(
+                    f"StructureDefinition '{getattr(current, 'name', '?')}' has neither a "
+                    "snapshot nor a baseDefinition — cannot reconstruct full ancestor index."
+                )
+            ancestor = self._registry.get(current.baseDefinition)
+            if ancestor.snapshot and ancestor.snapshot.element:
+                return DefinitionIndex.from_elements(ancestor.snapshot.element)
+            current = ancestor
 
     def _resolve_differential(
         self,

@@ -1035,8 +1035,6 @@ def test_resolve__auto_mode_is_default(resolver, base_index):
 
 
 def test_resolve__differential_resolves_base_via_registry(resolver, base_index):
-    """resolve() fetches the base StructureDefinition from the registry and recursively
-    resolves it to build the base_index used for differential merging."""
     diff_elements = [
         make_element("MyProfile", "MyProfile"),
         make_element("MyProfile.status", "MyProfile.status", min=1),
@@ -1059,8 +1057,6 @@ def test_resolve__differential_resolves_base_via_registry(resolver, base_index):
 
 
 def test_resolve__differential_recursive_chain(resolver, base_index):
-    """resolve() recursively resolves a chain of differential definitions until a
-    snapshot is found, without requiring any intermediate snapshot."""
     # Deepest base — provides the snapshot for the whole chain.
     root_sd = make_structure_def(
         snapshot_elements=[n.definition for n in base_index.nodes]
@@ -1101,7 +1097,6 @@ def test_resolve__differential_recursive_chain(resolver, base_index):
 
 
 def test_resolve__differential_raises_when_base_definition_is_missing(resolver):
-    """resolve() raises DefinitionResolutionError when the SD has no baseDefinition."""
     sd = make_structure_def(
         differential_elements=[
             make_element("MyProfile", "MyProfile"),
@@ -1111,3 +1106,239 @@ def test_resolve__differential_raises_when_base_definition_is_missing(resolver):
 
     with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
+
+
+def test_resolve__differential_no_snapshot_mismatched_root_falls_back_to_partial(
+    resolver, base_index
+):
+    # Snapshot uses 'BaseResource' as the root.
+    root_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+
+    # Mid profile uses a *different* root name ('MidProfile'), which is the
+    # non-standard scenario covered by the guard clause.
+    mid_diff = [
+        make_element("MidProfile", "MidProfile"),
+        make_element("MidProfile.status", "MidProfile.status", min=1),
+    ]
+    mid_sd = make_structure_def(
+        differential_elements=mid_diff,
+        base_definition="http://example.org/BaseResource",
+    )
+
+    top_diff = [
+        make_element("TopProfile", "TopProfile"),
+        make_element("TopProfile.status", "TopProfile.status", max="0"),
+    ]
+    top_sd = make_structure_def(
+        differential_elements=top_diff,
+        base_definition="http://example.org/MidProfile",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/MidProfile": mid_sd,
+            "http://example.org/BaseResource": root_sd,
+        }[url]
+    )
+
+    # Must not raise a DefinitionIndexError about multiple root candidates.
+    result = resolver.resolve(top_sd, mode="differential")
+
+    assert isinstance(result, DefinitionIndex)
+    node = result.get("TopProfile.status")
+    assert node is not None
+    assert node.max_cardinality == 0
+
+
+def test_resolve__differential_no_snapshot_base_uses_ancestor_snapshot(
+    resolver, base_index
+):
+    # Bottom of the chain — has a real snapshot that includes 'category'.
+    root_sd = make_structure_def(
+        snapshot_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element(
+                "BaseResource.status",
+                "BaseResource.status",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="code")],
+            ),
+            make_element(
+                "BaseResource.category",
+                "BaseResource.category",
+                min=0,
+                max="*",
+                type=[ElementDefinitionType(code="CodeableConcept")],
+            ),
+        ]
+    )
+
+    # Mid-level: diff-only, only mentions 'status', never mentions 'category'.
+    mid_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.status", "BaseResource.status", min=1),
+        ],
+        base_definition="http://example.org/BaseResource",
+    )
+
+    # Top-level: constrains 'category', which MidProfile never mentioned.
+    top_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.category", "BaseResource.category", min=1),
+        ],
+        base_definition="http://example.org/MidProfile",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/MidProfile": mid_sd,
+            "http://example.org/BaseResource": root_sd,
+        }[url]
+    )
+
+    result = resolver.resolve(top_sd, mode="differential")
+
+    assert isinstance(result, DefinitionIndex)
+    # category must be present and carry its type from the ancestor snapshot
+    category_node = result.get("BaseResource.category")
+    assert category_node is not None
+    assert category_node.min_cardinality == 1  # overridden by top diff
+
+
+def test_resolve__differential_no_snapshot_base_preserves_mid_constraints(
+    resolver, base_index
+):
+    root_sd = make_structure_def(
+        snapshot_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element(
+                "BaseResource.status",
+                "BaseResource.status",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="code")],
+            ),
+            make_element(
+                "BaseResource.category",
+                "BaseResource.category",
+                min=0,
+                max="*",
+                type=[ElementDefinitionType(code="CodeableConcept")],
+            ),
+        ]
+    )
+
+    # MidProfile raises min on 'status' to 1, never mentions 'category'.
+    mid_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.status", "BaseResource.status", min=1),
+        ],
+        base_definition="http://example.org/BaseResource",
+    )
+
+    # TopProfile restricts 'category' to max="1"; doesn't mention 'status'.
+    top_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.category", "BaseResource.category", max="1"),
+        ],
+        base_definition="http://example.org/MidProfile",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/MidProfile": mid_sd,
+            "http://example.org/BaseResource": root_sd,
+        }[url]
+    )
+
+    result = resolver.resolve(top_sd, mode="differential")
+
+    # category must appear with TopProfile's max=1 applied on top of the ancestor
+    # type definition (CodeableConcept) which MidProfile never touched.
+    category_node = result.get("BaseResource.category")
+    assert category_node is not None
+    assert category_node.max_cardinality == 1
+    # Type must be resolved from the ancestor snapshot, not be empty.
+    assert (
+        category_node.types
+    ), "category node has no types — ancestor snapshot was not used"
+    assert any(str(t.code) == "CodeableConcept" for t in category_node.types)
+
+
+# ==================================================================
+# SnapshotResolver._build_full_ancestor_index
+# ==================================================================
+
+
+def test_build_full_ancestor_index__returns_index_from_nearest_snapshot(
+    resolver, base_index
+):
+    snapshot_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    diff_only_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+        ],
+        base_definition="http://example.org/RootResource",
+    )
+
+    resolver._registry.get = MagicMock(return_value=snapshot_sd)
+
+    result = resolver._build_full_ancestor_index(diff_only_sd)
+
+    assert isinstance(result, DefinitionIndex)
+    assert result.root().id == "BaseResource"
+    assert result.get("BaseResource.status") is not None
+
+
+def test_build_full_ancestor_index__skips_multiple_snapshotless_ancestors(
+    resolver, base_index
+):
+    # Three-level chain: A (diff-only) → B (diff-only) → C (has snapshot)
+    sd_c = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    sd_b = make_structure_def(
+        differential_elements=[make_element("BaseResource", "BaseResource")],
+        base_definition="http://example.org/C",
+    )
+    sd_a = make_structure_def(
+        differential_elements=[make_element("BaseResource", "BaseResource")],
+        base_definition="http://example.org/B",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/B": sd_b,
+            "http://example.org/C": sd_c,
+        }[url]
+    )
+
+    result = resolver._build_full_ancestor_index(sd_a)
+
+    assert isinstance(result, DefinitionIndex)
+    assert result.root().id == "BaseResource"
+
+
+def test_build_full_ancestor_index__raises_when_chain_has_no_snapshot(resolver):
+    sd_b = make_structure_def(
+        differential_elements=[make_element("MyProfile", "MyProfile")],
+        base_definition=None,  # chain terminates here with no snapshot
+    )
+    sd_a = make_structure_def(
+        differential_elements=[make_element("MyProfile", "MyProfile")],
+        base_definition="http://example.org/B",
+    )
+
+    resolver._registry.get = MagicMock(return_value=sd_b)
+
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_full_ancestor_index(sd_a)
