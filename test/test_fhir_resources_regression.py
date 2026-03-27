@@ -1320,6 +1320,52 @@ def test_regression_issue_331__narrowing_cardinality_preserves_list_type(factory
     with pytest.raises(ValidationError):
         original.model_validate(invalid_payload)
 
+
+def test_regression_issue_333__backbone_element_differential_uses_specific_type(
+    factory,
+):
+    from fhircraft.fhir.resources.datatypes.R5.core import ObservationReferenceRange
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "example-profile-referencerange",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-profile-referencerange",
+        "version": "5.0.0",
+        "name": "ExampleProfileReferenceRange",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation"},
+                {
+                    "id": "Observation.referenceRange",
+                    "path": "Observation.referenceRange",
+                    "min": 1,
+                },
+            ]
+        },
+    }
+
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
+
+    from typing import get_args
+
+    annotation = model.model_fields["referenceRange"].annotation
+    # Unwrap Optional[List[X]] → X
+    inner_list = next(a for a in get_args(annotation) if a is not type(None))
+    item_type = get_args(inner_list)[0]
+
+    assert item_type is ObservationReferenceRange
+
+
 def test_regression_issue_334__chained_profile_differential_resolves_all_base_elements(
     factory,
 ):

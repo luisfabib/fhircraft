@@ -394,7 +394,7 @@ class ElementNode:
             self.definition.comment,
         ):
             if _has_content(candidate):
-                return candidate
+                return str(candidate)
         return ""
 
     # ------------------------------------------------------------------
