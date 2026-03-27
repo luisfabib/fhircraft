@@ -243,10 +243,24 @@ def test_build__field_name_matches_node_name(builder: Builder, index, assembler)
     assert build.fields[0].name == "category"
 
 
-def test_build__field_alias_is_node_raw_name(builder: Builder, index, assembler):
+def test_build__non_keyword_field_has_no_alias(builder: Builder, index, assembler):
     node = make_entry_node(name="category")
     build = builder.build(node, index)
-    assert build.fields[0].alias == "category"
+    assert build.fields[0].alias is None
+
+
+def test_build__python_keyword_field_gets_alias(index, assembler, monkeypatch):
+    builder = make_builder()
+    original_name = "class"
+    node = make_entry_node(name=original_name)
+    val_alias = AliasChoices(original_name, "class_")
+    monkeypatch.setattr(
+        builder,
+        "handle_python_keyword",
+        lambda name: ("class_", val_alias),
+    )
+    build = builder.build(node, index)
+    assert build.fields[0].alias == original_name
 
 
 def test_build__field_description_is_definition_short(
