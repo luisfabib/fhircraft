@@ -1432,3 +1432,119 @@ def test_regression_issue_334__chained_profile_differential_resolves_all_base_el
     item_type = get_args(inner_list)[0]
 
     assert issubclass(item_type, CodeableConcept)
+
+
+def test_regression_issue_335__extension_slice_on_complex_type_field(factory):
+    """Extension slice on a complex-type sub-field (e.g. Observation.code.extension)
+    must produce a typed slice model, not plain Optional[List[Extension]]."""
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "example-profile-ext-on-complex",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-profile-ext-on-complex",
+        "version": "5.0.0",
+        "name": "ExampleProfileExtOnComplex",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation.code", "path": "Observation.code"},
+                {
+                    "id": "Observation.code.extension",
+                    "path": "Observation.code.extension",
+                },
+                {
+                    "id": "Observation.code.extension:mySlice",
+                    "path": "Observation.code.extension",
+                    "sliceName": "mySlice",
+                    "type": [
+                        {
+                            "code": "Extension",
+                            "profile": [
+                                "http://example.org/fhir/StructureDefinition/my-ext-on-complex"
+                            ],
+                        }
+                    ],
+                },
+            ]
+        },
+    }
+
+    extension_sd = {
+        "resourceType": "StructureDefinition",
+        "id": "my-ext-on-complex",
+        "url": "http://example.org/fhir/StructureDefinition/my-ext-on-complex",
+        "version": "0.1.0",
+        "name": "MyExtOnComplex",
+        "status": "active",
+        "fhirVersion": "5.0.0",
+        "kind": "complex-type",
+        "abstract": False,
+        "context": [{"type": "element", "expression": "Observation.code.extension"}],
+        "type": "Extension",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "Extension.url",
+                    "path": "Extension.url",
+                    "fixedUri": "http://example.org/fhir/StructureDefinition/my-ext-on-complex",
+                },
+                {
+                    "id": "Extension.value[x]",
+                    "path": "Extension.value[x]",
+                    "type": [{"code": "string"}],
+                    "min": 1,
+                    "max": "1",
+                },
+            ]
+        },
+    }
+
+    factory.definition_registry.from_dict(structure_definition)
+    factory.definition_registry.from_dict(extension_sd)
+
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
+
+    from typing import Annotated, get_args
+
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, Extension
+
+    # Observation.code should be a CodeableConcept subclass
+    code_annotation = model.model_fields["code"].annotation
+    code_type = next(a for a in get_args(code_annotation) if a is not type(None))
+    assert issubclass(code_type, CodeableConcept)
+
+    # code.extension must be a sliced union containing the MySlice model
+    ext_annotation = code_type.model_fields["extension"].annotation
+    list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
+    annotated_item = get_args(list_type)[0]
+    union_type = get_args(annotated_item)[0]
+    union_members = get_args(union_type)
+
+    slice_models = [
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    ]
+    assert slice_models, (
+        "Expected at least one FHIRSliceModel in code.extension union, "
+        f"got {union_members}"
+    )
+    slice_model = slice_models[0]
+    assert issubclass(slice_model, Extension)
+    assert (
+        slice_model._canonical_url
+        == "http://example.org/fhir/StructureDefinition/my-ext-on-complex"
+    )
+    assert "valueString" in slice_model.model_fields

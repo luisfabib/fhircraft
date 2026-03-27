@@ -6,6 +6,12 @@ from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinition,
     ElementDefinitionType,
 )
+
+from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
+    ElementDefinitionSlicing,
+    ElementDefinitionSlicingDiscriminator,
+)
+
 from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import (
@@ -60,6 +66,18 @@ def make_structure_def(
         sd.differential = None
 
     return sd
+
+
+def make_url_slicing() -> ElementDefinitionSlicing:
+    """Return the canonical open-sliced-by-url discriminator found on extension elements."""
+    return ElementDefinitionSlicing.model_construct(
+        discriminator=[
+            ElementDefinitionSlicingDiscriminator.model_construct(
+                type="value", path="url"
+            )
+        ],
+        rules="open",
+    )
 
 
 # ------------------------------------------------------------------
@@ -227,6 +245,20 @@ def test_build_type_node__raises_error_for_no_type_matches(base_index, resolver)
             "Observation.value.nonExistentField",
             base_index,
         )
+
+
+def test_build_type_node__preserves_slicing_from_base_type(resolver):
+    node = resolver._build_type_node(
+        ["CodeableConcept"],
+        "Observation.code.extension",
+        make_base_index(make_element("Observation", "Observation")),
+    )
+
+    assert node is not None
+    assert (
+        node.definition.slicing is not None
+    ), "_build_type_node stripped slicing from CodeableConcept.extension"
+    assert node.is_slice_entry, "Type-expanded extension node should be a slice entry"
 
 
 # ------------------------------------------------------------------
@@ -423,6 +455,35 @@ def test_build_intermediate_node__definition_class_is_same_as_base(
     base_node = base_index.get("BaseResource.status")
     node = resolver._build_intermediate_node("MyProfile.status", base_index)
     assert type(node.definition) is type(base_node.definition)
+
+
+def test_build_intermediate_node__preserves_slicing_from_base(resolver):
+    """_build_intermediate_node expands Observation.code.extension from CodeableConcept
+    (the parent type) — the resulting node must retain the slicing discriminator."""
+    # Base index contains Observation.code typed as CodeableConcept; no .extension entry.
+    base_with_code = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.code",
+            "Observation.code",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+    )
+
+    node = resolver._build_intermediate_node(
+        "Observation.code.extension", base_with_code
+    )
+
+    assert node is not None
+    assert node.definition.slicing is not None, (
+        "_build_intermediate_node stripped slicing when expanding "
+        "Observation.code.extension from CodeableConcept"
+    )
+    assert node.is_slice_entry, (
+        "Synthesised Observation.code.extension node should be a slice entry"
+    )
 
 
 # ------------------------------------------------------------------
@@ -705,6 +766,89 @@ def test_resolve_differential__merge_result_is_stored_not_diff_node(
 
     stored = index.get("MyProfile.status")
     assert stored is merged_sentinel
+
+
+def test_resolve_differential__extension_slice_on_complex_field_is_present(resolver):
+    # Build a minimal Observation snapshot — only the top-level 'code' field.
+    obs_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.code",
+            "Observation.code",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+    ]
+    base_index = make_base_index(*obs_snapshot)
+
+    # The differential introduces a slice on Observation.code.extension.
+    diff = [
+        make_element("Observation", "Observation"),
+        make_element("Observation.code", "Observation.code"),
+        make_element("Observation.code.extension", "Observation.code.extension"),
+        make_element(
+            "Observation.code.extension:mySlice",
+            "Observation.code.extension",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="Extension")],
+        ),
+    ]
+
+    result = resolver._resolve_differential(diff, base_index)
+
+    # The slice entry node must be present and must be recognised as such.
+    ext_node = result.get("Observation.code.extension")
+    assert (
+        ext_node is not None
+    ), "Observation.code.extension missing from resolved index"
+    assert (
+        ext_node.is_slice_entry
+    ), "Observation.code.extension must be a slice entry so SlicedFieldBuilder handles it"
+
+    # The named slice must be present in the index.
+    assert (
+        "Observation.code.extension:mySlice" in result
+    ), "Observation.code.extension:mySlice missing — slice was silently dropped"
+
+
+def test_resolve_differential__slicing_preserved_on_intermediate_complex_type_node(
+    resolver,
+):
+    obs_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.code",
+            "Observation.code",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+    ]
+    base_index = make_base_index(*obs_snapshot)
+
+    diff = [
+        make_element("Observation", "Observation"),
+        make_element("Observation.code", "Observation.code"),
+        make_element("Observation.code.extension", "Observation.code.extension"),
+        make_element(
+            "Observation.code.extension:mySlice",
+            "Observation.code.extension",
+            min=1,
+            max="1",
+            type=[ElementDefinitionType(code="Extension")],
+        ),
+    ]
+
+    result = resolver._resolve_differential(diff, base_index)
+
+    ext_node = result.get("Observation.code.extension")
+    assert ext_node is not None
+    assert ext_node.definition.slicing is not None, (
+        "slicing was stripped when building the intermediate "
+        "Observation.code.extension node from CodeableConcept"
+    )
 
 
 # ==================================================================

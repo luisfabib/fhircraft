@@ -36,7 +36,7 @@ if TYPE_CHECKING:
         StructureDefinition as R5_StructureDefinition,
     )
 
-_BASE_MERGE_FIELDS = {"min", "max", "type", "short", "definition", "comment"}
+_BASE_MERGE_FIELDS = {"min", "max", "type", "short", "definition", "comment", "slicing"}
 
 
 class SnapshotResolver:
