@@ -381,13 +381,21 @@ class ElementNode:
         """
         Full combination of the elemments's `short`,  `definition`, and `comment` fields, in
         that order of preference.  Returns an empty string if none of those fields are set.
+
+        Strings that contain no alphanumeric characters are treated as absent and the next candidate is tried instead.
         """
-        return (
-            self.definition.definition
-            or self.definition.short
-            or self.definition.comment
-            or ""
-        )
+
+        def _has_content(value: str | None) -> bool:
+            return bool(value and re.search(r"[A-Za-z0-9]", value))
+
+        for candidate in (
+            self.definition.definition,
+            self.definition.short,
+            self.definition.comment,
+        ):
+            if _has_content(candidate):
+                return candidate
+        return ""
 
     # ------------------------------------------------------------------
     # Constraint values

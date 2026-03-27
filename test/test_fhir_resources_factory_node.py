@@ -486,3 +486,68 @@ def test_element_node_is_polymorphic_type_false_for_type_choice_slice(
     element.path = path
     node = ElementNode(definition=element)
     assert node.is_polymorphic_type == expected
+
+
+# ------------------------------------------------------------------
+# Documentation
+# ------------------------------------------------------------------
+
+
+def test_documentation__returns_definition_when_it_has_content(element):
+    element.definition = "A real definition."
+    element.short = "Short text"
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "A real definition."
+
+
+def test_documentation__falls_back_to_short_when_definition_has_no_alphanumeric(
+    element,
+):
+    element.definition = r"\-"
+    element.short = "Short text"
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "Short text"
+
+
+def test_documentation__falls_back_to_comment_when_definition_and_short_are_placeholders(
+    element,
+):
+    element.definition = r"\-"
+    element.short = "---"
+    element.comment = "Useful comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "Useful comment"
+
+
+def test_documentation__returns_empty_string_when_all_fields_are_placeholders(element):
+    element.definition = r"\-"
+    element.short = "---"
+    element.comment = "***"
+    node = ElementNode(definition=element)
+    assert node.documentation == ""
+
+
+def test_documentation__returns_empty_string_when_all_fields_are_none(element):
+    element.definition = None
+    element.short = None
+    element.comment = None
+    node = ElementNode(definition=element)
+    assert node.documentation == ""
+
+
+def test_documentation__returns_short_when_definition_is_none(element):
+    element.definition = None
+    element.short = "Short text"
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "Short text"
+
+
+def test_documentation__returns_comment_when_definition_and_short_are_none(element):
+    element.definition = None
+    element.short = None
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "A comment"
