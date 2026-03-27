@@ -2354,7 +2354,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_2_constraint_model_validator(self):
+    def FHIR_eld_2_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="min.empty() or max.empty() or (max = '*') or iif(max != '*', min <= max.toInteger())",
@@ -2364,7 +2364,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_5_constraint_model_validator(self):
+    def FHIR_eld_5_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="contentReference.empty() or (type.empty() and defaultValue.empty() and fixed.empty() and pattern.empty() and example.empty() and minValue.empty() and maxValue.empty() and maxLength.empty() and binding.empty())",
@@ -2374,7 +2374,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_6_constraint_model_validator(self):
+    def FHIR_eld_6_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="fixed.empty() or (type.count()  <= 1)",
@@ -2384,7 +2384,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_7_constraint_model_validator(self):
+    def FHIR_eld_7_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="pattern.empty() or (type.count() <= 1)",
@@ -2394,7 +2394,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_8_constraint_model_validator(self):
+    def FHIR_eld_8_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="pattern.empty() or fixed.empty()",
@@ -2404,7 +2404,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_11_constraint_model_validator(self):
+    def FHIR_eld_11_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="binding.empty() or type.code.empty() or type.select((code = 'code') or (code = 'Coding') or (code='CodeableConcept') or (code = 'Quantity') or (code = 'string') or (code = 'uri') or (code = 'Duration')).exists()",
@@ -2414,7 +2414,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_13_constraint_model_validator(self):
+    def FHIR_eld_13_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="type.select(code).isDistinct()",
@@ -2424,7 +2424,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_14_constraint_model_validator(self):
+    def FHIR_eld_14_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="constraint.select(key).isDistinct()",
@@ -2434,7 +2434,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_15_constraint_model_validator(self):
+    def FHIR_eld_15_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="defaultValue.empty() or meaningWhenMissing.empty()",
@@ -2444,7 +2444,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_16_constraint_model_validator(self):
+    def FHIR_eld_16_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="sliceName.empty() or sliceName.matches('^[a-zA-Z0-9\\/\\-_\\[\\]\\@]+$')",
@@ -2454,7 +2454,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_18_constraint_model_validator(self):
+    def FHIR_eld_18_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="(isModifier.exists() and isModifier) implies isModifierReason.exists()",
@@ -2464,7 +2464,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_19_constraint_model_validator(self):
+    def FHIR_eld_19_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="""path.matches('^[^\\s\\.,:;\\\'"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\.[^\\s\\.,:;\\\'"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\[x\\])?(\\:[^\\s\\.]+)?)*$')""",
@@ -2474,7 +2474,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_20_constraint_model_validator(self):
+    def FHIR_eld_20_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="""path.matches('^[A-Za-z][A-Za-z0-9]*(\\.[a-z][A-Za-z0-9]*(\\[x])?)*$')""",
@@ -2484,7 +2484,7 @@ class ElementDefinition(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_eld_22_constraint_model_validator(self):
+    def FHIR_eld_22_constraint_validator(self):
         return validate_model_constraint(
             self,
             expression="sliceIsConstraining.exists() implies sliceName.exists()",

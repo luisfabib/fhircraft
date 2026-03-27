@@ -1086,7 +1086,7 @@ class Task(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_inv_1_constraint_model_validator(self):
+    def FHIR_inv_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="lastModified.exists().not() or authoredOn.exists().not() or lastModified >= authoredOn",
@@ -1096,7 +1096,7 @@ class Task(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_tsk_1_constraint_model_validator(self):
+    def FHIR_tsk_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="restriction.exists() implies code.coding.where(code='fulfill' and system='http://hl7.org/fhir/CodeSystem/task-code').exists() and focus.exists()",

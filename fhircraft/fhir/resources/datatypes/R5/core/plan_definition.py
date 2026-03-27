@@ -1018,7 +1018,7 @@ class PlanDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
+    def FHIR_cnl_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
@@ -1061,7 +1061,7 @@ class PlanDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_pld_3_constraint_model_validator(self):
+    def FHIR_pld_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="%context.repeat(action).where((goalId in %context.goal.id).not()).exists().not()",
@@ -1071,7 +1071,7 @@ class PlanDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_pld_4_constraint_model_validator(self):
+    def FHIR_pld_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="%context.repeat(action).relatedAction.where((targetId in %context.repeat(action).id).not()).exists().not()",

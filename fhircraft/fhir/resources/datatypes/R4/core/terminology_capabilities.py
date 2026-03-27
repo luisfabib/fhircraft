@@ -506,7 +506,7 @@ class TerminologyCapabilities(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_tcp_0_constraint_model_validator(self):
+    def FHIR_tcp_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
@@ -516,7 +516,7 @@ class TerminologyCapabilities(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_tcp_2_constraint_model_validator(self):
+    def FHIR_tcp_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(description.count() + software.count() + implementation.count()) > 0",
@@ -526,7 +526,7 @@ class TerminologyCapabilities(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_tcp_3_constraint_model_validator(self):
+    def FHIR_tcp_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'instance') or implementation.exists()",
@@ -536,7 +536,7 @@ class TerminologyCapabilities(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_tcp_4_constraint_model_validator(self):
+    def FHIR_tcp_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'capability') or (implementation.exists().not() and software.exists())",
@@ -546,7 +546,7 @@ class TerminologyCapabilities(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_tcp_5_constraint_model_validator(self):
+    def FHIR_tcp_5_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind!='requirements') or (implementation.exists().not() and software.exists().not())",

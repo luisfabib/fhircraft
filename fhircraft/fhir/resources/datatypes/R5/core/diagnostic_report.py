@@ -201,7 +201,7 @@ class DiagnosticReport(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_dgr_1_constraint_model_validator(self):
+    def FHIR_dgr_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="composition.exists() implies (composition.resolve().section.entry.reference.where(resolve() is Observation) in (result.reference|result.reference.resolve().hasMember.reference))",

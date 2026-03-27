@@ -10,6 +10,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 
+
 class DomainResource(Resource):
     """
     A resource with narrative, extensions, and contained resources
@@ -48,7 +49,7 @@ class DomainResource(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
+    def FHIR_dom_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
@@ -58,7 +59,7 @@ class DomainResource(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
+    def FHIR_dom_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where(((id.exists() and ('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url)))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(uri) = '#').exists()).not()).trace('unmatched', id).empty()",
@@ -68,7 +69,7 @@ class DomainResource(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
+    def FHIR_dom_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
@@ -78,7 +79,7 @@ class DomainResource(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
+    def FHIR_dom_5_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
@@ -88,7 +89,7 @@ class DomainResource(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
+    def FHIR_dom_6_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",

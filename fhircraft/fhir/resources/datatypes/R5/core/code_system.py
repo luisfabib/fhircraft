@@ -595,7 +595,7 @@ class CodeSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
+    def FHIR_cnl_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
@@ -605,7 +605,7 @@ class CodeSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_csd_1_constraint_model_validator(self):
+    def FHIR_csd_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="concept.exists() implies concept.code.combine(%resource.concept.descendants().concept.code).isDistinct()",
@@ -615,7 +615,7 @@ class CodeSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_csd_2_constraint_model_validator(self):
+    def FHIR_csd_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="concept.concept.exists() implies hierarchyMeaning.exists()",
@@ -625,7 +625,7 @@ class CodeSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_csd_3_constraint_model_validator(self):
+    def FHIR_csd_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="concept.where(property.code = 'parent' or property.code = 'child').exists() implies hierarchyMeaning.exists()",
@@ -635,7 +635,7 @@ class CodeSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_csd_4_constraint_model_validator(self):
+    def FHIR_csd_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="CodeSystem.content = 'supplement' implies CodeSystem.supplements.exists()",

@@ -88,7 +88,7 @@ class Attachment(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_att_1_constraint_model_validator(self):
+    def FHIR_att_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="data.empty() or contentType.exists()",

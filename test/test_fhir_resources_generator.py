@@ -214,7 +214,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_ele_1_constraint_model_validator": (
+                "FHIR_ele_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -235,7 +235,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_ele_1_constraint_model_validator(self):
+            def FHIR_ele_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
@@ -259,7 +259,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_custom_1_constraint_model_validator": (
+                "FHIR_custom_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -280,7 +280,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_custom_1_constraint_model_validator(self):
+            def FHIR_custom_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="exists()",
@@ -531,7 +531,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 Field(description="A code field with multiline constraint."),
             ),
             __validators__={
-                "FHIR_TechniquesForProtonBeamModality_constraint_model_validator": (
+                "FHIR_TechniquesForProtonBeamModality_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -688,7 +688,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_child_1_constraint_model_validator": (
+                "FHIR_child_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -711,7 +711,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_grandchild_1_constraint_model_validator": (
+                "FHIR_grandchild_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -733,7 +733,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_child_1_constraint_model_validator(self):
+            def FHIR_child_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="exists()",
@@ -749,7 +749,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_grandchild_1_constraint_model_validator(self):
+            def FHIR_grandchild_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="exists()",

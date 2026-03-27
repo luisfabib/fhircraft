@@ -28,7 +28,7 @@ class RatioRange(DataType):
     )
 
     @model_validator(mode="after")
-    def FHIR_ratrng_1_constraint_model_validator(self):
+    def FHIR_ratrng_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="((lowNumerator.exists() or highNumerator.exists()) and denominator.exists()) or (lowNumerator.empty() and highNumerator.empty() and denominator.empty() and extension.exists())",
@@ -38,7 +38,7 @@ class RatioRange(DataType):
         )
 
     @model_validator(mode="after")
-    def FHIR_ratrng_2_constraint_model_validator(self):
+    def FHIR_ratrng_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="lowNumerator.hasValue().not() or highNumerator.hasValue().not()  or (lowNumerator.lowBoundary() <= highNumerator.highBoundary())",

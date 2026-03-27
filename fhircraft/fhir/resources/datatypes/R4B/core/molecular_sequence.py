@@ -604,7 +604,7 @@ class MolecularSequence(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_msq_3_constraint_model_validator(self):
+    def FHIR_msq_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="coordinateSystem = 1 or coordinateSystem = 0",

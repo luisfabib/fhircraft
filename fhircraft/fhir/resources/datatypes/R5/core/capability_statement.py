@@ -899,7 +899,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
+    def FHIR_cnl_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
@@ -929,7 +929,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_1_constraint_model_validator(self):
+    def FHIR_cpb_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="rest.exists() or messaging.exists() or document.exists()",
@@ -939,7 +939,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_2_constraint_model_validator(self):
+    def FHIR_cpb_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(description.count() + software.count() + implementation.count()) > 0",
@@ -949,7 +949,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_3_constraint_model_validator(self):
+    def FHIR_cpb_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="messaging.endpoint.empty() or kind = 'instance'",
@@ -959,7 +959,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_4_constraint_model_validator(self):
+    def FHIR_cpb_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="rest.mode.isDistinct()",
@@ -969,7 +969,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_7_constraint_model_validator(self):
+    def FHIR_cpb_7_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="document.select(profile&mode).isDistinct()",
@@ -1001,7 +1001,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_14_constraint_model_validator(self):
+    def FHIR_cpb_14_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'instance') or implementation.exists()",
@@ -1011,7 +1011,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_15_constraint_model_validator(self):
+    def FHIR_cpb_15_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'capability') or (implementation.exists().not() and software.exists())",
@@ -1021,7 +1021,7 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_16_constraint_model_validator(self):
+    def FHIR_cpb_16_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind!='requirements') or (implementation.exists().not() and software.exists().not())",

@@ -61,7 +61,7 @@ class Expression(DataType):
     )
 
     @model_validator(mode="after")
-    def FHIR_exp_1_constraint_model_validator(self):
+    def FHIR_exp_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="expression.exists() or reference.exists()",
@@ -71,7 +71,7 @@ class Expression(DataType):
         )
 
     @model_validator(mode="after")
-    def FHIR_exp_2_constraint_model_validator(self):
+    def FHIR_exp_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.hasValue() implies name.matches('[A-Za-z][A-Za-z0-9\\_]{0,63}')",

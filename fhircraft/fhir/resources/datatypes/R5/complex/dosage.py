@@ -163,7 +163,7 @@ class Dosage(BackboneType):
     )
 
     @model_validator(mode="after")
-    def FHIR_dos_1_constraint_model_validator(self):
+    def FHIR_dos_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="asNeededFor.empty() or asNeeded.empty() or asNeeded",

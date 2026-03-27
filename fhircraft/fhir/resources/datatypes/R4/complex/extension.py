@@ -417,7 +417,7 @@ class Extension(Element):
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_model_validator(self):
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="extension.exists() != value.exists()",

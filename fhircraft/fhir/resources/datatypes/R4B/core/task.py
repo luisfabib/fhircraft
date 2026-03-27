@@ -1025,7 +1025,7 @@ class Task(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_inv_1_constraint_model_validator(self):
+    def FHIR_inv_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="lastModified.exists().not() or authoredOn.exists().not() or lastModified >= authoredOn",

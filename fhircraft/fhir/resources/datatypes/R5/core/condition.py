@@ -235,7 +235,7 @@ class Condition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_con_2_constraint_model_validator(self):
+    def FHIR_con_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="category.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-category' and code='problem-list-item').exists() implies clinicalStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-clinical' and code='unknown').exists().not()",
@@ -245,7 +245,7 @@ class Condition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_con_3_constraint_model_validator(self):
+    def FHIR_con_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="abatement.exists() implies (clinicalStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-clinical' and (code='inactive' or code='resolved' or code='remission')).exists())",

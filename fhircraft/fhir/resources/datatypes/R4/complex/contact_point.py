@@ -56,7 +56,7 @@ class ContactPoint(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_cpt_2_constraint_model_validator(self):
+    def FHIR_cpt_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="value.empty() or system.exists()",

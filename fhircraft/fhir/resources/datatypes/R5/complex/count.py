@@ -13,7 +13,7 @@ class Count(Quantity):
     _type = "Quantity"
 
     @model_validator(mode="after")
-    def FHIR_cnt_3_constraint_model_validator(self):
+    def FHIR_cnt_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (code.empty() or code = '1') and (value.empty() or value.hasValue().not() or value.toString().contains('.').not())",

@@ -61,7 +61,7 @@ class Quantity(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_qty_3_constraint_model_validator(self):
+    def FHIR_qty_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
