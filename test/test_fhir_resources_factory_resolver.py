@@ -495,6 +495,23 @@ def test_merge_node_with_base__base_type_kept_when_diff_has_none(resolver):
     assert result.type_codes == ["code"]
 
 
+@pytest.mark.parametrize(
+    "min, max, base_min, base_max, expected_min, expected_max",
+    [
+        (None, None, 0, "1", 0, "1"),
+        (1, None, 0, "1", 0, "1"),
+    ],
+)
+def test_merge_node_with_base__base_is_constructued(
+    resolver, min, max, base_min, base_max, expected_min, expected_max
+):
+    diff = make_node(id="MyProfile.status", min=min, max=max)
+    base = make_node(id="BaseResource.status", min=base_min, max=base_max)
+    result = resolver._merge_node_with_base(diff, base)
+    assert result.definition.base.min == expected_min
+    assert result.definition.base.max == expected_max
+
+
 # ------------------------------------------------------------------
 # SnapshotResolver._resolve_differential
 # ------------------------------------------------------------------
@@ -542,7 +559,10 @@ def test_resolve_differential__intermediate_nodes_filled_from_base(
 ):
     diff = [
         make_element("MyProfile", "MyProfile"),
-        make_element("MyProfile.component.code", "MyProfile.component.code", max="*"),
+        make_element(
+            "MyProfile.component.code",
+            "MyProfile.component.code",
+        ),
     ]
     index = resolver._resolve_differential(diff, base_index)
     assert (node := index.get("MyProfile.component"))
@@ -550,7 +570,7 @@ def test_resolve_differential__intermediate_nodes_filled_from_base(
     assert node.max_cardinality == None
     assert (node := index.get("MyProfile.component.code"))
     assert node.min_cardinality == 0
-    assert node.max_cardinality == None
+    assert node.max_cardinality == 1
 
 
 def test_resolve_differential__multiple_diff_elements_all_in_result(

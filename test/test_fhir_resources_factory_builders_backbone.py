@@ -161,7 +161,7 @@ def test_build__field_name_matches_node_name(builder, index, mock_assembler):
 def test_build__field_annotation_is_assembled_model(builder, index, mock_assembler):
     node = make_node()
     result = builder.build(node, index)
-    assert get_args(result.fields[0].annotation)[0] is FakeBackboneModel
+    assert get_args(get_args(result.fields[0].annotation)[0])[0] is FakeBackboneModel
     assert mock_assembler.return_value.assemble.called
 
 

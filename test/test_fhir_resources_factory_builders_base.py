@@ -1,5 +1,5 @@
 import keyword
-from typing_extensions import get_args
+from typing_extensions import get_args, get_origin
 from unittest.mock import MagicMock
 import pytest
 from typing import Any, List, Optional
@@ -49,6 +49,7 @@ def make_node(
     max_cardinality: int | None = None,
     documentation: str | None = None,
     default_value: Any = None,
+    base_is_array: Optional[bool] = None,
 ):
     """Return a minimal mock of ElementNode."""
     node = MagicMock()
@@ -58,8 +59,10 @@ def make_node(
     node.max_cardinality = max_cardinality
     node.documentation = documentation
     node.default_value = default_value
+    node.base_is_array = base_is_array
     node.fixed = None
     node.pattern = None
+    node.max_length = None
     return node
 
 
@@ -104,11 +107,11 @@ def builder() -> Builder:
     class _ConcreteBuilder(Builder):
 
         # Not needed for these tests
-        def can_handle(self, *args, **kwargs):
+        def can_handle(self, *args, **kwargs):  # type: ignore[override]
             pass
 
         # Not needed for these tests
-        def build(self, *args, **kwargs):
+        def build(self, *args, **kwargs):  # type: ignore[override]
             pass
 
         # Mock helper
@@ -435,6 +438,47 @@ def test_build_field_information__defaults(
     assert info.name == "status"
     assert info.annotation == expected_annotation
     assert info.default == expected_default
+
+
+@pytest.mark.parametrize(
+    "is_array, base_is_array, expected",
+    [
+        # Normal (no merge): base_is_array=None → fallback to is_array
+        (False, None, False),
+        (True, None, True),
+        # Narrowing 1..* → 1..1: base was array, merged node is not
+        (False, True, True),
+        # Widening 1..1 → 1..* (invalid, graceful): base was scalar, merged node is array
+        (True, False, False),
+    ],
+)
+def test_build_field_information__base_is_array_governs_type_annotation(
+    is_array, base_is_array, expected
+):
+    node = make_node(is_array=is_array, base_is_array=base_is_array)
+    info = Builder.build_field_information("field", node, str)
+    # info.annotation is Optional[List[str]] or Optional[str]
+    inner = next(a for a in get_args(info.annotation) if a is not type(None))
+    is_list_annotation = get_origin(inner) is list
+    assert is_list_annotation == expected
+
+
+def test_build_field_information__narrowing_still_applies_cardinality_constraints():
+    node = make_node(
+        is_array=False, base_is_array=True, min_cardinality=1, max_cardinality=1
+    )
+    info = Builder.build_field_information("field", node, str)
+    assert info.min_length == 1
+    assert info.max_length == 1
+
+
+def test_build_field_information__widening_no_list_constraints():
+    node = make_node(
+        is_array=True, base_is_array=False, min_cardinality=0, max_cardinality=None
+    )
+    info = Builder.build_field_information("field", node, str)
+    assert info.min_length is None
+    assert info.max_length is None
 
 
 # ===========================================================================

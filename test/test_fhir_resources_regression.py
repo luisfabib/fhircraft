@@ -1,4 +1,8 @@
+from typing_extensions import get_args, get_origin
+
 import pytest
+from pydantic import ValidationError
+from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.fhir.resources.generator import CodeGenerator
 from fhircraft.config import override_config
@@ -1229,7 +1233,7 @@ def test_regression_issue_277(factory: FHIRModelFactory):
     # -----------------------------------------------------------------------
     assert model.__name__ == "MyAdverseEvent"
     assert (
-        model._canonical_url
+        model._canonical_url  # type: ignore
         == "http://example.org/fhir/StructureDefinition/my-adverse-event"
     )
     assert "suspectEntity" in model.model_fields
@@ -1255,3 +1259,63 @@ def test_regression_issue_277(factory: FHIRModelFactory):
         0
     ]
     assert issubclass(se_model, base_se_item)
+
+
+def test_regression_issue_331__narrowing_cardinality_preserves_list_type(factory):
+    """Narrowing 1..* → 1..1 must NOT unwrap List[T] to T."""
+
+    struct_def = {
+        "resourceType": "StructureDefinition",
+        "id": "narrowing-cardinality",
+        "url": "http://example.org/fhir/StructureDefinition/narrowing-cardinality",
+        "name": "NarrowingCardinality",
+        "status": "draft",
+        "kind": "resource",
+        "abstract": False,
+        "fhirVersion": "4.0.1",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "type": "Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation", "min": 1, "max": "*"},
+                # Narrow: base is 1..*, profile constrains to 1..1
+                {
+                    "id": "Observation.category",
+                    "path": "Observation.category",
+                    "min": 1,
+                    "max": "1",
+                },
+            ]
+        },
+    }
+
+    model = factory.build(struct_def)
+    original = get_fhir_type("Observation", "R4")
+
+    # The annotation must still be Optional[List[...]], not Optional[CodeableConcept]
+    annotation = model.model_fields["category"].annotation
+    inner = next(a for a in get_args(annotation) if a is not type(None))
+    assert (
+        get_origin(inner) is list
+    ), f"Expected List[...] annotation for narrowed field, got {annotation}"
+
+    # A bare dict (not a list) is invalid for both base and profiled model
+    invalid_payload = {
+        "resourceType": "Observation",
+        "id": "test",
+        "category": {
+            "coding": [
+                {
+                    "system": "http://hl7.org/fhir/observation-category",
+                    "code": "laboratory",
+                }
+            ]
+        },
+    }
+
+    with pytest.raises(ValidationError):
+        model.model_validate(invalid_payload)
+
+    with pytest.raises(ValidationError):
+        original.model_validate(invalid_payload)

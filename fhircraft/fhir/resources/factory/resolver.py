@@ -395,14 +395,30 @@ class SnapshotResolver:
             path=node.path or base_node.path,
             **{
                 **base_node.definition.model_dump(
-                    exclude_none=True, exclude={"id", "path", "contentReference"}
+                    exclude_none=True,
+                    exclude={"id", "path", "contentReference"},
                 ),
                 **node.definition.model_dump(
-                    exclude_none=True, exclude={"id", "path", "contentReference"}
+                    exclude_none=True,
+                    exclude={"id", "path", "contentReference"},
+                ),
+                "base": (
+                    node.definition.base
+                    if node.definition.base is not None
+                    else {
+                        "path": base_node.path,
+                        "min": base_node.definition.min,
+                        "max": base_node.definition.max,
+                    }
                 ),
             },
         )
-        return ElementNode(definition=merged_definition)
+        merged_node = ElementNode(definition=merged_definition)
+        if merged_node.is_array == True and merged_node.base_is_array == False:
+            raise DefinitionResolutionError(
+                f"Invalid cardinality change in element '{node.id}': cannot change from non-array to array cardinality when merging with base element."
+            )
+        return merged_node
 
     def _resolve_content_references(self, index: DefinitionIndex) -> DefinitionIndex:
         """

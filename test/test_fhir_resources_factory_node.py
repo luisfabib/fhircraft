@@ -195,9 +195,10 @@ def test_element_node_local_and_parent_id(element, id, expected_parent, expected
     assert node.parent_id == expected_parent
     assert node.local_id == expected_local
 
-    # ------------------------------------------------------------------
-    # Structural flags
-    # ------------------------------------------------------------------
+
+# ------------------------------------------------------------------
+# Structural flags
+# ------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -413,6 +414,35 @@ def test_cardinality_is_prohibited(element, expected):
 def test_cardinality_is_array(element, expected):
     node = ElementNode(definition=element)
     assert node.is_array == expected
+
+
+@pytest.mark.parametrize(
+    "base, expected_min, expected_max",
+    [
+        (MagicMock(min=0, max="0"), 0, 0),
+        (MagicMock(min=0, max="1"), 0, 1),
+        (MagicMock(min=1, max="2"), 1, 2),
+        (MagicMock(min=0, max="*"), 0, None),
+    ],
+)
+def test_cardinality_base(base, expected_min, expected_max):
+    node = ElementNode(definition=MagicMock(base=base))
+    assert node.base_min_cardinality == expected_min
+    assert node.base_max_cardinality == expected_max
+
+
+@pytest.mark.parametrize(
+    "base, expected",
+    [
+        (MagicMock(max="0"), False),
+        (MagicMock(max="1"), False),
+        (MagicMock(max="2"), True),
+        (MagicMock(max="*"), True),
+    ],
+)
+def test_cardinality_base_is_array(base, expected):
+    node = ElementNode(definition=MagicMock(base=base))
+    assert node.base_is_array == expected
 
 
 # ------------------------------------------------------------------

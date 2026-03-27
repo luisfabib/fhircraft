@@ -59,6 +59,7 @@ def make_node(
     node.pattern = pattern
     node.default_value = default_value
     node.definition.constraint = constraints or []
+    node.base_is_array = None
     node.max_length = None
     node.min_value = None
     node.max_value = None

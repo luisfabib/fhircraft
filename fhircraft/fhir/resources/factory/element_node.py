@@ -6,11 +6,11 @@ than raw ``ElementDefinition`` objects.  All properties are derived purely from
 the definition's own fields; no external state is required.
 """
 
-from __future__ import annotations
-
 import re
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, Sequence
+from typing import TYPE_CHECKING, Any, Literal, Sequence
+
+from pydantic_core import PydanticUndefined
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
@@ -25,6 +25,8 @@ if TYPE_CHECKING:
         ElementDefinition as R5ElementDefinition,
         ElementDefinitionType as R5ElementDefinitionType,
     )
+
+_Unset: Any = PydanticUndefined
 
 POLYMORPHIC_PATH_SUFFIX = "[x]"
 BACKBONE_CODES = frozenset({"BackboneElement", "Element"})
@@ -185,8 +187,7 @@ class ElementNode:
         a slice ancestry boundary.
         """
         return any(
-            ":" in seg and not re.search(r"\[x\]:", seg)
-            for seg in self.id.split(".")
+            ":" in seg and not re.search(r"\[x\]:", seg) for seg in self.id.split(".")
         )
 
     @property
@@ -253,6 +254,41 @@ class ElementNode:
     # ------------------------------------------------------------------
 
     @property
+    def base_min_cardinality(self) -> int | None:
+        """
+        Minimum cardinality of the base element when this node was produced by merging a differential element with its base.  ``None`` means this node was not produced by a merge (snapshot or root element).
+        """
+        return self.definition.base.min if self.definition.base else None
+
+    @property
+    def base_max_cardinality(self) -> int | None:
+        """
+        Maximum cardinality of the base element when this node was produced by merging a differential element with its base. ``None`` means unbounded (``*``).).
+        """
+        if not self.definition.base:
+            return _Unset
+        val = getattr(self.definition.base, "max", None)
+        if val is None:
+            return None
+        s = str(val)
+        if s == "*":
+            return None
+        try:
+            return int(s)
+        except (ValueError, TypeError):
+            return None
+
+    @property
+    def base_is_array(self) -> bool | None:
+        """
+        Whether the base element is multi-valued and represented as a list (``max`` > 1 or ``*``) when this node was produced by merging a differential element with its base.  ``None`` means this node was not produced by a merge (snapshot or root element).
+        """
+        max_cardinality = self.base_max_cardinality
+        if max_cardinality is _Unset:
+            return None
+        return max_cardinality is None or max_cardinality > 1
+
+    @property
     def min_cardinality(self) -> int:
         """
         Minimum cardinality (defaults to 0 when not specified).
@@ -267,9 +303,7 @@ class ElementNode:
     def max_cardinality(self) -> int | None:
         """Maximum cardinality.  ``None`` means unbounded (``*``)."""
         if (val := getattr(self.definition, "max", None)) is None:
-            raise ValueError(
-                "ElementDefinition.max is required and must be an integer or valid string."
-            )
+            return _Unset
         s = str(val)
         if s == "*":
             return None
@@ -289,10 +323,12 @@ class ElementNode:
         return self.max_cardinality == 0
 
     @property
-    def is_array(self) -> bool:
+    def is_array(self) -> bool | None:
         """
-        Whether this element is multi-valued and represented as a list (``max`` > 1 or ``*``).
+        Whether this element is multi-valued and represented as a list (``max`` > 1 or ``*``). Returns ``None`` if cardinality is not specified.
         """
+        if self.max_cardinality is _Unset:
+            return None
         return (self.max_cardinality is None) or (self.max_cardinality > 1)
 
     # ------------------------------------------------------------------

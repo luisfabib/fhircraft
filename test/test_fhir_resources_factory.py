@@ -1018,7 +1018,7 @@ def test_factory__caches_differential_model(factory: FHIRModelFactory):
                     "definition": "Base definition of Patient",
                     "base": {"path": "Patient", "min": 0, "max": "*"},
                 },
-                {"id": "Patient.id", "path": "Patient.id", "min": 1, "max": "*"},
+                {"id": "Patient.id", "path": "Patient.id", "min": 1, "max": "1"},
             ]
         },
     }
@@ -1049,7 +1049,7 @@ def test_factory__differential_inherits_from_base(factory: FHIRModelFactory):
         "differential": {
             "element": [
                 {"id": "Patient", "path": "Patient", "min": 0, "max": "*"},
-                {"id": "Patient.id", "path": "Patient.id", "min": 1, "max": "*"},
+                {"id": "Patient.id", "path": "Patient.id", "min": 1, "max": "1"},
             ]
         },
     }
@@ -1089,7 +1089,7 @@ def test_factory__constructs_model_from_snapshot_auto_mode(factory: FHIRModelFac
                     "id": "Patient.id",
                     "path": "Patient.id",
                     "min": 1,
-                    "max": "*",
+                    "max": "1",
                     "type": [{"code": "string"}],
                     "definition": "Patient identifier",
                     "base": {"path": "Patient.id", "min": 0, "max": "*"},
@@ -1168,9 +1168,9 @@ def test_factory__construct_diff_min_cardinality(factory: FHIRModelFactory):
                     "id": "Resource.id",
                     "path": "Resource.id",
                     "min": 1,
-                    "max": "*",
+                    "max": "1",
                     "definition": "Required element",
-                    "base": {"path": "Resource.id", "min": 0, "max": "*"},
+                    "base": {"path": "Resource.id", "min": 0, "max": "1"},
                 }
             ]
         },
@@ -1183,24 +1183,20 @@ def test_factory__construct_diff_min_cardinality(factory: FHIRModelFactory):
     element = mock_resource.model_fields.get("id")
     assert element is not None, "Profiled element field not found in model fields"
     assert (
-        element.annotation == Optional[List[primitives.String]]
+        element.annotation == Optional[primitives.String]
     ), "Profiled element field does not have correct type annotation"
 
     # Assert metadata
     element_metadata = element.metadata
     assert element_metadata is not None, "No metadata found for profiled element"
-    assert (
-        next((meta for meta in element_metadata if isinstance(meta, MinLen))).min_length
-        == 1
-    ), "Profiled min. cardinality has not been correctly set"
 
     # Test valid dataset
     assert (
-        mock_resource.model_validate({"id": ["test"]}) is not None
+        mock_resource.model_validate({"id": "test"}) is not None
     ), "Valid dataset did not validate correctly"
     # Test invalid dataset
     with pytest.raises(ValidationError):
-        mock_resource.model_validate({"id": []})
+        mock_resource.model_validate({"id": ["test"]})
 
 
 def test_factory__construct_diff_fixed_value_constraint(factory: FHIRModelFactory):
