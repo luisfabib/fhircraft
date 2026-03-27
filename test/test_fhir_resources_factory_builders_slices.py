@@ -91,6 +91,7 @@ def make_entry_node(
     pattern=None,
     constraints=None,
     default_value=None,
+    is_prohibited: bool = False,
 ):
     node = MagicMock(name="mock-entry-node")
     node.name = name
@@ -107,6 +108,7 @@ def make_entry_node(
     node.pattern = pattern
     node.default_value = default_value
     node.slicing_rules = slicing_rules
+    node.is_prohibited = is_prohibited
     node.max_length = None
     node.min_value = None
     node.max_value = None

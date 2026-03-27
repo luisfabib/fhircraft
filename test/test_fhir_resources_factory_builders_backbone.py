@@ -43,6 +43,7 @@ def make_node(
     max_length=None,
     min_value=None,
     max_value=None,
+    is_prohibited: bool = False,
 ):
     node = MagicMock(name="mock-node")
     node.name = name
@@ -59,6 +60,7 @@ def make_node(
     node.max_length = max_length
     node.min_value = min_value
     node.max_value = max_value
+    node.is_prohibited = is_prohibited
     node.types = [make_type_definition(type_code, fhir_release)]
     return node
 

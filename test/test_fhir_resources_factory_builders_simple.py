@@ -43,6 +43,7 @@ def make_node(
     constraints=None,
     default_value=None,
     path: str | None = None,
+    is_prohibited: bool = False,
 ):
     node = MagicMock()
     node.name = name
@@ -60,6 +61,7 @@ def make_node(
     node.default_value = default_value
     node.definition.constraint = constraints or []
     node.base_is_array = base_is_array
+    node.is_prohibited = is_prohibited
     node.max_length = None
     node.min_value = None
     node.max_value = None

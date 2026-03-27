@@ -289,8 +289,10 @@ class Builder(ABC):
         if effective_is_array:
             annotation = List[annotation]
 
-        # Enforce optionality for all fields
-        annotation = Optional[annotation]
+        if node.is_prohibited:
+            annotation = None
+        else:
+            annotation = Optional[annotation]
 
         return FieldInformation(
             name=name,

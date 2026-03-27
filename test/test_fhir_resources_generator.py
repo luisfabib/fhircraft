@@ -949,6 +949,29 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             "Inherited property should not appear in child class",
         )
 
+    def test_model_with_prohibited_field_renders_none_annotation(self):
+        """A field with annotation=type(None) (0..0 cardinality) must render as 'None', not \"<class 'NoneType'>\"."""
+        model = create_model(
+            "ModelWithProhibitedField",
+            active=(
+                primitives.Boolean,
+                Field(default=None, description="Active flag."),
+            ),
+            prohibited=(
+                type(None),
+                Field(default=None, description="Prohibited field."),
+            ),
+        )
+        expected_block = """
+            prohibited: None = Field(
+                description="Prohibited field.",
+                default=None,
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+        code = generate_resource_model_code(model)
+        self.assertNotIn("<class 'NoneType'>", code)
+
 
 @pytest.mark.parametrize(
     "model",

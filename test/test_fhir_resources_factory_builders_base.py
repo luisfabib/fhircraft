@@ -50,6 +50,7 @@ def make_node(
     documentation: str | None = None,
     default_value: Any = None,
     base_is_array: Optional[bool] = None,
+    is_prohibited: bool = False,
 ):
     """Return a minimal mock of ElementNode."""
     node = MagicMock()
@@ -60,6 +61,7 @@ def make_node(
     node.documentation = documentation
     node.default_value = default_value
     node.base_is_array = base_is_array
+    node.is_prohibited = is_prohibited
     node.fixed = None
     node.pattern = None
     node.max_length = None
@@ -420,20 +422,30 @@ def test_build_field_information__returns_field_information_instance():
 
 
 @pytest.mark.parametrize(
-    "default, is_array, type, expected_default, expected_annotation",
+    "default, is_array, is_prohibited, type, expected_default, expected_annotation",
     [
-        (None, False, str, None, Optional[str]),
-        ("active", False, str, "active", Optional[str]),
-        (None, True, str, None, Optional[List[str]]),
-        ("active", True, str, ["active"], Optional[List[str]]),
-        (["active"], True, str, ["active"], Optional[List[str]]),
-        (["active", "final"], True, str, ["active", "final"], Optional[List[str]]),
+        (None, False, False, str, None, Optional[str]),
+        ("active", False, False, str, "active", Optional[str]),
+        (None, True, False, str, None, Optional[List[str]]),
+        ("active", True, False, str, ["active"], Optional[List[str]]),
+        (["active"], True, False, str, ["active"], Optional[List[str]]),
+        (None, False, True, str, None, None),
+        (
+            ["active", "final"],
+            True,
+            False,
+            str,
+            ["active", "final"],
+            Optional[List[str]],
+        ),
     ],
 )
 def test_build_field_information__defaults(
-    default, is_array, type, expected_default, expected_annotation
+    default, is_array, is_prohibited, type, expected_default, expected_annotation
 ):
-    node = make_node(is_array=is_array, default_value=default)
+    node = make_node(
+        is_array=is_array, default_value=default, is_prohibited=is_prohibited
+    )
     info = Builder.build_field_information("status", node, type)
     assert info.name == "status"
     assert info.annotation == expected_annotation
