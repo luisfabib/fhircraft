@@ -43,6 +43,7 @@ def make_node(
     max_length=None,
     min_value=None,
     max_value=None,
+    is_prohibited: bool = False,
 ):
     node = MagicMock(name="mock-node")
     node.name = name
@@ -59,6 +60,7 @@ def make_node(
     node.max_length = max_length
     node.min_value = min_value
     node.max_value = max_value
+    node.is_prohibited = is_prohibited
     node.types = [make_type_definition(type_code, fhir_release)]
     return node
 
@@ -132,6 +134,66 @@ def test_can_handle__queries_index_with_node_id(builder, index):
     index.get_children.assert_called_with("Observation.component")
 
 
+def test_can_handle__returns_true_when_backbone_type_has_specific_base_field():
+    class SpecificBackbone(BaseModel):
+        pass
+
+    class ParentModel(BaseModel):
+        referenceRange: Optional[List[SpecificBackbone]] = None
+
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
+    node = make_node(
+        name="referenceRange",
+        path="Observation.referenceRange",
+        type_code="BackboneElement",
+    )
+    node.type_codes = ["BackboneElement"]
+    index = make_index(children=[])
+    assert builder.can_handle(node, index) is True
+
+
+def test_can_handle__returns_false_when_backbone_type_code_but_no_context_base():
+    builder = make_builder(resource_name="TestResource", base=None)
+    node = make_node(
+        name="referenceRange",
+        path="Observation.referenceRange",
+        type_code="BackboneElement",
+    )
+    node.type_codes = ["BackboneElement"]
+    index = make_index(children=[])
+    assert builder.can_handle(node, index) is False
+
+
+def test_can_handle__returns_false_when_backbone_type_code_but_field_not_in_base():
+    class ParentModel(BaseModel):
+        pass  # no referenceRange field
+
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
+    node = make_node(
+        name="referenceRange",
+        path="Observation.referenceRange",
+        type_code="BackboneElement",
+    )
+    node.type_codes = ["BackboneElement"]
+    index = make_index(children=[])
+    assert builder.can_handle(node, index) is False
+
+
+def test_can_handle__returns_false_when_backbone_type_code_but_base_field_has_no_model_subclass():
+    class ParentModel(BaseModel):
+        referenceRange: Optional[str] = None  # no BaseModel subclass in annotation
+
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
+    node = make_node(
+        name="referenceRange",
+        path="Observation.referenceRange",
+        type_code="BackboneElement",
+    )
+    node.type_codes = ["BackboneElement"]
+    index = make_index(children=[])
+    assert builder.can_handle(node, index) is False
+
+
 # ===========================================================================
 # BackboneFieldBuilder.build
 # ===========================================================================
@@ -161,7 +223,7 @@ def test_build__field_name_matches_node_name(builder, index, mock_assembler):
 def test_build__field_annotation_is_assembled_model(builder, index, mock_assembler):
     node = make_node()
     result = builder.build(node, index)
-    assert get_args(result.fields[0].annotation)[0] is FakeBackboneModel
+    assert get_args(get_args(result.fields[0].annotation)[0])[0] is FakeBackboneModel
     assert mock_assembler.return_value.assemble.called
 
 
@@ -319,3 +381,66 @@ def test_build__non_keyword_field_has_no_validation_alias(
     result = builder.build(node, index)
     assert result.fields[0].validation_alias is None
     assert mock_assembler.return_value.assemble.called
+
+
+def test_build__uses_backbone_base_directly_when_no_children():
+    class SpecificBackbone(BaseModel):
+        pass
+
+    class ParentModel(BaseModel):
+        referenceRange: Optional[List[SpecificBackbone]] = None
+
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
+    node = make_node(
+        name="referenceRange",
+        path="Observation.referenceRange",
+        type_code="BackboneElement",
+    )
+    index = make_index(children=[])
+
+    result = builder.build(node, index)
+
+    # The field annotation should wrap SpecificBackbone directly
+    item = get_args(get_args(result.fields[0].annotation)[0])[0]
+    assert item is SpecificBackbone
+
+
+def test_build__does_not_call_assembler_when_no_children(mock_assembler):
+    class SpecificBackbone(BaseModel):
+        pass
+
+    class ParentModel(BaseModel):
+        component: Optional[SpecificBackbone] = None
+
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
+    node = make_node(
+        name="component",
+        path="Resource.component",
+        type_code="BackboneElement",
+    )
+    index = make_index(children=[])
+
+    builder.build(node, index)
+
+    mock_assembler.return_value.assemble.assert_not_called()
+
+
+def test_build__no_children_returns_single_field_with_correct_name():
+    class SpecificBackbone(BaseModel):
+        pass
+
+    class ParentModel(BaseModel):
+        referenceRange: Optional[List[SpecificBackbone]] = None
+
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
+    node = make_node(
+        name="referenceRange",
+        path="Observation.referenceRange",
+        type_code="BackboneElement",
+    )
+    index = make_index(children=[])
+
+    result = builder.build(node, index)
+
+    assert len(result.fields) == 1
+    assert result.fields[0].name == "referenceRange"

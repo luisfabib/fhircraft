@@ -1,4 +1,8 @@
+from typing_extensions import get_args, get_origin
+
 import pytest
+from pydantic import ValidationError
+from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.fhir.resources.generator import CodeGenerator
 from fhircraft.config import override_config
@@ -1229,7 +1233,7 @@ def test_regression_issue_277(factory: FHIRModelFactory):
     # -----------------------------------------------------------------------
     assert model.__name__ == "MyAdverseEvent"
     assert (
-        model._canonical_url
+        model._canonical_url  # type: ignore
         == "http://example.org/fhir/StructureDefinition/my-adverse-event"
     )
     assert "suspectEntity" in model.model_fields
@@ -1255,3 +1259,292 @@ def test_regression_issue_277(factory: FHIRModelFactory):
         0
     ]
     assert issubclass(se_model, base_se_item)
+
+
+def test_regression_issue_331__narrowing_cardinality_preserves_list_type(factory):
+    """Narrowing 1..* → 1..1 must NOT unwrap List[T] to T."""
+
+    struct_def = {
+        "resourceType": "StructureDefinition",
+        "id": "narrowing-cardinality",
+        "url": "http://example.org/fhir/StructureDefinition/narrowing-cardinality",
+        "name": "NarrowingCardinality",
+        "status": "draft",
+        "kind": "resource",
+        "abstract": False,
+        "fhirVersion": "4.0.1",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "type": "Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation", "min": 1, "max": "*"},
+                # Narrow: base is 1..*, profile constrains to 1..1
+                {
+                    "id": "Observation.category",
+                    "path": "Observation.category",
+                    "min": 1,
+                    "max": "1",
+                },
+            ]
+        },
+    }
+
+    model = factory.build(struct_def)
+    original = get_fhir_type("Observation", "R4")
+
+    # The annotation must still be Optional[List[...]], not Optional[CodeableConcept]
+    annotation = model.model_fields["category"].annotation
+    inner = next(a for a in get_args(annotation) if a is not type(None))
+    assert (
+        get_origin(inner) is list
+    ), f"Expected List[...] annotation for narrowed field, got {annotation}"
+
+    # A bare dict (not a list) is invalid for both base and profiled model
+    invalid_payload = {
+        "resourceType": "Observation",
+        "id": "test",
+        "category": {
+            "coding": [
+                {
+                    "system": "http://hl7.org/fhir/observation-category",
+                    "code": "laboratory",
+                }
+            ]
+        },
+    }
+
+    with pytest.raises(ValidationError):
+        model.model_validate(invalid_payload)
+
+    with pytest.raises(ValidationError):
+        original.model_validate(invalid_payload)
+
+
+def test_regression_issue_333__backbone_element_differential_uses_specific_type(
+    factory,
+):
+    from fhircraft.fhir.resources.datatypes.R5.core import ObservationReferenceRange
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "example-profile-referencerange",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-profile-referencerange",
+        "version": "5.0.0",
+        "name": "ExampleProfileReferenceRange",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation"},
+                {
+                    "id": "Observation.referenceRange",
+                    "path": "Observation.referenceRange",
+                    "min": 1,
+                },
+            ]
+        },
+    }
+
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
+
+    from typing import get_args
+
+    annotation = model.model_fields["referenceRange"].annotation
+    # Unwrap Optional[List[X]] → X
+    inner_list = next(a for a in get_args(annotation) if a is not type(None))
+    item_type = get_args(inner_list)[0]
+
+    assert item_type is ObservationReferenceRange
+
+
+def test_regression_issue_334__chained_profile_differential_resolves_all_base_elements(
+    factory,
+):
+    structure_definition_1 = {
+        "resourceType": "StructureDefinition",
+        "id": "example-chained-profile-1",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-chained-profile-1",
+        "version": "5.0.0",
+        "name": "ExampleChainedProfile1",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation"},
+                {"id": "Observation.id", "path": "Observation.id", "min": 1},
+            ]
+        },
+    }
+
+    structure_definition_2 = {
+        "resourceType": "StructureDefinition",
+        "id": "example-chained-profile-2",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-chained-profile-2",
+        "version": "5.0.0",
+        "name": "ExampleChainedProfile2",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/example-chained-profile-1",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation"},
+                {"id": "Observation.category", "path": "Observation.category"},
+            ]
+        },
+    }
+
+    factory.definition_registry.from_dict(structure_definition_1)
+    factory.definition_registry.from_dict(structure_definition_2)
+
+    with override_config(validation_mode="skip"):
+        # This must not raise TypeResolutionError / AssemblerError
+        model = factory.build(
+            structure_definition=structure_definition_2, mode="differential"
+        )
+
+    from typing import get_args
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept
+
+    assert (
+        "category" in model.model_fields
+    ), "Observation.category missing from the built model."
+
+    annotation = model.model_fields["category"].annotation
+    inner_list = next(a for a in get_args(annotation) if a is not type(None))
+    item_type = get_args(inner_list)[0]
+
+    assert issubclass(item_type, CodeableConcept)
+
+
+def test_regression_issue_335__extension_slice_on_complex_type_field(factory):
+    """Extension slice on a complex-type sub-field (e.g. Observation.code.extension)
+    must produce a typed slice model, not plain Optional[List[Extension]]."""
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "example-profile-ext-on-complex",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-profile-ext-on-complex",
+        "version": "5.0.0",
+        "name": "ExampleProfileExtOnComplex",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Observation.code", "path": "Observation.code"},
+                {
+                    "id": "Observation.code.extension",
+                    "path": "Observation.code.extension",
+                },
+                {
+                    "id": "Observation.code.extension:mySlice",
+                    "path": "Observation.code.extension",
+                    "sliceName": "mySlice",
+                    "type": [
+                        {
+                            "code": "Extension",
+                            "profile": [
+                                "http://example.org/fhir/StructureDefinition/my-ext-on-complex"
+                            ],
+                        }
+                    ],
+                },
+            ]
+        },
+    }
+
+    extension_sd = {
+        "resourceType": "StructureDefinition",
+        "id": "my-ext-on-complex",
+        "url": "http://example.org/fhir/StructureDefinition/my-ext-on-complex",
+        "version": "0.1.0",
+        "name": "MyExtOnComplex",
+        "status": "active",
+        "fhirVersion": "5.0.0",
+        "kind": "complex-type",
+        "abstract": False,
+        "context": [{"type": "element", "expression": "Observation.code.extension"}],
+        "type": "Extension",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "Extension.url",
+                    "path": "Extension.url",
+                    "fixedUri": "http://example.org/fhir/StructureDefinition/my-ext-on-complex",
+                },
+                {
+                    "id": "Extension.value[x]",
+                    "path": "Extension.value[x]",
+                    "type": [{"code": "string"}],
+                    "min": 1,
+                    "max": "1",
+                },
+            ]
+        },
+    }
+
+    factory.definition_registry.from_dict(structure_definition)
+    factory.definition_registry.from_dict(extension_sd)
+
+    with override_config(validation_mode="skip"):
+        model = factory.build(
+            structure_definition=structure_definition, mode="differential"
+        )
+
+    from typing import Annotated, get_args
+
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, Extension
+
+    # Observation.code should be a CodeableConcept subclass
+    code_annotation = model.model_fields["code"].annotation
+    code_type = next(a for a in get_args(code_annotation) if a is not type(None))
+    assert issubclass(code_type, CodeableConcept)
+
+    # code.extension must be a sliced union containing the MySlice model
+    ext_annotation = code_type.model_fields["extension"].annotation
+    list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
+    annotated_item = get_args(list_type)[0]
+    union_type = get_args(annotated_item)[0]
+    union_members = get_args(union_type)
+
+    slice_models = [
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    ]
+    assert slice_models, (
+        "Expected at least one FHIRSliceModel in code.extension union, "
+        f"got {union_members}"
+    )
+    slice_model = slice_models[0]
+    assert issubclass(slice_model, Extension)
+    assert (
+        slice_model._canonical_url
+        == "http://example.org/fhir/StructureDefinition/my-ext-on-complex"
+    )
+    assert "valueString" in slice_model.model_fields

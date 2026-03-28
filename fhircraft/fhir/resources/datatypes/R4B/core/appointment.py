@@ -233,7 +233,7 @@ class Appointment(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_app_2_constraint_model_validator(self):
+    def FHIR_app_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="start.exists() = end.exists()",
@@ -243,7 +243,7 @@ class Appointment(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_app_3_constraint_model_validator(self):
+    def FHIR_app_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(start.exists() and end.exists()) or (status in ('proposed' | 'cancelled' | 'waitlist'))",
@@ -253,7 +253,7 @@ class Appointment(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_app_4_constraint_model_validator(self):
+    def FHIR_app_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="Appointment.cancelationReason.exists() implies (Appointment.status='no-show' or Appointment.status='cancelled')",

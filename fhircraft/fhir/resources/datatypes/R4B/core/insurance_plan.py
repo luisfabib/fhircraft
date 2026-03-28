@@ -318,7 +318,7 @@ class InsurancePlan(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_ipn_1_constraint_model_validator(self):
+    def FHIR_ipn_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(identifier.count() + name.count()) > 0",

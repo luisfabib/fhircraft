@@ -206,7 +206,7 @@ class Group(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_grp_1_constraint_model_validator(self):
+    def FHIR_grp_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="member.empty() or (actual = true)",

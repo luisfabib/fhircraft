@@ -59,7 +59,7 @@ snapshot_structure_def = {
                 "max": "1",
                 "type": [{"code": "string"}],
                 "definition": "A legacy patient's full name",
-                "base": {"path": "Resource", "min": 0, "max": "*"},
+                "base": {"path": "Element", "min": 0, "max": "1"},
             }
         ]
     }

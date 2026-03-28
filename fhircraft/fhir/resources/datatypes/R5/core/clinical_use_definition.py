@@ -327,7 +327,7 @@ class ClinicalUseDefinition(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_cud_1_constraint_model_validator(self):
+    def FHIR_cud_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(ClinicalUseDefinition.indication.count() + ClinicalUseDefinition.contraindication.count() + ClinicalUseDefinition.interaction.count() + ClinicalUseDefinition.undesirableEffect.count() + ClinicalUseDefinition.warning.count())  < 2",

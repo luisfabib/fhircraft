@@ -260,7 +260,7 @@ class Condition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_con_3_constraint_model_validator(self):
+    def FHIR_con_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="verificationStatus.empty().not() and verificationStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-ver-status' and code='entered-in-error').exists().not() and category.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-category' and code='problem-list-item').exists() implies clinicalStatus.empty().not()",
@@ -270,7 +270,7 @@ class Condition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_con_4_constraint_model_validator(self):
+    def FHIR_con_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="abatement.empty() or clinicalStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-clinical' and (code='resolved' or code='remission' or code='inactive')).exists()",
@@ -280,7 +280,7 @@ class Condition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_con_5_constraint_model_validator(self):
+    def FHIR_con_5_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="verificationStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-ver-status' and code='entered-in-error').empty() or clinicalStatus.empty()",

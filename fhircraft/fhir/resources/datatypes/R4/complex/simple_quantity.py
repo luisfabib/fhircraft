@@ -13,7 +13,7 @@ class SimpleQuantity(Quantity):
     _type = "Quantity"
 
     @model_validator(mode="after")
-    def FHIR_sqty_1_constraint_model_validator(self):
+    def FHIR_sqty_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="comparator.empty()",

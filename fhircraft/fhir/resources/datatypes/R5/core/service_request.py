@@ -416,7 +416,7 @@ class ServiceRequest(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdystr_1_constraint_model_validator(self):
+    def FHIR_bdystr_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="bodySite.exists() implies bodyStructure.empty()",
@@ -426,7 +426,7 @@ class ServiceRequest(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_prr_1_constraint_model_validator(self):
+    def FHIR_prr_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="orderDetail.empty() or code.exists()",

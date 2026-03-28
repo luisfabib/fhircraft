@@ -280,7 +280,7 @@ class Consent(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ppc_1_constraint_model_validator(self):
+    def FHIR_ppc_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="policy.exists() or policyRule.exists()",
@@ -290,7 +290,7 @@ class Consent(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ppc_2_constraint_model_validator(self):
+    def FHIR_ppc_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="patient.exists() or scope.coding.where(system='something' and code='patient-privacy').exists().not()",
@@ -300,7 +300,7 @@ class Consent(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ppc_3_constraint_model_validator(self):
+    def FHIR_ppc_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="patient.exists() or scope.coding.where(system='something' and code='research').exists().not()",
@@ -310,7 +310,7 @@ class Consent(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ppc_4_constraint_model_validator(self):
+    def FHIR_ppc_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="patient.exists() or scope.coding.where(system='something' and code='adr').exists().not()",
@@ -320,7 +320,7 @@ class Consent(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ppc_5_constraint_model_validator(self):
+    def FHIR_ppc_5_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="patient.exists() or scope.coding.where(system='something' and code='treatment').exists().not()",

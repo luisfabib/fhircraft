@@ -431,7 +431,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_0_constraint_model_validator(self):
+    def FHIR_sdf_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
@@ -441,7 +441,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_1_constraint_model_validator(self):
+    def FHIR_sdf_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="derivation = 'constraint' or snapshot.element.select(path).isDistinct()",
@@ -451,7 +451,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_15a_constraint_model_validator(self):
+    def FHIR_sdf_15a_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind!='logical'  and differential.element.first().path.contains('.').not()) implies differential.element.first().type.empty()",
@@ -461,7 +461,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_4_constraint_model_validator(self):
+    def FHIR_sdf_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="abstract = true or baseDefinition.exists()",
@@ -471,7 +471,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_5_constraint_model_validator(self):
+    def FHIR_sdf_5_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type != 'Extension' or derivation = 'specialization' or (context.exists())",
@@ -481,7 +481,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_6_constraint_model_validator(self):
+    def FHIR_sdf_6_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="snapshot.exists() or differential.exists()",
@@ -491,7 +491,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_9_constraint_model_validator(self):
+    def FHIR_sdf_9_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="children().element.where(path.contains('.').not()).label.empty() and children().element.where(path.contains('.').not()).code.empty() and children().element.where(path.contains('.').not()).requirements.empty()",
@@ -512,7 +512,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_11_constraint_model_validator(self):
+    def FHIR_sdf_11_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="kind != 'logical' implies snapshot.empty() or snapshot.element.first().path = type",
@@ -522,7 +522,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_14_constraint_model_validator(self):
+    def FHIR_sdf_14_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="snapshot.element.all(id.exists()) and differential.element.all(id.exists())",
@@ -532,7 +532,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_15_constraint_model_validator(self):
+    def FHIR_sdf_15_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="kind!='logical' implies snapshot.element.first().type.empty()",
@@ -542,7 +542,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_16_constraint_model_validator(self):
+    def FHIR_sdf_16_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="snapshot.element.all(id.exists()) and snapshot.element.id.trace('ids').isDistinct()",
@@ -552,7 +552,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_17_constraint_model_validator(self):
+    def FHIR_sdf_17_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="differential.element.all(id.exists()) and differential.element.id.trace('ids').isDistinct()",
@@ -562,7 +562,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_18_constraint_model_validator(self):
+    def FHIR_sdf_18_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="contextInvariant.exists() implies type = 'Extension'",
@@ -572,7 +572,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_19_constraint_model_validator(self):
+    def FHIR_sdf_19_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="url.startsWith('http://hl7.org/fhir/StructureDefinition') implies (differential.element.type.code.all(matches('^[a-zA-Z0-9]+$') or matches('^http:\\/\\/hl7\\.org\\/fhirpath\\/System\\.[A-Z][A-Za-z]+$')) and snapshot.element.type.code.all(matches('^[a-zA-Z0-9\\.]+$') or matches('^http:\\/\\/hl7\\.org\\/fhirpath\\/System\\.[A-Z][A-Za-z]+$')))",
@@ -582,7 +582,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_21_constraint_model_validator(self):
+    def FHIR_sdf_21_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="differential.element.defaultValue.exists() implies (derivation = 'specialization')",
@@ -592,7 +592,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_22_constraint_model_validator(self):
+    def FHIR_sdf_22_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="url.startsWith('http://hl7.org/fhir/StructureDefinition') implies (snapshot.element.defaultValue.empty() and differential.element.defaultValue.empty())",
@@ -602,7 +602,7 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_23_constraint_model_validator(self):
+    def FHIR_sdf_23_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(snapshot | differential).element.all(path.contains('.').not() implies sliceName.empty())",

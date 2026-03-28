@@ -499,7 +499,7 @@ class Observation(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_obs_6_constraint_model_validator(self):
+    def FHIR_obs_6_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="dataAbsentReason.empty() or value.empty()",
@@ -509,7 +509,7 @@ class Observation(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_obs_7_constraint_model_validator(self):
+    def FHIR_obs_7_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="value.empty() or component.code.where(coding.intersect(%resource.code.coding).exists()).empty()",

@@ -21,10 +21,10 @@ from fhircraft.fhir.resources.validators import (
 
 class TypeChoiceFieldBuilder(Builder):
 
-    def can_handle(self, node: ElementNode, _: DefinitionIndex) -> bool:
+    def can_handle(self, node: ElementNode, index: DefinitionIndex) -> bool:
         return node.is_polymorphic_type
 
-    def build(self, node: ElementNode, _: DefinitionIndex) -> Build:
+    def build(self, node: ElementNode, index: DefinitionIndex) -> Build:
 
         build = Build()
         base_name = node.name

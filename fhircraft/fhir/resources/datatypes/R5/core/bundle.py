@@ -299,7 +299,7 @@ class Bundle(Resource):
     )
 
     @model_validator(mode="after")
-    def FHIR_bdl_1_constraint_model_validator(self):
+    def FHIR_bdl_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="total.empty() or (type = 'searchset') or (type = 'history')",
@@ -309,7 +309,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_2_constraint_model_validator(self):
+    def FHIR_bdl_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'searchset') or entry.search.empty()",
@@ -319,7 +319,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_3a_constraint_model_validator(self):
+    def FHIR_bdl_3a_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type in ('document' | 'message' | 'searchset' | 'collection') implies entry.all(resource.exists() and request.empty() and response.empty())",
@@ -329,7 +329,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_3b_constraint_model_validator(self):
+    def FHIR_bdl_3b_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'history' implies entry.all(request.exists() and response.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
@@ -339,7 +339,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_3c_constraint_model_validator(self):
+    def FHIR_bdl_3c_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type in ('transaction' | 'batch') implies entry.all(request.method.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
@@ -349,7 +349,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_3d_constraint_model_validator(self):
+    def FHIR_bdl_3d_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type in ('transaction-response' | 'batch-response') implies entry.all(response.exists())",
@@ -370,7 +370,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_7_constraint_model_validator(self):
+    def FHIR_bdl_7_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'history') or entry.where(fullUrl.exists()).select(fullUrl&iif(resource.meta.versionId.exists(), resource.meta.versionId, '')).isDistinct()",
@@ -391,7 +391,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_9_constraint_model_validator(self):
+    def FHIR_bdl_9_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'document' implies (identifier.system.exists() and identifier.value.exists())",
@@ -401,7 +401,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_10_constraint_model_validator(self):
+    def FHIR_bdl_10_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'document' implies (timestamp.hasValue())",
@@ -411,7 +411,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_11_constraint_model_validator(self):
+    def FHIR_bdl_11_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'document' implies entry.first().resource.is(Composition)",
@@ -421,7 +421,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_12_constraint_model_validator(self):
+    def FHIR_bdl_12_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'message' implies entry.first().resource.is(MessageHeader)",
@@ -431,7 +431,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_13_constraint_model_validator(self):
+    def FHIR_bdl_13_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'subscription-notification' implies entry.first().resource.is(SubscriptionStatus)",
@@ -441,7 +441,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_14_constraint_model_validator(self):
+    def FHIR_bdl_14_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'history' implies entry.request.method != 'PATCH'",
@@ -451,7 +451,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_15_constraint_model_validator(self):
+    def FHIR_bdl_15_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type='transaction' or type='transaction-response' or type='batch' or type='batch-response' or entry.all(fullUrl.exists() or request.method='POST')",
@@ -461,7 +461,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_16_constraint_model_validator(self):
+    def FHIR_bdl_16_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="issues.exists() implies (issues.issue.severity = 'information' or issues.issue.severity = 'warning')",
@@ -471,7 +471,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_17_constraint_model_validator(self):
+    def FHIR_bdl_17_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'document' implies issues.empty()",
@@ -481,7 +481,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_18_constraint_model_validator(self):
+    def FHIR_bdl_18_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'searchset' implies link.where(relation = 'self' and url.exists()).exists()",

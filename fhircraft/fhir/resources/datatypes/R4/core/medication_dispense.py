@@ -246,7 +246,7 @@ class MedicationDispense(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_mdd_1_constraint_model_validator(self):
+    def FHIR_mdd_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="whenHandedOver.empty() or whenPrepared.empty() or whenHandedOver >= whenPrepared",

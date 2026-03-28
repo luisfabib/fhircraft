@@ -298,7 +298,7 @@ class Bundle(Resource):
     )
 
     @model_validator(mode="after")
-    def FHIR_bdl_1_constraint_model_validator(self):
+    def FHIR_bdl_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="total.empty() or (type = 'searchset') or (type = 'history')",
@@ -308,7 +308,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_2_constraint_model_validator(self):
+    def FHIR_bdl_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="entry.search.empty() or (type = 'searchset')",
@@ -318,7 +318,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_3_constraint_model_validator(self):
+    def FHIR_bdl_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="entry.all(request.exists() = (%resource.type = 'batch' or %resource.type = 'transaction' or %resource.type = 'history'))",
@@ -328,7 +328,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_4_constraint_model_validator(self):
+    def FHIR_bdl_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="entry.all(response.exists() = (%resource.type = 'batch-response' or %resource.type = 'transaction-response' or %resource.type = 'history'))",
@@ -349,7 +349,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_7_constraint_model_validator(self):
+    def FHIR_bdl_7_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'history') or entry.where(fullUrl.exists()).select(fullUrl&resource.meta.versionId).isDistinct()",
@@ -370,7 +370,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_9_constraint_model_validator(self):
+    def FHIR_bdl_9_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'document' implies (identifier.system.exists() and identifier.value.exists())",
@@ -380,7 +380,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_10_constraint_model_validator(self):
+    def FHIR_bdl_10_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'document' implies (timestamp.hasValue())",
@@ -390,7 +390,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_11_constraint_model_validator(self):
+    def FHIR_bdl_11_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'document' implies entry.first().resource.is(Composition)",
@@ -400,7 +400,7 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
-    def FHIR_bdl_12_constraint_model_validator(self):
+    def FHIR_bdl_12_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'message' implies entry.first().resource.is(MessageHeader)",

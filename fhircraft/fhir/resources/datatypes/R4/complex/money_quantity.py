@@ -13,7 +13,7 @@ class MoneyQuantity(Quantity):
     _type = "Quantity"
 
     @model_validator(mode="after")
-    def FHIR_mqty_1_constraint_model_validator(self):
+    def FHIR_mqty_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(code.exists() or value.empty()) and (system.empty() or system = 'urn:iso:std:iso:4217')",

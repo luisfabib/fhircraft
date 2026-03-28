@@ -457,7 +457,7 @@ class Device(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_dev_1_constraint_model_validator(self):
+    def FHIR_dev_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.where(display=true).count() <= 1",

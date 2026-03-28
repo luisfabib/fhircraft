@@ -681,7 +681,7 @@ class Measure(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
+    def FHIR_cnl_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
@@ -702,7 +702,7 @@ class Measure(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_mea_1_constraint_model_validator(self):
+    def FHIR_mea_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="group.stratifier.all((code | description | criteria).exists() xor component.exists())",

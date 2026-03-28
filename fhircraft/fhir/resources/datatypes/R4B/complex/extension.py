@@ -356,17 +356,6 @@ class Extension(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("extension",),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -434,7 +423,7 @@ class Extension(Element):
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_model_validator(self):
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="extension.exists() != value.exists()",

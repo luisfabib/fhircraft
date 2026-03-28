@@ -228,7 +228,7 @@ class AllergyIntolerance(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ait_1_constraint_model_validator(self):
+    def FHIR_ait_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(verificationStatus.exists() and verificationStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/allergyintolerance-verification' and code='entered-in-error').exists().not()) implies clinicalStatus.exists()",
@@ -238,7 +238,7 @@ class AllergyIntolerance(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ait_2_constraint_model_validator(self):
+    def FHIR_ait_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(verificationStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/allergyintolerance-verification' and code='entered-in-error').exists()) implies clinicalStatus.exists().not()",

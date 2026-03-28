@@ -36,7 +36,7 @@ if TYPE_CHECKING:
         StructureDefinition as R5_StructureDefinition,
     )
 
-_BASE_MERGE_FIELDS = {"min", "max", "type", "short", "definition", "comment"}
+_BASE_MERGE_FIELDS = {"min", "max", "type", "short", "definition", "comment", "slicing"}
 
 
 class SnapshotResolver:
@@ -126,7 +126,13 @@ class SnapshotResolver:
                 )
                 base_index.update(partial_base_index.nodes, replace=True)
             else:
-                base_index = partial_base_index
+
+                ancestor_base_index = self._build_full_ancestor_index(base_definition)
+                if ancestor_base_index.root().id == partial_base_index.root().id:
+                    ancestor_base_index.update(partial_base_index.nodes, replace=True)
+                    base_index = ancestor_base_index
+                else:
+                    base_index = partial_base_index
             # Merge differential over base snapshot to produce a synthetic snapshot
             resolved_index = self._resolve_differential(
                 sd.differential.element, base_index
@@ -145,6 +151,41 @@ class SnapshotResolver:
     # ------------------------------------------------------------------
     # Differential resolution
     # ------------------------------------------------------------------
+
+    def _build_full_ancestor_index(
+        self,
+        sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition",
+    ) -> DefinitionIndex:
+        """
+        Walk the ``baseDefinition`` chain of *sd* until an ancestor with a complete
+        snapshot is found, and return a :class:`DefinitionIndex` built from that snapshot.
+
+        This is used when an intermediate base ``StructureDefinition`` carries no snapshot
+        of its own (i.e. it is a differential-only custom profile).  The caller is
+        responsible for subsequently applying the intermediate profile's own resolved
+        differential nodes on top of the returned index via :meth:`DefinitionIndex.update`.
+
+        Args:
+            sd: The differential-only StructureDefinition whose ancestor chain should be walked.
+
+        Returns:
+            DefinitionIndex: Index built from the nearest ancestor snapshot.
+
+        Raises:
+            DefinitionResolutionError: If the ancestor chain is exhausted without finding
+                                       a definition that has a snapshot.
+        """
+        current = sd
+        while True:
+            if not current.baseDefinition:
+                raise DefinitionResolutionError(
+                    f"StructureDefinition '{getattr(current, 'name', '?')}' has neither a "
+                    "snapshot nor a baseDefinition — cannot reconstruct full ancestor index."
+                )
+            ancestor = self._registry.get(current.baseDefinition)
+            if ancestor.snapshot and ancestor.snapshot.element:
+                return DefinitionIndex.from_elements(ancestor.snapshot.element)
+            current = ancestor
 
     def _resolve_differential(
         self,
@@ -258,10 +299,30 @@ class SnapshotResolver:
             if root_name
             else base_node.path
         )
+        merge_fields = base_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS))
+        # For type-choice type-slices (e.g. value[x]:valueQuantity) narrow the
+        # inherited type list to the single concrete type indicated by the suffix.
+        candidate = ElementNode(
+            definition=base_node.definition.__class__(
+                id=id, path=new_path, **merge_fields
+            )
+        )
+        if candidate.is_type_choice_slice and base_node.types:
+            concrete_suffix = id.rsplit(":", 1)[1].lower()
+            matched_type = next(
+                (
+                    t
+                    for t in base_node.types
+                    if t.code and concrete_suffix.endswith(str(t.code).lower())
+                ),
+                None,
+            )
+            if matched_type is not None:
+                merge_fields["type"] = [matched_type]
         new_definition = base_node.definition.__class__(
             id=id,
             path=new_path,
-            **base_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+            **merge_fields,
         )
         return ElementNode(definition=new_definition)
 
@@ -278,7 +339,10 @@ class SnapshotResolver:
         matching element definition from its snapshot.
 
         Args:
-            datatypes: A sequence of datatype names to expand. Must contain exactly one type.
+            datatypes: A sequence of datatype names to expand. When multiple types are
+                       provided (e.g. for a polymorphic ``value[x]`` element), each type
+                       is tried in order and the first one that contains a matching
+                       sub-element is used.
             id: The unique identifier for the element node to be created.
             base_index: A DefinitionIndex used to check for existing elements.
 
@@ -290,7 +354,8 @@ class SnapshotResolver:
 
         Notes:
             - This method is used during differential StructureDefinition resolution.
-            - Only complex types are supported for expansion.
+            - Only complex types are supported for expansion; primitive and FHIRPath types
+              are skipped when iterating over multiple candidates.
             - The generated element id is checked against the base index to prevent conflicts.
         """
         if not self._registry:
@@ -298,51 +363,56 @@ class SnapshotResolver:
                 "Repository is required for type expansion during differential resolution."
             )
 
-        if len(datatypes) != 1:
+        if not datatypes:
             raise DefinitionResolutionError(
-                "Type expansion is only supported for elements with a single type."
-            )
-        datatype = datatypes[0]
-        if datatype.startswith(FHIRPATH_TYPE_PREFIX):
-            raise DefinitionResolutionError(
-                f"Type expansion is not supported for FHIRPath types. Found type '{datatype}'."
+                f"Type expansion failed for element '{id}'. No type codes provided."
             )
 
-        type_structure_definition = self._registry.get(f"{FHIR_TYPE_PREFIX}{datatype}")
-        if type_structure_definition.kind != "complex-type":
-            raise DefinitionResolutionError(
-                f"Type expansion is only supported for complex types. Type '{datatype}' has kind '{type_structure_definition.kind}'."
-            )
-        if not type_structure_definition:
-            raise DefinitionResolutionError(
-                f"Type expansion failed: StructureDefinition for type '{datatype}' not found in repository."
-            )
-        snapshot = type_structure_definition.snapshot
-        if not snapshot or not snapshot.element:
-            raise DefinitionResolutionError(
-                f"Type expansion failed: StructureDefinition for type '{datatype}' has no snapshot or snapshot elements."
-            )
         local_id = id.rsplit(".", 1)[-1]
-        matching_node = next(
-            (n for e in snapshot.element if (n := ElementNode(e)).local_id == local_id),
-            None,
-        )
-        if not matching_node:
-            raise DefinitionResolutionError(
-                f"Type expansion failed: no matching element with local id '{local_id}' found in snapshot of type '{datatype}'."
-            )
         id_path = ".".join([seg.split(":")[0] for seg in id.split(".")])
         if id in base_index:
             raise DefinitionResolutionError(
                 f"Type expansion failed: generated intermediate node id '{id}' already exists in base index."
             )
-        # Determine unsliced path for newly synthesised element
-        return ElementNode(
-            definition=matching_node.definition.__class__(
-                id=id,
-                path=id_path,
-                **matching_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+
+        for datatype in datatypes:
+            if datatype.startswith(FHIRPATH_TYPE_PREFIX):
+                continue
+            try:
+                type_structure_definition = self._registry.get(
+                    f"{FHIR_TYPE_PREFIX}{datatype}"
+                )
+            except FileNotFoundError:
+                continue
+            if type_structure_definition.kind != "complex-type":
+                continue
+            snapshot = type_structure_definition.snapshot
+            if not snapshot or not snapshot.element:
+                continue
+            matching_node = next(
+                (
+                    n
+                    for e in snapshot.element
+                    if (n := ElementNode(e)).local_id == local_id
+                ),
+                None,
             )
+            if matching_node is None:
+                continue
+            # Determine unsliced path for newly synthesised element
+            return ElementNode(
+                definition=matching_node.definition.__class__(
+                    id=id,
+                    path=id_path,
+                    **matching_node.definition.model_dump(
+                        include=set(_BASE_MERGE_FIELDS)
+                    ),
+                )
+            )
+
+        raise DefinitionResolutionError(
+            f"Type expansion failed for element '{id}'. No matching element with local id "
+            f"'{local_id}' found in any of the provided types: {list(datatypes)}."
         )
 
     def _merge_node_with_base(
@@ -366,14 +436,30 @@ class SnapshotResolver:
             path=node.path or base_node.path,
             **{
                 **base_node.definition.model_dump(
-                    exclude_none=True, exclude={"id", "path", "contentReference"}
+                    exclude_none=True,
+                    exclude={"id", "path", "contentReference"},
                 ),
                 **node.definition.model_dump(
-                    exclude_none=True, exclude={"id", "path", "contentReference"}
+                    exclude_none=True,
+                    exclude={"id", "path", "contentReference"},
+                ),
+                "base": (
+                    node.definition.base
+                    if node.definition.base is not None
+                    else {
+                        "path": base_node.path,
+                        "min": base_node.definition.min,
+                        "max": base_node.definition.max,
+                    }
                 ),
             },
         )
-        return ElementNode(definition=merged_definition)
+        merged_node = ElementNode(definition=merged_definition)
+        if merged_node.is_array == True and merged_node.base_is_array == False:
+            raise DefinitionResolutionError(
+                f"Invalid cardinality change in element '{node.id}': cannot change from non-array to array cardinality when merging with base element."
+            )
+        return merged_node
 
     def _resolve_content_references(self, index: DefinitionIndex) -> DefinitionIndex:
         """

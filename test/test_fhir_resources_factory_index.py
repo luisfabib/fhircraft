@@ -199,6 +199,23 @@ def test_index_get_by_path_ignore_slices(slicing_index, id, expected, count):
     assert expected in {n.path for n in nodes}
 
 
+def test_index_get_by_path_ignore_slices_excludes_type_choice_nodes():
+    index = DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node("Observation.value[x]", "Observation.value[x]"),
+            make_node("Observation.value[x]:valueQuantity", "Observation.value[x]"),
+            make_node("Observation.value[x]:valueString", "Observation.value[x]"),
+        ]
+    )
+    nodes = index.get_by_path("Observation.value[x]", ignore_slices=True)
+    ids = {n.id for n in nodes}
+    assert "Observation.value[x]:valueQuantity" not in ids
+    assert "Observation.value[x]:valueString" not in ids
+    assert "Observation.value[x]" in ids
+    assert len(nodes) == 1
+
+
 def test_index_get_by_path_raises_for_missing(simple_index):
     with pytest.raises(DefinitionIndexError):
         simple_index.get_by_path("Observation.missing")
@@ -302,6 +319,26 @@ def test_get_children_empty_for_leaf(simple_index):
     assert simple_index.get_children("Observation.code") == []
 
 
+def test_get_children_excludes_type_choice_slice_nodes():
+    index = DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node(
+                "Observation.value[x]", "Observation.value[x]", slicing=MagicMock()
+            ),
+            make_node("Observation.value[x]:valueQuantity", "Observation.value[x]"),
+            make_node("Observation.value[x]:valueString", "Observation.value[x]"),
+            make_node("Observation.code", "Observation.code"),
+        ]
+    )
+    children = index.get_children("Observation")
+    ids = {n.id for n in children}
+    assert "Observation.value[x]:valueQuantity" not in ids
+    assert "Observation.value[x]:valueString" not in ids
+    assert "Observation.value[x]" in ids
+    assert "Observation.code" in ids
+
+
 # ------------------------------------------------------------------
 # Navigation — get_slices
 # ------------------------------------------------------------------
@@ -311,6 +348,24 @@ def test_get_slices_returns_named_slices(slicing_index):
     slices = slicing_index.get_slices("Observation.component")
     ids = {n.id for n in slices}
     assert ids == {"Observation.component:systolic", "Observation.component:diastolic"}
+
+
+def test_get_slices_excludes_type_choice_slice_nodes():
+    index = DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node(
+                "Observation.value[x]", "Observation.value[x]", slicing=MagicMock()
+            ),
+            make_node("Observation.value[x]:valueQuantity", "Observation.value[x]"),
+            make_node("Observation.value[x]:valueString", "Observation.value[x]"),
+        ]
+    )
+    slices = index.get_slices("Observation.value[x]")
+    ids = {n.id for n in slices}
+    assert "Observation.value[x]:valueQuantity" not in ids
+    assert "Observation.value[x]:valueString" not in ids
+    assert ids == set()
 
 
 def test_get_slices_raises_for_non_slice_entry(simple_index):
@@ -347,8 +402,6 @@ def test_get_slice_children_returns_children_of_slice(slicing_index):
     assert ids == {
         "Observation.component:systolic.code",
         "Observation.component:systolic.value[x]",
-        "Observation.component:systolic.valueString",
-        "Observation.component:systolic.valueCodeableConcept",
     }
 
 

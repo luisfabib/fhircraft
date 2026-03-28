@@ -119,7 +119,7 @@ class SubscriptionStatus(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_sst_1_constraint_model_validator(self):
+    def FHIR_sst_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'event-notification' or type = 'query-event') implies notificationEvent.exists()",
@@ -129,7 +129,7 @@ class SubscriptionStatus(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sst_2_constraint_model_validator(self):
+    def FHIR_sst_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="type = 'query-status' implies status.exists()",

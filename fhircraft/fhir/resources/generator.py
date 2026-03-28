@@ -385,7 +385,11 @@ class CodeGenerator:
                 ):
                     continue
                 self._recursively_import_annotation_types(info.annotation)
-                annotation_string = repr(info.annotation)
+                # type(None) (NoneType) renders as "<class 'NoneType'>" via repr(); map it to "None"
+                if info.annotation is type(None):
+                    annotation_string = "None"
+                else:
+                    annotation_string = repr(info.annotation)
 
                 # Handle forward references
                 if "ForwardRef" in annotation_string:

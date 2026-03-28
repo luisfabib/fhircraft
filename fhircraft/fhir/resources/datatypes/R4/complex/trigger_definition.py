@@ -71,7 +71,7 @@ class TriggerDefinition(Element):
         )
 
     @model_validator(mode="after")
-    def FHIR_trd_1_constraint_model_validator(self):
+    def FHIR_trd_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="data.empty() or timing.empty()",
@@ -81,7 +81,7 @@ class TriggerDefinition(Element):
         )
 
     @model_validator(mode="after")
-    def FHIR_trd_2_constraint_model_validator(self):
+    def FHIR_trd_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="condition.exists() implies data.exists()",
@@ -91,7 +91,7 @@ class TriggerDefinition(Element):
         )
 
     @model_validator(mode="after")
-    def FHIR_trd_3_constraint_model_validator(self):
+    def FHIR_trd_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'named-event' implies name.exists()) and (type = 'periodic' implies timing.exists()) and (type.startsWith('data-') implies data.exists())",

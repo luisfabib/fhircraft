@@ -24,7 +24,7 @@ class Range(DataType):
     )
 
     @model_validator(mode="after")
-    def FHIR_rng_2_constraint_model_validator(self):
+    def FHIR_rng_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="low.value.empty() or high.value.empty() or low.lowBoundary().comparable(high.highBoundary()).not() or (low.lowBoundary() <= high.highBoundary())",

@@ -290,7 +290,7 @@ class SearchParameter(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_spd_0_constraint_model_validator(self):
+    def FHIR_spd_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
@@ -300,7 +300,7 @@ class SearchParameter(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_spd_1_constraint_model_validator(self):
+    def FHIR_spd_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="xpath.empty() or xpathUsage.exists()",
@@ -310,7 +310,7 @@ class SearchParameter(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_spd_2_constraint_model_validator(self):
+    def FHIR_spd_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="chain.empty() or type = 'reference'",

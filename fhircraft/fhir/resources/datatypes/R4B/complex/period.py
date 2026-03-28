@@ -34,7 +34,7 @@ class Period(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_per_1_constraint_model_validator(self):
+    def FHIR_per_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="start.hasValue().not() or end.hasValue().not() or (start <= end)",

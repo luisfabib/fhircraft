@@ -62,7 +62,7 @@ class Expression(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_exp_1_constraint_model_validator(self):
+    def FHIR_exp_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="expression.exists() or reference.exists()",

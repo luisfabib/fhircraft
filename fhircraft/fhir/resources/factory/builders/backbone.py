@@ -1,5 +1,5 @@
 from fhircraft.fhir.resources.factory.builders.base import Build, Builder
-from fhircraft.fhir.resources.factory.element_node import ElementNode
+from fhircraft.fhir.resources.factory.element_node import ElementNode, BACKBONE_CODES
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
@@ -11,7 +11,25 @@ class BackboneFieldBuilder(Builder):
 
     def can_handle(self, node: ElementNode, index: DefinitionIndex) -> bool:
         has_children = bool(index.get_children(node.id))
-        return has_children
+        if has_children:
+            return True
+        if node.type_codes and any(code in BACKBONE_CODES for code in node.type_codes):
+            if self.context.base and node.name in self.context.base.model_fields:
+                backbone_base = next(
+                    (
+                        m
+                        for m in _get_deepest_args(
+                            self.context.base.model_fields[node.name].annotation
+                        )
+                        if isinstance(m, type)
+                        and issubclass(m, BaseModel)
+                        and m is not type(None)
+                    ),
+                    None,
+                )
+                if backbone_base is not None:
+                    return True
+        return False
 
     def build(self, node: ElementNode, index: DefinitionIndex) -> Build:
         from fhircraft.fhir.resources.factory.assembler import ModelAssembler
@@ -48,6 +66,19 @@ class BackboneFieldBuilder(Builder):
                     else FHIRBaseModel
                 )
             )
+
+        # When no child elements are constrained, use the resolved backbone type directly instead of creating an empty wrapper subclass.
+        if not index.get_children(node.id):
+            build.fields.append(
+                self.build_field_information(
+                    safe_name,
+                    node,
+                    backbone_base,
+                    validation_alias=val_alias,
+                )
+            )
+            build.validators = self.build_field_validators(node, safe_name)
+            return build
 
         # Build the backbone model name from the element path
         path_parts = node.path.split(".")[1:]  # strip resource prefix
