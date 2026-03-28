@@ -629,7 +629,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
+    def FHIR_cnl_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
@@ -672,7 +672,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_3_constraint_model_validator(self):
+    def FHIR_exs_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="status='active' or status='retired' implies actor.exists()",
@@ -682,7 +682,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_4_constraint_model_validator(self):
+    def FHIR_exs_4_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="status='active' or status='retired' implies process.exists()",
@@ -703,7 +703,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_6_constraint_model_validator(self):
+    def FHIR_exs_6_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="actor.key.count() = actor.key.distinct().count()",
@@ -713,7 +713,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_7_constraint_model_validator(self):
+    def FHIR_exs_7_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="actor.title.count() = actor.title.distinct().count()",
@@ -723,7 +723,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_8_constraint_model_validator(self):
+    def FHIR_exs_8_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="instance.key.count() = instance.key.distinct().count()",
@@ -733,7 +733,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_9_constraint_model_validator(self):
+    def FHIR_exs_9_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="instance.title.count() = instance.title.distinct().count()",
@@ -765,7 +765,7 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_12_constraint_model_validator(self):
+    def FHIR_exs_12_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="process.title.count() = process.title.distinct().count()",

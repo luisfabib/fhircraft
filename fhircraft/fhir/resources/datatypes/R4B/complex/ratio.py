@@ -24,7 +24,7 @@ class Ratio(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_rat_1_constraint_model_validator(self):
+    def FHIR_rat_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(numerator.exists() and denominator.exists()) or (numerator.empty() and denominator.empty() and extension.exists())",

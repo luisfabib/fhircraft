@@ -61,7 +61,7 @@ class Identifier(DataType):
     )
 
     @model_validator(mode="after")
-    def FHIR_ident_1_constraint_model_validator(self):
+    def FHIR_ident_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="value.exists()",

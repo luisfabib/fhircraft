@@ -13,7 +13,7 @@ class Age(Quantity):
     _type = "Quantity"
 
     @model_validator(mode="after")
-    def FHIR_age_1_constraint_model_validator(self):
+    def FHIR_age_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (value.empty() or value.hasValue().not() or value > 0)",

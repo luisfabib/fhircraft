@@ -57,6 +57,7 @@ class SlicedFieldBuilder(Builder):
 
         # Build a slice model for each named slice
         slice_models: list[type] = []
+        slice_base = None
         for slice_node in index.get_slices(node.id):
             slice_name: str = slice_node.slice_name  # type: ignore[union-attr]
             slice_model_name = (
@@ -125,7 +126,7 @@ class SlicedFieldBuilder(Builder):
                 safe_name,
                 node,
                 annotation,
-                alias=node.name,
+                alias=node.name if safe_name != node.name else None,
                 validation_alias=val_alias,
                 description=getattr(node.definition, "short", None),
             )

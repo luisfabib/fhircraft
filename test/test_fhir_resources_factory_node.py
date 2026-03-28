@@ -195,9 +195,10 @@ def test_element_node_local_and_parent_id(element, id, expected_parent, expected
     assert node.parent_id == expected_parent
     assert node.local_id == expected_local
 
-    # ------------------------------------------------------------------
-    # Structural flags
-    # ------------------------------------------------------------------
+
+# ------------------------------------------------------------------
+# Structural flags
+# ------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -221,13 +222,31 @@ def test_element_node_is_root(element, path, expected):
         ("Resource.name", False),
         ("Resource.name:surname", True),
         ("Resource.value[x]", False),
-        ("Resource.value[x]:valueString", True),
+        ("Resource.value[x]:valueString", False),
+        ("Resource.component.value[x]:valueQuantity", False),
     ],
 )
 def test_element_node_is_slice(element, id, expected):
     element.id = id
     node = ElementNode(definition=element)
     assert node.is_slice == expected
+
+
+@pytest.mark.parametrize(
+    "id, expected",
+    [
+        ("Resource.name", False),
+        ("Resource.name[x]", False),
+        ("Resource.value[x]:valueString", True),
+        ("Resource.component.value[x]:valueQuantity", True),
+        ("Resource.name:surname", False),
+        ("Patient.deceased[x]:deceasedBoolean", True),
+    ],
+)
+def test_element_node_is_type_choice_slice(element, id, expected):
+    element.id = id
+    node = ElementNode(definition=element)
+    assert node.is_type_choice_slice == expected
 
 
 @pytest.mark.parametrize(
@@ -241,6 +260,24 @@ def test_element_node_is_slice_entry(element, slicing, expected):
     element.slicing = slicing
     node = ElementNode(definition=element)
     assert node.is_slice_entry == expected
+
+
+@pytest.mark.parametrize(
+    "id, expected",
+    [
+        ("Observation.component:systolic.code", True),
+        ("Observation.component:systolic", True),
+        ("Observation.value[x]:valueQuantity", False),
+        ("Observation.component.value[x]:valueBoolean", False),
+        ("Observation.component:slice.value[x]:valueQuantity", True),
+        ("Observation.code", False),
+        ("Observation.component.value[x]", False),
+    ],
+)
+def test_element_node_is_slice_child_type_choice(element, id, expected):
+    element.id = id
+    node = ElementNode(definition=element)
+    assert node.is_slice_child == expected
 
 
 @pytest.mark.parametrize(
@@ -279,9 +316,9 @@ def test_element_node_slice_name(element, id, expected):
     "id, expected",
     [
         ("Resource.name:surname", ["surname"]),
-        ("Resource.value[x]:valueString", ["valueString"]),
-        ("Resource.extension.value[x]:valueString", ["valueString"]),
-        ("Resource.extension:slice.value[x]:valueString", ["slice", "valueString"]),
+        ("Resource.value[x]:valueString", []),
+        ("Resource.extension.value[x]:valueString", []),
+        ("Resource.extension:slice.value[x]:valueString", ["slice"]),
     ],
 )
 def test_element_node_slice_ancestry(element, id, expected):
@@ -379,6 +416,35 @@ def test_cardinality_is_array(element, expected):
     assert node.is_array == expected
 
 
+@pytest.mark.parametrize(
+    "base, expected_min, expected_max",
+    [
+        (MagicMock(min=0, max="0"), 0, 0),
+        (MagicMock(min=0, max="1"), 0, 1),
+        (MagicMock(min=1, max="2"), 1, 2),
+        (MagicMock(min=0, max="*"), 0, None),
+    ],
+)
+def test_cardinality_base(base, expected_min, expected_max):
+    node = ElementNode(definition=MagicMock(base=base))
+    assert node.base_min_cardinality == expected_min
+    assert node.base_max_cardinality == expected_max
+
+
+@pytest.mark.parametrize(
+    "base, expected",
+    [
+        (MagicMock(max="0"), False),
+        (MagicMock(max="1"), False),
+        (MagicMock(max="2"), True),
+        (MagicMock(max="*"), True),
+    ],
+)
+def test_cardinality_base_is_array(base, expected):
+    node = ElementNode(definition=MagicMock(base=base))
+    assert node.base_is_array == expected
+
+
 # ------------------------------------------------------------------
 # Type helpers
 # ------------------------------------------------------------------
@@ -399,3 +465,89 @@ def test_element_node_is_polymorphic_type(element, path, expected):
     element.path = path
     node = ElementNode(definition=element)
     assert node.is_polymorphic_type == expected
+
+
+@pytest.mark.parametrize(
+    "id, path, expected",
+    [
+        ("Observation.value[x]:valueQuantity", "Observation.value[x]", False),
+        ("Patient.deceased[x]:deceasedBoolean", "Patient.deceased[x]", False),
+        (
+            "Observation.component.value[x]:valueCodeableConcept",
+            "Observation.component.value[x]",
+            False,
+        ),
+    ],
+)
+def test_element_node_is_polymorphic_type_false_for_type_choice_slice(
+    element, id, path, expected
+):
+    element.id = id
+    element.path = path
+    node = ElementNode(definition=element)
+    assert node.is_polymorphic_type == expected
+
+
+# ------------------------------------------------------------------
+# Documentation
+# ------------------------------------------------------------------
+
+
+def test_documentation__returns_definition_when_it_has_content(element):
+    element.definition = "A real definition."
+    element.short = "Short text"
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "A real definition."
+
+
+def test_documentation__falls_back_to_short_when_definition_has_no_alphanumeric(
+    element,
+):
+    element.definition = r"\-"
+    element.short = "Short text"
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "Short text"
+
+
+def test_documentation__falls_back_to_comment_when_definition_and_short_are_placeholders(
+    element,
+):
+    element.definition = r"\-"
+    element.short = "---"
+    element.comment = "Useful comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "Useful comment"
+
+
+def test_documentation__returns_empty_string_when_all_fields_are_placeholders(element):
+    element.definition = r"\-"
+    element.short = "---"
+    element.comment = "***"
+    node = ElementNode(definition=element)
+    assert node.documentation == ""
+
+
+def test_documentation__returns_empty_string_when_all_fields_are_none(element):
+    element.definition = None
+    element.short = None
+    element.comment = None
+    node = ElementNode(definition=element)
+    assert node.documentation == ""
+
+
+def test_documentation__returns_short_when_definition_is_none(element):
+    element.definition = None
+    element.short = "Short text"
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "Short text"
+
+
+def test_documentation__returns_comment_when_definition_and_short_are_none(element):
+    element.definition = None
+    element.short = None
+    element.comment = "A comment"
+    node = ElementNode(definition=element)
+    assert node.documentation == "A comment"

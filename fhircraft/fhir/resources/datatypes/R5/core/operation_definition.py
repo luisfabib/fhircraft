@@ -489,7 +489,7 @@ class OperationDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
+    def FHIR_cnl_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
@@ -554,7 +554,7 @@ class OperationDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_opd_5_constraint_model_validator(self):
+    def FHIR_opd_5_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind = 'query') implies (instance = false)",
@@ -564,7 +564,7 @@ class OperationDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_opd_6_constraint_model_validator(self):
+    def FHIR_opd_6_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind = 'query') implies (parameter.all((use = 'in' and searchType.exists()) or (use != 'in')))",
@@ -574,7 +574,7 @@ class OperationDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_opd_7_constraint_model_validator(self):
+    def FHIR_opd_7_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(kind = 'query') implies ((parameter.where(use = 'out').count() = 1) and (parameter.where(use = 'out').all(name = 'result' and type = 'Bundle')))",

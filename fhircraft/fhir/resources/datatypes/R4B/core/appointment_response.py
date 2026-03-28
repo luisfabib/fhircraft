@@ -94,7 +94,7 @@ class AppointmentResponse(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_apr_1_constraint_model_validator(self):
+    def FHIR_apr_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="participantType.exists() or actor.exists()",

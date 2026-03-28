@@ -415,7 +415,7 @@ class FamilyMemberHistory(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_fhs_1_constraint_model_validator(self):
+    def FHIR_fhs_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="age.empty() or born.empty()",
@@ -425,7 +425,7 @@ class FamilyMemberHistory(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_fhs_2_constraint_model_validator(self):
+    def FHIR_fhs_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="age.exists() or estimatedAge.empty()",
@@ -435,7 +435,7 @@ class FamilyMemberHistory(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_fhs_3_constraint_model_validator(self):
+    def FHIR_fhs_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="age.empty() or deceased.empty()",

@@ -59,7 +59,6 @@ if TYPE_CHECKING:
         ElementDefinitionConstraint as R5_ElementDefinitionConstraint,
     )
 
-_type = type
 
 # Class-level attribute names that collide with Pydantic's metaclass machinery
 CLASS_RESERVED_KEYWORDS: frozenset[str] = frozenset(
@@ -280,15 +279,20 @@ class Builder(ABC):
             else:
                 default = None
 
-        if node.is_array and default is not None:
+        effective_is_array = (
+            node.base_is_array if node.base_is_array is not None else node.is_array
+        )
+        if effective_is_array and default is not None:
             default = ensure_list(default)
 
         annotation = type
-        if node.is_array:
+        if effective_is_array:
             annotation = List[annotation]
 
-        # Enforce optionality for all fields
-        annotation = Optional[annotation]
+        if node.is_prohibited:
+            annotation = None
+        else:
+            annotation = Optional[annotation]
 
         return FieldInformation(
             name=name,
@@ -297,9 +301,9 @@ class Builder(ABC):
             alias=alias,
             validation_alias=validation_alias,
             description=description or node.documentation,
-            min_length=node.min_cardinality if node.is_array else None,
+            min_length=node.min_cardinality if effective_is_array else None,
             max_length=node.max_length
-            or (node.max_cardinality if node.is_array else None),
+            or (node.max_cardinality if effective_is_array else None),
             min_value=node.min_value,
             max_value=node.max_value,
         )

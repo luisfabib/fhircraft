@@ -36,12 +36,14 @@ def make_node(
     is_array: bool = False,
     min_cardinality: int = 0,
     max_cardinality: int | None = None,
+    base_is_array: bool | None = None,
     documentation: str | None = None,
     fixed=None,
     pattern=None,
     constraints=None,
     default_value=None,
     path: str | None = None,
+    is_prohibited: bool = False,
 ):
     node = MagicMock()
     node.name = name
@@ -58,6 +60,8 @@ def make_node(
     node.pattern = pattern
     node.default_value = default_value
     node.definition.constraint = constraints or []
+    node.base_is_array = base_is_array
+    node.is_prohibited = is_prohibited
     node.max_length = None
     node.min_value = None
     node.max_value = None
@@ -204,7 +208,13 @@ def test_build__normal_name_has_no_validation_alias(builder: Builder, index):
 
 
 def test_build__non_array_annotation_is_optional(builder: Builder, index):
-    node = make_node("status", type_codes=["CodeableConcept"], is_array=False)
+    node = make_node(
+        "status",
+        type_codes=["CodeableConcept"],
+        is_array=False,
+        base_is_array=False,
+        max_cardinality=1,
+    )
     ti = make_type_info(r4_complex.CodeableConcept, "complex-type", False)
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)

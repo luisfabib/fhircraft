@@ -6,6 +6,12 @@ from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinition,
     ElementDefinitionType,
 )
+
+from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
+    ElementDefinitionSlicing,
+    ElementDefinitionSlicingDiscriminator,
+)
+
 from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import (
@@ -60,6 +66,18 @@ def make_structure_def(
         sd.differential = None
 
     return sd
+
+
+def make_url_slicing() -> ElementDefinitionSlicing:
+    """Return the canonical open-sliced-by-url discriminator found on extension elements."""
+    return ElementDefinitionSlicing.model_construct(
+        discriminator=[
+            ElementDefinitionSlicingDiscriminator.model_construct(
+                type="value", path="url"
+            )
+        ],
+        rules="open",
+    )
 
 
 # ------------------------------------------------------------------
@@ -168,6 +186,81 @@ def test_build_type_node__ignores_fhirpath_type_nodes(base_index, resolver, type
         resolver._build_type_node([type], "Observation.value", base_index)
 
 
+def test_build_type_node__raises_error_for_empty_datatypes(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node([], "Observation.value", base_index)
+
+
+def test_build_type_node__returns_first_matching_for_multiple_types(
+    base_index, resolver
+):
+    node = resolver._build_type_node(
+        ["Quantity", "CodeableConcept"],
+        "Observation.value.coding",
+        base_index,
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.value.coding"
+    assert node.path == "Observation.value.coding"
+
+
+def test_build_type_node__skips_non_matching_first_type_for_multiple_types(
+    base_index, resolver
+):
+    node = resolver._build_type_node(
+        ["Quantity", "CodeableConcept"],
+        "Observation.value.coding",
+        base_index,
+    )
+    # coding is defined on CodeableConcept — verify cardinality comes from that definition
+    assert node.min_cardinality == 0
+    assert node.max_cardinality is None  # max="*" on CodeableConcept.coding
+
+
+def test_build_type_node__raises_error_for_all_fhirpath_types(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node(
+            [
+                "http://hl7.org/fhirpath/System.String",
+                "http://hl7.org/fhirpath/System.Integer",
+            ],
+            "Observation.value",
+            base_index,
+        )
+
+
+def test_build_type_node__raises_error_for_all_primitive_types(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node(
+            ["string", "integer", "boolean"],
+            "Observation.value.text",
+            base_index,
+        )
+
+
+def test_build_type_node__raises_error_for_no_type_matches(base_index, resolver):
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_type_node(
+            ["Quantity", "CodeableConcept"],
+            "Observation.value.nonExistentField",
+            base_index,
+        )
+
+
+def test_build_type_node__preserves_slicing_from_base_type(resolver):
+    node = resolver._build_type_node(
+        ["CodeableConcept"],
+        "Observation.code.extension",
+        make_base_index(make_element("Observation", "Observation")),
+    )
+
+    assert node is not None
+    assert (
+        node.definition.slicing is not None
+    ), "_build_type_node stripped slicing from CodeableConcept.extension"
+    assert node.is_slice_entry, "Type-expanded extension node should be a slice entry"
+
+
 # ------------------------------------------------------------------
 # SnapshotResolver._build_intermediate_node
 # ------------------------------------------------------------------
@@ -238,6 +331,115 @@ def test_build_intermediate_node__return_inherited_from_type(resolver, base_inde
     assert node.definition.short == "Unique id for inter-element referencing"
 
 
+def test_build_intermediate_node__polymorphic_parent_expands_via_first_matching_type(
+    resolver,
+):
+    # Build a base_index that contains a polymorphic value[x] parent
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            short="Measurement value",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x].coding", base_index_with_poly
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.value[x].coding"
+    assert node.path == "Observation.value[x].coding"
+
+
+def test_build_intermediate_node__type_choice_id_returns_element_node(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            short="Measurement value",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.value[x]:valueQuantity"
+
+
+def test_build_intermediate_node__type_choice_id_has_correct_path(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert node.path == "Observation.value[x]"
+
+
+def test_build_intermediate_node__type_choice_id_narrows_type_list(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert node.type_codes == ["Quantity"]
+
+
+def test_build_intermediate_node__type_choice_id_is_not_polymorphic(resolver):
+    base_index_with_poly = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            min=0,
+            max="1",
+            type=[
+                ElementDefinitionType(code="Quantity"),
+                ElementDefinitionType(code="CodeableConcept"),
+            ],
+        ),
+    )
+    node = resolver._build_intermediate_node(
+        "Observation.value[x]:valueQuantity", base_index_with_poly
+    )
+    assert node.is_polymorphic_type is False
+    assert node.is_type_choice_slice is True
+
+
 def test_build_intermediate_node__path_lookup_ignores_slices(resolver, base_index):
     base_index.add(
         make_node(id="BaseResource.component:sliceA", path="BaseResource.component")
@@ -253,6 +455,35 @@ def test_build_intermediate_node__definition_class_is_same_as_base(
     base_node = base_index.get("BaseResource.status")
     node = resolver._build_intermediate_node("MyProfile.status", base_index)
     assert type(node.definition) is type(base_node.definition)
+
+
+def test_build_intermediate_node__preserves_slicing_from_base(resolver):
+    """_build_intermediate_node expands Observation.code.extension from CodeableConcept
+    (the parent type) — the resulting node must retain the slicing discriminator."""
+    # Base index contains Observation.code typed as CodeableConcept; no .extension entry.
+    base_with_code = make_base_index(
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.code",
+            "Observation.code",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+    )
+
+    node = resolver._build_intermediate_node(
+        "Observation.code.extension", base_with_code
+    )
+
+    assert node is not None
+    assert node.definition.slicing is not None, (
+        "_build_intermediate_node stripped slicing when expanding "
+        "Observation.code.extension from CodeableConcept"
+    )
+    assert node.is_slice_entry, (
+        "Synthesised Observation.code.extension node should be a slice entry"
+    )
 
 
 # ------------------------------------------------------------------
@@ -325,6 +556,23 @@ def test_merge_node_with_base__base_type_kept_when_diff_has_none(resolver):
     assert result.type_codes == ["code"]
 
 
+@pytest.mark.parametrize(
+    "min, max, base_min, base_max, expected_min, expected_max",
+    [
+        (None, None, 0, "1", 0, "1"),
+        (1, None, 0, "1", 0, "1"),
+    ],
+)
+def test_merge_node_with_base__base_is_constructued(
+    resolver, min, max, base_min, base_max, expected_min, expected_max
+):
+    diff = make_node(id="MyProfile.status", min=min, max=max)
+    base = make_node(id="BaseResource.status", min=base_min, max=base_max)
+    result = resolver._merge_node_with_base(diff, base)
+    assert result.definition.base.min == expected_min
+    assert result.definition.base.max == expected_max
+
+
 # ------------------------------------------------------------------
 # SnapshotResolver._resolve_differential
 # ------------------------------------------------------------------
@@ -372,7 +620,10 @@ def test_resolve_differential__intermediate_nodes_filled_from_base(
 ):
     diff = [
         make_element("MyProfile", "MyProfile"),
-        make_element("MyProfile.component.code", "MyProfile.component.code", max="*"),
+        make_element(
+            "MyProfile.component.code",
+            "MyProfile.component.code",
+        ),
     ]
     index = resolver._resolve_differential(diff, base_index)
     assert (node := index.get("MyProfile.component"))
@@ -380,7 +631,7 @@ def test_resolve_differential__intermediate_nodes_filled_from_base(
     assert node.max_cardinality == None
     assert (node := index.get("MyProfile.component.code"))
     assert node.min_cardinality == 0
-    assert node.max_cardinality == None
+    assert node.max_cardinality == 1
 
 
 def test_resolve_differential__multiple_diff_elements_all_in_result(
@@ -515,6 +766,89 @@ def test_resolve_differential__merge_result_is_stored_not_diff_node(
 
     stored = index.get("MyProfile.status")
     assert stored is merged_sentinel
+
+
+def test_resolve_differential__extension_slice_on_complex_field_is_present(resolver):
+    # Build a minimal Observation snapshot — only the top-level 'code' field.
+    obs_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.code",
+            "Observation.code",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+    ]
+    base_index = make_base_index(*obs_snapshot)
+
+    # The differential introduces a slice on Observation.code.extension.
+    diff = [
+        make_element("Observation", "Observation"),
+        make_element("Observation.code", "Observation.code"),
+        make_element("Observation.code.extension", "Observation.code.extension"),
+        make_element(
+            "Observation.code.extension:mySlice",
+            "Observation.code.extension",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="Extension")],
+        ),
+    ]
+
+    result = resolver._resolve_differential(diff, base_index)
+
+    # The slice entry node must be present and must be recognised as such.
+    ext_node = result.get("Observation.code.extension")
+    assert (
+        ext_node is not None
+    ), "Observation.code.extension missing from resolved index"
+    assert (
+        ext_node.is_slice_entry
+    ), "Observation.code.extension must be a slice entry so SlicedFieldBuilder handles it"
+
+    # The named slice must be present in the index.
+    assert (
+        "Observation.code.extension:mySlice" in result
+    ), "Observation.code.extension:mySlice missing — slice was silently dropped"
+
+
+def test_resolve_differential__slicing_preserved_on_intermediate_complex_type_node(
+    resolver,
+):
+    obs_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.code",
+            "Observation.code",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+    ]
+    base_index = make_base_index(*obs_snapshot)
+
+    diff = [
+        make_element("Observation", "Observation"),
+        make_element("Observation.code", "Observation.code"),
+        make_element("Observation.code.extension", "Observation.code.extension"),
+        make_element(
+            "Observation.code.extension:mySlice",
+            "Observation.code.extension",
+            min=1,
+            max="1",
+            type=[ElementDefinitionType(code="Extension")],
+        ),
+    ]
+
+    result = resolver._resolve_differential(diff, base_index)
+
+    ext_node = result.get("Observation.code.extension")
+    assert ext_node is not None
+    assert ext_node.definition.slicing is not None, (
+        "slicing was stripped when building the intermediate "
+        "Observation.code.extension node from CodeableConcept"
+    )
 
 
 # ==================================================================
@@ -845,8 +1179,6 @@ def test_resolve__auto_mode_is_default(resolver, base_index):
 
 
 def test_resolve__differential_resolves_base_via_registry(resolver, base_index):
-    """resolve() fetches the base StructureDefinition from the registry and recursively
-    resolves it to build the base_index used for differential merging."""
     diff_elements = [
         make_element("MyProfile", "MyProfile"),
         make_element("MyProfile.status", "MyProfile.status", min=1),
@@ -869,8 +1201,6 @@ def test_resolve__differential_resolves_base_via_registry(resolver, base_index):
 
 
 def test_resolve__differential_recursive_chain(resolver, base_index):
-    """resolve() recursively resolves a chain of differential definitions until a
-    snapshot is found, without requiring any intermediate snapshot."""
     # Deepest base — provides the snapshot for the whole chain.
     root_sd = make_structure_def(
         snapshot_elements=[n.definition for n in base_index.nodes]
@@ -911,7 +1241,6 @@ def test_resolve__differential_recursive_chain(resolver, base_index):
 
 
 def test_resolve__differential_raises_when_base_definition_is_missing(resolver):
-    """resolve() raises DefinitionResolutionError when the SD has no baseDefinition."""
     sd = make_structure_def(
         differential_elements=[
             make_element("MyProfile", "MyProfile"),
@@ -921,3 +1250,239 @@ def test_resolve__differential_raises_when_base_definition_is_missing(resolver):
 
     with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
+
+
+def test_resolve__differential_no_snapshot_mismatched_root_falls_back_to_partial(
+    resolver, base_index
+):
+    # Snapshot uses 'BaseResource' as the root.
+    root_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+
+    # Mid profile uses a *different* root name ('MidProfile'), which is the
+    # non-standard scenario covered by the guard clause.
+    mid_diff = [
+        make_element("MidProfile", "MidProfile"),
+        make_element("MidProfile.status", "MidProfile.status", min=1),
+    ]
+    mid_sd = make_structure_def(
+        differential_elements=mid_diff,
+        base_definition="http://example.org/BaseResource",
+    )
+
+    top_diff = [
+        make_element("TopProfile", "TopProfile"),
+        make_element("TopProfile.status", "TopProfile.status", max="0"),
+    ]
+    top_sd = make_structure_def(
+        differential_elements=top_diff,
+        base_definition="http://example.org/MidProfile",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/MidProfile": mid_sd,
+            "http://example.org/BaseResource": root_sd,
+        }[url]
+    )
+
+    # Must not raise a DefinitionIndexError about multiple root candidates.
+    result = resolver.resolve(top_sd, mode="differential")
+
+    assert isinstance(result, DefinitionIndex)
+    node = result.get("TopProfile.status")
+    assert node is not None
+    assert node.max_cardinality == 0
+
+
+def test_resolve__differential_no_snapshot_base_uses_ancestor_snapshot(
+    resolver, base_index
+):
+    # Bottom of the chain — has a real snapshot that includes 'category'.
+    root_sd = make_structure_def(
+        snapshot_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element(
+                "BaseResource.status",
+                "BaseResource.status",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="code")],
+            ),
+            make_element(
+                "BaseResource.category",
+                "BaseResource.category",
+                min=0,
+                max="*",
+                type=[ElementDefinitionType(code="CodeableConcept")],
+            ),
+        ]
+    )
+
+    # Mid-level: diff-only, only mentions 'status', never mentions 'category'.
+    mid_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.status", "BaseResource.status", min=1),
+        ],
+        base_definition="http://example.org/BaseResource",
+    )
+
+    # Top-level: constrains 'category', which MidProfile never mentioned.
+    top_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.category", "BaseResource.category", min=1),
+        ],
+        base_definition="http://example.org/MidProfile",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/MidProfile": mid_sd,
+            "http://example.org/BaseResource": root_sd,
+        }[url]
+    )
+
+    result = resolver.resolve(top_sd, mode="differential")
+
+    assert isinstance(result, DefinitionIndex)
+    # category must be present and carry its type from the ancestor snapshot
+    category_node = result.get("BaseResource.category")
+    assert category_node is not None
+    assert category_node.min_cardinality == 1  # overridden by top diff
+
+
+def test_resolve__differential_no_snapshot_base_preserves_mid_constraints(
+    resolver, base_index
+):
+    root_sd = make_structure_def(
+        snapshot_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element(
+                "BaseResource.status",
+                "BaseResource.status",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="code")],
+            ),
+            make_element(
+                "BaseResource.category",
+                "BaseResource.category",
+                min=0,
+                max="*",
+                type=[ElementDefinitionType(code="CodeableConcept")],
+            ),
+        ]
+    )
+
+    # MidProfile raises min on 'status' to 1, never mentions 'category'.
+    mid_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.status", "BaseResource.status", min=1),
+        ],
+        base_definition="http://example.org/BaseResource",
+    )
+
+    # TopProfile restricts 'category' to max="1"; doesn't mention 'status'.
+    top_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.category", "BaseResource.category", max="1"),
+        ],
+        base_definition="http://example.org/MidProfile",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/MidProfile": mid_sd,
+            "http://example.org/BaseResource": root_sd,
+        }[url]
+    )
+
+    result = resolver.resolve(top_sd, mode="differential")
+
+    # category must appear with TopProfile's max=1 applied on top of the ancestor
+    # type definition (CodeableConcept) which MidProfile never touched.
+    category_node = result.get("BaseResource.category")
+    assert category_node is not None
+    assert category_node.max_cardinality == 1
+    # Type must be resolved from the ancestor snapshot, not be empty.
+    assert (
+        category_node.types
+    ), "category node has no types — ancestor snapshot was not used"
+    assert any(str(t.code) == "CodeableConcept" for t in category_node.types)
+
+
+# ==================================================================
+# SnapshotResolver._build_full_ancestor_index
+# ==================================================================
+
+
+def test_build_full_ancestor_index__returns_index_from_nearest_snapshot(
+    resolver, base_index
+):
+    snapshot_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    diff_only_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+        ],
+        base_definition="http://example.org/RootResource",
+    )
+
+    resolver._registry.get = MagicMock(return_value=snapshot_sd)
+
+    result = resolver._build_full_ancestor_index(diff_only_sd)
+
+    assert isinstance(result, DefinitionIndex)
+    assert result.root().id == "BaseResource"
+    assert result.get("BaseResource.status") is not None
+
+
+def test_build_full_ancestor_index__skips_multiple_snapshotless_ancestors(
+    resolver, base_index
+):
+    # Three-level chain: A (diff-only) → B (diff-only) → C (has snapshot)
+    sd_c = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    sd_b = make_structure_def(
+        differential_elements=[make_element("BaseResource", "BaseResource")],
+        base_definition="http://example.org/C",
+    )
+    sd_a = make_structure_def(
+        differential_elements=[make_element("BaseResource", "BaseResource")],
+        base_definition="http://example.org/B",
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/B": sd_b,
+            "http://example.org/C": sd_c,
+        }[url]
+    )
+
+    result = resolver._build_full_ancestor_index(sd_a)
+
+    assert isinstance(result, DefinitionIndex)
+    assert result.root().id == "BaseResource"
+
+
+def test_build_full_ancestor_index__raises_when_chain_has_no_snapshot(resolver):
+    sd_b = make_structure_def(
+        differential_elements=[make_element("MyProfile", "MyProfile")],
+        base_definition=None,  # chain terminates here with no snapshot
+    )
+    sd_a = make_structure_def(
+        differential_elements=[make_element("MyProfile", "MyProfile")],
+        base_definition="http://example.org/B",
+    )
+
+    resolver._registry.get = MagicMock(return_value=sd_b)
+
+    with pytest.raises(DefinitionResolutionError):
+        resolver._build_full_ancestor_index(sd_a)

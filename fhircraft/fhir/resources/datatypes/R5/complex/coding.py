@@ -61,7 +61,7 @@ class Coding(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_cod_1_constraint_model_validator(self):
+    def FHIR_cod_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="code.exists().not() implies display.exists().not()",

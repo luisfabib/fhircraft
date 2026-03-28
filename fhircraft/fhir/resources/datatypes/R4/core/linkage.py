@@ -78,7 +78,7 @@ class Linkage(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_lnk_1_constraint_model_validator(self):
+    def FHIR_lnk_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="item.count()>1",

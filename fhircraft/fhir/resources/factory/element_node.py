@@ -6,11 +6,11 @@ than raw ``ElementDefinition`` objects.  All properties are derived purely from
 the definition's own fields; no external state is required.
 """
 
-from __future__ import annotations
-
 import re
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, Sequence
+from typing import TYPE_CHECKING, Any, Literal, Sequence
+
+from pydantic_core import PydanticUndefined
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
@@ -25,6 +25,8 @@ if TYPE_CHECKING:
         ElementDefinition as R5ElementDefinition,
         ElementDefinitionType as R5ElementDefinitionType,
     )
+
+_Unset: Any = PydanticUndefined
 
 POLYMORPHIC_PATH_SUFFIX = "[x]"
 BACKBONE_CODES = frozenset({"BackboneElement", "Element"})
@@ -139,14 +141,35 @@ class ElementNode:
         return self.depth == 0
 
     @property
+    def is_type_choice_slice(self) -> bool:
+        """
+        True when this element is a type-choice type-slice.
+
+        Per the FHIR spec, when a polymorphic element (path ends in ``[x]``) is
+        constrained to a specific type, the id reflects that type with a colon
+        suffix directly after the ``[x]``, e.g.
+        ``Patient.deceased[x]:deceasedBoolean``.
+
+        This is distinct from a named list-slice such as
+        ``Observation.component:systolic`` where the colon follows a plain
+        element name.
+        """
+        return bool(re.search(r"\[x\]:[A-Za-z]", self.local_id))
+
+    @property
     def is_slice(self) -> bool:
         """
         True when this element *is* a named slice definition.
 
-        A named slice has a colon in its :attr:`local_id`, e.g.
+        A named slice has a colon in its :attr:`local_id` that is **not**
+        immediately preceded by ``[x]``, e.g.
         ``Observation.component:systolic`` → ``local_id = "component:systolic"``.
+
+        Type-choice type-slices such as ``Patient.deceased[x]:deceasedBoolean``
+        are **not** considered named slices; use :attr:`is_type_choice_slice` for
+        those.
         """
-        return ":" in self.local_id
+        return ":" in self.local_id and not self.is_type_choice_slice
 
     @property
     def is_slice_entry(self) -> bool:
@@ -157,9 +180,15 @@ class ElementNode:
 
     @property
     def is_slice_child(self) -> bool:
-        """True when *any* ancestor segment of the id contains ``:`` — this element lives
-        inside a slice sub-tree."""
-        return any(":" in seg for seg in self.id.split("."))
+        """True when *any* ancestor segment of the id contains a **named-slice**
+        colon — this element lives inside a named-slice sub-tree.
+
+        Type-choice colon suffixes (``[x]:TypeName``) are excluded; they are not
+        a slice ancestry boundary.
+        """
+        return any(
+            ":" in seg and not re.search(r"\[x\]:", seg) for seg in self.id.split(".")
+        )
 
     @property
     def is_content_reference(self) -> bool:
@@ -174,10 +203,10 @@ class ElementNode:
     def slice_name(self) -> str | None:
         """
         The slice name (part after ``:`` in :attr:`local_id`), or ``None`` if this
-        element is not itself a named slice.
+        element is not a named slice or type-choice type-slice.
         """
-        if not self.is_slice:
-            raise ValueError("Only slices have slice names")
+        if not self.is_slice and not self.is_type_choice_slice:
+            raise ValueError("Only slices and type-choice slices have slice names")
         return self.definition.sliceName or self.local_id.split(":", 1)[1]
 
     @property
@@ -209,17 +238,55 @@ class ElementNode:
     @property
     def slice_ancestry(self) -> list[str]:
         """
-        Names of all ancestor slices in outermost-first order.
+        Names of all **named** ancestor slices in outermost-first order.
+
+        Type-choice colon suffixes (``[x]:TypeName``) are excluded because they
+        denote a type specialisation, not a named list-slice boundary.
         """
         names: list[str] = []
         for seg in self.id.split("."):
-            if ":" in seg:
+            if ":" in seg and not re.search(r"\[x\]:", seg):
                 names.append(seg.split(":", 1)[1])
         return names
 
     # ------------------------------------------------------------------
     # Cardinality
     # ------------------------------------------------------------------
+
+    @property
+    def base_min_cardinality(self) -> int | None:
+        """
+        Minimum cardinality of the base element when this node was produced by merging a differential element with its base.  ``None`` means this node was not produced by a merge (snapshot or root element).
+        """
+        return self.definition.base.min if self.definition.base else None
+
+    @property
+    def base_max_cardinality(self) -> int | None:
+        """
+        Maximum cardinality of the base element when this node was produced by merging a differential element with its base. ``None`` means unbounded (``*``).).
+        """
+        if not self.definition.base:
+            return _Unset
+        val = getattr(self.definition.base, "max", None)
+        if val is None:
+            return None
+        s = str(val)
+        if s == "*":
+            return None
+        try:
+            return int(s)
+        except (ValueError, TypeError):
+            return None
+
+    @property
+    def base_is_array(self) -> bool | None:
+        """
+        Whether the base element is multi-valued and represented as a list (``max`` > 1 or ``*``) when this node was produced by merging a differential element with its base.  ``None`` means this node was not produced by a merge (snapshot or root element).
+        """
+        max_cardinality = self.base_max_cardinality
+        if max_cardinality is _Unset:
+            return None
+        return max_cardinality is None or max_cardinality > 1
 
     @property
     def min_cardinality(self) -> int:
@@ -236,9 +303,7 @@ class ElementNode:
     def max_cardinality(self) -> int | None:
         """Maximum cardinality.  ``None`` means unbounded (``*``)."""
         if (val := getattr(self.definition, "max", None)) is None:
-            raise ValueError(
-                "ElementDefinition.max is required and must be an integer or valid string."
-            )
+            return _Unset
         s = str(val)
         if s == "*":
             return None
@@ -258,10 +323,12 @@ class ElementNode:
         return self.max_cardinality == 0
 
     @property
-    def is_array(self) -> bool:
+    def is_array(self) -> bool | None:
         """
-        Whether this element is multi-valued and represented as a list (``max`` > 1 or ``*``).
+        Whether this element is multi-valued and represented as a list (``max`` > 1 or ``*``). Returns ``None`` if cardinality is not specified.
         """
+        if self.max_cardinality is _Unset:
+            return None
         return (self.max_cardinality is None) or (self.max_cardinality > 1)
 
     # ------------------------------------------------------------------
@@ -287,7 +354,13 @@ class ElementNode:
 
         Note: If the element is polymorphic (has more than one datatype), then the end of the
         path for the element SHALL be "[x]" to designate that the name of the element may vary when serialized.
+
+        Type-choice slice nodes (e.g. ``Patient.deceased[x]:deceasedBoolean``) are
+        **not** considered polymorphic — they represent a single concrete type
+        constraint and must not trigger type-choice synthesis in the index.
         """
+        if self.is_type_choice_slice:
+            return False
         return self.path.endswith(POLYMORPHIC_PATH_SUFFIX) or len(self.type_codes) > 1
 
     @property
@@ -308,13 +381,21 @@ class ElementNode:
         """
         Full combination of the elemments's `short`,  `definition`, and `comment` fields, in
         that order of preference.  Returns an empty string if none of those fields are set.
+
+        Strings that contain no alphanumeric characters are treated as absent and the next candidate is tried instead.
         """
-        return (
-            self.definition.definition
-            or self.definition.short
-            or self.definition.comment
-            or ""
-        )
+
+        def _has_content(value: str | None) -> bool:
+            return bool(value and re.search(r"[A-Za-z0-9]", value))
+
+        for candidate in (
+            self.definition.definition,
+            self.definition.short,
+            self.definition.comment,
+        ):
+            if _has_content(candidate):
+                return str(candidate)
+        return ""
 
     # ------------------------------------------------------------------
     # Constraint values

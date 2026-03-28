@@ -502,7 +502,7 @@ class CodeSystem(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_csd_0_constraint_model_validator(self):
+    def FHIR_csd_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
@@ -512,7 +512,7 @@ class CodeSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_csd_1_constraint_model_validator(self):
+    def FHIR_csd_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="concept.code.combine($this.descendants().concept.code).isDistinct()",

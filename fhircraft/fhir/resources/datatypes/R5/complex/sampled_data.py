@@ -101,7 +101,7 @@ class SampledData(DataType):
     )
 
     @model_validator(mode="after")
-    def FHIR_sdd_1_constraint_model_validator(self):
+    def FHIR_sdd_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="interval.exists().not() xor offsets.exists().not()",

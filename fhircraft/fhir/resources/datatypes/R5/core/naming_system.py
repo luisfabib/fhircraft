@@ -334,7 +334,7 @@ class NamingSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
+    def FHIR_cnl_0_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
@@ -355,7 +355,7 @@ class NamingSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_nsd_1_constraint_model_validator(self):
+    def FHIR_nsd_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="kind != 'root' or uniqueId.all(type != 'uuid')",
@@ -365,7 +365,7 @@ class NamingSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_nsd_2_constraint_model_validator(self):
+    def FHIR_nsd_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="uniqueId.where(preferred = true).select(type).isDistinct()",
@@ -375,7 +375,7 @@ class NamingSystem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_nsd_3_constraint_model_validator(self):
+    def FHIR_nsd_3_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="uniqueId.where(authoritative = 'true').select(type.toString() & period.start.toString() & period.end.toString()).isDistinct()",

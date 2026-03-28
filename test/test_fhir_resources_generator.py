@@ -214,7 +214,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_ele_1_constraint_model_validator": (
+                "FHIR_ele_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -235,7 +235,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_ele_1_constraint_model_validator(self):
+            def FHIR_ele_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
@@ -259,7 +259,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_custom_1_constraint_model_validator": (
+                "FHIR_custom_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -280,7 +280,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_custom_1_constraint_model_validator(self):
+            def FHIR_custom_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="exists()",
@@ -445,7 +445,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         expected_block = """
         class Slice(FHIRSliceModel):
             min_cardinality: ClassVar[int] = 0
-            max_cardinality: ClassVar[int] = 2
+            max_cardinality: ClassVar[int | None] = 2
 
             valueString: str = Field(
                 description="A string value",
@@ -472,7 +472,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         expected_block = """
         class ExtensionSlice(Extension, FHIRSliceModel):
             min_cardinality: ClassVar[int] = 1
-            max_cardinality: ClassVar[int] = 1
+            max_cardinality: ClassVar[int | None] = 1
             
             url: str = Field(
                 description="Extension URL",
@@ -531,7 +531,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 Field(description="A code field with multiline constraint."),
             ),
             __validators__={
-                "FHIR_TechniquesForProtonBeamModality_constraint_model_validator": (
+                "FHIR_TechniquesForProtonBeamModality_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -688,7 +688,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_child_1_constraint_model_validator": (
+                "FHIR_child_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -711,7 +711,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 ),
             ),
             __validators__={
-                "FHIR_grandchild_1_constraint_model_validator": (
+                "FHIR_grandchild_1_constraint_validator": (
                     model_validator(mode="after")(
                         partial(
                             fhir_validators.validate_model_constraint,
@@ -733,7 +733,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_child_1_constraint_model_validator(self):
+            def FHIR_child_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="exists()",
@@ -749,7 +749,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
 
             @model_validator(mode="after")
-            def FHIR_grandchild_1_constraint_model_validator(self):
+            def FHIR_grandchild_1_constraint_validator(self):
                 return validate_model_constraint(
                     self,
                     expression="exists()",
@@ -948,6 +948,29 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             child_class_has_property,
             "Inherited property should not appear in child class",
         )
+
+    def test_model_with_prohibited_field_renders_none_annotation(self):
+        """A field with annotation=type(None) (0..0 cardinality) must render as 'None', not \"<class 'NoneType'>\"."""
+        model = create_model(
+            "ModelWithProhibitedField",
+            active=(
+                primitives.Boolean,
+                Field(default=None, description="Active flag."),
+            ),
+            prohibited=(
+                type(None),
+                Field(default=None, description="Prohibited field."),
+            ),
+        )
+        expected_block = """
+            prohibited: None = Field(
+                description="Prohibited field.",
+                default=None,
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+        code = generate_resource_model_code(model)
+        self.assertNotIn("<class 'NoneType'>", code)
 
 
 @pytest.mark.parametrize(

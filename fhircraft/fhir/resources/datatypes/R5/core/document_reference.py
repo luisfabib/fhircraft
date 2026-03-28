@@ -260,7 +260,7 @@ class DocumentReference(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_docRef_1_constraint_model_validator(self):
+    def FHIR_docRef_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="facilityType.empty() or context.where(resolve() is Encounter).empty()",
@@ -270,7 +270,7 @@ class DocumentReference(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_docRef_2_constraint_model_validator(self):
+    def FHIR_docRef_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="practiceSetting.empty() or context.where(resolve() is Encounter).empty()",

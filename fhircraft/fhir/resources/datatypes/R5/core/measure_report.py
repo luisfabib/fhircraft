@@ -484,7 +484,7 @@ class MeasureReport(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_mrp_1_constraint_model_validator(self):
+    def FHIR_mrp_1_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type != 'data-exchange') or group.exists().not()",
@@ -494,7 +494,7 @@ class MeasureReport(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_mrp_2_constraint_model_validator(self):
+    def FHIR_mrp_2_constraint_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="group.stratifier.stratum.all(value.exists() xor component.exists())",
