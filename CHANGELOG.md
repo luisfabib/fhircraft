@@ -7,11 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.7.1 - 2026-03-28
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.1...0.7.0)
+
+### Added
+
+- Added `skip_invalid` parameter to `StructureDefinitionRegistry.download_package` and `FHIRModelFactory.register_package` to gracefully skip `StructureDefinition` resources that fail validation, issuing a warning instead of raising an error ([#327](https://github.com/luisfabib/fhircraft/pull/327))
+- Added `include_dependencies` parameter to `StructureDefinitionRegistry.download_package` and `FHIRModelFactory.register_package` to control whether package dependencies are automatically downloaded and registered alongside the requested package ([#327](https://github.com/luisfabib/fhircraft/pull/327))
+
+### Fixed
+
+- Fixed `toDate()`/`convertsToDate()`, `toDateTime()` / `convertsToDateTime()`, and `toTime()` / `convertsToTime()` to support `date`, `datetime`, `time`, `System.Date`, `System.DateTime`, and `System.Time` types rather than returning empty lists ([#320](https://github.com/luisfabib/fhircraft/pull/320), fixes [#328](https://github.com/luisfabib/fhircraft/pull/328))
+- Updated the regular expression in `toDecimal` and `convertsToDecimal` to correctly recognize numbers with a leading plus sign, enabling support for strings like "+14" and "+14.5" in conversion functions ([#321](https://github.com/luisfabib/fhircraft/pull/321), fixes [#309](https://github.com/luisfabib/fhircraft/pull/309))
+- Ensured that the FHIRPath `now()` function always returns a time-zone aware `DateTime` (fixed to the UTC offset) as required by the FHIRPath specification ([#322](https://github.com/luisfabib/fhircraft/pull/322), fixes [#312](https://github.com/luisfabib/fhircraft/pull/312))
+- Fixed the propagation of any UTC offset from timezone-aware Python `datetime`/`time` objects into the FHIRPath `DateTime.hour_shift` / `DateTime.minute_shift` fields, preserving timezone information through serialization and comparison ([#322](https://github.com/luisfabib/fhircraft/pull/322))
+- Fixed the FHIRPath `DateTime` / `Time` literals string parsing to ensure the `Z` suffix (UTC shorthand) is parsedas `hour_shift = 0` / `minute_shift = 0` ([#322](https://github.com/luisfabib/fhircraft/pull/322))
+* Fixed spelling errors in the FHIRPath lexer calendar duration tokens list by replacing "miliseond" and "miliseconds" with the correct "millisecond" and "milliseconds" ([#323](https://github.com/luisfabib/fhircraft/pull/323), fixes [#313](https://github.com/luisfabib/fhircraft/pull/313))
+- Introduced`TypePrecisionError` to signal that a comparison cannot be performed between FHIRPath values with different levels of precision, allowing equality operators to propagate an empty collection per the FHIRPath spec ([#324](https://github.com/luisfabib/fhircraft/pull/324))
+- Refactored FHIRPath `Time` and `DateTime` literals to store seconds as `float` (combining seconds and milliseconds) instead of separate `second` and `millisecond` integer fields, improving sub-second precision handling ([#324](https://github.com/luisfabib/fhircraft/pull/324))
+- Fixed `to_time()` and `to_datetime()` conversion methods to propagate timezone offset (`hour_shift` / `minute_shift`) into the returned Python `time`/`datetime` objects. ([#324](https://github.com/luisfabib/fhircraft/pull/324))
+- Fixed `Time` and `DateTime` literals string parsers to accept 1–3 digit millisecond values and correctly combine them with the seconds field as a float ([#324](https://github.com/luisfabib/fhircraft/pull/324))
+- Fixed `NotEquals` (`!=`) operator to return an empty collection when the operands are empty or of incompatible types, instead of incorrectly inverting a non-boolean result ([#324](https://github.com/luisfabib/fhircraft/pull/324), fixes [#305](https://github.com/luisfabib/fhircraft/pull/305))
+- Fixed `Equivalent` (`~`) string comparison to normalize internal whitespace (collapsing runs of whitespace to a single space) in addition to trimming and lowercasing. ([#324](https://github.com/luisfabib/fhircraft/pull/324), fixes [#311](https://github.com/luisfabib/fhircraft/pull/311))
+- Fixed `Equals` (`=`) and `Equivalent` (`~`) to return an empty collection when a `TypePrecisionError` is raised during comparison of values with differing precision levels ([#324](https://github.com/luisfabib/fhircraft/pull/324))
+- Refactored `All.evaluate()` to use `.single()` for criteria evaluation so
+  that single-item results are correctly unwrapped ([#324](https://github.com/luisfabib/fhircraft/pull/324))
+- Update `validate_FHIR_element_pattern()` to use `is_dict_subset(_pattern, _element)` instead of `merge_dicts(_element, _pattern) == _element` to ensure that pattern containment is properly executed ([#325](https://github.com/luisfabib/fhircraft/pull/325), fixes [#317](https://github.com/luisfabib/fhircraft/pull/317))
+- Ensured that extension placeholder fields for primitive type-choice variants (e.g. `value[x]`) are now named after the concrete typed field (`valueString_ext`, `valueBoolean_ext`, …) rather than the polymorphic base name (`value_ext`) ([#330](https://github.com/luisfabib/fhircraft/pull/330), fixes [#329](https://github.com/luisfabib/fhircraft/pull/329))
+- Fixed factory to preserve base-type cardinality through differential merging such that profiled models no longer silently change array-fields into singleton ones ([#337](https://github.com/luisfabib/fhircraft/pull/337), fixes [#331](https://github.com/luisfabib/fhircraft/pull/331))
+- Prevented `SlicedFieldBuilder` from emitting a redundant serialization alias when the field name was not renamed ([#337](https://github.com/luisfabib/fhircraft/pull/337), fixes [#332](https://github.com/luisfabib/fhircraft/pull/332))
+- Fixed backbone field builder to short-circuit `build()` and return the original specific backbone type directly when the differential has no children, instead of generating an empty subclass ([#337](https://github.com/luisfabib/fhircraft/pull/337), fixes [#333](https://github.com/luisfabib/fhircraft/pull/333))
+- Fixed `SnapshotResolver` to correctly resolve all base elements when an intermediate profile in the `baseDefinition` chain has no snapshot ([#337](https://github.com/luisfabib/fhircraft/pull/337), fixes [#334](https://github.com/luisfabib/fhircraft/pull/334))
+- Ensured that extensions on complex type fields are correctly accounted for and generated by the model factory ([#337](https://github.com/luisfabib/fhircraft/pull/337), fixes [#335](https://github.com/luisfabib/fhircraft/pull/335))
+- Implemented handling of prohibited fields (`0..0`) to be set as `None`-typed fields in the builder ([#337](https://github.com/luisfabib/fhircraft/pull/337))
+- Updated `ElementNode.documentation` retrieval to skip non-alphanumeric-only content in the `short`, `definition` and `comment` ([#337](https://github.com/luisfabib/fhircraft/pull/337))
+- Fixed `max_cardinality` type annotation to allow `None` in generated source code ([#337](https://github.com/luisfabib/fhircraft/pull/337))
+- Ensured that multiple type codes on an element definition are supported in the factory resolver ([#337](https://github.com/luisfabib/fhircraft/pull/337))
+
+----------------- 
+
 ## v0.7.0 - 2026-03-20
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.0...0.6.5)
-
-
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.0...0.6.5)
 
 ### Added
 
