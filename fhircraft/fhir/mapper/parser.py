@@ -1,4 +1,5 @@
 from ast import arg
+import datetime
 import html
 import logging
 import os.path
@@ -15,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
-from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
 from fhircraft.utils import ensure_list
 
 StructureMapUnion = (
@@ -76,13 +76,7 @@ class FhirMappingLanguageParser(FhirPathParser):
     def _parse_StructureMapGroupRuleTargetParameter(
         self,
         value: (
-            str
-            | int
-            | bool
-            | float
-            | primitives.Date
-            | primitives.DateTime
-            | primitives.Time
+            str | int | bool | float | datetime.date | datetime.datetime | datetime.time
         ),
     ) -> (
         R4_models.StructureMapGroupRuleTargetParameter
@@ -98,11 +92,11 @@ class FhirMappingLanguageParser(FhirPathParser):
             arg["valueBoolean"] = value
         elif isinstance(value, float):
             arg["valueDecimal"] = value
-        elif is_date(value):
+        elif isinstance(value, datetime.date):
             arg["valueDate"] = value
-        elif is_datetime(value):
+        elif isinstance(value, datetime.datetime):
             arg["valueDateTime"] = value
-        elif is_time(value):
+        elif isinstance(value, datetime.time):
             arg["valueTime"] = value
         StructureMapGroupRuleTargetParameter = self._get_model(
             model_name="StructureMapGroupRuleTargetParameter",
@@ -846,11 +840,11 @@ class FhirMappingLanguageParser(FhirPathParser):
                 source.defaultValueBoolean = value
             elif isinstance(value, float):
                 source.defaultValueDecimal = value
-            elif is_date(value):
+            elif isinstance(value, datetime.date):
                 source.defaultValueDate = value
-            elif is_datetime(value):
+            elif isinstance(value, datetime.datetime):
                 source.defaultValueDateTime = value
-            elif is_time(value):
+            elif isinstance(value, datetime.time):
                 source.defaultValueTime = value
 
         p[0] = self.StructureMapGroupRuleSource(

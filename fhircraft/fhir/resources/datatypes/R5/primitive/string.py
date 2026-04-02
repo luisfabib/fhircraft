@@ -10,7 +10,7 @@ class String(Element, FHIRPrimitiveModel):
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/string"
     _type = "string"
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     value: Optional[str] = Field(
         default=None,

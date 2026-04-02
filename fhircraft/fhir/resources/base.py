@@ -36,7 +36,7 @@ class FhirBaseModelKind(str, enum.Enum):
     """Enumeration of StructureMap model modes."""
 
     LOGICAL = "logical"
-    PRIMITIVE = "primitive"
+    PRIMITIVE_TYPE = "primitive-type"
     COMPLEX_TYPE = "complex-type"
     RESOURCE = "resource"
 
@@ -73,7 +73,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     # Structureal metadata
     _abstract: ClassVar[bool] = False
     _kind: ClassVar[
-        FhirBaseModelKind | Literal["primitive", "complex-type", "resource", "logical"]
+        FhirBaseModelKind
+        | Literal["primitive-type", "complex-type", "resource", "logical"]
     ] = "logical"
     _type: ClassVar[str]
     _canonical_url: ClassVar[str | None]
@@ -1018,7 +1019,7 @@ class FHIRPrimitiveModel(FHIRBaseModel):
     """
 
     value: Any = Field(..., description="The actual value")
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     @model_validator(mode="before")
     @classmethod

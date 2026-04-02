@@ -10,7 +10,7 @@ class Base64Binary(Element, FHIRPrimitiveModel):
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/base64Binary"
     _type = "base64Binary"
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     value: Optional[str] = Field(
         default=None,

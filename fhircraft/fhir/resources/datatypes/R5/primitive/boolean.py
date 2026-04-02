@@ -10,7 +10,7 @@ class Boolean(PrimitiveType, FHIRPrimitiveModel):
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/boolean"
     _type = "boolean"
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     value: Optional[bool] = Field(
         default=None,

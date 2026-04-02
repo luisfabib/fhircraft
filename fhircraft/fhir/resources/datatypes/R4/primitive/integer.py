@@ -17,7 +17,7 @@ class Integer(Element, FHIRPrimitiveModel):
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/integer"
     _type = "integer"
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     value: Optional[int] = Field(
         default=None,

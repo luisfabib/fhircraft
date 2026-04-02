@@ -4,8 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 from typing import Any, List, Optional
 from pydantic.aliases import AliasChoices
-from fhircraft.fhir.resources.datatypes import primitives
-from fhircraft.fhir.resources.datatypes.R4 import core, complex
+from fhircraft.fhir.resources.datatypes.R4 import core, complex, primitive
 from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
 from fhircraft.fhir.resources.factory.builders.base import (
     FHIR_SD_PREFIX,
@@ -238,19 +237,18 @@ def test_resolve_type__raises_when_code_is_empty_string(builder: Builder):
 
 
 FHIR_PRIMITIVE_CODES = [
-    ("string", primitives.String),
-    ("integer", primitives.Integer),
-    ("integer64", primitives.Integer64),
-    ("positiveInt", primitives.PositiveInt),
-    ("boolean", primitives.Boolean),
-    ("decimal", primitives.Decimal),
-    ("date", primitives.Date),
-    ("dateTime", primitives.DateTime),
-    ("time", primitives.Time),
-    ("code", primitives.Code),
-    ("id", primitives.Id),
-    ("uri", primitives.Uri),
-    ("canonical", primitives.Canonical),
+    ("string", primitive.String),
+    ("integer", primitive.Integer),
+    ("positiveInt", primitive.PositiveInt),
+    ("boolean", primitive.Boolean),
+    ("decimal", primitive.Decimal),
+    ("date", primitive.Date),
+    ("dateTime", primitive.DateTime),
+    ("time", primitive.Time),
+    ("code", primitive.Code),
+    ("id", primitive.Id),
+    ("uri", primitive.Uri),
+    ("canonical", primitive.Canonical),
 ]
 
 
@@ -261,8 +259,7 @@ FHIR_PRIMITIVE_CODES = [
 def test_resolve_type__primitive(builder: Builder, code, expected):
     # Simulate a primitive: not a subclass of FHIRBaseModel
     info = builder.resolve_type(make_type(code=code))
-    assert info.kind == "primitive"
-    assert info.requires_primitive_extension == True
+    assert info.kind == "primitive-type"
     assert info.type is expected
 
 
@@ -272,19 +269,18 @@ def test_resolve_type__primitive(builder: Builder, code, expected):
 )
 def test_resolve_type__primitive_absolute_url(builder: Builder, code, expected):
     info = builder.resolve_type(make_type(code=f"{FHIR_SD_PREFIX}{code}"))
-    assert info.kind == "primitive"
-    assert info.requires_primitive_extension == True
+    assert info.kind == "primitive-type"
     assert info.type is expected
 
 
 FHIRPATH_CODES = [
-    ("System.String", primitives.String),
-    ("System.Integer", primitives.Integer),
-    ("System.Boolean", primitives.Boolean),
-    ("System.Decimal", primitives.Decimal),
-    ("System.Date", primitives.Date),
-    ("System.DateTime", primitives.DateTime),
-    ("System.Time", primitives.Time),
+    ("System.String", primitive.String),
+    ("System.Integer", primitive.Integer),
+    ("System.Boolean", primitive.Boolean),
+    ("System.Decimal", primitive.Decimal),
+    ("System.Date", primitive.Date),
+    ("System.DateTime", primitive.DateTime),
+    ("System.Time", primitive.Time),
 ]
 
 
@@ -294,24 +290,22 @@ FHIRPATH_CODES = [
 )
 def test_resolve_type__fhirpath_without_profile(builder: Builder, code, expected):
     info = builder.resolve_type(make_type(code=f"http://hl7.org/fhirpath/{code}"))
-    assert info.kind == "primitive"
-    assert info.requires_primitive_extension == False
+    assert info.kind == "primitive-type"
     assert info.type is expected
 
 
 @pytest.mark.parametrize(
     "code, fhir_type, expected",
     [
-        ("System.String", "Uri", primitives.Uri),
-        ("System.String", "Code", primitives.Code),
-        ("System.String", "Canonical", primitives.Canonical),
-        ("System.Integer", "Integer64", primitives.Integer64),
-        ("System.Integer", "PositiveInt", primitives.PositiveInt),
-        ("System.Boolean", "Boolean", primitives.Boolean),
-        ("System.Decimal", "Decimal", primitives.Decimal),
-        ("System.Date", "Date", primitives.Date),
-        ("System.DateTime", "DateTime", primitives.DateTime),
-        ("System.Time", "Time", primitives.Time),
+        ("System.String", "Uri", primitive.Uri),
+        ("System.String", "Code", primitive.Code),
+        ("System.String", "Canonical", primitive.Canonical),
+        ("System.Integer", "PositiveInt", primitive.PositiveInt),
+        ("System.Boolean", "Boolean", primitive.Boolean),
+        ("System.Decimal", "Decimal", primitive.Decimal),
+        ("System.Date", "Date", primitive.Date),
+        ("System.DateTime", "DateTime", primitive.DateTime),
+        ("System.Time", "Time", primitive.Time),
     ],
 )
 def test_resolve_type__fhirpath_with_extension(
@@ -326,8 +320,7 @@ def test_resolve_type__fhirpath_with_extension(
             extension=[type_extension],
         )
     )
-    assert info.kind == "primitive"
-    assert info.requires_primitive_extension == False
+    assert info.kind == "primitive-type"
     assert info.type is expected
 
 
@@ -347,7 +340,6 @@ FHIR_COMPLEX_CODES = [
 def test_resolve_type__complex(builder: Builder, code, expected):
     info = builder.resolve_type(make_type(code=code))
     assert info.kind == "complex-type"
-    assert info.requires_primitive_extension == False
     assert info.type is expected
 
 
@@ -358,7 +350,6 @@ def test_resolve_type__complex(builder: Builder, code, expected):
 def test_resolve_type__complex_absolute_url(builder: Builder, code, expected):
     info = builder.resolve_type(make_type(code=f"{FHIR_SD_PREFIX}{code}"))
     assert info.kind == "complex-type"
-    assert info.requires_primitive_extension == False
     assert info.type is expected
 
 
@@ -378,7 +369,6 @@ FHIR_RESOURCE_CODES = [
 def test_resolve_type__resource(builder: Builder, code, expected):
     info = builder.resolve_type(make_type(code=code))
     assert info.kind == "resource"
-    assert info.requires_primitive_extension == False
     assert info.type is expected
 
 
@@ -389,7 +379,6 @@ def test_resolve_type__resource(builder: Builder, code, expected):
 def test_resolve_type__resource_absolute_url(builder: Builder, code, expected):
     info = builder.resolve_type(make_type(code=f"{FHIR_SD_PREFIX}{code}"))
     assert info.kind == "resource"
-    assert info.requires_primitive_extension == False
     assert info.type is expected
 
 
@@ -406,7 +395,6 @@ def test_profile_profile(builder: Builder, kind, id, expected):
     profile_url = f"http://example.org/fhir/org/StructureDefinition/{id}"
     info = builder.resolve_type(make_type(code="Reference", profile=[profile_url]))
     assert info.kind == kind
-    assert info.requires_primitive_extension == False
     assert info.type is expected
 
 

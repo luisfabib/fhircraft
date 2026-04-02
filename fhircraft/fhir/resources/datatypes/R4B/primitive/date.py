@@ -19,7 +19,7 @@ class Date(Element, FHIRPrimitiveModel):
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/date"
     _type = "date"
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     value: Optional[str] = Field(
         default=None,

@@ -26,7 +26,7 @@ class Instant(Element, FHIRPrimitiveModel):
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/instant"
     _type = "instant"
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     value: Optional[str] = Field(
         default=None,

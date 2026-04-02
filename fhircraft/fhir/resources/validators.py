@@ -328,7 +328,7 @@ def validate_FHIR_element_fixed_value(
         constant = constant[0]
     _element = element[0] if isinstance(element, list) else element
     try:
-        if isinstance(_element, FHIRBaseModel):
+        if isinstance(constant, FHIRBaseModel) and isinstance(_element, FHIRBaseModel):
             assert constant.model_dump() == _element.model_dump()
         else:
             assert constant == _element

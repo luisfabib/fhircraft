@@ -13,7 +13,7 @@ class Decimal(Element, FHIRPrimitiveModel):
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/decimal"
     _type = "decimal"
-    _kind = "primitive"
+    _kind = "primitive-type"
 
     value: Optional[float] = Field(
         default=None,

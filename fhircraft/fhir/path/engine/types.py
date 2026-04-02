@@ -67,12 +67,11 @@ class FHIRTypesOperator(FHIRPath):
             elif isinstance(value, fhirpath_literals.Time):
                 return type_.__name__ == "Time"
             else:
-                try:
-                    return type_utils.is_fhir_primitive_type(value, type_)
-                except type_utils.FHIRTypeError:
-                    return type_utils.is_fhir_complex_type(
-                        value, type_
-                    ) or type_utils.is_fhir_resource_type(value, type_)
+                return (
+                    type_utils.is_fhir_primitive_type(value, type_)
+                    or type_utils.is_fhir_complex_type(value, type_)
+                    or type_utils.is_fhir_resource_type(value, type_)
+                )
         elif namespace == "System":
             return isinstance(value, type_)
         else:

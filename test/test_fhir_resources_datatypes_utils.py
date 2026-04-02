@@ -14,36 +14,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
 from fhircraft.fhir.resources.datatypes.utils import (
     get_primitive_type_by_name,
     get_primitive_type_name,
-    is_boolean,
-    is_date,
-    is_datetime,
-    is_decimal,
-    is_fhir_primitive,
     is_fhir_primitive_type,
     is_fhir_complex_type,
     is_fhir_resource_type,
-    is_integer,
-    is_integer64,
-    is_positive_int,
-    is_string,
-    is_time,
-    is_code,
-    is_unsigned_int,
-    is_uri,
-    is_url,
-    is_canonical,
-    is_base64binary,
-    is_oid,
-    is_uuid,
-    is_id,
-    is_markdown,
     list_primitive_types,
-    to_boolean,
-    to_date,
-    to_datetime,
-    to_decimal,
-    to_integer,
-    to_time,
+    is_fhir_primitive,
 )
 
 
@@ -52,12 +27,12 @@ from fhircraft.fhir.resources.datatypes.utils import (
     (
         (True, True),
         (False, True),
-        ("True", True),
-        ("False", True),
+        ("True", False),
+        ("False", False),
         ("true", True),
         ("false", True),
-        ("1", True),
-        ("0", True),
+        ("1", False),
+        ("0", False),
         ("Atrue", False),
         ("Afalse", False),
         ("trueB", False),
@@ -68,7 +43,7 @@ from fhircraft.fhir.resources.datatypes.utils import (
     ),
 )
 def test_is_boolean(value, expected):
-    assert is_boolean(value) == expected
+    assert is_fhir_primitive_type(value, "boolean", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -95,7 +70,7 @@ def test_is_boolean(value, expected):
     ],
 )
 def test_is_integer(value, expected):
-    assert is_integer(value) == expected
+    assert is_fhir_primitive_type(value, "integer", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -122,7 +97,7 @@ def test_is_integer(value, expected):
     ],
 )
 def test_is_integer64(value, expected):
-    assert is_integer64(value) == expected
+    assert is_fhir_primitive_type(value, "integer64", "R5") == expected
 
 
 @pytest.mark.parametrize(
@@ -137,7 +112,7 @@ def test_is_integer64(value, expected):
     ],
 )
 def test_is_decimal(value, expected):
-    assert is_decimal(value) == expected
+    assert is_fhir_primitive_type(value, "decimal", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -149,7 +124,7 @@ def test_is_decimal(value, expected):
     ],
 )
 def test_is_string(value, expected):
-    assert is_string(value) == expected
+    assert is_fhir_primitive_type(value, "string", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -175,7 +150,7 @@ def test_is_string(value, expected):
     ],
 )
 def test_is_uri(value, expected):
-    assert is_uri(value) == expected
+    assert is_fhir_primitive_type(value, "uri", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -203,7 +178,7 @@ def test_is_uri(value, expected):
     ],
 )
 def test_is_url(value, expected):
-    assert is_url(value) == expected
+    assert is_fhir_primitive_type(value, "url", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -244,7 +219,7 @@ def test_is_url(value, expected):
     ],
 )
 def test_is_base64binary(value, expected):
-    assert is_base64binary(value) == expected
+    assert is_fhir_primitive_type(value, "base64Binary", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -264,7 +239,7 @@ def test_is_base64binary(value, expected):
     ],
 )
 def test_is_canonical(value, expected):
-    assert is_canonical(value) == expected
+    assert is_fhir_primitive_type(value, "canonical", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -279,7 +254,7 @@ def test_is_canonical(value, expected):
     ],
 )
 def test_is_date_param(value, expected):
-    assert is_date(value) == expected
+    assert is_fhir_primitive_type(value, "date", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -298,7 +273,7 @@ def test_is_date_param(value, expected):
     ],
 )
 def test_is_datetime(value, expected):
-    assert is_datetime(value) == expected
+    assert is_fhir_primitive_type(value, "dateTime", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -313,7 +288,7 @@ def test_is_datetime(value, expected):
     ],
 )
 def test_is_time(value, expected):
-    assert is_time(value) == expected
+    assert is_fhir_primitive_type(value, "time", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -332,7 +307,7 @@ def test_is_time(value, expected):
     ],
 )
 def test_is_unsigned_int(value, expected):
-    assert is_unsigned_int(value) == expected
+    assert is_fhir_primitive_type(value, "unsignedInt", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -351,7 +326,7 @@ def test_is_unsigned_int(value, expected):
     ],
 )
 def test_is_positive_int(value, expected):
-    assert is_positive_int(value) == expected
+    assert is_fhir_primitive_type(value, "positiveInt", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -375,7 +350,7 @@ def test_is_positive_int(value, expected):
     ],
 )
 def test_is_code(value, expected):
-    assert is_code(value) == expected
+    assert is_fhir_primitive_type(value, "code", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -391,7 +366,7 @@ def test_is_code(value, expected):
     ],
 )
 def test_is_oid(value, expected):
-    assert is_oid(value) == expected
+    assert is_fhir_primitive_type(value, "oid", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -417,7 +392,7 @@ def test_is_oid(value, expected):
     ],
 )
 def test_is_uuid(value, expected):
-    assert is_uuid(value) == expected
+    assert is_fhir_primitive_type(value, "uuid", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -435,7 +410,7 @@ def test_is_uuid(value, expected):
     ],
 )
 def test_is_id(value, expected):
-    assert is_id(value) == expected
+    assert is_fhir_primitive_type(value, "id", "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -453,91 +428,7 @@ def test_is_id(value, expected):
     ],
 )
 def test_is_markdown(value, expected):
-    assert is_markdown(value) == expected
-
-
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        ("true", True),
-        ("false", False),
-        ("1", True),
-        ("0", False),
-        ("invalid", None),
-    ],
-)
-def test_to_boolean(value, expected):
-    assert to_boolean(value) == expected
-
-
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        ("123", 123),
-        ("-456", -456),
-        (789, 789),
-        ("invalid", None),
-    ],
-)
-def test_to_integer(value, expected):
-    assert to_integer(value) == expected
-
-
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        ("12.34", 12.34),
-        ("56", 56.0),
-        (78.9, 78.9),
-        ("invalid", None),
-    ],
-)
-def test_to_decimal(value, expected):
-    assert to_decimal(value) == expected
-
-
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        ("2023-12-25", "2023-12-25"),
-        ("2023-12-25T10:30:00", "2023-12-25"),
-        ("invalid", None),
-    ],
-)
-def test_to_date(value, expected):
-    assert to_date(value) == expected
-
-
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        ("10:30:00", "10:30:00"),
-        ("23:59:59", "23:59:59"),
-        ("00:00:00", "00:00:00"),
-        ("10:30", "10:30"),
-        ("invalid", None),
-    ],
-)
-def test_to_time(value, expected):
-    assert to_time(value) == expected
-
-
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        ("2023-12-25T10:30:00+02:00", "2023-12-25T10:30:00+02:00"),
-        ("2023-12-25T10:30:00Z", "2023-12-25T10:30:00Z"),
-        ("2023-12-25T10:30:00", "2023-12-25T10:30:00"),
-        ("2023-12-25T10:30", "2023-12-25T10:30"),
-        ("2023-12-25T10", "2023-12-25T10"),
-        ("2023-12-25", "2023-12-25"),
-        ("2023-12", "2023-12"),
-        ("2023", "2023"),
-        ("invalid-datetime", None),
-    ],
-)
-def test_to_datetime(value, expected):
-    assert to_datetime(value) == expected
+    assert is_fhir_primitive_type(value, "markdown", "R4") == expected
 
 
 def test_utility_functions():
@@ -573,7 +464,7 @@ def test_utility_functions():
     ],
 )
 def test_is_fhir_primitive_type(value, fhir_type, expected):
-    assert is_fhir_primitive_type(value, fhir_type) == expected
+    assert is_fhir_primitive_type(value, fhir_type, "R4") == expected
 
 
 @pytest.mark.parametrize(

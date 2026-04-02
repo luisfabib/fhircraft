@@ -35,54 +35,43 @@ _type_adapter_cache: dict[int, TypeAdapter] = {}
 
 # Type checking functions
 def is_fhir_primitive_type(
-    value: Any, fhir_type: Type | TypeAliasType | str, raise_on_error: bool = True
+    value: Any,
+    fhir_type: "type[FHIRBaseModel] | type | TypeAliasType | str",
+    release: str | None = None,
 ) -> bool:
     """
-    Check if a value conforms to a FHIR primitive type.
+    Check if a value conforms to a primitive FHIR type.
 
     Args:
         value: The value to check
-        fhir_type: The FHIR type to check against (class, TypeAliasType, or string name)
-        raise_on_error: Whether to raise FHIRTypeError on unknown type (default: True)
+        fhir_type: The primitive FHIR type (or name thereof) to check against
 
     Returns:
         bool: `True` if the value conforms to the type, `False` otherwise
 
     Raises:
-        FHIRTypeError: If the fhir_type is a string and does not correspond to a known type
-
-    Examples:
-        >>> is_fhir_primitive_type("123", primitives.Integer)
-        True
-        >>> is_fhir_primitive_type("true", primitives.Boolean)
-        True
-        >>> is_fhir_primitive_type("invalid-date", primitives.Date)
-        False
-        >>> is_fhir_primitive_type(42, "UnsignedInt")
-        True
+        FHIRTypeError: If the fhir_type is a string and does not correspond to a known primitive type
     """
-    # Handle string type names
     if isinstance(fhir_type, str):
-        if hasattr(primitives, fhir_type):
-            fhir_type = getattr(primitives, fhir_type)
-        else:
-            if raise_on_error:
-                raise FHIRTypeError(f"Unknown FHIR type: {fhir_type}")
+        if not release:
+            raise FHIRTypeError(
+                f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
+            )
+        fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
+
+    if isinstance(fhir_type, type) and issubclass(fhir_type, BaseModel):
+        if getattr(fhir_type, "_kind", None) != "primitive-type":
             return False
-
-    # For TypeAliasType, use Pydantic validation
-    if not isinstance(fhir_type, TypeAliasType):
-        raise FHIRTypeError(f"fhir_type must be a TypeAliasType or string name")
-
-    # Use cached TypeAdapter to avoid recreating it on every call
-    type_id = id(fhir_type)
-    if type_id not in _type_adapter_cache:
-        _type_adapter_cache[type_id] = TypeAdapter(fhir_type)
-
-    try:
-        _type_adapter_cache[type_id].validate_python(value)
-        return True
-    except ValidationError:
+        elif isinstance(value, fhir_type):
+            return True
+        else:
+            try:
+                fhir_type.model_validate(value)
+                return True
+            except ValidationError as e:
+                print(e)
+                return False
+    else:
         return False
 
 
@@ -167,145 +156,16 @@ def is_fhir_resource_type(
         return False
 
 
-def is_boolean(value: Any) -> bool:
-    """Check if value is a valid FHIR Boolean."""
-    return is_fhir_primitive_type(value, primitives.Boolean)  # type: ignore
-
-
-def is_integer(value: Any) -> bool:
-    """Check if value is a valid FHIR Integer."""
-    return is_fhir_primitive_type(value, primitives.Integer)  # type: ignore
-
-
-def is_integer64(value: Any) -> bool:
-    """Check if value is a valid FHIR Integer64."""
-    return is_fhir_primitive_type(value, primitives.Integer64)  # type: ignore
-
-
-def is_decimal(value: Any) -> bool:
-    """Check if value is a valid FHIR Decimal."""
-    return is_fhir_primitive_type(value, primitives.Decimal)  # type: ignore
-
-
-def is_string(value: Any) -> bool:
-    """Check if value is a valid FHIR String."""
-    return is_fhir_primitive_type(value, primitives.String)  # type: ignore
-
-
-def is_uri(value: Any) -> bool:
-    """Check if value is a valid FHIR Uri."""
-    return is_fhir_primitive_type(value, primitives.Uri)  # type: ignore
-
-
-def is_url(value: Any) -> bool:
-    """Check if value is a valid FHIR Url."""
-    return is_fhir_primitive_type(value, primitives.Url)  # type: ignore
-
-
-def is_canonical(value: Any) -> bool:
-    """Check if value is a valid FHIR Canonical."""
-    return is_fhir_primitive_type(value, primitives.Canonical)  # type: ignore
-
-
-def is_base64binary(value: Any) -> bool:
-    """Check if value is a valid FHIR Base64Binary."""
-    return is_fhir_primitive_type(value, primitives.Base64Binary)  # type: ignore
-
-
-def is_instant(value: Any) -> bool:
-    """Check if value is a valid FHIR Instant."""
-    return (
-        is_fhir_primitive_type(value, primitives.Instant)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, datetime)
-    )
-
-
-def is_date(value: Any) -> bool:
-    """Check if value is a valid FHIR Date."""
-    return (
-        is_fhir_primitive_type(value, primitives.Date)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, date) and not isinstance(value, datetime)
-    )
-
-
-def is_datetime(value: Any) -> bool:
-    """Check if value is a valid FHIR DateTime."""
-    return (
-        is_fhir_primitive_type(value, primitives.DateTime)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, datetime)
-    )
-
-
-def is_time(value: Any) -> bool:
-    """Check if value is a valid FHIR Time."""
-    return (
-        is_fhir_primitive_type(value, primitives.Time)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, time)
-    )
-
-
-def is_code(value: Any) -> bool:
-    """Check if value is a valid FHIR Code."""
-    return is_fhir_primitive_type(value, primitives.Code)  # type: ignore
-
-
-def is_oid(value: Any) -> bool:
-    """Check if value is a valid FHIR Oid."""
-    return is_fhir_primitive_type(value, primitives.Oid)  # type: ignore
-
-
-def is_id(value: Any) -> bool:
-    """Check if value is a valid FHIR Id."""
-    return is_fhir_primitive_type(value, primitives.Id)  # type: ignore
-
-
-def is_markdown(value: Any) -> bool:
-    """Check if value is a valid FHIR Markdown."""
-    return is_fhir_primitive_type(value, primitives.Markdown)  # type: ignore
-
-
-def is_unsigned_int(value: Any) -> bool:
-    """Check if value is a valid FHIR UnsignedInt."""
-    return is_fhir_primitive_type(value, primitives.UnsignedInt)  # type: ignore
-
-
-def is_positive_int(value: Any) -> bool:
-    """Check if value is a valid FHIR PositiveInt."""
-    return is_fhir_primitive_type(value, primitives.PositiveInt)  # type: ignore
-
-
-def is_uuid(value: Any) -> bool:
-    """Check if value is a valid FHIR Uuid."""
-    return is_fhir_primitive_type(value, primitives.Uuid)  # type: ignore
-
-
 def is_fhir_primitive(value: Any) -> bool:
     """Check if a value is a FHIR primitive type."""
-    return (
-        is_string(value)
-        or is_boolean(value)
-        or is_integer(value)
-        or is_decimal(value)
-        or is_date(value)
-        or is_datetime(value)
-        or is_time(value)
-        or is_code(value)
-        or is_uri(value)
-        or is_url(value)
-        or is_canonical(value)
-        or is_base64binary(value)
-        or is_instant(value)
-        or is_oid(value)
-        or is_id(value)
-        or is_markdown(value)
-        or is_unsigned_int(value)
-        or is_positive_int(value)
-        or is_uuid(value)
-    )
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel) and value.value is not None:
+        return True
+    if isinstance(value, (str | int | float | bool | date | datetime | time)):
+        return True
+    else:
+        return False
 
 
 # Type conversion functions with core logic

@@ -29,8 +29,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
-from fhircraft.fhir.resources.datatypes.R4 import core, complex
-from fhircraft.fhir.resources.datatypes import primitives
+from fhircraft.fhir.resources.datatypes.R4 import core, complex, primitive
 
 env = {"%fhirRelease": "R4"}
 
@@ -39,11 +38,11 @@ env = {"%fhirRelease": "R4"}
     "type_specifier,expected_value",
     [
         # Primitive types
-        ("string", primitives.String),
-        ("canonical", primitives.Canonical),
-        ("url", primitives.Url),
-        ("dateTime", primitives.DateTime),
-        ("markdown", primitives.Markdown),
+        ("string", primitive.String),
+        ("canonical", primitive.Canonical),
+        ("url", primitive.Url),
+        ("dateTime", primitive.DateTime),
+        ("markdown", primitive.Markdown),
         # DomainResource types
         ("Patient", core.Patient),
         ("Observation", core.Observation),
