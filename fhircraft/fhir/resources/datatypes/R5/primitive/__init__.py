@@ -4,20 +4,20 @@ from .boolean import Boolean
 from .canonical import Canonical
 from .code import Code
 from .date import Date
-from .datetime import DateTime
+from .date_time import DateTime
 from .decimal import Decimal
 from .instant import Instant
 from .integer import Integer
 from .integer64 import Integer64
 from .markdown import Markdown
 from .oid import Oid
-from .positiveint import PositiveInt
+from .positive_int import PositiveInt
 from .time import Time
-from .unsignedint import UnsignedInt
+from .unsigned_int import UnsignedInt
 from .uri import Uri
 from .url import Url
 from .uuid import Uuid
-from .base64binary import Base64Binary
+from .base64_binary import Base64Binary
 from .xhtml import Xhtml
 
 __all__ = [

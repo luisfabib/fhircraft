@@ -1,18 +1,11 @@
-from __future__ import annotations
-
-from typing_extensions import TypeAliasType
-from unittest.mock import patch
-
 import pytest
-
+from fhircraft.fhir.resources.base import FHIRPrimitiveModel, FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.registry import (
     TypeRegistry,
-    _registry_cache,
     get_fhir_type,
     get_fhir_type_by_url,
     get_registry,
 )
-from fhircraft.fhir.resources.datatypes import primitives
 
 
 # ---------------------------------------------------------------------------
@@ -35,7 +28,6 @@ _PRIMITIVES = [
     "Id",
     "Instant",
     "Integer",
-    "Integer64",
     "Markdown",
     "Oid",
     "PositiveInt",
@@ -162,7 +154,8 @@ def test_get_fhir_type__returns_non_none_type(release: str, type_str: str):
 @pytest.mark.parametrize("release", FHIR_RELEASES)
 def test_get_fhir_type__primitive_is_type_alias(release: str, type_str: str):
     result = get_fhir_type(type_str, release)
-    assert isinstance(result, TypeAliasType)
+    assert isinstance(result, type)
+    assert issubclass(result, FHIRPrimitiveModel)
 
 
 @pytest.mark.parametrize("type_str", _COMPLEX_CASES + _RESOURCE_CASES)
@@ -170,6 +163,7 @@ def test_get_fhir_type__primitive_is_type_alias(release: str, type_str: str):
 def test_get_fhir_type__complex_and_resource_is_type(release: str, type_str: str):
     result = get_fhir_type(type_str, release)
     assert isinstance(result, type)
+    assert issubclass(result, FHIRBaseModel)
 
 
 def test_get_fhir_type__raises_attribute_error_for_unknown_name():
@@ -198,7 +192,8 @@ def test_get_fhir_type_by_url__returns_non_none_type(release: str, url: str):
 @pytest.mark.parametrize("release", FHIR_RELEASES)
 def test_get_fhir_type_by_url__primitive_url_returns_type_alias(release: str, url: str):
     result = get_fhir_type_by_url(url, release)
-    assert isinstance(result, TypeAliasType)
+    assert isinstance(result, type)
+    assert issubclass(result, FHIRPrimitiveModel)
 
 
 @pytest.mark.parametrize("url", _COMPLEX_URLS + _RESOURCE_URLS)
@@ -208,6 +203,7 @@ def test_get_fhir_type_by_url__complex_and_resource_url_returns_type(
 ):
     result = get_fhir_type_by_url(url, release)
     assert isinstance(result, type)
+    assert issubclass(result, FHIRBaseModel)
 
 
 def test_get_fhir_type_by_url__raises_attribute_error_for_unknown_url():
