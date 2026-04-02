@@ -1035,6 +1035,34 @@ class FHIRPrimitiveModel(FHIRBaseModel):
             return self.value == other.value
         return self.value == other
 
+    def __gt__(self, other):
+        return (
+            self.value > other.value
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value > other
+        )
+
+    def __lt__(self, other):
+        return (
+            self.value < other.value
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value < other
+        )
+
+    def __ge__(self, other):
+        return (
+            self.value >= other.value
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value >= other
+        )
+
+    def __le__(self, other):
+        return (
+            self.value <= other.value
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value <= other
+        )
+
     def __hash__(self) -> int:
         return hash(self.value)
 
