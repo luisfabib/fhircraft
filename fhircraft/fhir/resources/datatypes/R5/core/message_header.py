@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Url,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MessageHeaderDestination(BackboneElement):
     """
     The destination application which the message is intended for.
@@ -38,11 +31,6 @@ class MessageHeaderDestination(BackboneElement):
         description="Actual destination address or Endpoint resource",
         default=None,
     )
-    endpointUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for endpointUrl extensions",
-        default=None,
-        alias="_endpointUrl",
-    )
     endpointReference: Optional[Reference] = Field(
         description="Actual destination address or Endpoint resource",
         default=None,
@@ -50,11 +38,6 @@ class MessageHeaderDestination(BackboneElement):
     name: Optional[String] = Field(
         description="Name of system",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     target: Optional[Reference] = Field(
         description="Particular delivery destination within the destination",
@@ -81,7 +64,6 @@ class MessageHeaderDestination(BackboneElement):
             required=False,
         )
 
-
 class MessageHeaderSource(BackboneElement):
     """
     The source application from which this message originated.
@@ -91,11 +73,6 @@ class MessageHeaderSource(BackboneElement):
         description="Actual source address or Endpoint resource",
         default=None,
     )
-    endpointUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for endpointUrl extensions",
-        default=None,
-        alias="_endpointUrl",
-    )
     endpointReference: Optional[Reference] = Field(
         description="Actual source address or Endpoint resource",
         default=None,
@@ -104,28 +81,13 @@ class MessageHeaderSource(BackboneElement):
         description="Name of system",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     software: Optional[String] = Field(
         description="Name of software running the system",
         default=None,
     )
-    software_ext: Optional[Element] = Field(
-        description="Placeholder element for software extensions",
-        default=None,
-        alias="_software",
-    )
     version: Optional[String] = Field(
         description="Version of software running",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     contact: Optional[ContactPoint] = Field(
         description="Human contact for problems",
@@ -148,7 +110,6 @@ class MessageHeaderSource(BackboneElement):
             required=False,
         )
 
-
 class MessageHeaderResponse(BackboneElement):
     """
     Information about the message that this message is a response to.  Only present if this message is a response.
@@ -162,16 +123,10 @@ class MessageHeaderResponse(BackboneElement):
         description="ok | transient-error | fatal-error",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     details: Optional[Reference] = Field(
         description="Specific list of hints/warnings/errors",
         default=None,
     )
-
 
 class MessageHeader(DomainResource):
     """
@@ -189,11 +144,6 @@ class MessageHeader(DomainResource):
     eventCanonical: Optional[Canonical] = Field(
         description="Event code or link to EventDefinition",
         default=None,
-    )
-    eventCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for eventCanonical extensions",
-        default=None,
-        alias="_eventCanonical",
     )
     destination: Optional[ListType[MessageHeaderDestination]] = Field(
         description="Message destination application(s)",
@@ -230,11 +180,6 @@ class MessageHeader(DomainResource):
     definition: Optional[Canonical] = Field(
         description="Link to the definition for this message",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
 
     @property

@@ -4,14 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Decimal,
-    Integer,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -26,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ObservationDefinitionQuantitativeDetails(BackboneElement):
     """
@@ -45,21 +37,10 @@ class ObservationDefinitionQuantitativeDetails(BackboneElement):
         description="SI to Customary unit conversion factor",
         default=None,
     )
-    conversionFactor_ext: Optional[Element] = Field(
-        description="Placeholder element for conversionFactor extensions",
-        default=None,
-        alias="_conversionFactor",
-    )
     decimalPrecision: Optional[Integer] = Field(
         description="Decimal precision of observation quantitative results",
         default=None,
     )
-    decimalPrecision_ext: Optional[Element] = Field(
-        description="Placeholder element for decimalPrecision extensions",
-        default=None,
-        alias="_decimalPrecision",
-    )
-
 
 class ObservationDefinitionQualifiedInterval(BackboneElement):
     """
@@ -69,11 +50,6 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
     category: Optional[Code] = Field(
         description="reference | critical | absolute",
         default=None,
-    )
-    category_ext: Optional[Element] = Field(
-        description="Placeholder element for category extensions",
-        default=None,
-        alias="_category",
     )
     range: Optional[Range] = Field(
         description="The interval itself, for continuous or ordinal observations",
@@ -91,11 +67,6 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
     age: Optional[Range] = Field(
         description="Applicable age range, if relevant",
         default=None,
@@ -108,12 +79,6 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         description="Condition associated with the reference range",
         default=None,
     )
-    condition_ext: Optional[Element] = Field(
-        description="Placeholder element for condition extensions",
-        default=None,
-        alias="_condition",
-    )
-
 
 class ObservationDefinition(DomainResource):
     """
@@ -152,19 +117,9 @@ class ObservationDefinition(DomainResource):
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
-    permittedDataType_ext: Optional[Element] = Field(
-        description="Placeholder element for permittedDataType extensions",
-        default=None,
-        alias="_permittedDataType",
-    )
     multipleResultsAllowed: Optional[Boolean] = Field(
         description="Multiple results allowed",
         default=None,
-    )
-    multipleResultsAllowed_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleResultsAllowed extensions",
-        default=None,
-        alias="_multipleResultsAllowed",
     )
     method: Optional[CodeableConcept] = Field(
         description="Method used to produce the observation",
@@ -173,11 +128,6 @@ class ObservationDefinition(DomainResource):
     preferredReportName: Optional[String] = Field(
         description="Preferred report name",
         default=None,
-    )
-    preferredReportName_ext: Optional[Element] = Field(
-        description="Placeholder element for preferredReportName extensions",
-        default=None,
-        alias="_preferredReportName",
     )
     quantitativeDetails: Optional[ObservationDefinitionQuantitativeDetails] = Field(
         description="Characteristics of quantitative results",

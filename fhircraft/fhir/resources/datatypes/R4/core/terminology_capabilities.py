@@ -4,16 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Url,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -28,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class TerminologyCapabilitiesSoftware(BackboneElement):
     """
     Software that is covered by this terminology capability statement.  It is used when the statement describes the capabilities of a particular software version, independent of an installation.
@@ -38,21 +28,10 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         description="A name the software is known by",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     version: Optional[String] = Field(
         description="Version covered by this statement",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-
 
 class TerminologyCapabilitiesImplementation(BackboneElement):
     """
@@ -63,21 +42,10 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
         description="Describes this specific instance",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     url: Optional[Url] = Field(
         description="Base URL for the implementation",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-
 
 class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     """
@@ -88,21 +56,10 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         description="Code of the property supported",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     op: Optional[ListType[Code]] = Field(
         description="Operations supported for the property",
         default=None,
     )
-    op_ext: Optional[Element] = Field(
-        description="Placeholder element for op extensions",
-        default=None,
-        alias="_op",
-    )
-
 
 class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
     """
@@ -113,28 +70,13 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         description="Version identifier for this version",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     isDefault: Optional[Boolean] = Field(
         description="If this is the default version for this code system",
         default=None,
     )
-    isDefault_ext: Optional[Element] = Field(
-        description="Placeholder element for isDefault extensions",
-        default=None,
-        alias="_isDefault",
-    )
     compositional: Optional[Boolean] = Field(
         description="If compositional grammar is supported",
         default=None,
-    )
-    compositional_ext: Optional[Element] = Field(
-        description="Placeholder element for compositional extensions",
-        default=None,
-        alias="_compositional",
     )
     language: Optional[ListType[Code]] = Field(
         description="Language Displays supported",
@@ -150,12 +92,6 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         default=None,
         alias="property",
     )
-    property_ext: Optional[Element] = Field(
-        description="Placeholder element for property extensions",
-        default=None,
-        alias="_property",
-    )
-
 
 class TerminologyCapabilitiesCodeSystem(BackboneElement):
     """
@@ -166,11 +102,6 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         description="URI for the Code System",
         default=None,
     )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
-    )
     version: Optional[ListType[TerminologyCapabilitiesCodeSystemVersion]] = Field(
         description="Version of Code System supported",
         default=None,
@@ -179,12 +110,6 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         description="Whether subsumption is supported",
         default=None,
     )
-    subsumption_ext: Optional[Element] = Field(
-        description="Placeholder element for subsumption extensions",
-        default=None,
-        alias="_subsumption",
-    )
-
 
 class TerminologyCapabilitiesExpansionParameter(BackboneElement):
     """
@@ -195,21 +120,10 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
         description="Expansion Parameter name",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     documentation: Optional[String] = Field(
         description="Description of support for parameter",
         default=None,
     )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
-    )
-
 
 class TerminologyCapabilitiesExpansion(BackboneElement):
     """
@@ -220,28 +134,13 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         description="Whether the server can return nested value sets",
         default=None,
     )
-    hierarchical_ext: Optional[Element] = Field(
-        description="Placeholder element for hierarchical extensions",
-        default=None,
-        alias="_hierarchical",
-    )
     paging: Optional[Boolean] = Field(
         description="Whether the server supports paging on expansion",
         default=None,
     )
-    paging_ext: Optional[Element] = Field(
-        description="Placeholder element for paging extensions",
-        default=None,
-        alias="_paging",
-    )
     incomplete: Optional[Boolean] = Field(
         description="Allow request for incomplete expansions?",
         default=None,
-    )
-    incomplete_ext: Optional[Element] = Field(
-        description="Placeholder element for incomplete extensions",
-        default=None,
-        alias="_incomplete",
     )
     parameter: Optional[ListType[TerminologyCapabilitiesExpansionParameter]] = Field(
         description="Supported expansion parameter",
@@ -251,12 +150,6 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         description="Documentation about text searching works",
         default=None,
     )
-    textFilter_ext: Optional[Element] = Field(
-        description="Placeholder element for textFilter extensions",
-        default=None,
-        alias="_textFilter",
-    )
-
 
 class TerminologyCapabilitiesValidateCode(BackboneElement):
     """
@@ -267,12 +160,6 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
         description="Whether translations are validated",
         default=None,
     )
-    translations_ext: Optional[Element] = Field(
-        description="Placeholder element for translations extensions",
-        default=None,
-        alias="_translations",
-    )
-
 
 class TerminologyCapabilitiesTranslation(BackboneElement):
     """
@@ -283,12 +170,6 @@ class TerminologyCapabilitiesTranslation(BackboneElement):
         description="Whether the client must identify the map",
         default=None,
     )
-    needsMap_ext: Optional[Element] = Field(
-        description="Placeholder element for needsMap extensions",
-        default=None,
-        alias="_needsMap",
-    )
-
 
 class TerminologyCapabilitiesClosure(BackboneElement):
     """
@@ -299,12 +180,6 @@ class TerminologyCapabilitiesClosure(BackboneElement):
         description="If cross-system closure is supported",
         default=None,
     )
-    translation_ext: Optional[Element] = Field(
-        description="Placeholder element for translation extensions",
-        default=None,
-        alias="_translation",
-    )
-
 
 class TerminologyCapabilities(DomainResource):
     """
@@ -331,73 +206,33 @@ class TerminologyCapabilities(DomainResource):
         description="Canonical identifier for this terminology capabilities, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     version: Optional[String] = Field(
         description="Business version of the terminology capabilities",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     name: Optional[String] = Field(
         description="Name for this terminology capabilities (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this terminology capabilities (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -406,11 +241,6 @@ class TerminologyCapabilities(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the terminology capabilities",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -424,28 +254,13 @@ class TerminologyCapabilities(DomainResource):
         description="Why this terminology capabilities is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     kind: Optional[Code] = Field(
         description="instance | capability | requirements",
         default=None,
-    )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
     )
     software: Optional[TerminologyCapabilitiesSoftware] = Field(
         description="Software that is covered by this terminology capability statement",
@@ -459,11 +274,6 @@ class TerminologyCapabilities(DomainResource):
         description="Whether lockedDate is supported",
         default=None,
     )
-    lockedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lockedDate extensions",
-        default=None,
-        alias="_lockedDate",
-    )
     codeSystem: Optional[ListType[TerminologyCapabilitiesCodeSystem]] = Field(
         description="A code system supported by the server",
         default=None,
@@ -475,11 +285,6 @@ class TerminologyCapabilities(DomainResource):
     codeSearch: Optional[Code] = Field(
         description="explicit | all",
         default=None,
-    )
-    codeSearch_ext: Optional[Element] = Field(
-        description="Placeholder element for codeSearch extensions",
-        default=None,
-        alias="_codeSearch",
     )
     validateCode: Optional[TerminologyCapabilitiesValidateCode] = Field(
         description="Information about the [ValueSet/$validate-code](https://hl7.org/fhir/R4/valueset-operation-validate-code.html) operation",

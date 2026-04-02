@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -30,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class RiskAssessmentPrediction(BackboneElement):
     """
     Describes the expected outcome for the subject.
@@ -44,11 +37,6 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Likelihood of specified outcome",
         default=None,
     )
-    probabilityDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for probabilityDecimal extensions",
-        default=None,
-        alias="_probabilityDecimal",
-    )
     probabilityRange: Optional[Range] = Field(
         description="Likelihood of specified outcome",
         default=None,
@@ -61,11 +49,6 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Relative likelihood",
         default=None,
     )
-    relativeRisk_ext: Optional[Element] = Field(
-        description="Placeholder element for relativeRisk extensions",
-        default=None,
-        alias="_relativeRisk",
-    )
     whenPeriod: Optional[Period] = Field(
         description="Timeframe or age range",
         default=None,
@@ -77,11 +60,6 @@ class RiskAssessmentPrediction(BackboneElement):
     rationale: Optional[String] = Field(
         description="Explanation of prediction",
         default=None,
-    )
-    rationale_ext: Optional[Element] = Field(
-        description="Placeholder element for rationale extensions",
-        default=None,
-        alias="_rationale",
     )
 
     @property
@@ -116,7 +94,6 @@ class RiskAssessmentPrediction(BackboneElement):
             required=False,
         )
 
-
 class RiskAssessment(DomainResource):
     """
     An assessment of the likely outcome(s) for a patient or other subject as well as the likelihood of each outcome.
@@ -142,11 +119,6 @@ class RiskAssessment(DomainResource):
         description="registered | preliminary | final | amended +",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     method: Optional[CodeableConcept] = Field(
         description="Evaluation mechanism",
         default=None,
@@ -166,11 +138,6 @@ class RiskAssessment(DomainResource):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When was assessment made?",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When was assessment made?",
@@ -199,11 +166,6 @@ class RiskAssessment(DomainResource):
     mitigation: Optional[String] = Field(
         description="How to reduce risk",
         default=None,
-    )
-    mitigation_ext: Optional[Element] = Field(
-        description="Placeholder element for mitigation extensions",
-        default=None,
-        alias="_mitigation",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments on the risk assessment",

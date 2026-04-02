@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class FormularyItem(DomainResource):
     """
@@ -39,9 +38,4 @@ class FormularyItem(DomainResource):
     status: Optional[Code] = Field(
         description="active | entered-in-error | inactive",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )

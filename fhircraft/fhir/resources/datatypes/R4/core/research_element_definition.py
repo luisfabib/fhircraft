@@ -4,16 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -36,7 +27,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ResearchElementDefinitionCharacteristic(BackboneElement):
     """
     A characteristic that defines the members of the research element. Multiple characteristics are applied with "and" semantics.
@@ -49,11 +39,6 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     definitionCanonical: Optional[Canonical] = Field(
         description="What code or expression defines members?",
         default=None,
-    )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
     )
     definitionExpression: Optional[Expression] = Field(
         description="What code or expression defines members?",
@@ -71,11 +56,6 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="Whether the characteristic includes or excludes members",
         default=None,
     )
-    exclude_ext: Optional[Element] = Field(
-        description="Placeholder element for exclude extensions",
-        default=None,
-        alias="_exclude",
-    )
     unitOfMeasure: Optional[CodeableConcept] = Field(
         description="What unit is the outcome described in?",
         default=None,
@@ -84,19 +64,9 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="What time period does the study cover",
         default=None,
     )
-    studyEffectiveDescription_ext: Optional[Element] = Field(
-        description="Placeholder element for studyEffectiveDescription extensions",
-        default=None,
-        alias="_studyEffectiveDescription",
-    )
     studyEffectiveDateTime: Optional[DateTime] = Field(
         description="What time period does the study cover",
         default=None,
-    )
-    studyEffectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for studyEffectiveDateTime extensions",
-        default=None,
-        alias="_studyEffectiveDateTime",
     )
     studyEffectivePeriod: Optional[Period] = Field(
         description="What time period does the study cover",
@@ -118,28 +88,13 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median",
         default=None,
     )
-    studyEffectiveGroupMeasure_ext: Optional[Element] = Field(
-        description="Placeholder element for studyEffectiveGroupMeasure extensions",
-        default=None,
-        alias="_studyEffectiveGroupMeasure",
-    )
     participantEffectiveDescription: Optional[String] = Field(
         description="What time period do participants cover",
         default=None,
     )
-    participantEffectiveDescription_ext: Optional[Element] = Field(
-        description="Placeholder element for participantEffectiveDescription extensions",
-        default=None,
-        alias="_participantEffectiveDescription",
-    )
     participantEffectiveDateTime: Optional[DateTime] = Field(
         description="What time period do participants cover",
         default=None,
-    )
-    participantEffectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for participantEffectiveDateTime extensions",
-        default=None,
-        alias="_participantEffectiveDateTime",
     )
     participantEffectivePeriod: Optional[Period] = Field(
         description="What time period do participants cover",
@@ -160,11 +115,6 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     participantEffectiveGroupMeasure: Optional[Code] = Field(
         description="mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median",
         default=None,
-    )
-    participantEffectiveGroupMeasure_ext: Optional[Element] = Field(
-        description="Placeholder element for participantEffectiveGroupMeasure extensions",
-        default=None,
-        alias="_participantEffectiveGroupMeasure",
     )
 
     @property
@@ -215,7 +165,6 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
             required=False,
         )
 
-
 class ResearchElementDefinition(DomainResource):
     """
     The ResearchElementDefinition resource describes a "PICO" element that knowledge (evidence, assertion, recommendation) is about.
@@ -241,11 +190,6 @@ class ResearchElementDefinition(DomainResource):
         description="Canonical identifier for this research element definition, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the research element definition",
         default=None,
@@ -254,64 +198,29 @@ class ResearchElementDefinition(DomainResource):
         description="Business version of the research element definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     name: Optional[String] = Field(
         description="Name for this research element definition (computer friendly)",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     title: Optional[String] = Field(
         description="Name for this research element definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     shortTitle: Optional[String] = Field(
         description="Title for use in informal contexts",
         default=None,
-    )
-    shortTitle_ext: Optional[Element] = Field(
-        description="Placeholder element for shortTitle extensions",
-        default=None,
-        alias="_shortTitle",
     )
     subtitle: Optional[String] = Field(
         description="Subordinate title of the ResearchElementDefinition",
         default=None,
     )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
@@ -325,19 +234,9 @@ class ResearchElementDefinition(DomainResource):
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -347,19 +246,9 @@ class ResearchElementDefinition(DomainResource):
         description="Natural language description of the research element definition",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     comment: Optional[ListType[String]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -373,46 +262,21 @@ class ResearchElementDefinition(DomainResource):
         description="Why this research element definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     usage: Optional[String] = Field(
         description="Describes the clinical usage of the ResearchElementDefinition",
         default=None,
-    )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
     )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the research element definition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the research element definition was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the research element definition is expected to be used",
@@ -446,28 +310,13 @@ class ResearchElementDefinition(DomainResource):
         description="Logic used by the ResearchElementDefinition",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
-    )
     type: Optional[Code] = Field(
         description="population | exposure | outcome",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     variableType: Optional[Code] = Field(
         description="dichotomous | continuous | descriptive",
         default=None,
-    )
-    variableType_ext: Optional[Element] = Field(
-        description="Placeholder element for variableType extensions",
-        default=None,
-        alias="_variableType",
     )
     characteristic: Optional[ListType[ResearchElementDefinitionCharacteristic]] = Field(
         description="What defines the members of the research element",

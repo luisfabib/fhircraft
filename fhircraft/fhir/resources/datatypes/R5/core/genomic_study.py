@@ -5,14 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Canonical,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -28,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class GenomicStudyAnalysisInput(BackboneElement):
     """
@@ -68,7 +60,6 @@ class GenomicStudyAnalysisInput(BackboneElement):
             required=False,
         )
 
-
 class GenomicStudyAnalysisOutput(BackboneElement):
     """
     Outputs for the analysis event.
@@ -82,7 +73,6 @@ class GenomicStudyAnalysisOutput(BackboneElement):
         description="Type of output data (e.g., VCF, MAF, or BAM)",
         default=None,
     )
-
 
 class GenomicStudyAnalysisPerformer(BackboneElement):
     """
@@ -98,7 +88,6 @@ class GenomicStudyAnalysisPerformer(BackboneElement):
         default=None,
     )
 
-
 class GenomicStudyAnalysisDevice(BackboneElement):
     """
     Devices used for the analysis (e.g., instruments, software), with settings and parameters.
@@ -112,7 +101,6 @@ class GenomicStudyAnalysisDevice(BackboneElement):
         description="Specific function for the device used for the analysis",
         default=None,
     )
-
 
 class GenomicStudyAnalysis(BackboneElement):
     """
@@ -139,28 +127,13 @@ class GenomicStudyAnalysis(BackboneElement):
         description="The defined protocol that describes the analysis",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[Uri] = Field(
         description="The URL pointing to an externally maintained protocol that describes the analysis",
         default=None,
     )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
-    )
     title: Optional[String] = Field(
         description="Name of the analysis event (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     focus: Optional[ListType[Reference]] = Field(
         description="What the genomic analysis is about, when it is not about the subject of record",
@@ -173,11 +146,6 @@ class GenomicStudyAnalysis(BackboneElement):
     date: Optional[DateTime] = Field(
         description="The date of the analysis event",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Any notes capture with the analysis event",
@@ -212,7 +180,6 @@ class GenomicStudyAnalysis(BackboneElement):
         default=None,
     )
 
-
 class GenomicStudy(DomainResource):
     """
     A set of analyses performed to analyze and generate genomic data.
@@ -230,11 +197,6 @@ class GenomicStudy(DomainResource):
         description="registered | available | cancelled | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of the study (e.g., Familial variant segregation, Functional variation detection, or Gene expression profiling)",
         default=None,
@@ -250,11 +212,6 @@ class GenomicStudy(DomainResource):
     startDate: Optional[DateTime] = Field(
         description="When the genomic study was started",
         default=None,
-    )
-    startDate_ext: Optional[Element] = Field(
-        description="Placeholder element for startDate extensions",
-        default=None,
-        alias="_startDate",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Event resources that the genomic study is based on",
@@ -276,19 +233,9 @@ class GenomicStudy(DomainResource):
         description="The defined protocol that describes the study",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[Uri] = Field(
         description="The URL pointing to an externally maintained protocol that describes the study",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments related to the genomic study",
@@ -297,11 +244,6 @@ class GenomicStudy(DomainResource):
     description: Optional[Markdown] = Field(
         description="Description of the genomic study",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     analysis: Optional[ListType[GenomicStudyAnalysis]] = Field(
         description="Genomic Analysis Event",

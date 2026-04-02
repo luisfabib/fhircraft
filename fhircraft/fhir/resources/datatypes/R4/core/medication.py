@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -25,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class MedicationIngredient(BackboneElement):
     """
@@ -43,11 +36,6 @@ class MedicationIngredient(BackboneElement):
     isActive: Optional[Boolean] = Field(
         description="Active ingredient indicator",
         default=None,
-    )
-    isActive_ext: Optional[Element] = Field(
-        description="Placeholder element for isActive extensions",
-        default=None,
-        alias="_isActive",
     )
     strength: Optional[Ratio] = Field(
         description="Quantity of ingredient present",
@@ -70,7 +58,6 @@ class MedicationIngredient(BackboneElement):
             required=True,
         )
 
-
 class MedicationBatch(BackboneElement):
     """
     Information that only applies to packages (not products).
@@ -80,21 +67,10 @@ class MedicationBatch(BackboneElement):
         description="Identifier assigned to batch",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
     expirationDate: Optional[DateTime] = Field(
         description="When batch will expire",
         default=None,
     )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
-    )
-
 
 class Medication(DomainResource):
     """
@@ -128,11 +104,6 @@ class Medication(DomainResource):
     status: Optional[Code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     manufacturer: Optional[Reference] = Field(
         description="Manufacturer of the item",

@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     """
     A set of additional dependencies for this mapping to hold. This mapping is only applicable if the specified element can be resolved, and it has the specified value.
@@ -39,39 +30,18 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
         default=None,
         alias="property",
     )
-    property_ext: Optional[Element] = Field(
-        description="Placeholder element for property extensions",
-        default=None,
-        alias="_property",
-    )
     system: Optional[Canonical] = Field(
         description="Code System (if necessary)",
         default=None,
-    )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
     )
     value: Optional[String] = Field(
         description="Value of the referenced element",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     display: Optional[String] = Field(
         description="Display for the code (if value is a code)",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
-
 
 class ConceptMapGroupElementTargetProduct(BackboneElement):
     """
@@ -83,39 +53,18 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
         default=None,
         alias="property",
     )
-    property_ext: Optional[Element] = Field(
-        description="Placeholder element for property extensions",
-        default=None,
-        alias="_property",
-    )
     system: Optional[Canonical] = Field(
         description="Code System (if necessary)",
         default=None,
-    )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
     )
     value: Optional[String] = Field(
         description="Value of the referenced element",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     display: Optional[String] = Field(
         description="Display for the code (if value is a code)",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
-
 
 class ConceptMapGroupElementTarget(BackboneElement):
     """
@@ -126,37 +75,17 @@ class ConceptMapGroupElementTarget(BackboneElement):
         description="Code that identifies the target element",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     display: Optional[String] = Field(
         description="Display for the code",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
     equivalence: Optional[Code] = Field(
         description="relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint",
         default=None,
     )
-    equivalence_ext: Optional[Element] = Field(
-        description="Placeholder element for equivalence extensions",
-        default=None,
-        alias="_equivalence",
-    )
     comment: Optional[String] = Field(
         description="Description of status/issues in mapping",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     dependsOn: Optional[ListType[ConceptMapGroupElementTargetDependsOn]] = Field(
         description="Other elements required for this mapping (from context)",
@@ -167,7 +96,6 @@ class ConceptMapGroupElementTarget(BackboneElement):
         default=None,
     )
 
-
 class ConceptMapGroupElement(BackboneElement):
     """
     Mappings for an individual concept in the source to one or more concepts in the target.
@@ -177,25 +105,14 @@ class ConceptMapGroupElement(BackboneElement):
         description="Identifies element being mapped",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     display: Optional[String] = Field(
         description="Display for the code",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
     target: Optional[ListType[ConceptMapGroupElementTarget]] = Field(
         description="Concept in target system for element",
         default=None,
     )
-
 
 class ConceptMapGroupUnmapped(BackboneElement):
     """
@@ -206,39 +123,18 @@ class ConceptMapGroupUnmapped(BackboneElement):
         description="provided | fixed | other-map",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
     code: Optional[Code] = Field(
         description="Fixed code when mode = fixed",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     display: Optional[String] = Field(
         description="Display for the code",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
     url: Optional[Canonical] = Field(
         description="canonical reference to an additional ConceptMap to use for mapping if the source concept is unmapped",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-
 
 class ConceptMapGroup(BackboneElement):
     """
@@ -249,37 +145,17 @@ class ConceptMapGroup(BackboneElement):
         description="Source system where concepts to be mapped are defined",
         default=None,
     )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
-    )
     sourceVersion: Optional[String] = Field(
         description="Specific version of the  code system",
         default=None,
-    )
-    sourceVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceVersion extensions",
-        default=None,
-        alias="_sourceVersion",
     )
     target: Optional[Uri] = Field(
         description="Target system that the concepts are to be mapped to",
         default=None,
     )
-    target_ext: Optional[Element] = Field(
-        description="Placeholder element for target extensions",
-        default=None,
-        alias="_target",
-    )
     targetVersion: Optional[String] = Field(
         description="Specific version of the  code system",
         default=None,
-    )
-    targetVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for targetVersion extensions",
-        default=None,
-        alias="_targetVersion",
     )
     element: Optional[ListType[ConceptMapGroupElement]] = Field(
         description="Mappings for a concept from the source set",
@@ -289,7 +165,6 @@ class ConceptMapGroup(BackboneElement):
         description="What to do when there is no mapping for the source concept",
         default=None,
     )
-
 
 class ConceptMap(DomainResource):
     """
@@ -316,11 +191,6 @@ class ConceptMap(DomainResource):
         description="Canonical identifier for this concept map, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[Identifier] = Field(
         description="Additional identifier for the concept map",
         default=None,
@@ -329,64 +199,29 @@ class ConceptMap(DomainResource):
         description="Business version of the concept map",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     name: Optional[String] = Field(
         description="Name for this concept map (computer friendly)",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     title: Optional[String] = Field(
         description="Name for this concept map (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -395,11 +230,6 @@ class ConceptMap(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the concept map",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -413,55 +243,25 @@ class ConceptMap(DomainResource):
         description="Why this concept map is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     sourceUri: Optional[Uri] = Field(
         description="The source value set that contains the concepts that are being mapped",
         default=None,
     )
-    sourceUri_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceUri extensions",
-        default=None,
-        alias="_sourceUri",
-    )
     sourceCanonical: Optional[Canonical] = Field(
         description="The source value set that contains the concepts that are being mapped",
         default=None,
-    )
-    sourceCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceCanonical extensions",
-        default=None,
-        alias="_sourceCanonical",
     )
     targetUri: Optional[Uri] = Field(
         description="The target value set which provides context for the mappings",
         default=None,
     )
-    targetUri_ext: Optional[Element] = Field(
-        description="Placeholder element for targetUri extensions",
-        default=None,
-        alias="_targetUri",
-    )
     targetCanonical: Optional[Canonical] = Field(
         description="The target value set which provides context for the mappings",
         default=None,
-    )
-    targetCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for targetCanonical extensions",
-        default=None,
-        alias="_targetCanonical",
     )
     group: Optional[ListType[ConceptMapGroup]] = Field(
         description="Same source and target systems",

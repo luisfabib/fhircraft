@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CommunicationRequestPayload(BackboneElement):
     """
     Text, attachment(s), or resource(s) to be communicated to the recipient.
@@ -37,11 +30,6 @@ class CommunicationRequestPayload(BackboneElement):
     contentString: Optional[String] = Field(
         description="Message part content",
         default=None,
-    )
-    contentString_ext: Optional[Element] = Field(
-        description="Placeholder element for contentString extensions",
-        default=None,
-        alias="_contentString",
     )
     contentAttachment: Optional[Attachment] = Field(
         description="Message part content",
@@ -67,7 +55,6 @@ class CommunicationRequestPayload(BackboneElement):
             field_name_base="content",
             required=True,
         )
-
 
 class CommunicationRequest(DomainResource):
     """
@@ -110,11 +97,6 @@ class CommunicationRequest(DomainResource):
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
@@ -127,19 +109,9 @@ class CommunicationRequest(DomainResource):
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     doNotPerform: Optional[Boolean] = Field(
         description="True if request is prohibiting action",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     medium: Optional[ListType[CodeableConcept]] = Field(
         description="A channel of communication",
@@ -165,11 +137,6 @@ class CommunicationRequest(DomainResource):
         description="When scheduled",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
     occurrencePeriod: Optional[Period] = Field(
         description="When scheduled",
         default=None,
@@ -177,11 +144,6 @@ class CommunicationRequest(DomainResource):
     authoredOn: Optional[DateTime] = Field(
         description="When request transitioned to being actionable",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Who/what is requesting service",

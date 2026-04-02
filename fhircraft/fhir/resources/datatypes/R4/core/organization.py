@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class OrganizationContact(BackboneElement):
     """
@@ -44,7 +43,6 @@ class OrganizationContact(BackboneElement):
         description="Visiting or postal addresses for the contact",
         default=None,
     )
-
 
 class Organization(DomainResource):
     """
@@ -75,11 +73,6 @@ class Organization(DomainResource):
         description="Whether the organization\u0027s record is still in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of organization",
         default=None,
@@ -88,19 +81,9 @@ class Organization(DomainResource):
         description="Name used for the organization",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     alias: Optional[ListType[String]] = Field(
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
-    )
-    alias_ext: Optional[Element] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
     )
     telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the organization",

@@ -3,9 +3,8 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex.element import Element
-
 
 class Narrative(Element):
     """
@@ -17,11 +16,6 @@ class Narrative(Element):
     status: Optional[Code] = Field(
         description="generated | extensions | additional | empty",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     div: Optional[str] = Field(
         description="Limited xhtml content",

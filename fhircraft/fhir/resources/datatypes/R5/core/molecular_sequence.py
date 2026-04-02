@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Integer
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class MolecularSequenceRelativeStartingSequence(BackboneElement):
     """
@@ -44,11 +43,6 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
         description="The reference sequence that represents the starting sequence",
         default=None,
     )
-    sequenceString_ext: Optional[Element] = Field(
-        description="Placeholder element for sequenceString extensions",
-        default=None,
-        alias="_sequenceString",
-    )
     sequenceReference: Optional[Reference] = Field(
         description="The reference sequence that represents the starting sequence",
         default=None,
@@ -57,37 +51,17 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
         description="Start position of the window on the starting sequence",
         default=None,
     )
-    windowStart_ext: Optional[Element] = Field(
-        description="Placeholder element for windowStart extensions",
-        default=None,
-        alias="_windowStart",
-    )
     windowEnd: Optional[Integer] = Field(
         description="End position of the window on the starting sequence",
         default=None,
-    )
-    windowEnd_ext: Optional[Element] = Field(
-        description="Placeholder element for windowEnd extensions",
-        default=None,
-        alias="_windowEnd",
     )
     orientation: Optional[Code] = Field(
         description="sense | antisense",
         default=None,
     )
-    orientation_ext: Optional[Element] = Field(
-        description="Placeholder element for orientation extensions",
-        default=None,
-        alias="_orientation",
-    )
     strand: Optional[Code] = Field(
         description="watson | crick",
         default=None,
-    )
-    strand_ext: Optional[Element] = Field(
-        description="Placeholder element for strand extensions",
-        default=None,
-        alias="_strand",
     )
 
     @property
@@ -106,7 +80,6 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
             required=False,
         )
 
-
 class MolecularSequenceRelativeEdit(BackboneElement):
     """
     Changes in sequence from the starting sequence.
@@ -116,39 +89,18 @@ class MolecularSequenceRelativeEdit(BackboneElement):
         description="Start position of the edit on the starting sequence",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
     end: Optional[Integer] = Field(
         description="End position of the edit on the starting sequence",
         default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
     replacementSequence: Optional[String] = Field(
         description="Allele that was observed",
         default=None,
     )
-    replacementSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for replacementSequence extensions",
-        default=None,
-        alias="_replacementSequence",
-    )
     replacedSequence: Optional[String] = Field(
         description="Allele in the starting sequence",
         default=None,
     )
-    replacedSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for replacedSequence extensions",
-        default=None,
-        alias="_replacedSequence",
-    )
-
 
 class MolecularSequenceRelative(BackboneElement):
     """
@@ -163,11 +115,6 @@ class MolecularSequenceRelative(BackboneElement):
         description="Indicates the order in which the sequence should be considered when putting multiple \u0027relative\u0027 elements together",
         default=None,
     )
-    ordinalPosition_ext: Optional[Element] = Field(
-        description="Placeholder element for ordinalPosition extensions",
-        default=None,
-        alias="_ordinalPosition",
-    )
     sequenceRange: Optional[Range] = Field(
         description="Indicates the nucleotide range in the composed sequence when multiple \u0027relative\u0027 elements are used together",
         default=None,
@@ -180,7 +127,6 @@ class MolecularSequenceRelative(BackboneElement):
         description="Changes in sequence from the starting sequence",
         default=None,
     )
-
 
 class MolecularSequence(DomainResource):
     """
@@ -198,11 +144,6 @@ class MolecularSequence(DomainResource):
     type: Optional[Code] = Field(
         description="aa | dna | rna",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     subject: Optional[Reference] = Field(
         description="Subject this sequence is associated too",
@@ -227,11 +168,6 @@ class MolecularSequence(DomainResource):
     literal: Optional[String] = Field(
         description="Sequence that was observed",
         default=None,
-    )
-    literal_ext: Optional[Element] = Field(
-        description="Placeholder element for literal extensions",
-        default=None,
-        alias="_literal",
     )
     formatted: Optional[ListType[Attachment]] = Field(
         description="Embedded file or a link (URL) which contains content to represent the sequence",

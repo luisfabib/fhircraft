@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Date,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -31,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class FamilyMemberHistoryCondition(BackboneElement):
     """
     The significant Conditions (or condition) that the family member had. This is a repeating section to allow a system to represent more than one condition per resource, though there is nothing stopping multiple resources - one per condition.
@@ -49,11 +40,6 @@ class FamilyMemberHistoryCondition(BackboneElement):
         description="Whether the condition contributed to the cause of death",
         default=None,
     )
-    contributedToDeath_ext: Optional[Element] = Field(
-        description="Placeholder element for contributedToDeath extensions",
-        default=None,
-        alias="_contributedToDeath",
-    )
     onsetAge: Optional[Age] = Field(
         description="When condition first manifested",
         default=None,
@@ -69,11 +55,6 @@ class FamilyMemberHistoryCondition(BackboneElement):
     onsetString: Optional[String] = Field(
         description="When condition first manifested",
         default=None,
-    )
-    onsetString_ext: Optional[Element] = Field(
-        description="Placeholder element for onsetString extensions",
-        default=None,
-        alias="_onsetString",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Extra information about condition",
@@ -95,7 +76,6 @@ class FamilyMemberHistoryCondition(BackboneElement):
             field_name_base="onset",
             required=False,
         )
-
 
 class FamilyMemberHistory(DomainResource):
     """
@@ -126,28 +106,13 @@ class FamilyMemberHistory(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
-    )
     status: Optional[Code] = Field(
         description="partial | completed | entered-in-error | health-unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     dataAbsentReason: Optional[CodeableConcept] = Field(
         description="subject-unknown | withheld | unable-to-obtain | deferred",
@@ -161,19 +126,9 @@ class FamilyMemberHistory(DomainResource):
         description="When history was recorded or last updated",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     name: Optional[String] = Field(
         description="The family member described",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     relationship: Optional[CodeableConcept] = Field(
         description="Relationship to the subject",
@@ -191,19 +146,9 @@ class FamilyMemberHistory(DomainResource):
         description="(approximate) date of birth",
         default=None,
     )
-    bornDate_ext: Optional[Element] = Field(
-        description="Placeholder element for bornDate extensions",
-        default=None,
-        alias="_bornDate",
-    )
     bornString: Optional[String] = Field(
         description="(approximate) date of birth",
         default=None,
-    )
-    bornString_ext: Optional[Element] = Field(
-        description="Placeholder element for bornString extensions",
-        default=None,
-        alias="_bornString",
     )
     ageAge: Optional[Age] = Field(
         description="(approximate) age",
@@ -217,28 +162,13 @@ class FamilyMemberHistory(DomainResource):
         description="(approximate) age",
         default=None,
     )
-    ageString_ext: Optional[Element] = Field(
-        description="Placeholder element for ageString extensions",
-        default=None,
-        alias="_ageString",
-    )
     estimatedAge: Optional[Boolean] = Field(
         description="Age is estimated?",
         default=None,
     )
-    estimatedAge_ext: Optional[Element] = Field(
-        description="Placeholder element for estimatedAge extensions",
-        default=None,
-        alias="_estimatedAge",
-    )
     deceasedBoolean: Optional[Boolean] = Field(
         description="Dead? How old/when?",
         default=None,
-    )
-    deceasedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedBoolean extensions",
-        default=None,
-        alias="_deceasedBoolean",
     )
     deceasedAge: Optional[Age] = Field(
         description="Dead? How old/when?",
@@ -252,19 +182,9 @@ class FamilyMemberHistory(DomainResource):
         description="Dead? How old/when?",
         default=None,
     )
-    deceasedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedDate extensions",
-        default=None,
-        alias="_deceasedDate",
-    )
     deceasedString: Optional[String] = Field(
         description="Dead? How old/when?",
         default=None,
-    )
-    deceasedString_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedString extensions",
-        default=None,
-        alias="_deceasedString",
     )
     reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why was family member history performed?",

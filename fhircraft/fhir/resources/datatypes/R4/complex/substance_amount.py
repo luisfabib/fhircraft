@@ -3,14 +3,13 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 
 from .codeable_concept import CodeableConcept
 from .element import Element
 from .backbone_element import BackboneElement
 from .quantity import Quantity
 from .range import Range
-
 
 class SubstanceAmount(BackboneElement):
     """
@@ -38,11 +37,6 @@ class SubstanceAmount(BackboneElement):
     amountText: Optional[String] = Field(
         description="A textual comment on a numeric value",
         default=None,
-    )
-    amountText_ext: Optional[Element] = Field(
-        description="Placeholder element for amountText extensions",
-        default=None,
-        alias="_amountText",
     )
     referenceRange: Optional[Element] = Field(
         description="Reference range of possible or expected values",

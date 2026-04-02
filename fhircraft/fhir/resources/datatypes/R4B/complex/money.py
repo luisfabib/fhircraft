@@ -3,9 +3,8 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex.element import Element
-
 
 class Money(Element):
     """
@@ -18,17 +17,7 @@ class Money(Element):
         description="Numerical value (with implicit precision)",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     currency: Optional[Code] = Field(
         description="ISO 4217 Currency Code",
         default=None,
-    )
-    currency_ext: Optional[Element] = Field(
-        description="Placeholder element for currency extensions",
-        default=None,
-        alias="_currency",
     )

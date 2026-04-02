@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-    Date,
-    PositiveInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -29,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ImmunizationPerformer(BackboneElement):
     """
     Indicates who performed the immunization event.
@@ -44,7 +35,6 @@ class ImmunizationPerformer(BackboneElement):
         default=None,
     )
 
-
 class ImmunizationEducation(BackboneElement):
     """
     Educational material presented to the patient (or guardian) at the time of vaccine administration.
@@ -54,39 +44,18 @@ class ImmunizationEducation(BackboneElement):
         description="Educational material document identifier",
         default=None,
     )
-    documentType_ext: Optional[Element] = Field(
-        description="Placeholder element for documentType extensions",
-        default=None,
-        alias="_documentType",
-    )
     reference: Optional[Uri] = Field(
         description="Educational material reference pointer",
         default=None,
-    )
-    reference_ext: Optional[Element] = Field(
-        description="Placeholder element for reference extensions",
-        default=None,
-        alias="_reference",
     )
     publicationDate: Optional[DateTime] = Field(
         description="Educational material publication date",
         default=None,
     )
-    publicationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for publicationDate extensions",
-        default=None,
-        alias="_publicationDate",
-    )
     presentationDate: Optional[DateTime] = Field(
         description="Educational material presentation date",
         default=None,
     )
-    presentationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for presentationDate extensions",
-        default=None,
-        alias="_presentationDate",
-    )
-
 
 class ImmunizationReaction(BackboneElement):
     """
@@ -97,11 +66,6 @@ class ImmunizationReaction(BackboneElement):
         description="When reaction started",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     detail: Optional[Reference] = Field(
         description="Additional information on reaction",
         default=None,
@@ -110,12 +74,6 @@ class ImmunizationReaction(BackboneElement):
         description="Indicates self-reported reaction",
         default=None,
     )
-    reported_ext: Optional[Element] = Field(
-        description="Placeholder element for reported extensions",
-        default=None,
-        alias="_reported",
-    )
-
 
 class ImmunizationProtocolApplied(BackboneElement):
     """
@@ -125,11 +83,6 @@ class ImmunizationProtocolApplied(BackboneElement):
     series: Optional[String] = Field(
         description="Name of vaccine series",
         default=None,
-    )
-    series_ext: Optional[Element] = Field(
-        description="Placeholder element for series extensions",
-        default=None,
-        alias="_series",
     )
     authority: Optional[Reference] = Field(
         description="Who is responsible for publishing the recommendations",
@@ -143,37 +96,17 @@ class ImmunizationProtocolApplied(BackboneElement):
         description="Dose number within series",
         default=None,
     )
-    doseNumberPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberPositiveInt extensions",
-        default=None,
-        alias="_doseNumberPositiveInt",
-    )
     doseNumberString: Optional[String] = Field(
         description="Dose number within series",
         default=None,
-    )
-    doseNumberString_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberString extensions",
-        default=None,
-        alias="_doseNumberString",
     )
     seriesDosesPositiveInt: Optional[PositiveInt] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
-    seriesDosesPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesPositiveInt extensions",
-        default=None,
-        alias="_seriesDosesPositiveInt",
-    )
     seriesDosesString: Optional[String] = Field(
         description="Recommended number of doses for immunity",
         default=None,
-    )
-    seriesDosesString_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesString extensions",
-        default=None,
-        alias="_seriesDosesString",
     )
 
     @property
@@ -208,7 +141,6 @@ class ImmunizationProtocolApplied(BackboneElement):
             required=False,
         )
 
-
 class Immunization(DomainResource):
     """
     Describes the event of a patient being administered a vaccine or a record of an immunization as reported by a patient, a clinician or another party.
@@ -238,11 +170,6 @@ class Immunization(DomainResource):
         description="completed | entered-in-error | not-done",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason not done",
         default=None,
@@ -263,37 +190,17 @@ class Immunization(DomainResource):
         description="Vaccine administration date",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
     occurrenceString: Optional[String] = Field(
         description="Vaccine administration date",
         default=None,
-    )
-    occurrenceString_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceString extensions",
-        default=None,
-        alias="_occurrenceString",
     )
     recorded: Optional[DateTime] = Field(
         description="When the immunization was first captured in the subject\u0027s record",
         default=None,
     )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
-    )
     primarySource: Optional[Boolean] = Field(
         description="Indicates context the data was recorded in",
         default=None,
-    )
-    primarySource_ext: Optional[Element] = Field(
-        description="Placeholder element for primarySource extensions",
-        default=None,
-        alias="_primarySource",
     )
     reportOrigin: Optional[CodeableConcept] = Field(
         description="Indicates the source of a secondarily reported record",
@@ -311,19 +218,9 @@ class Immunization(DomainResource):
         description="Vaccine lot number",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
     expirationDate: Optional[Date] = Field(
         description="Vaccine expiration date",
         default=None,
-    )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
     )
     site: Optional[CodeableConcept] = Field(
         description="Body site vaccine  was administered",
@@ -356,11 +253,6 @@ class Immunization(DomainResource):
     isSubpotent: Optional[Boolean] = Field(
         description="Dose potency",
         default=None,
-    )
-    isSubpotent_ext: Optional[Element] = Field(
-        description="Placeholder element for isSubpotent extensions",
-        default=None,
-        alias="_isSubpotent",
     )
     subpotentReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for being subpotent",

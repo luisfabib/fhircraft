@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -34,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ServiceRequestOrderDetailParameter(BackboneElement):
     """
@@ -61,11 +52,6 @@ class ServiceRequestOrderDetailParameter(BackboneElement):
         description="The value for the order detail",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="The value for the order detail",
         default=None,
@@ -73,11 +59,6 @@ class ServiceRequestOrderDetailParameter(BackboneElement):
     valueString: Optional[String] = Field(
         description="The value for the order detail",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valuePeriod: Optional[Period] = Field(
         description="The value for the order detail",
@@ -108,7 +89,6 @@ class ServiceRequestOrderDetailParameter(BackboneElement):
             required=True,
         )
 
-
 class ServiceRequestOrderDetail(BackboneElement):
     """
     Additional details and instructions about the how the services are to be delivered.   For example, and order for a urinary catheter may have an order detail for an external or indwelling catheter, or an order for a bandage may require additional instructions specifying how the bandage should be applied.
@@ -123,7 +103,6 @@ class ServiceRequestOrderDetail(BackboneElement):
         default=None,
     )
 
-
 class ServiceRequestPatientInstruction(BackboneElement):
     """
     Instructions in terms that are understood by the patient or consumer.
@@ -132,11 +111,6 @@ class ServiceRequestPatientInstruction(BackboneElement):
     instructionMarkdown: Optional[Markdown] = Field(
         description="Patient or consumer-oriented instructions",
         default=None,
-    )
-    instructionMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for instructionMarkdown extensions",
-        default=None,
-        alias="_instructionMarkdown",
     )
     instructionReference: Optional[Reference] = Field(
         description="Patient or consumer-oriented instructions",
@@ -159,7 +133,6 @@ class ServiceRequestPatientInstruction(BackboneElement):
             required=False,
         )
 
-
 class ServiceRequest(DomainResource):
     """
     A record of a request for service such as diagnostic investigations, treatments, or operations to be performed.
@@ -177,19 +150,9 @@ class ServiceRequest(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",
@@ -207,19 +170,9 @@ class ServiceRequest(DomainResource):
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     intent: Optional[Code] = Field(
         description="proposal | plan | directive | order +",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of service",
@@ -229,19 +182,9 @@ class ServiceRequest(DomainResource):
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     doNotPerform: Optional[Boolean] = Field(
         description="True if service/procedure should not be performed",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     code: Optional[CodeableReference] = Field(
         description="What is being requested/ordered",
@@ -279,11 +222,6 @@ class ServiceRequest(DomainResource):
         description="When service should occur",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
     occurrencePeriod: Optional[Period] = Field(
         description="When service should occur",
         default=None,
@@ -296,11 +234,6 @@ class ServiceRequest(DomainResource):
         description="Preconditions for service",
         default=None,
     )
-    asNeededBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeededBoolean extensions",
-        default=None,
-        alias="_asNeededBoolean",
-    )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",
         default=None,
@@ -308,11 +241,6 @@ class ServiceRequest(DomainResource):
     authoredOn: Optional[DateTime] = Field(
         description="Date request signed",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Who/what is requesting service",

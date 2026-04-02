@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-    Boolean,
-    UnsignedInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -30,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CoverageEligibilityResponseEvent(BackboneElement):
     """
     Information code for an event with a corresponding date or period.
@@ -43,11 +34,6 @@ class CoverageEligibilityResponseEvent(BackboneElement):
     whenDateTime: Optional[DateTime] = Field(
         description="Occurance date or period",
         default=None,
-    )
-    whenDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for whenDateTime extensions",
-        default=None,
-        alias="_whenDateTime",
     )
     whenPeriod: Optional[Period] = Field(
         description="Occurance date or period",
@@ -70,7 +56,6 @@ class CoverageEligibilityResponseEvent(BackboneElement):
             required=True,
         )
 
-
 class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
     """
     Benefits used to date.
@@ -84,19 +69,9 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
         description="Benefits allowed",
         default=None,
     )
-    allowedUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedUnsignedInt extensions",
-        default=None,
-        alias="_allowedUnsignedInt",
-    )
     allowedString: Optional[String] = Field(
         description="Benefits allowed",
         default=None,
-    )
-    allowedString_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedString extensions",
-        default=None,
-        alias="_allowedString",
     )
     allowedMoney: Optional[Money] = Field(
         description="Benefits allowed",
@@ -106,19 +81,9 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
         description="Benefits used",
         default=None,
     )
-    usedUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for usedUnsignedInt extensions",
-        default=None,
-        alias="_usedUnsignedInt",
-    )
     usedString: Optional[String] = Field(
         description="Benefits used",
         default=None,
-    )
-    usedString_ext: Optional[Element] = Field(
-        description="Placeholder element for usedString extensions",
-        default=None,
-        alias="_usedString",
     )
     usedMoney: Optional[Money] = Field(
         description="Benefits used",
@@ -157,7 +122,6 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
             required=False,
         )
 
-
 class CoverageEligibilityResponseInsuranceItem(BackboneElement):
     """
     Benefits and optionally current balances, and authorization details by category or service.
@@ -183,28 +147,13 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Excluded from the plan",
         default=None,
     )
-    excluded_ext: Optional[Element] = Field(
-        description="Placeholder element for excluded extensions",
-        default=None,
-        alias="_excluded",
-    )
     name: Optional[String] = Field(
         description="Short name for the benefit",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     description: Optional[String] = Field(
         description="Description of the benefit or services covered",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     network: Optional[CodeableConcept] = Field(
         description="In or out of network",
@@ -228,11 +177,6 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Authorization required flag",
         default=None,
     )
-    authorizationRequired_ext: Optional[Element] = Field(
-        description="Placeholder element for authorizationRequired extensions",
-        default=None,
-        alias="_authorizationRequired",
-    )
     authorizationSupporting: Optional[ListType[CodeableConcept]] = Field(
         description="Type of required supporting materials",
         default=None,
@@ -241,12 +185,6 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Preauthorization requirements endpoint",
         default=None,
     )
-    authorizationUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for authorizationUrl extensions",
-        default=None,
-        alias="_authorizationUrl",
-    )
-
 
 class CoverageEligibilityResponseInsurance(BackboneElement):
     """
@@ -261,11 +199,6 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
         description="Coverage inforce indicator",
         default=None,
     )
-    inforce_ext: Optional[Element] = Field(
-        description="Placeholder element for inforce extensions",
-        default=None,
-        alias="_inforce",
-    )
     benefitPeriod: Optional[Period] = Field(
         description="When the benefits are applicable",
         default=None,
@@ -274,7 +207,6 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
         description="Benefits and authorization details",
         default=None,
     )
-
 
 class CoverageEligibilityResponseError(BackboneElement):
     """
@@ -289,12 +221,6 @@ class CoverageEligibilityResponseError(BackboneElement):
         description="FHIRPath of element(s) related to issue",
         default=None,
     )
-    expression_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-
 
 class CoverageEligibilityResponse(DomainResource):
     """
@@ -315,19 +241,9 @@ class CoverageEligibilityResponse(DomainResource):
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     purpose: Optional[ListType[Code]] = Field(
         description="auth-requirements | benefits | discovery | validation",
         default=None,
-    )
-    purpose_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
     )
     patient: Optional[Reference] = Field(
         description="Intended recipient of products and services",
@@ -341,11 +257,6 @@ class CoverageEligibilityResponse(DomainResource):
         description="Estimated date or dates of service",
         default=None,
     )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
-    )
     servicedPeriod: Optional[Period] = Field(
         description="Estimated date or dates of service",
         default=None,
@@ -353,11 +264,6 @@ class CoverageEligibilityResponse(DomainResource):
     created: Optional[DateTime] = Field(
         description="Response creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     requestor: Optional[Reference] = Field(
         description="Party responsible for the request",
@@ -371,19 +277,9 @@ class CoverageEligibilityResponse(DomainResource):
         description="queued | complete | error | partial",
         default=None,
     )
-    outcome_ext: Optional[Element] = Field(
-        description="Placeholder element for outcome extensions",
-        default=None,
-        alias="_outcome",
-    )
     disposition: Optional[String] = Field(
         description="Disposition Message",
         default=None,
-    )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
     )
     insurer: Optional[Reference] = Field(
         description="Coverage issuer",
@@ -396,11 +292,6 @@ class CoverageEligibilityResponse(DomainResource):
     preAuthRef: Optional[String] = Field(
         description="Preauthorization reference",
         default=None,
-    )
-    preAuthRef_ext: Optional[Element] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
     )
     form: Optional[CodeableConcept] = Field(
         description="Printed form identifier",

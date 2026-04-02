@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ConsentPolicy(BackboneElement):
     """
     The references to the policies that are included in this consent scope. Policies may be organizational, but are often defined jurisdictionally, or in law.
@@ -38,21 +31,10 @@ class ConsentPolicy(BackboneElement):
         description="Enforcement source for policy",
         default=None,
     )
-    authority_ext: Optional[Element] = Field(
-        description="Placeholder element for authority extensions",
-        default=None,
-        alias="_authority",
-    )
     uri: Optional[Uri] = Field(
         description="Specific policy covered by this consent",
         default=None,
     )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
-    )
-
 
 class ConsentVerification(BackboneElement):
     """
@@ -63,11 +45,6 @@ class ConsentVerification(BackboneElement):
         description="Has been verified",
         default=None,
     )
-    verified_ext: Optional[Element] = Field(
-        description="Placeholder element for verified extensions",
-        default=None,
-        alias="_verified",
-    )
     verifiedWith: Optional[Reference] = Field(
         description="Person who verified",
         default=None,
@@ -76,12 +53,6 @@ class ConsentVerification(BackboneElement):
         description="When consent verified",
         default=None,
     )
-    verificationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for verificationDate extensions",
-        default=None,
-        alias="_verificationDate",
-    )
-
 
 class ConsentProvisionActor(BackboneElement):
     """
@@ -97,7 +68,6 @@ class ConsentProvisionActor(BackboneElement):
         default=None,
     )
 
-
 class ConsentProvisionData(BackboneElement):
     """
     The resources controlled by this rule if specific resources are referenced.
@@ -107,16 +77,10 @@ class ConsentProvisionData(BackboneElement):
         description="instance | related | dependents | authoredby",
         default=None,
     )
-    meaning_ext: Optional[Element] = Field(
-        description="Placeholder element for meaning extensions",
-        default=None,
-        alias="_meaning",
-    )
     reference: Optional[Reference] = Field(
         description="The actual data reference",
         default=None,
     )
-
 
 class ConsentProvision(BackboneElement):
     """
@@ -126,11 +90,6 @@ class ConsentProvision(BackboneElement):
     type: Optional[Code] = Field(
         description="deny | permit",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     period: Optional[Period] = Field(
         description="Timeframe for this rule",
@@ -174,7 +133,6 @@ class ConsentProvision(BackboneElement):
         default=None,
     )
 
-
 class Consent(DomainResource):
     """
     A record of a healthcare consumer's  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
@@ -204,11 +162,6 @@ class Consent(DomainResource):
         description="draft | proposed | active | rejected | inactive | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     scope: Optional[CodeableConcept] = Field(
         description="Which of the four areas this resource covers (extensible)",
         default=None,
@@ -224,11 +177,6 @@ class Consent(DomainResource):
     dateTime: Optional[DateTime] = Field(
         description="When this Consent was created or indexed",
         default=None,
-    )
-    dateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for dateTime extensions",
-        default=None,
-        alias="_dateTime",
     )
     performer: Optional[ListType[Reference]] = Field(
         description="Who is agreeing to the policy and rules",

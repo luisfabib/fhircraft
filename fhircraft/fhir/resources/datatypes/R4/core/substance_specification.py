@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -29,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubstanceSpecificationMoiety(BackboneElement):
     """
     Moiety, for structural modifications.
@@ -47,11 +40,6 @@ class SubstanceSpecificationMoiety(BackboneElement):
         description="Textual name for this moiety substance",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     stereochemistry: Optional[CodeableConcept] = Field(
         description="Stereochemistry type",
         default=None,
@@ -64,11 +52,6 @@ class SubstanceSpecificationMoiety(BackboneElement):
         description="Molecular formula",
         default=None,
     )
-    molecularFormula_ext: Optional[Element] = Field(
-        description="Placeholder element for molecularFormula extensions",
-        default=None,
-        alias="_molecularFormula",
-    )
     amountQuantity: Optional[Quantity] = Field(
         description="Quantitative value for this moiety",
         default=None,
@@ -76,11 +59,6 @@ class SubstanceSpecificationMoiety(BackboneElement):
     amountString: Optional[String] = Field(
         description="Quantitative value for this moiety",
         default=None,
-    )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
     )
 
     @property
@@ -99,7 +77,6 @@ class SubstanceSpecificationMoiety(BackboneElement):
             required=False,
         )
 
-
 class SubstanceSpecificationProperty(BackboneElement):
     """
     General specifications for this substance, including how it is related to other substances.
@@ -117,11 +94,6 @@ class SubstanceSpecificationProperty(BackboneElement):
         description="Parameters that were used in the measurement of a property (e.g. for viscosity: measured at 20C with a pH of 7.1)",
         default=None,
     )
-    parameters_ext: Optional[Element] = Field(
-        description="Placeholder element for parameters extensions",
-        default=None,
-        alias="_parameters",
-    )
     definingSubstanceReference: Optional[Reference] = Field(
         description="A substance upon which a defining property depends (e.g. for solubility: in water, in alcohol)",
         default=None,
@@ -137,11 +109,6 @@ class SubstanceSpecificationProperty(BackboneElement):
     amountString: Optional[String] = Field(
         description="Quantitative value for this property",
         default=None,
-    )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
     )
 
     @property
@@ -176,7 +143,6 @@ class SubstanceSpecificationProperty(BackboneElement):
             required=False,
         )
 
-
 class SubstanceSpecificationStructureIsotopeMolecularWeight(BackboneElement):
     """
     The molecular weight or weight range (for proteins, polymers or nucleic acids).
@@ -194,7 +160,6 @@ class SubstanceSpecificationStructureIsotopeMolecularWeight(BackboneElement):
         description="Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field",
         default=None,
     )
-
 
 class SubstanceSpecificationStructureIsotope(BackboneElement):
     """
@@ -224,7 +189,6 @@ class SubstanceSpecificationStructureIsotope(BackboneElement):
         )
     )
 
-
 class SubstanceSpecificationStructureMolecularWeight(BackboneElement):
     """
     The molecular weight or weight range (for proteins, polymers or nucleic acids).
@@ -243,7 +207,6 @@ class SubstanceSpecificationStructureMolecularWeight(BackboneElement):
         default=None,
     )
 
-
 class SubstanceSpecificationStructureRepresentation(BackboneElement):
     """
     Molecular structural representation.
@@ -257,16 +220,10 @@ class SubstanceSpecificationStructureRepresentation(BackboneElement):
         description="The structural representation as text string in a format e.g. InChI, SMILES, MOLFILE, CDX",
         default=None,
     )
-    representation_ext: Optional[Element] = Field(
-        description="Placeholder element for representation extensions",
-        default=None,
-        alias="_representation",
-    )
     attachment: Optional[Attachment] = Field(
         description="An attached file with the structural representation",
         default=None,
     )
-
 
 class SubstanceSpecificationStructure(BackboneElement):
     """
@@ -285,19 +242,9 @@ class SubstanceSpecificationStructure(BackboneElement):
         description="Molecular formula",
         default=None,
     )
-    molecularFormula_ext: Optional[Element] = Field(
-        description="Placeholder element for molecularFormula extensions",
-        default=None,
-        alias="_molecularFormula",
-    )
     molecularFormulaByMoiety: Optional[String] = Field(
         description="Specified per moiety according to the Hill system, i.e. first C, then H, then alphabetical, each moiety separated by a dot",
         default=None,
-    )
-    molecularFormulaByMoiety_ext: Optional[Element] = Field(
-        description="Placeholder element for molecularFormulaByMoiety extensions",
-        default=None,
-        alias="_molecularFormulaByMoiety",
     )
     isotope: Optional[ListType[SubstanceSpecificationStructureIsotope]] = Field(
         description="Applicable for single substances that contain a radionuclide or a non-natural isotopic ratio",
@@ -318,7 +265,6 @@ class SubstanceSpecificationStructure(BackboneElement):
         default=None,
     )
 
-
 class SubstanceSpecificationCode(BackboneElement):
     """
     Codes associated with the substance.
@@ -336,25 +282,14 @@ class SubstanceSpecificationCode(BackboneElement):
         description="The date at which the code status is changed as part of the terminology maintenance",
         default=None,
     )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
-    )
     comment: Optional[String] = Field(
         description="Any comment can be provided in this field, if necessary",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
-
 
 class SubstanceSpecificationNameOfficial(BackboneElement):
     """
@@ -373,12 +308,6 @@ class SubstanceSpecificationNameOfficial(BackboneElement):
         description="Date of official name change",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-
 
 class SubstanceSpecificationName(BackboneElement):
     """
@@ -388,11 +317,6 @@ class SubstanceSpecificationName(BackboneElement):
     name: Optional[String] = Field(
         description="The actual name",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     type: Optional[CodeableConcept] = Field(
         description="Name type",
@@ -405,11 +329,6 @@ class SubstanceSpecificationName(BackboneElement):
     preferred: Optional[Boolean] = Field(
         description="If this is the preferred name for this substance",
         default=None,
-    )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
     )
     language: Optional[ListType[CodeableConcept]] = Field(
         description="Language of the name",
@@ -440,7 +359,6 @@ class SubstanceSpecificationName(BackboneElement):
         default=None,
     )
 
-
 class SubstanceSpecificationRelationship(BackboneElement):
     """
     A link between this substance and another, with details of the relationship.
@@ -462,11 +380,6 @@ class SubstanceSpecificationRelationship(BackboneElement):
         description="For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships",
         default=None,
     )
-    isDefining_ext: Optional[Element] = Field(
-        description="Placeholder element for isDefining extensions",
-        default=None,
-        alias="_isDefining",
-    )
     amountQuantity: Optional[Quantity] = Field(
         description="A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other",
         default=None,
@@ -482,11 +395,6 @@ class SubstanceSpecificationRelationship(BackboneElement):
     amountString: Optional[String] = Field(
         description="A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other",
         default=None,
-    )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
     )
     amountRatioLowLimit: Optional[Ratio] = Field(
         description="For use when the numeric",
@@ -533,7 +441,6 @@ class SubstanceSpecificationRelationship(BackboneElement):
             required=False,
         )
 
-
 class SubstanceSpecification(DomainResource):
     """
     The detailed description of a substance, typically at a level beyond what is used for prescribing.
@@ -575,11 +482,6 @@ class SubstanceSpecification(DomainResource):
         description="Textual description of the substance",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
@@ -587,11 +489,6 @@ class SubstanceSpecification(DomainResource):
     comment: Optional[String] = Field(
         description="Textual comment about this record of a substance",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     moiety: Optional[ListType[SubstanceSpecificationMoiety]] = Field(
         description="Moiety, for structural modifications",

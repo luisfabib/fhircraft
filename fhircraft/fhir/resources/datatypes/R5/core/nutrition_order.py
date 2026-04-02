@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Boolean,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -33,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class NutritionOrderOralDietSchedule(BackboneElement):
     """
     Schedule information for an oral diet.
@@ -47,16 +38,10 @@ class NutritionOrderOralDietSchedule(BackboneElement):
         description="Take \u0027as needed\u0027",
         default=None,
     )
-    asNeeded_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeeded extensions",
-        default=None,
-        alias="_asNeeded",
-    )
     asNeededFor: Optional[CodeableConcept] = Field(
         description="Take \u0027as needed\u0027 for x",
         default=None,
     )
-
 
 class NutritionOrderOralDietNutrient(BackboneElement):
     """
@@ -72,7 +57,6 @@ class NutritionOrderOralDietNutrient(BackboneElement):
         default=None,
     )
 
-
 class NutritionOrderOralDietTexture(BackboneElement):
     """
     Class that describes any texture modifications required for the patient to safely consume various types of solid foods.
@@ -86,7 +70,6 @@ class NutritionOrderOralDietTexture(BackboneElement):
         description="Concepts that are used to identify an entity that is ingested for nutritional purposes",
         default=None,
     )
-
 
 class NutritionOrderOralDiet(BackboneElement):
     """
@@ -117,12 +100,6 @@ class NutritionOrderOralDiet(BackboneElement):
         description="Instructions or additional information about the oral diet",
         default=None,
     )
-    instruction_ext: Optional[Element] = Field(
-        description="Placeholder element for instruction extensions",
-        default=None,
-        alias="_instruction",
-    )
-
 
 class NutritionOrderSupplementSchedule(BackboneElement):
     """
@@ -137,16 +114,10 @@ class NutritionOrderSupplementSchedule(BackboneElement):
         description="Take \u0027as needed\u0027",
         default=None,
     )
-    asNeeded_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeeded extensions",
-        default=None,
-        alias="_asNeeded",
-    )
     asNeededFor: Optional[CodeableConcept] = Field(
         description="Take \u0027as needed\u0027 for x",
         default=None,
     )
-
 
 class NutritionOrderSupplement(BackboneElement):
     """
@@ -161,11 +132,6 @@ class NutritionOrderSupplement(BackboneElement):
         description="Product or brand name of the nutritional supplement",
         default=None,
     )
-    productName_ext: Optional[Element] = Field(
-        description="Placeholder element for productName extensions",
-        default=None,
-        alias="_productName",
-    )
     schedule: Optional[NutritionOrderSupplementSchedule] = Field(
         description="Scheduling information for supplements",
         default=None,
@@ -178,12 +144,6 @@ class NutritionOrderSupplement(BackboneElement):
         description="Instructions or additional information about the oral supplement",
         default=None,
     )
-    instruction_ext: Optional[Element] = Field(
-        description="Placeholder element for instruction extensions",
-        default=None,
-        alias="_instruction",
-    )
-
 
 class NutritionOrderEnteralFormulaAdditive(BackboneElement):
     """
@@ -198,16 +158,10 @@ class NutritionOrderEnteralFormulaAdditive(BackboneElement):
         description="Product or brand name of the modular additive",
         default=None,
     )
-    productName_ext: Optional[Element] = Field(
-        description="Placeholder element for productName extensions",
-        default=None,
-        alias="_productName",
-    )
     quantity: Optional[Quantity] = Field(
         description="Amount of additive to be given or mixed in",
         default=None,
     )
-
 
 class NutritionOrderEnteralFormulaAdministrationSchedule(BackboneElement):
     """
@@ -222,16 +176,10 @@ class NutritionOrderEnteralFormulaAdministrationSchedule(BackboneElement):
         description="Take \u0027as needed\u0027",
         default=None,
     )
-    asNeeded_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeeded extensions",
-        default=None,
-        alias="_asNeeded",
-    )
     asNeededFor: Optional[CodeableConcept] = Field(
         description="Take \u0027as needed\u0027 for x",
         default=None,
     )
-
 
 class NutritionOrderEnteralFormulaAdministration(BackboneElement):
     """
@@ -271,7 +219,6 @@ class NutritionOrderEnteralFormulaAdministration(BackboneElement):
             required=False,
         )
 
-
 class NutritionOrderEnteralFormula(BackboneElement):
     """
     Feeding provided through the gastrointestinal tract via a tube, catheter, or stoma that delivers nutrition distal to the oral cavity.
@@ -284,11 +231,6 @@ class NutritionOrderEnteralFormula(BackboneElement):
     baseFormulaProductName: Optional[String] = Field(
         description="Product or brand name of the enteral or infant formula",
         default=None,
-    )
-    baseFormulaProductName_ext: Optional[Element] = Field(
-        description="Placeholder element for baseFormulaProductName extensions",
-        default=None,
-        alias="_baseFormulaProductName",
     )
     deliveryDevice: Optional[ListType[CodeableReference]] = Field(
         description="Intended type of device for the administration",
@@ -320,12 +262,6 @@ class NutritionOrderEnteralFormula(BackboneElement):
         description="Formula feeding instructions expressed as text",
         default=None,
     )
-    administrationInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for administrationInstruction extensions",
-        default=None,
-        alias="_administrationInstruction",
-    )
-
 
 class NutritionOrder(DomainResource):
     """
@@ -344,28 +280,13 @@ class NutritionOrder(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
-    )
     instantiates: Optional[ListType[Uri]] = Field(
         description="Instantiates protocol or definition",
         default=None,
-    )
-    instantiates_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiates extensions",
-        default=None,
-        alias="_instantiates",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="What this order fulfills",
@@ -379,28 +300,13 @@ class NutritionOrder(DomainResource):
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     intent: Optional[Code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     subject: Optional[Reference] = Field(
         description="Who requires the diet, formula or nutritional supplement",
@@ -417,11 +323,6 @@ class NutritionOrder(DomainResource):
     dateTime: Optional[DateTime] = Field(
         description="Date and time the nutrition order was requested",
         default=None,
-    )
-    dateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for dateTime extensions",
-        default=None,
-        alias="_dateTime",
     )
     orderer: Optional[Reference] = Field(
         description="Who ordered the diet, formula or nutritional supplement",
@@ -446,11 +347,6 @@ class NutritionOrder(DomainResource):
     outsideFoodAllowed: Optional[Boolean] = Field(
         description="Capture when a food item is brought in by the patient and/or family",
         default=None,
-    )
-    outsideFoodAllowed_ext: Optional[Element] = Field(
-        description="Placeholder element for outsideFoodAllowed extensions",
-        default=None,
-        alias="_outsideFoodAllowed",
     )
     oralDiet: Optional[NutritionOrderOralDiet] = Field(
         description="Oral diet components",

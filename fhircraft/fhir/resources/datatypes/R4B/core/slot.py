@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -23,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class Slot(DomainResource):
     """
@@ -74,44 +67,19 @@ class Slot(DomainResource):
         description="busy | free | busy-unavailable | busy-tentative | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     start: Optional[Instant] = Field(
         description="Date/Time that the slot is to begin",
         default=None,
-    )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
     )
     end: Optional[Instant] = Field(
         description="Date/Time that the slot is to conclude",
         default=None,
     )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
-    )
     overbooked: Optional[Boolean] = Field(
         description="This slot has already been overbooked, appointments are unlikely to be accepted for this time",
         default=None,
     )
-    overbooked_ext: Optional[Element] = Field(
-        description="Placeholder element for overbooked extensions",
-        default=None,
-        alias="_overbooked",
-    )
     comment: Optional[String] = Field(
         description="Comments on the slot to describe any extended information. Such as custom constraints on the slot",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )

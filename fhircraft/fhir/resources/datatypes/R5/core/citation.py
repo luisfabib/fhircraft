@@ -5,17 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-    PositiveInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -37,7 +27,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CitationSummary(BackboneElement):
     """
     A human-readable display of key concepts to represent the citation.
@@ -51,12 +40,6 @@ class CitationSummary(BackboneElement):
         description="The human-readable display of the citation summary",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
-
 
 class CitationClassification(BackboneElement):
     """
@@ -72,7 +55,6 @@ class CitationClassification(BackboneElement):
         default=None,
     )
 
-
 class CitationStatusDate(BackboneElement):
     """
     The state or status of the citation record paired with an effective date or period for that state.
@@ -86,16 +68,10 @@ class CitationStatusDate(BackboneElement):
         description="Either occurred or expected",
         default=None,
     )
-    actual_ext: Optional[Element] = Field(
-        description="Placeholder element for actual extensions",
-        default=None,
-        alias="_actual",
-    )
     period: Optional[Period] = Field(
         description="When the status started and/or ended",
         default=None,
     )
-
 
 class CitationCitedArtifactVersion(BackboneElement):
     """
@@ -106,16 +82,10 @@ class CitationCitedArtifactVersion(BackboneElement):
         description="The version number or other version identifier",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     baseCitation: Optional[Reference] = Field(
         description="Citation for the main version of the cited artifact",
         default=None,
     )
-
 
 class CitationCitedArtifactStatusDate(BackboneElement):
     """
@@ -130,16 +100,10 @@ class CitationCitedArtifactStatusDate(BackboneElement):
         description="Either occurred or expected",
         default=None,
     )
-    actual_ext: Optional[Element] = Field(
-        description="Placeholder element for actual extensions",
-        default=None,
-        alias="_actual",
-    )
     period: Optional[Period] = Field(
         description="When the status started and/or ended",
         default=None,
     )
-
 
 class CitationCitedArtifactTitle(BackboneElement):
     """
@@ -158,12 +122,6 @@ class CitationCitedArtifactTitle(BackboneElement):
         description="The title of the article or artifact",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
-
 
 class CitationCitedArtifactAbstract(BackboneElement):
     """
@@ -182,21 +140,10 @@ class CitationCitedArtifactAbstract(BackboneElement):
         description="Abstract content",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
     copyright: Optional[Markdown] = Field(
         description="Copyright notice for the abstract",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-
 
 class CitationCitedArtifactPart(BackboneElement):
     """
@@ -211,16 +158,10 @@ class CitationCitedArtifactPart(BackboneElement):
         description="The specification of the component",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     baseCitation: Optional[Reference] = Field(
         description="The citation for the full article or artifact",
         default=None,
     )
-
 
 class CitationCitedArtifactRelatesTo(BackboneElement):
     """
@@ -231,11 +172,6 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as | reprint | reprint-of",
         default=None,
     )
-    type_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     classifier: Optional[ListType[CodeableConcept]] = Field(
         description="Additional classifiers",
         default=None,
@@ -244,28 +180,13 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="Short label",
         default=None,
     )
-    label_ext: Optional[Element] = Field(
-        description="Placeholder element for label extensions",
-        default=None,
-        alias="_label",
-    )
     display: Optional[String] = Field(
         description="Brief description of the related artifact",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
     citation: Optional[Markdown] = Field(
         description="Bibliographic citation for the artifact",
         default=None,
-    )
-    citation_ext: Optional[Element] = Field(
-        description="Placeholder element for citation extensions",
-        default=None,
-        alias="_citation",
     )
     document: Optional[Attachment] = Field(
         description="What document is being referenced",
@@ -275,16 +196,10 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="What artifact is being referenced",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
     resourceReference: Optional[Reference] = Field(
         description="What artifact, if not a conformance resource",
         default=None,
     )
-
 
 class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
     """
@@ -303,11 +218,6 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         description="Name of the database or title of the book or journal",
         default=None,
     )
-    title_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     publisher: Optional[Reference] = Field(
         description="Name of or resource describing the publisher",
         default=None,
@@ -316,12 +226,6 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         description="Geographic location of the publisher",
         default=None,
     )
-    publisherLocation_ext: Optional[Element] = Field(
-        description="Placeholder element for publisherLocation extensions",
-        default=None,
-        alias="_publisherLocation",
-    )
-
 
 class CitationCitedArtifactPublicationForm(BackboneElement):
     """
@@ -340,55 +244,25 @@ class CitationCitedArtifactPublicationForm(BackboneElement):
         description="Volume number of journal or other collection in which the article is published",
         default=None,
     )
-    volume_ext: Optional[Element] = Field(
-        description="Placeholder element for volume extensions",
-        default=None,
-        alias="_volume",
-    )
     issue: Optional[String] = Field(
         description="Issue, part or supplement of journal or other collection in which the article is published",
         default=None,
-    )
-    issue_ext: Optional[Element] = Field(
-        description="Placeholder element for issue extensions",
-        default=None,
-        alias="_issue",
     )
     articleDate: Optional[DateTime] = Field(
         description="The date the article was added to the database, or the date the article was released",
         default=None,
     )
-    articleDate_ext: Optional[Element] = Field(
-        description="Placeholder element for articleDate extensions",
-        default=None,
-        alias="_articleDate",
-    )
     publicationDateText: Optional[String] = Field(
         description="Text representation of the date on which the issue of the cited artifact was published",
         default=None,
-    )
-    publicationDateText_ext: Optional[Element] = Field(
-        description="Placeholder element for publicationDateText extensions",
-        default=None,
-        alias="_publicationDateText",
     )
     publicationDateSeason: Optional[String] = Field(
         description="Season in which the cited artifact was published",
         default=None,
     )
-    publicationDateSeason_ext: Optional[Element] = Field(
-        description="Placeholder element for publicationDateSeason extensions",
-        default=None,
-        alias="_publicationDateSeason",
-    )
     lastRevisionDate: Optional[DateTime] = Field(
         description="The date the article was last revised or updated in the database",
         default=None,
-    )
-    lastRevisionDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastRevisionDate extensions",
-        default=None,
-        alias="_lastRevisionDate",
     )
     language: Optional[ListType[CodeableConcept]] = Field(
         description="Language(s) in which this form of the article is published",
@@ -398,57 +272,26 @@ class CitationCitedArtifactPublicationForm(BackboneElement):
         description="Entry number or identifier for inclusion in a database",
         default=None,
     )
-    accessionNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for accessionNumber extensions",
-        default=None,
-        alias="_accessionNumber",
-    )
     pageString: Optional[String] = Field(
         description="Used for full display of pagination",
         default=None,
-    )
-    pageString_ext: Optional[Element] = Field(
-        description="Placeholder element for pageString extensions",
-        default=None,
-        alias="_pageString",
     )
     firstPage: Optional[String] = Field(
         description="Used for isolated representation of first page",
         default=None,
     )
-    firstPage_ext: Optional[Element] = Field(
-        description="Placeholder element for firstPage extensions",
-        default=None,
-        alias="_firstPage",
-    )
     lastPage: Optional[String] = Field(
         description="Used for isolated representation of last page",
         default=None,
-    )
-    lastPage_ext: Optional[Element] = Field(
-        description="Placeholder element for lastPage extensions",
-        default=None,
-        alias="_lastPage",
     )
     pageCount: Optional[String] = Field(
         description="Number of pages or screens",
         default=None,
     )
-    pageCount_ext: Optional[Element] = Field(
-        description="Placeholder element for pageCount extensions",
-        default=None,
-        alias="_pageCount",
-    )
     copyright: Optional[Markdown] = Field(
         description="Copyright notice for the full article or artifact",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-
 
 class CitationCitedArtifactWebLocation(BackboneElement):
     """
@@ -463,12 +306,6 @@ class CitationCitedArtifactWebLocation(BackboneElement):
         description="The specific URL",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-
 
 class CitationCitedArtifactClassification(BackboneElement):
     """
@@ -488,7 +325,6 @@ class CitationCitedArtifactClassification(BackboneElement):
         default=None,
     )
 
-
 class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElement):
     """
     Contributions with accounting for time or number.
@@ -502,12 +338,6 @@ class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElem
         description="The time that the contribution was made",
         default=None,
     )
-    time_ext: Optional[Element] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
-    )
-
 
 class CitationCitedArtifactContributorshipEntry(BackboneElement):
     """
@@ -521,11 +351,6 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
     forenameInitials: Optional[String] = Field(
         description="For citation styles that use initials",
         default=None,
-    )
-    forenameInitials_ext: Optional[Element] = Field(
-        description="Placeholder element for forenameInitials extensions",
-        default=None,
-        alias="_forenameInitials",
     )
     affiliation: Optional[ListType[Reference]] = Field(
         description="Organizational affiliation",
@@ -549,21 +374,10 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
         description="Whether the contributor is the corresponding contributor for the role",
         default=None,
     )
-    correspondingContact_ext: Optional[Element] = Field(
-        description="Placeholder element for correspondingContact extensions",
-        default=None,
-        alias="_correspondingContact",
-    )
     rankingOrder: Optional[PositiveInt] = Field(
         description="Ranked order of contribution",
         default=None,
     )
-    rankingOrder_ext: Optional[Element] = Field(
-        description="Placeholder element for rankingOrder extensions",
-        default=None,
-        alias="_rankingOrder",
-    )
-
 
 class CitationCitedArtifactContributorshipSummary(BackboneElement):
     """
@@ -586,12 +400,6 @@ class CitationCitedArtifactContributorshipSummary(BackboneElement):
         description="The display string for the author list, contributor list, or contributorship statement",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class CitationCitedArtifactContributorship(BackboneElement):
     """
@@ -602,11 +410,6 @@ class CitationCitedArtifactContributorship(BackboneElement):
         description="Indicates if the list includes all authors and/or contributors",
         default=None,
     )
-    complete_ext: Optional[Element] = Field(
-        description="Placeholder element for complete extensions",
-        default=None,
-        alias="_complete",
-    )
     entry: Optional[ListType[CitationCitedArtifactContributorshipEntry]] = Field(
         description="An individual entity named as a contributor",
         default=None,
@@ -615,7 +418,6 @@ class CitationCitedArtifactContributorship(BackboneElement):
         description="Used to record a display of the author/contributor list without separate data element for each list member",
         default=None,
     )
-
 
 class CitationCitedArtifact(BackboneElement):
     """
@@ -633,11 +435,6 @@ class CitationCitedArtifact(BackboneElement):
     dateAccessed: Optional[DateTime] = Field(
         description="When the cited artifact was accessed",
         default=None,
-    )
-    dateAccessed_ext: Optional[Element] = Field(
-        description="Placeholder element for dateAccessed extensions",
-        default=None,
-        alias="_dateAccessed",
     )
     version: Optional[CitationCitedArtifactVersion] = Field(
         description="The defined version of the cited artifact",
@@ -688,7 +485,6 @@ class CitationCitedArtifact(BackboneElement):
         default=None,
     )
 
-
 class Citation(DomainResource):
     """
     The Citation Resource enables reference to any knowledge artifact for purposes of identification and attribution. The Citation Resource supports existing reference structures and developing publication practices such as versioning, expressing complex contributorship roles, and referencing computable resources.
@@ -698,20 +494,9 @@ class Citation(DomainResource):
     _type = "Citation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Citation"
 
-    language_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-
     url: Optional[Uri] = Field(
         description="Canonical identifier for this citation record, represented as a globally unique URI",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier for the citation record itself",
@@ -721,19 +506,9 @@ class Citation(DomainResource):
         description="Business version of the citation record",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -743,55 +518,25 @@ class Citation(DomainResource):
         description="Name for this citation record (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this citation record (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="The publisher of the citation record, not the publisher of the article or artifact being cited",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher of the citation record",
@@ -800,11 +545,6 @@ class Citation(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the citation",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the citation record content is intended to support",
@@ -818,46 +558,21 @@ class Citation(DomainResource):
         description="Why this citation is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions for the citation record, not for the cited artifact",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s) for the ciation record, not for the cited artifact",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the citation record was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the citation record was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the citation record is expected to be used",

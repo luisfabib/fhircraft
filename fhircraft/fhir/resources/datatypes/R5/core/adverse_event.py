@@ -5,11 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    Code,
-    DateTime,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -22,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
 )
 from .domain_resource import DomainResource
-
 
 class AdverseEventParticipant(BackboneElement):
     """
@@ -37,7 +32,6 @@ class AdverseEventParticipant(BackboneElement):
         description="Who was involved in the adverse event or the potential adverse event",
         default=None,
     )
-
 
 class AdverseEventSuspectEntityCausality(BackboneElement):
     """
@@ -56,7 +50,6 @@ class AdverseEventSuspectEntityCausality(BackboneElement):
         description="Author of the information on the possible cause of the event",
         default=None,
     )
-
 
 class AdverseEventSuspectEntity(BackboneElement):
     """
@@ -92,7 +85,6 @@ class AdverseEventSuspectEntity(BackboneElement):
             required=True,
         )
 
-
 class AdverseEventContributingFactor(BackboneElement):
     """
     The contributing factors suspected to have increased the probability or severity of the adverse event.
@@ -122,7 +114,6 @@ class AdverseEventContributingFactor(BackboneElement):
             field_name_base="item",
             required=True,
         )
-
 
 class AdverseEventPreventiveAction(BackboneElement):
     """
@@ -154,7 +145,6 @@ class AdverseEventPreventiveAction(BackboneElement):
             required=True,
         )
 
-
 class AdverseEventMitigatingAction(BackboneElement):
     """
     The ameliorating action taken after the adverse event occured in order to reduce the extent of harm.
@@ -184,7 +174,6 @@ class AdverseEventMitigatingAction(BackboneElement):
             field_name_base="item",
             required=True,
         )
-
 
 class AdverseEventSupportingInfo(BackboneElement):
     """
@@ -216,7 +205,6 @@ class AdverseEventSupportingInfo(BackboneElement):
             required=True,
         )
 
-
 class AdverseEvent(DomainResource):
     """
     An event (i.e. any change to current patient status) that may be related to unintended effects on a patient or research participant. The unintended effects may require additional monitoring, treatment, hospitalization, or may result in death. The AdverseEvent resource also extends to potential or avoided events that could have had such effects. There are two major domains where the AdverseEvent resource is expected to be used. One is in clinical care reported adverse events and the other is in reporting adverse events in clinical  research trial management.  Adverse events can be reported by healthcare providers, patients, caregivers or by medical products manufacturers.  Given the differences between these two concepts, we recommend consulting the domain specific implementation guides when implementing the AdverseEvent Resource. The implementation guides include specific extensions, value sets and constraints.
@@ -234,19 +222,9 @@ class AdverseEvent(DomainResource):
         description="in-progress | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     actuality: Optional[Code] = Field(
         description="actual | potential",
         default=None,
-    )
-    actuality_ext: Optional[Element] = Field(
-        description="Placeholder element for actuality extensions",
-        default=None,
-        alias="_actuality",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="wrong-patient | procedure-mishap | medication-mishap | device | unsafe-physical-environment | hospital-aquired-infection | wrong-body-site",
@@ -268,11 +246,6 @@ class AdverseEvent(DomainResource):
         description="When the event occurred",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
     occurrencePeriod: Optional[Period] = Field(
         description="When the event occurred",
         default=None,
@@ -285,19 +258,9 @@ class AdverseEvent(DomainResource):
         description="When the event was detected",
         default=None,
     )
-    detected_ext: Optional[Element] = Field(
-        description="Placeholder element for detected extensions",
-        default=None,
-        alias="_detected",
-    )
     recordedDate: Optional[DateTime] = Field(
         description="When the event was recorded",
         default=None,
-    )
-    recordedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedDate extensions",
-        default=None,
-        alias="_recordedDate",
     )
     resultingEffect: Optional[ListType[Reference]] = Field(
         description="Effect on the subject due to this event",
@@ -330,11 +293,6 @@ class AdverseEvent(DomainResource):
     expectedInResearchStudy: Optional[Boolean] = Field(
         description="Considered likely or probable or anticipated in the research study",
         default=None,
-    )
-    expectedInResearchStudy_ext: Optional[Element] = Field(
-        description="Placeholder element for expectedInResearchStudy extensions",
-        default=None,
-        alias="_expectedInResearchStudy",
     )
     suspectEntity: Optional[ListType[AdverseEventSuspectEntity]] = Field(
         description="The suspected agent causing the adverse event",

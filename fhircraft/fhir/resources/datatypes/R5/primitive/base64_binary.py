@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import Field
 
 from fhircraft.fhir.resources.base import FHIRPrimitiveModel
-from fhircraft.fhir.resources.datatypes.R5.complex import PrimitiveType
+from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 
 
 class Base64Binary(PrimitiveType, FHIRPrimitiveModel):

@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    DateTime,
-    Date,
-    Canonical,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -31,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ArtifactAssessmentContent(BackboneElement):
     """
     A component comment, classifier, or rating of the artifact.
@@ -41,19 +31,9 @@ class ArtifactAssessmentContent(BackboneElement):
         description="comment | classifier | rating | container | response | change-request",
         default=None,
     )
-    informationType_ext: Optional[Element] = Field(
-        description="Placeholder element for informationType extensions",
-        default=None,
-        alias="_informationType",
-    )
     summary: Optional[Markdown] = Field(
         description="Brief summary of the content",
         default=None,
-    )
-    summary_ext: Optional[Element] = Field(
-        description="Placeholder element for summary extensions",
-        default=None,
-        alias="_summary",
     )
     type: Optional[CodeableConcept] = Field(
         description="What type of content",
@@ -75,11 +55,6 @@ class ArtifactAssessmentContent(BackboneElement):
         description="What the comment is directed to",
         default=None,
     )
-    path_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
     relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional information",
         default=None,
@@ -88,16 +63,10 @@ class ArtifactAssessmentContent(BackboneElement):
         description="Acceptable to publicly share the resource content",
         default=None,
     )
-    freeToShare_ext: Optional[Element] = Field(
-        description="Placeholder element for freeToShare extensions",
-        default=None,
-        alias="_freeToShare",
-    )
     component: Optional[ListType["ArtifactAssessmentContent"]] = Field(
         description="Contained content",
         default=None,
     )
-
 
 class ArtifactAssessment(DomainResource):
     """
@@ -116,11 +85,6 @@ class ArtifactAssessment(DomainResource):
         description="A short title for the assessment for use in displaying and selecting",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     citeAsReference: Optional[Reference] = Field(
         description="How to cite the comment or rating",
         default=None,
@@ -129,46 +93,21 @@ class ArtifactAssessment(DomainResource):
         description="How to cite the comment or rating",
         default=None,
     )
-    citeAsMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for citeAsMarkdown extensions",
-        default=None,
-        alias="_citeAsMarkdown",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the artifact assessment was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the artifact assessment was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     artifactReference: Optional[Reference] = Field(
         description="The artifact assessed, commented upon or rated",
@@ -178,19 +117,9 @@ class ArtifactAssessment(DomainResource):
         description="The artifact assessed, commented upon or rated",
         default=None,
     )
-    artifactCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for artifactCanonical extensions",
-        default=None,
-        alias="_artifactCanonical",
-    )
     artifactUri: Optional[Uri] = Field(
         description="The artifact assessed, commented upon or rated",
         default=None,
-    )
-    artifactUri_ext: Optional[Element] = Field(
-        description="Placeholder element for artifactUri extensions",
-        default=None,
-        alias="_artifactUri",
     )
     content: Optional[ListType[ArtifactAssessmentContent]] = Field(
         description="Comment, classifier, or rating content",
@@ -200,19 +129,9 @@ class ArtifactAssessment(DomainResource):
         description="submitted | triaged | waiting-for-input | resolved-no-change | resolved-change-required | deferred | duplicate | applied | published | entered-in-error",
         default=None,
     )
-    workflowStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for workflowStatus extensions",
-        default=None,
-        alias="_workflowStatus",
-    )
     disposition: Optional[Code] = Field(
         description="unresolved | not-persuasive | persuasive | persuasive-with-modification | not-persuasive-with-modification",
         default=None,
-    )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
     )
 
     @property

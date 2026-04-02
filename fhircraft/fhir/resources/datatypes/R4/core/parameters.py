@@ -4,27 +4,7 @@ from typing import List as ListType, Literal, Optional
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    Base64Binary,
-    Boolean,
-    Canonical,
-    Code,
-    Date,
-    DateTime,
-    Decimal,
-    Id,
-    Instant,
-    Integer,
-    Markdown,
-    Oid,
-    PositiveInt,
-    String,
-    Time,
-    UnsignedInt,
-    Uri,
-    Url,
-    Uuid,
-)
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Address,
     Age,
@@ -63,7 +43,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 
-
 class ParametersParameter(BackboneElement):
     """
     A parameter passed to or received from the operation.
@@ -73,181 +52,81 @@ class ParametersParameter(BackboneElement):
         description="Name from the definition",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     valueBase64Binary: Optional[Base64Binary] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueCanonical: Optional[Canonical] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
     )
     valueCode: Optional[Code] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
-    )
     valueDate: Optional[Date] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
     )
     valueDateTime: Optional[DateTime] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
     valueDecimal: Optional[Decimal] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
     )
     valueId: Optional[Id] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
-    )
     valueInstant: Optional[Instant] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInstant extensions",
-        default=None,
-        alias="_valueInstant",
     )
     valueInteger: Optional[Integer] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
     valueMarkdown: Optional[Markdown] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
     )
     valueOid: Optional[Oid] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueOid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueOid extensions",
-        default=None,
-        alias="_valueOid",
-    )
     valuePositiveInt: Optional[PositiveInt] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valuePositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valuePositiveInt extensions",
-        default=None,
-        alias="_valuePositiveInt",
     )
     valueString: Optional[String] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueTime: Optional[Time] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
     )
     valueUnsignedInt: Optional[UnsignedInt] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUnsignedInt extensions",
-        default=None,
-        alias="_valueUnsignedInt",
-    )
     valueUri: Optional[Uri] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
     )
     valueUrl: Optional[Url] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
     valueUuid: Optional[Uuid] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueUuid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUuid extensions",
-        default=None,
-        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="If parameter is a data type",
@@ -448,7 +327,6 @@ class ParametersParameter(BackboneElement):
             field_name_base="value",
             required=False,
         )
-
 
 class Parameters(Resource):
     """

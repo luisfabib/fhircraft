@@ -4,14 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Integer,
-    DateTime,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -26,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class BiologicallyDerivedProductCollection(BackboneElement):
     """
@@ -44,11 +36,6 @@ class BiologicallyDerivedProductCollection(BackboneElement):
     collectedDateTime: Optional[DateTime] = Field(
         description="Time of product collection",
         default=None,
-    )
-    collectedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for collectedDateTime extensions",
-        default=None,
-        alias="_collectedDateTime",
     )
     collectedPeriod: Optional[Period] = Field(
         description="Time of product collection",
@@ -71,7 +58,6 @@ class BiologicallyDerivedProductCollection(BackboneElement):
             required=False,
         )
 
-
 class BiologicallyDerivedProductProcessing(BackboneElement):
     """
     Any processing of the product during collection that does not change the fundamental nature of the product. For example adding anti-coagulants during the collection of Peripheral Blood Stem Cells.
@@ -80,11 +66,6 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
     description: Optional[String] = Field(
         description="Description of of processing",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     procedure: Optional[CodeableConcept] = Field(
         description="Procesing code",
@@ -98,11 +79,6 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
         description="Time of processing",
         default=None,
     )
-    timeDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timeDateTime extensions",
-        default=None,
-        alias="_timeDateTime",
-    )
     timePeriod: Optional[Period] = Field(
         description="Time of processing",
         default=None,
@@ -124,7 +100,6 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
             required=False,
         )
 
-
 class BiologicallyDerivedProductManipulation(BackboneElement):
     """
     Any manipulation of product post-collection that is intended to alter the product.  For example a buffy-coat enrichment or CD8 reduction of Peripheral Blood Stem Cells to make it more suitable for infusion.
@@ -134,19 +109,9 @@ class BiologicallyDerivedProductManipulation(BackboneElement):
         description="Description of manipulation",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     timeDateTime: Optional[DateTime] = Field(
         description="Time of manipulation",
         default=None,
-    )
-    timeDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timeDateTime extensions",
-        default=None,
-        alias="_timeDateTime",
     )
     timePeriod: Optional[Period] = Field(
         description="Time of manipulation",
@@ -169,7 +134,6 @@ class BiologicallyDerivedProductManipulation(BackboneElement):
             required=False,
         )
 
-
 class BiologicallyDerivedProductStorage(BackboneElement):
     """
     Product storage.
@@ -179,34 +143,18 @@ class BiologicallyDerivedProductStorage(BackboneElement):
         description="Description of storage",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     temperature: Optional[Decimal] = Field(
         description="Storage temperature",
         default=None,
-    )
-    temperature_ext: Optional[Element] = Field(
-        description="Placeholder element for temperature extensions",
-        default=None,
-        alias="_temperature",
     )
     scale: Optional[Code] = Field(
         description="farenheit | celsius | kelvin",
         default=None,
     )
-    scale_ext: Optional[Element] = Field(
-        description="Placeholder element for scale extensions",
-        default=None,
-        alias="_scale",
-    )
     duration: Optional[Period] = Field(
         description="Storage timeperiod",
         default=None,
     )
-
 
 class BiologicallyDerivedProduct(DomainResource):
     """
@@ -240,11 +188,6 @@ class BiologicallyDerivedProduct(DomainResource):
         description="organ | tissue | fluid | cells | biologicalAgent",
         default=None,
     )
-    productCategory_ext: Optional[Element] = Field(
-        description="Placeholder element for productCategory extensions",
-        default=None,
-        alias="_productCategory",
-    )
     productCode: Optional[CodeableConcept] = Field(
         description="What this biologically derived product is",
         default=None,
@@ -253,11 +196,6 @@ class BiologicallyDerivedProduct(DomainResource):
         description="available | unavailable",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     request: Optional[ListType[Reference]] = Field(
         description="Procedure request",
         default=None,
@@ -265,11 +203,6 @@ class BiologicallyDerivedProduct(DomainResource):
     quantity: Optional[Integer] = Field(
         description="The amount of this biologically derived product",
         default=None,
-    )
-    quantity_ext: Optional[Element] = Field(
-        description="Placeholder element for quantity extensions",
-        default=None,
-        alias="_quantity",
     )
     parent: Optional[ListType[Reference]] = Field(
         description="BiologicallyDerivedProduct parent",

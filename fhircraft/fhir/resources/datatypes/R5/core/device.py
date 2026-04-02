@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Base64Binary,
-    DateTime,
-    Boolean,
-    Integer,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -36,7 +28,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DeviceUdiCarrier(BackboneElement):
     """
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
@@ -46,57 +37,26 @@ class DeviceUdiCarrier(BackboneElement):
         description="Mandatory fixed portion of UDI",
         default=None,
     )
-    deviceIdentifier_ext: Optional[Element] = Field(
-        description="Placeholder element for deviceIdentifier extensions",
-        default=None,
-        alias="_deviceIdentifier",
-    )
     issuer: Optional[Uri] = Field(
         description="UDI Issuing Organization",
         default=None,
-    )
-    issuer_ext: Optional[Element] = Field(
-        description="Placeholder element for issuer extensions",
-        default=None,
-        alias="_issuer",
     )
     jurisdiction: Optional[Uri] = Field(
         description="Regional UDI authority",
         default=None,
     )
-    jurisdiction_ext: Optional[Element] = Field(
-        description="Placeholder element for jurisdiction extensions",
-        default=None,
-        alias="_jurisdiction",
-    )
     carrierAIDC: Optional[Base64Binary] = Field(
         description="UDI Machine Readable Barcode String",
         default=None,
-    )
-    carrierAIDC_ext: Optional[Element] = Field(
-        description="Placeholder element for carrierAIDC extensions",
-        default=None,
-        alias="_carrierAIDC",
     )
     carrierHRF: Optional[String] = Field(
         description="UDI Human Readable Barcode String",
         default=None,
     )
-    carrierHRF_ext: Optional[Element] = Field(
-        description="Placeholder element for carrierHRF extensions",
-        default=None,
-        alias="_carrierHRF",
-    )
     entryType: Optional[Code] = Field(
         description="barcode | rfid | manual | card | self-reported | electronic-transmission | unknown",
         default=None,
     )
-    entryType_ext: Optional[Element] = Field(
-        description="Placeholder element for entryType extensions",
-        default=None,
-        alias="_entryType",
-    )
-
 
 class DeviceName(BackboneElement):
     """
@@ -107,30 +67,14 @@ class DeviceName(BackboneElement):
         description="The term that names the device",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     type: Optional[Code] = Field(
         description="registered-name | user-friendly-name | patient-reported-name",
         default=None,
-    )
-    type_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     display: Optional[Boolean] = Field(
         description="The preferred device name",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
-
 
 class DeviceVersion(BackboneElement):
     """
@@ -149,21 +93,10 @@ class DeviceVersion(BackboneElement):
         description="The date the version was installed on the device",
         default=None,
     )
-    installDate_ext: Optional[Element] = Field(
-        description="Placeholder element for installDate extensions",
-        default=None,
-        alias="_installDate",
-    )
     value: Optional[String] = Field(
         description="The version text",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class DeviceConformsTo(BackboneElement):
     """
@@ -182,12 +115,6 @@ class DeviceConformsTo(BackboneElement):
         description="Specific form or variant of the standard",
         default=None,
     )
-    version_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-
 
 class DeviceProperty(BackboneElement):
     """
@@ -210,28 +137,13 @@ class DeviceProperty(BackboneElement):
         description="Value of the property",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the property",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the property",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Value of the property",
@@ -266,7 +178,6 @@ class DeviceProperty(BackboneElement):
             required=True,
         )
 
-
 class Device(DomainResource):
     """
     This resource describes the properties (regulated, has real time clock, etc.), adminstrative (manufacturer name, model number, serial number, firmware, etc.), and type (knee replacement, blood pressure cuff, MRI, etc.) of a physical unit (these values do not change much within a given module, for example the serail number, manufacturer name, and model number). An actual unit may consist of several modules in a distinct hierarchy and these are represented by multiple Device resources and bound through the 'parent' element.
@@ -284,11 +195,6 @@ class Device(DomainResource):
         description="The name used to display by default when the device is referenced",
         default=None,
     )
-    displayName_ext: Optional[Element] = Field(
-        description="Placeholder element for displayName extensions",
-        default=None,
-        alias="_displayName",
-    )
     definition: Optional[CodeableReference] = Field(
         description="The reference to the definition for the device",
         default=None,
@@ -300,11 +206,6 @@ class Device(DomainResource):
     status: Optional[Code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     availabilityStatus: Optional[CodeableConcept] = Field(
         description="lost | damaged | destroyed | available",
@@ -318,46 +219,21 @@ class Device(DomainResource):
         description="Name of device manufacturer",
         default=None,
     )
-    manufacturer_ext: Optional[Element] = Field(
-        description="Placeholder element for manufacturer extensions",
-        default=None,
-        alias="_manufacturer",
-    )
     manufactureDate: Optional[DateTime] = Field(
         description="Date when the device was made",
         default=None,
-    )
-    manufactureDate_ext: Optional[Element] = Field(
-        description="Placeholder element for manufactureDate extensions",
-        default=None,
-        alias="_manufactureDate",
     )
     expirationDate: Optional[DateTime] = Field(
         description="Date and time of expiry of this device (if applicable)",
         default=None,
     )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
-    )
     lotNumber: Optional[String] = Field(
         description="Lot number of manufacture",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
     serialNumber: Optional[String] = Field(
         description="Serial number assigned by the manufacturer",
         default=None,
-    )
-    serialNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for serialNumber extensions",
-        default=None,
-        alias="_serialNumber",
     )
     name: Optional[ListType[DeviceName]] = Field(
         description="The name or names of the device as known to the manufacturer and/or patient",
@@ -367,19 +243,9 @@ class Device(DomainResource):
         description="The manufacturer\u0027s model number for the device",
         default=None,
     )
-    modelNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for modelNumber extensions",
-        default=None,
-        alias="_modelNumber",
-    )
     partNumber: Optional[String] = Field(
         description="The part number or catalog number of the device",
         default=None,
-    )
-    partNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for partNumber extensions",
-        default=None,
-        alias="_partNumber",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Indicates a high-level grouping of the device",
@@ -429,11 +295,6 @@ class Device(DomainResource):
     url: Optional[Uri] = Field(
         description="Network address to contact device",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services provided by the device",

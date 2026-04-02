@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -25,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SpecimenFeature(BackboneElement):
     """
     A physical feature or landmark on a specimen, highlighted for context by the collector of the specimen (e.g. surgeon), that identifies the type of feature as well as its meaning (e.g. the red ink indicating the resection margin of the right lobe of the excised prostate tissue or wire loop at radiologically suspected tumor location).
@@ -39,12 +38,6 @@ class SpecimenFeature(BackboneElement):
         description="Information about the feature",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-
 
 class SpecimenCollection(BackboneElement):
     """
@@ -58,11 +51,6 @@ class SpecimenCollection(BackboneElement):
     collectedDateTime: Optional[DateTime] = Field(
         description="Collection time",
         default=None,
-    )
-    collectedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for collectedDateTime extensions",
-        default=None,
-        alias="_collectedDateTime",
     )
     collectedPeriod: Optional[Period] = Field(
         description="Collection time",
@@ -133,7 +121,6 @@ class SpecimenCollection(BackboneElement):
             required=False,
         )
 
-
 class SpecimenProcessing(BackboneElement):
     """
     Details concerning processing and processing steps for the specimen.
@@ -142,11 +129,6 @@ class SpecimenProcessing(BackboneElement):
     description: Optional[String] = Field(
         description="Textual description of procedure",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     method: Optional[CodeableConcept] = Field(
         description="Indicates the treatment step  applied to the specimen",
@@ -159,11 +141,6 @@ class SpecimenProcessing(BackboneElement):
     timeDateTime: Optional[DateTime] = Field(
         description="Date and time of specimen processing",
         default=None,
-    )
-    timeDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timeDateTime extensions",
-        default=None,
-        alias="_timeDateTime",
     )
     timePeriod: Optional[Period] = Field(
         description="Date and time of specimen processing",
@@ -186,7 +163,6 @@ class SpecimenProcessing(BackboneElement):
             required=False,
         )
 
-
 class SpecimenContainer(BackboneElement):
     """
     The container holding the specimen.  The recursive nature of containers; i.e. blood in tube in tray in rack is not addressed here.
@@ -204,7 +180,6 @@ class SpecimenContainer(BackboneElement):
         description="Quantity of specimen within container",
         default=None,
     )
-
 
 class Specimen(DomainResource):
     """
@@ -227,11 +202,6 @@ class Specimen(DomainResource):
         description="available | unavailable | unsatisfactory | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Kind of material that forms the specimen",
         default=None,
@@ -244,11 +214,6 @@ class Specimen(DomainResource):
         description="The time when specimen is received by the testing laboratory",
         default=None,
     )
-    receivedTime_ext: Optional[Element] = Field(
-        description="Placeholder element for receivedTime extensions",
-        default=None,
-        alias="_receivedTime",
-    )
     parent: Optional[ListType[Reference]] = Field(
         description="Specimen from which this specimen originated",
         default=None,
@@ -260,11 +225,6 @@ class Specimen(DomainResource):
     combined: Optional[Code] = Field(
         description="grouped | pooled",
         default=None,
-    )
-    combined_ext: Optional[Element] = Field(
-        description="Placeholder element for combined extensions",
-        default=None,
-        alias="_combined",
     )
     role: Optional[ListType[CodeableConcept]] = Field(
         description="The role the specimen serves",

@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class MedicinalProductIndicationOtherTherapy(BackboneElement):
     """
@@ -54,7 +53,6 @@ class MedicinalProductIndicationOtherTherapy(BackboneElement):
             field_name_base="medication",
             required=True,
         )
-
 
 class MedicinalProductIndication(DomainResource):
     """

@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    Id,
-    UnsignedInt,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -30,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ImagingSelectionPerformer(BackboneElement):
     """
     Selector of the instances – human or machine.
@@ -45,7 +36,6 @@ class ImagingSelectionPerformer(BackboneElement):
         default=None,
     )
 
-
 class ImagingSelectionInstanceImageRegion2D(BackboneElement):
     """
     Each imaging selection instance or frame list might includes an image region, specified by a region type and a set of 2D coordinates.
@@ -56,21 +46,10 @@ class ImagingSelectionInstanceImageRegion2D(BackboneElement):
         description="point | polyline | interpolated | circle | ellipse",
         default=None,
     )
-    regionType_ext: Optional[Element] = Field(
-        description="Placeholder element for regionType extensions",
-        default=None,
-        alias="_regionType",
-    )
     coordinate: Optional[ListType[Decimal]] = Field(
         description="Specifies the coordinates that define the image region",
         default=None,
     )
-    coordinate_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for coordinate extensions",
-        default=None,
-        alias="_coordinate",
-    )
-
 
 class ImagingSelectionInstanceImageRegion3D(BackboneElement):
     """
@@ -81,21 +60,10 @@ class ImagingSelectionInstanceImageRegion3D(BackboneElement):
         description="point | multipoint | polyline | polygon | ellipse | ellipsoid",
         default=None,
     )
-    regionType_ext: Optional[Element] = Field(
-        description="Placeholder element for regionType extensions",
-        default=None,
-        alias="_regionType",
-    )
     coordinate: Optional[ListType[Decimal]] = Field(
         description="Specifies the coordinates that define the image region",
         default=None,
     )
-    coordinate_ext: Optional[Element] = Field(
-        description="Placeholder element for coordinate extensions",
-        default=None,
-        alias="_coordinate",
-    )
-
 
 class ImagingSelectionInstance(BackboneElement):
     """
@@ -106,19 +74,9 @@ class ImagingSelectionInstance(BackboneElement):
         description="DICOM SOP Instance UID",
         default=None,
     )
-    uid_ext: Optional[Element] = Field(
-        description="Placeholder element for uid extensions",
-        default=None,
-        alias="_uid",
-    )
     number: Optional[UnsignedInt] = Field(
         description="DICOM Instance Number",
         default=None,
-    )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
     )
     sopClass: Optional[Coding] = Field(
         description="DICOM SOP Class UID",
@@ -128,11 +86,6 @@ class ImagingSelectionInstance(BackboneElement):
         description="The selected subset of the SOP Instance",
         default=None,
     )
-    subset_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for subset extensions",
-        default=None,
-        alias="_subset",
-    )
     imageRegion2D: Optional[ListType[ImagingSelectionInstanceImageRegion2D]] = Field(
         description="A specific 2D region in a DICOM image / frame",
         default=None,
@@ -141,7 +94,6 @@ class ImagingSelectionInstance(BackboneElement):
         description="A specific 3D region in a DICOM frame of reference",
         default=None,
     )
-
 
 class ImagingSelection(DomainResource):
     """
@@ -160,11 +112,6 @@ class ImagingSelection(DomainResource):
         description="available | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     subject: Optional[Reference] = Field(
         description="Subject of the selected instances",
         default=None,
@@ -172,11 +119,6 @@ class ImagingSelection(DomainResource):
     issued: Optional[Instant] = Field(
         description="Date / Time when this imaging selection was created",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     performer: Optional[ListType[ImagingSelectionPerformer]] = Field(
         description="Selector of the instances (human or machine)",
@@ -198,11 +140,6 @@ class ImagingSelection(DomainResource):
         description="DICOM Study Instance UID",
         default=None,
     )
-    studyUid_ext: Optional[Element] = Field(
-        description="Placeholder element for studyUid extensions",
-        default=None,
-        alias="_studyUid",
-    )
     derivedFrom: Optional[ListType[Reference]] = Field(
         description="The imaging study from which the imaging selection is derived",
         default=None,
@@ -215,28 +152,13 @@ class ImagingSelection(DomainResource):
         description="DICOM Series Instance UID",
         default=None,
     )
-    seriesUid_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesUid extensions",
-        default=None,
-        alias="_seriesUid",
-    )
     seriesNumber: Optional[UnsignedInt] = Field(
         description="DICOM Series Number",
         default=None,
     )
-    seriesNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesNumber extensions",
-        default=None,
-        alias="_seriesNumber",
-    )
     frameOfReferenceUid: Optional[Id] = Field(
         description="The Frame of Reference UID for the selected images",
         default=None,
-    )
-    frameOfReferenceUid_ext: Optional[Element] = Field(
-        description="Placeholder element for frameOfReferenceUid extensions",
-        default=None,
-        alias="_frameOfReferenceUid",
     )
     bodySite: Optional[CodeableReference] = Field(
         description="Body part examined",

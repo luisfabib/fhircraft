@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CompositionAttester(BackboneElement):
     """
     A participant who has attested to the accuracy of the composition/document.
@@ -30,25 +29,14 @@ class CompositionAttester(BackboneElement):
         description="personal | professional | legal | official",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
     time: Optional[DateTime] = Field(
         description="When the composition was attested",
         default=None,
-    )
-    time_ext: Optional[Element] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
     )
     party: Optional[Reference] = Field(
         description="Who attested the composition",
         default=None,
     )
-
 
 class CompositionRelatesTo(BackboneElement):
     """
@@ -58,11 +46,6 @@ class CompositionRelatesTo(BackboneElement):
     code: Optional[Code] = Field(
         description="replaces | transforms | signs | appends",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     targetIdentifier: Optional[Identifier] = Field(
         description="Target of the relationship",
@@ -89,7 +72,6 @@ class CompositionRelatesTo(BackboneElement):
             required=True,
         )
 
-
 class CompositionEvent(BackboneElement):
     """
     The clinical service, such as a colonoscopy or an appendectomy, being documented.
@@ -108,7 +90,6 @@ class CompositionEvent(BackboneElement):
         default=None,
     )
 
-
 class CompositionSection(BackboneElement):
     """
     The root of the sections that make up the composition.
@@ -117,11 +98,6 @@ class CompositionSection(BackboneElement):
     title: Optional[String] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     code: Optional[CodeableConcept] = Field(
         description="Classification of section (recommended)",
@@ -143,11 +119,6 @@ class CompositionSection(BackboneElement):
         description="working | snapshot | changes",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
     orderedBy: Optional[CodeableConcept] = Field(
         description="Order of section entries",
         default=None,
@@ -164,7 +135,6 @@ class CompositionSection(BackboneElement):
         description="Nested Section",
         default=None,
     )
-
 
 class Composition(DomainResource):
     """
@@ -195,11 +165,6 @@ class Composition(DomainResource):
         description="preliminary | final | amended | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Kind of composition (LOINC if possible)",
         default=None,
@@ -220,11 +185,6 @@ class Composition(DomainResource):
         description="Composition editing time",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the composition",
         default=None,
@@ -233,19 +193,9 @@ class Composition(DomainResource):
         description="Human Readable name/title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     confidentiality: Optional[Code] = Field(
         description="As defined by affinity domain",
         default=None,
-    )
-    confidentiality_ext: Optional[Element] = Field(
-        description="Placeholder element for confidentiality extensions",
-        default=None,
-        alias="_confidentiality",
     )
     attester: Optional[ListType[CompositionAttester]] = Field(
         description="Attests to accuracy of composition",

@@ -4,14 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -31,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ChargeItemPerformer(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -45,7 +37,6 @@ class ChargeItemPerformer(BackboneElement):
         description="Individual who was performing",
         default=None,
     )
-
 
 class ChargeItem(DomainResource):
     """
@@ -76,28 +67,13 @@ class ChargeItem(DomainResource):
         description="Defining information about the code of this charge item",
         default=None,
     )
-    definitionUri_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionUri extensions",
-        default=None,
-        alias="_definitionUri",
-    )
     definitionCanonical: Optional[ListType[Canonical]] = Field(
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
-    )
     status: Optional[Code] = Field(
         description="planned | billable | not-billable | aborted | billed | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced ChargeItem",
@@ -118,11 +94,6 @@ class ChargeItem(DomainResource):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When the charged service was applied",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When the charged service was applied",
@@ -160,11 +131,6 @@ class ChargeItem(DomainResource):
         description="Factor overriding the associated rules",
         default=None,
     )
-    factorOverride_ext: Optional[Element] = Field(
-        description="Placeholder element for factorOverride extensions",
-        default=None,
-        alias="_factorOverride",
-    )
     priceOverride: Optional[Money] = Field(
         description="Price overriding the associated rules",
         default=None,
@@ -173,11 +139,6 @@ class ChargeItem(DomainResource):
         description="Reason for overriding the list price/factor",
         default=None,
     )
-    overrideReason_ext: Optional[Element] = Field(
-        description="Placeholder element for overrideReason extensions",
-        default=None,
-        alias="_overrideReason",
-    )
     enterer: Optional[Reference] = Field(
         description="Individual who was entering",
         default=None,
@@ -185,11 +146,6 @@ class ChargeItem(DomainResource):
     enteredDate: Optional[DateTime] = Field(
         description="Date the charge item was entered",
         default=None,
-    )
-    enteredDate_ext: Optional[Element] = Field(
-        description="Placeholder element for enteredDate extensions",
-        default=None,
-        alias="_enteredDate",
     )
     reason: Optional[ListType[CodeableConcept]] = Field(
         description="Why was the charged  service rendered?",

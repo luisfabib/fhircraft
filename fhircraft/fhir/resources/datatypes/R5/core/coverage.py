@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    PositiveInt,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -29,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CoveragePaymentBy(BackboneElement):
     """
     Link to the paying party and optionally what specifically they will be responsible to pay.
@@ -43,12 +36,6 @@ class CoveragePaymentBy(BackboneElement):
         description="Party\u0027s responsibility",
         default=None,
     )
-    responsibility_ext: Optional[Element] = Field(
-        description="Placeholder element for responsibility extensions",
-        default=None,
-        alias="_responsibility",
-    )
-
 
 class CoverageClass(BackboneElement):
     """
@@ -67,12 +54,6 @@ class CoverageClass(BackboneElement):
         description="Human readable description of the type and value",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-
 
 class CoverageCostToBeneficiaryException(BackboneElement):
     """
@@ -87,7 +68,6 @@ class CoverageCostToBeneficiaryException(BackboneElement):
         description="The effective period of the exception",
         default=None,
     )
-
 
 class CoverageCostToBeneficiary(BackboneElement):
     """
@@ -143,7 +123,6 @@ class CoverageCostToBeneficiary(BackboneElement):
             required=False,
         )
 
-
 class Coverage(DomainResource):
     """
     Financial instrument which may be used to reimburse or pay for health care products and services. Includes both insurance and self-payment.
@@ -161,19 +140,9 @@ class Coverage(DomainResource):
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     kind: Optional[Code] = Field(
         description="insurance | self-pay | other",
         default=None,
-    )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
     )
     paymentBy: Optional[ListType[CoveragePaymentBy]] = Field(
         description="Self-pay parties and responsibility",
@@ -203,11 +172,6 @@ class Coverage(DomainResource):
         description="Dependent number",
         default=None,
     )
-    dependent_ext: Optional[Element] = Field(
-        description="Placeholder element for dependent extensions",
-        default=None,
-        alias="_dependent",
-    )
     relationship: Optional[CodeableConcept] = Field(
         description="Beneficiary relationship to the subscriber",
         default=None,
@@ -229,19 +193,9 @@ class Coverage(DomainResource):
         description="Relative order of the coverage",
         default=None,
     )
-    order_ext: Optional[Element] = Field(
-        description="Placeholder element for order extensions",
-        default=None,
-        alias="_order",
-    )
     network: Optional[String] = Field(
         description="Insurer network",
         default=None,
-    )
-    network_ext: Optional[Element] = Field(
-        description="Placeholder element for network extensions",
-        default=None,
-        alias="_network",
     )
     costToBeneficiary: Optional[ListType[CoverageCostToBeneficiary]] = Field(
         description="Patient payments for services/products",
@@ -250,11 +204,6 @@ class Coverage(DomainResource):
     subrogation: Optional[Boolean] = Field(
         description="Reimbursement to insurer",
         default=None,
-    )
-    subrogation_ext: Optional[Element] = Field(
-        description="Placeholder element for subrogation extensions",
-        default=None,
-        alias="_subrogation",
     )
     contract: Optional[ListType[Reference]] = Field(
         description="Contract details",

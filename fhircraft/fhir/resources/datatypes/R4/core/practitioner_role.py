@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Time,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -27,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PractitionerRoleAvailableTime(BackboneElement):
     """
     A collection of times the practitioner is available or performing this role at the location and/or healthcareservice.
@@ -37,39 +30,18 @@ class PractitionerRoleAvailableTime(BackboneElement):
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
-    daysOfWeek_ext: Optional[Element] = Field(
-        description="Placeholder element for daysOfWeek extensions",
-        default=None,
-        alias="_daysOfWeek",
-    )
     allDay: Optional[Boolean] = Field(
         description="Always available? e.g. 24 hour service",
         default=None,
-    )
-    allDay_ext: Optional[Element] = Field(
-        description="Placeholder element for allDay extensions",
-        default=None,
-        alias="_allDay",
     )
     availableStartTime: Optional[Time] = Field(
         description="Opening time of day (ignored if allDay = true)",
         default=None,
     )
-    availableStartTime_ext: Optional[Element] = Field(
-        description="Placeholder element for availableStartTime extensions",
-        default=None,
-        alias="_availableStartTime",
-    )
     availableEndTime: Optional[Time] = Field(
         description="Closing time of day (ignored if allDay = true)",
         default=None,
     )
-    availableEndTime_ext: Optional[Element] = Field(
-        description="Placeholder element for availableEndTime extensions",
-        default=None,
-        alias="_availableEndTime",
-    )
-
 
 class PractitionerRoleNotAvailable(BackboneElement):
     """
@@ -80,16 +52,10 @@ class PractitionerRoleNotAvailable(BackboneElement):
         description="Reason presented to the user explaining why time not available",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     during: Optional[Period] = Field(
         description="Service not available from this date",
         default=None,
     )
-
 
 class PractitionerRole(DomainResource):
     """
@@ -119,11 +85,6 @@ class PractitionerRole(DomainResource):
     active: Optional[Boolean] = Field(
         description="Whether this practitioner role record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     period: Optional[Period] = Field(
         description="The period during which the practitioner is authorized to perform in these role(s)",
@@ -168,11 +129,6 @@ class PractitionerRole(DomainResource):
     availabilityExceptions: Optional[String] = Field(
         description="Description of availability exceptions",
         default=None,
-    )
-    availabilityExceptions_ext: Optional[Element] = Field(
-        description="Placeholder element for availabilityExceptions extensions",
-        default=None,
-        alias="_availabilityExceptions",
     )
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the practitioner with this role",

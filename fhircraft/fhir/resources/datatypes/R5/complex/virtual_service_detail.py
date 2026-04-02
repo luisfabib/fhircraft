@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     DataType,
     Element,
@@ -11,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Coding,
     ContactPoint,
 )
-
 
 class VirtualServiceDetail(DataType):
     """
@@ -44,28 +43,13 @@ class VirtualServiceDetail(DataType):
         description="Address to see alternative connection details",
         default=None,
     )
-    additionalInfo_ext: Optional[List[Optional[Element]]] = Field(
-        description="Placeholder element for additionalInfo extensions",
-        default=None,
-        alias="_additionalInfo",
-    )
     maxParticipants: Optional[PositiveInt] = Field(
         description="Maximum number of participants supported by the virtual service",
         default=None,
     )
-    maxParticipants_ext: Optional[Element] = Field(
-        description="Placeholder element for maxParticipants extensions",
-        default=None,
-        alias="_maxParticipants",
-    )
     sessionKey: Optional[String] = Field(
         description="Session Key required by the virtual service",
         default=None,
-    )
-    sessionKey_ext: Optional[Element] = Field(
-        description="Placeholder element for sessionKey extensions",
-        default=None,
-        alias="_sessionKey",
     )
 
     @model_validator(mode="after")

@@ -5,18 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-    Integer,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -34,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ValueSetComposeIncludeConceptDesignation(BackboneElement):
     """
@@ -58,12 +46,6 @@ class ValueSetComposeIncludeConceptDesignation(BackboneElement):
         description="The text value for this designation",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class ValueSetComposeIncludeConcept(BackboneElement):
     """
@@ -74,25 +56,14 @@ class ValueSetComposeIncludeConcept(BackboneElement):
         description="Code or expression from system",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     display: Optional[String] = Field(
         description="Text to display for this code for this value set in this valueset",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
     designation: Optional[ListType[ValueSetComposeIncludeConceptDesignation]] = Field(
         description="Additional representations for this concept",
         default=None,
     )
-
 
 class ValueSetComposeIncludeFilter(BackboneElement):
     """
@@ -104,30 +75,14 @@ class ValueSetComposeIncludeFilter(BackboneElement):
         default=None,
         alias="property",
     )
-    property_ext: Optional[Element] = Field(
-        description="Placeholder element for property extensions",
-        default=None,
-        alias="_property",
-    )
     op: Optional[Code] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists",
         default=None,
-    )
-    op_ext: Optional[Element] = Field(
-        description="Placeholder element for op extensions",
-        default=None,
-        alias="_op",
     )
     value: Optional[String] = Field(
         description="Code from the system, or regex criteria, or boolean value for exists",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class ValueSetComposeInclude(BackboneElement):
     """
@@ -138,19 +93,9 @@ class ValueSetComposeInclude(BackboneElement):
         description="The system the codes come from",
         default=None,
     )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
     version: Optional[String] = Field(
         description="Specific version of the code system referred to",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     concept: Optional[ListType[ValueSetComposeIncludeConcept]] = Field(
         description="A concept defined in the system",
@@ -164,21 +109,10 @@ class ValueSetComposeInclude(BackboneElement):
         description="Select the contents included in this value set",
         default=None,
     )
-    valueSet_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for valueSet extensions",
-        default=None,
-        alias="_valueSet",
-    )
     copyright: Optional[String] = Field(
         description="A copyright statement for the specific code system included in the value set",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-
 
 class ValueSetComposeExclude(BackboneElement):
     """
@@ -189,19 +123,9 @@ class ValueSetComposeExclude(BackboneElement):
         description="The system the codes come from",
         default=None,
     )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
     version: Optional[String] = Field(
         description="Specific version of the code system referred to",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     concept: Optional[ListType[ValueSetComposeIncludeConcept]] = Field(
         description="A concept defined in the system",
@@ -215,21 +139,10 @@ class ValueSetComposeExclude(BackboneElement):
         description="Select the contents included in this value set",
         default=None,
     )
-    valueSet_ext: Optional[Element] = Field(
-        description="Placeholder element for valueSet extensions",
-        default=None,
-        alias="_valueSet",
-    )
     copyright: Optional[String] = Field(
         description="A copyright statement for the specific code system included in the value set",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-
 
 class ValueSetCompose(BackboneElement):
     """
@@ -240,19 +153,9 @@ class ValueSetCompose(BackboneElement):
         description="Fixed date for references with no specified version (transitive)",
         default=None,
     )
-    lockedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lockedDate extensions",
-        default=None,
-        alias="_lockedDate",
-    )
     inactive: Optional[Boolean] = Field(
         description="Whether inactive codes are in the value set",
         default=None,
-    )
-    inactive_ext: Optional[Element] = Field(
-        description="Placeholder element for inactive extensions",
-        default=None,
-        alias="_inactive",
     )
     include: Optional[ListType[ValueSetComposeInclude]] = Field(
         description="Include one or more codes from a code system or other value set(s)",
@@ -267,12 +170,6 @@ class ValueSetCompose(BackboneElement):
         default=None,
         alias="property",
     )
-    property_ext: Optional[Element] = Field(
-        description="Placeholder element for property extensions",
-        default=None,
-        alias="_property",
-    )
-
 
 class ValueSetExpansionParameter(BackboneElement):
     """
@@ -283,73 +180,33 @@ class ValueSetExpansionParameter(BackboneElement):
         description="Name as assigned by the client or server",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     valueString: Optional[String] = Field(
         description="Value of the named parameter",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the named parameter",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
     valueUri: Optional[Uri] = Field(
         description="Value of the named parameter",
         default=None,
-    )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
     )
     valueCode: Optional[Code] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the named parameter",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
 
     @property
@@ -368,7 +225,6 @@ class ValueSetExpansionParameter(BackboneElement):
             required=False,
         )
 
-
 class ValueSetExpansionProperty(BackboneElement):
     """
     A property defines an additional slot through which additional information can be provided about a concept.
@@ -378,21 +234,10 @@ class ValueSetExpansionProperty(BackboneElement):
         description="Identifies the property on the concepts, and when referred to in operations",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     uri: Optional[Uri] = Field(
         description="Formal identifier for the property",
         default=None,
     )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
-    )
-
 
 class ValueSetExpansionContainsDesignation(BackboneElement):
     """
@@ -416,12 +261,6 @@ class ValueSetExpansionContainsDesignation(BackboneElement):
         description="The text value for this designation",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
     """
@@ -432,19 +271,9 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
         description="Reference to ValueSet.expansion.property.code",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     valueCode: Optional[Code] = Field(
         description="Value of the subproperty for this concept",
         default=None,
-    )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
     )
     valueCoding: Optional[Coding] = Field(
         description="Value of the subproperty for this concept",
@@ -454,46 +283,21 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the subproperty for this concept",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the subproperty for this concept",
         default=None,
-    )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
     )
 
     @property
@@ -512,7 +316,6 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
             required=True,
         )
 
-
 class ValueSetExpansionContainsProperty(BackboneElement):
     """
     A property value for this concept.
@@ -522,19 +325,9 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         description="Reference to ValueSet.expansion.property.code",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     valueCode: Optional[Code] = Field(
         description="Value of the property for this concept",
         default=None,
-    )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
     )
     valueCoding: Optional[Coding] = Field(
         description="Value of the property for this concept",
@@ -544,46 +337,21 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the property for this concept",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the property for this concept",
         default=None,
-    )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
     )
     subProperty: Optional[ListType[ValueSetExpansionContainsPropertySubProperty]] = (
         Field(
@@ -608,7 +376,6 @@ class ValueSetExpansionContainsProperty(BackboneElement):
             required=True,
         )
 
-
 class ValueSetExpansionContains(BackboneElement):
     """
     The codes that are contained in the value set expansion.
@@ -618,55 +385,25 @@ class ValueSetExpansionContains(BackboneElement):
         description="System value for the code",
         default=None,
     )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
     abstract: Optional[Boolean] = Field(
         description="If user cannot select this entry",
         default=None,
-    )
-    abstract_ext: Optional[Element] = Field(
-        description="Placeholder element for abstract extensions",
-        default=None,
-        alias="_abstract",
     )
     inactive: Optional[Boolean] = Field(
         description="If concept is inactive in the code system",
         default=None,
     )
-    inactive_ext: Optional[Element] = Field(
-        description="Placeholder element for inactive extensions",
-        default=None,
-        alias="_inactive",
-    )
     version: Optional[String] = Field(
         description="Version in which this code/display is defined",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     code: Optional[Code] = Field(
         description="Code - if blank, this is not a selectable code",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     display: Optional[String] = Field(
         description="User display for the concept",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
     designation: Optional[ListType[ValueSetExpansionContainsDesignation]] = Field(
         description="Additional representations for this item",
@@ -682,7 +419,6 @@ class ValueSetExpansionContains(BackboneElement):
         default=None,
     )
 
-
 class ValueSetExpansion(BackboneElement):
     """
     A value set can also be "expanded", where the value set is turned into a simple collection of enumerated codes. This element holds the expansion, if it has been performed.
@@ -692,46 +428,21 @@ class ValueSetExpansion(BackboneElement):
         description="Identifies the value set expansion (business identifier)",
         default=None,
     )
-    identifier_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for identifier extensions",
-        default=None,
-        alias="_identifier",
-    )
     next: Optional[Uri] = Field(
         description="Opaque urls for paging through expansion results",
         default=None,
-    )
-    next_ext: Optional[Element] = Field(
-        description="Placeholder element for next extensions",
-        default=None,
-        alias="_next",
     )
     timestamp: Optional[DateTime] = Field(
         description="Time ValueSet expansion happened",
         default=None,
     )
-    timestamp_ext: Optional[Element] = Field(
-        description="Placeholder element for timestamp extensions",
-        default=None,
-        alias="_timestamp",
-    )
     total: Optional[Integer] = Field(
         description="Total number of codes in the expansion",
         default=None,
     )
-    total_ext: Optional[Element] = Field(
-        description="Placeholder element for total extensions",
-        default=None,
-        alias="_total",
-    )
     offset: Optional[Integer] = Field(
         description="Offset at which this resource starts",
         default=None,
-    )
-    offset_ext: Optional[Element] = Field(
-        description="Placeholder element for offset extensions",
-        default=None,
-        alias="_offset",
     )
     parameter: Optional[ListType[ValueSetExpansionParameter]] = Field(
         description="Parameter that controlled the expansion process",
@@ -747,7 +458,6 @@ class ValueSetExpansion(BackboneElement):
         default=None,
     )
 
-
 class ValueSetScope(BackboneElement):
     """
     Description of the semantic space the Value Set Expansion is intended to cover and should further clarify the text in ValueSet.description.
@@ -757,21 +467,10 @@ class ValueSetScope(BackboneElement):
         description="Criteria describing which concepts or codes should be included and why",
         default=None,
     )
-    inclusionCriteria_ext: Optional[Element] = Field(
-        description="Placeholder element for inclusionCriteria extensions",
-        default=None,
-        alias="_inclusionCriteria",
-    )
     exclusionCriteria: Optional[String] = Field(
         description="Criteria describing which concepts or codes should be excluded and why",
         default=None,
     )
-    exclusionCriteria_ext: Optional[Element] = Field(
-        description="Placeholder element for exclusionCriteria extensions",
-        default=None,
-        alias="_exclusionCriteria",
-    )
-
 
 class ValueSet(DomainResource):
     """
@@ -786,11 +485,6 @@ class ValueSet(DomainResource):
         description="Canonical identifier for this value set, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the value set (business identifier)",
         default=None,
@@ -799,19 +493,9 @@ class ValueSet(DomainResource):
         description="Business version of the value set",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -821,55 +505,25 @@ class ValueSet(DomainResource):
         description="Name for this value set (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this value set (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -878,11 +532,6 @@ class ValueSet(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the value set",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -896,55 +545,25 @@ class ValueSet(DomainResource):
         description="Indicates whether or not any change to the content logical definition may occur",
         default=None,
     )
-    immutable_ext: Optional[Element] = Field(
-        description="Placeholder element for immutable extensions",
-        default=None,
-        alias="_immutable",
-    )
     purpose: Optional[Markdown] = Field(
         description="Why this value set is defined",
         default=None,
-    )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
     )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
-    )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
     )
     approvalDate: Optional[Date] = Field(
         description="When the ValueSet was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the ValueSet was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the ValueSet is expected to be used",

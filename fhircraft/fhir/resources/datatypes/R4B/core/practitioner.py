@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -29,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class PractitionerQualification(BackboneElement):
     """
@@ -52,7 +45,6 @@ class PractitionerQualification(BackboneElement):
         description="Organization that regulates and issues the qualification",
         default=None,
     )
-
 
 class Practitioner(DomainResource):
     """
@@ -83,11 +75,6 @@ class Practitioner(DomainResource):
         description="Whether this practitioner\u0027s record is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     name: Optional[ListType[HumanName]] = Field(
         description="The name(s) associated with the practitioner",
         default=None,
@@ -104,19 +91,9 @@ class Practitioner(DomainResource):
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
     birthDate: Optional[Date] = Field(
         description="The date  on which the practitioner was born",
         default=None,
-    )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
     )
     photo: Optional[ListType[Attachment]] = Field(
         description="Image of the person",

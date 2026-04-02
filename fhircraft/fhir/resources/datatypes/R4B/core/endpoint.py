@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Url
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class Endpoint(DomainResource):
     """
@@ -51,11 +50,6 @@ class Endpoint(DomainResource):
         description="active | suspended | error | off | entered-in-error | test",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     connectionType: Optional[Coding] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
         default=None,
@@ -63,11 +57,6 @@ class Endpoint(DomainResource):
     name: Optional[String] = Field(
         description="A name that this endpoint can be identified by",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     managingOrganization: Optional[Reference] = Field(
         description="Organization that manages this endpoint (might not be the organization that exposes the endpoint)",
@@ -89,26 +78,11 @@ class Endpoint(DomainResource):
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    payloadMimeType_ext: Optional[Element] = Field(
-        description="Placeholder element for payloadMimeType extensions",
-        default=None,
-        alias="_payloadMimeType",
-    )
     address: Optional[Url] = Field(
         description="The technical base address for connecting to this endpoint",
         default=None,
     )
-    address_ext: Optional[Element] = Field(
-        description="Placeholder element for address extensions",
-        default=None,
-        alias="_address",
-    )
     header: Optional[ListType[String]] = Field(
         description="Usage depends on the channel type",
         default=None,
-    )
-    header_ext: Optional[Element] = Field(
-        description="Placeholder element for header extensions",
-        default=None,
-        alias="_header",
     )

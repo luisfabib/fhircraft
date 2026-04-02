@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Integer,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
     """
@@ -45,16 +38,10 @@ class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
         description="Used to specify whether the attribute described is a defining element for the unique identification of the polymer",
         default=None,
     )
-    isDefining_ext: Optional[Element] = Field(
-        description="Placeholder element for isDefining extensions",
-        default=None,
-        alias="_isDefining",
-    )
     amount: Optional[Quantity] = Field(
         description="A percentage",
         default=None,
     )
-
 
 class SubstancePolymerMonomerSet(BackboneElement):
     """
@@ -72,7 +59,6 @@ class SubstancePolymerMonomerSet(BackboneElement):
         )
     )
 
-
 class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation(BackboneElement):
     """
     Applies to homopolymer and block co-polymers where the degree of polymerisation within a block can be described.
@@ -86,30 +72,14 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation(BackboneElement):
         description="An average amount of polymerisation",
         default=None,
     )
-    average_ext: Optional[Element] = Field(
-        description="Placeholder element for average extensions",
-        default=None,
-        alias="_average",
-    )
     low: Optional[Integer] = Field(
         description="A low expected limit of the amount",
         default=None,
-    )
-    low_ext: Optional[Element] = Field(
-        description="Placeholder element for low extensions",
-        default=None,
-        alias="_low",
     )
     high: Optional[Integer] = Field(
         description="A high expected limit of the amount",
         default=None,
     )
-    high_ext: Optional[Element] = Field(
-        description="Placeholder element for high extensions",
-        default=None,
-        alias="_high",
-    )
-
 
 class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
     """
@@ -124,11 +94,6 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
         description="The structural representation as text string in a standard format e.g. InChI, SMILES, MOLFILE, CDX, SDF, PDB, mmCIF",
         default=None,
     )
-    representation_ext: Optional[Element] = Field(
-        description="Placeholder element for representation extensions",
-        default=None,
-        alias="_representation",
-    )
     format: Optional[CodeableConcept] = Field(
         description="The format of the representation e.g. InChI, SMILES, MOLFILE, CDX, SDF, PDB, mmCIF",
         default=None,
@@ -137,7 +102,6 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
         description="An attached file with the structural representation",
         default=None,
     )
-
 
 class SubstancePolymerRepeatRepeatUnit(BackboneElement):
     """
@@ -148,11 +112,6 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         description="Structural repeat units are essential elements for defining polymers",
         default=None,
     )
-    unit_ext: Optional[Element] = Field(
-        description="Placeholder element for unit extensions",
-        default=None,
-        alias="_unit",
-    )
     orientation: Optional[CodeableConcept] = Field(
         description="The orientation of the polymerisation, e.g. head-tail, head-head, random",
         default=None,
@@ -160,11 +119,6 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
     amount: Optional[Integer] = Field(
         description="Number of repeats of this unit",
         default=None,
-    )
-    amount_ext: Optional[Element] = Field(
-        description="Placeholder element for amount extensions",
-        default=None,
-        alias="_amount",
     )
     degreeOfPolymerisation: Optional[
         ListType[SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation]
@@ -179,7 +133,6 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         default=None,
     )
 
-
 class SubstancePolymerRepeat(BackboneElement):
     """
     Specifies and quantifies the repeated units and their configuration.
@@ -189,11 +142,6 @@ class SubstancePolymerRepeat(BackboneElement):
         description="A representation of an (average) molecular formula from a polymer",
         default=None,
     )
-    averageMolecularFormula_ext: Optional[Element] = Field(
-        description="Placeholder element for averageMolecularFormula extensions",
-        default=None,
-        alias="_averageMolecularFormula",
-    )
     repeatUnitAmountType: Optional[CodeableConcept] = Field(
         description="How the quantitative amount of Structural Repeat Units is captured (e.g. Exact, Numeric, Average)",
         default=None,
@@ -202,7 +150,6 @@ class SubstancePolymerRepeat(BackboneElement):
         description="An SRU - Structural Repeat Unit",
         default=None,
     )
-
 
 class SubstancePolymer(DomainResource):
     """
@@ -233,11 +180,6 @@ class SubstancePolymer(DomainResource):
     modification: Optional[String] = Field(
         description="Todo - this is intended to connect to a repeating full modification structure, also used by Protein and Nucleic Acid . String is just a placeholder",
         default=None,
-    )
-    modification_ext: Optional[Element] = Field(
-        description="Placeholder element for modification extensions",
-        default=None,
-        alias="_modification",
     )
     monomerSet: Optional[ListType[SubstancePolymerMonomerSet]] = Field(
         description="Todo",

@@ -4,14 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Base64Binary,
-    Boolean,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -31,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class NutritionProductNutrient(BackboneElement):
     """
     The product's nutritional information expressed by the nutrients.
@@ -46,7 +38,6 @@ class NutritionProductNutrient(BackboneElement):
         default=None,
     )
 
-
 class NutritionProductIngredient(BackboneElement):
     """
     Ingredients contained in this product.
@@ -60,7 +51,6 @@ class NutritionProductIngredient(BackboneElement):
         description="The amount of ingredient that is in the product",
         default=None,
     )
-
 
 class NutritionProductProductCharacteristic(BackboneElement):
     """
@@ -79,11 +69,6 @@ class NutritionProductProductCharacteristic(BackboneElement):
         description="The value of the characteristic",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueQuantity: Optional[Quantity] = Field(
         description="The value of the characteristic",
         default=None,
@@ -92,11 +77,6 @@ class NutritionProductProductCharacteristic(BackboneElement):
         description="The value of the characteristic",
         default=None,
     )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
-    )
     valueAttachment: Optional[Attachment] = Field(
         description="The value of the characteristic",
         default=None,
@@ -104,11 +84,6 @@ class NutritionProductProductCharacteristic(BackboneElement):
     valueBoolean: Optional[Boolean] = Field(
         description="The value of the characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
 
     @property
@@ -134,7 +109,6 @@ class NutritionProductProductCharacteristic(BackboneElement):
             required=True,
         )
 
-
 class NutritionProductInstance(BackboneElement):
     """
     Conveys instance-level information about this product item. One or several physical, countable instances or occurrences of the product.
@@ -152,30 +126,14 @@ class NutritionProductInstance(BackboneElement):
         description="The identification of the batch or lot of the product",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
     expiry: Optional[DateTime] = Field(
         description="The expiry date or date and time for the product",
         default=None,
-    )
-    expiry_ext: Optional[Element] = Field(
-        description="Placeholder element for expiry extensions",
-        default=None,
-        alias="_expiry",
     )
     useBy: Optional[DateTime] = Field(
         description="The date until which the product is expected to be good for consumption",
         default=None,
     )
-    useBy_ext: Optional[Element] = Field(
-        description="Placeholder element for useBy extensions",
-        default=None,
-        alias="_useBy",
-    )
-
 
 class NutritionProduct(DomainResource):
     """
@@ -201,11 +159,6 @@ class NutritionProduct(DomainResource):
     status: Optional[Code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="A category or class of the nutrition product (halal, kosher, gluten free, vegan, etc)",

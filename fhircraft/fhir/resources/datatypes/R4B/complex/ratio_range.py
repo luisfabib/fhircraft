@@ -3,9 +3,8 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex import Element, Quantity
-
 
 class RatioRange(Element):
     """

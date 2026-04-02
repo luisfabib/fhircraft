@@ -5,19 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-    UnsignedInt,
-    Integer,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -36,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CodeSystemFilter(BackboneElement):
     """
     A filter that can be used in a value set compose statement when selecting concepts using a filter.
@@ -46,39 +33,18 @@ class CodeSystemFilter(BackboneElement):
         description="Code that identifies the filter",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     description: Optional[String] = Field(
         description="How or why the filter is used",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     operator: Optional[ListType[Code]] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists",
         default=None,
     )
-    operator_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for operator extensions",
-        default=None,
-        alias="_operator",
-    )
     value: Optional[String] = Field(
         description="What to use for the value",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class CodeSystemProperty(BackboneElement):
     """
@@ -89,39 +55,18 @@ class CodeSystemProperty(BackboneElement):
         description="Identifies the property on the concepts, and when referred to in operations",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     uri: Optional[Uri] = Field(
         description="Formal identifier for the property",
         default=None,
-    )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
     )
     description: Optional[String] = Field(
         description="Why the property is defined, and/or what it conveys",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     type: Optional[Code] = Field(
         description="code | Coding | string | integer | boolean | dateTime | decimal",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-
 
 class CodeSystemConceptDesignation(BackboneElement):
     """
@@ -145,12 +90,6 @@ class CodeSystemConceptDesignation(BackboneElement):
         description="The text value for this designation",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class CodeSystemConceptProperty(BackboneElement):
     """
@@ -161,19 +100,9 @@ class CodeSystemConceptProperty(BackboneElement):
         description="Reference to CodeSystem.property.code",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     valueCode: Optional[Code] = Field(
         description="Value of the property for this concept",
         default=None,
-    )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
     )
     valueCoding: Optional[Coding] = Field(
         description="Value of the property for this concept",
@@ -183,46 +112,21 @@ class CodeSystemConceptProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the property for this concept",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the property for this concept",
         default=None,
-    )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
     )
 
     @property
@@ -241,7 +145,6 @@ class CodeSystemConceptProperty(BackboneElement):
             required=True,
         )
 
-
 class CodeSystemConcept(BackboneElement):
     """
     Concepts that are in the code system. The concept definitions are inherently hierarchical, but the definitions must be consulted to determine what the meanings of the hierarchical relationships are.
@@ -251,28 +154,13 @@ class CodeSystemConcept(BackboneElement):
         description="Code that identifies concept",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     display: Optional[String] = Field(
         description="Text to display to the user",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
     definition: Optional[String] = Field(
         description="Formal definition",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
     designation: Optional[ListType[CodeSystemConceptDesignation]] = Field(
         description="Additional representations for the concept",
@@ -288,7 +176,6 @@ class CodeSystemConcept(BackboneElement):
         default=None,
     )
 
-
 class CodeSystem(DomainResource):
     """
     The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
@@ -302,11 +189,6 @@ class CodeSystem(DomainResource):
         description="Canonical identifier for this code system, represented as a URI (globally unique) (Coding.system)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the code system (business identifier)",
         default=None,
@@ -315,19 +197,9 @@ class CodeSystem(DomainResource):
         description="Business version of the code system (Coding.version)",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -337,55 +209,25 @@ class CodeSystem(DomainResource):
         description="Name for this code system (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this code system (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -394,11 +236,6 @@ class CodeSystem(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the code system",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -412,46 +249,21 @@ class CodeSystem(DomainResource):
         description="Why this code system is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the CodeSystem was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the CodeSystem was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the CodeSystem is expected to be used",
@@ -485,73 +297,33 @@ class CodeSystem(DomainResource):
         description="If code comparison is case sensitive",
         default=None,
     )
-    caseSensitive_ext: Optional[Element] = Field(
-        description="Placeholder element for caseSensitive extensions",
-        default=None,
-        alias="_caseSensitive",
-    )
     valueSet: Optional[Canonical] = Field(
         description="Canonical reference to the value set with entire code system",
         default=None,
-    )
-    valueSet_ext: Optional[Element] = Field(
-        description="Placeholder element for valueSet extensions",
-        default=None,
-        alias="_valueSet",
     )
     hierarchyMeaning: Optional[Code] = Field(
         description="grouped-by | is-a | part-of | classified-with",
         default=None,
     )
-    hierarchyMeaning_ext: Optional[Element] = Field(
-        description="Placeholder element for hierarchyMeaning extensions",
-        default=None,
-        alias="_hierarchyMeaning",
-    )
     compositional: Optional[Boolean] = Field(
         description="If code system defines a compositional grammar",
         default=None,
-    )
-    compositional_ext: Optional[Element] = Field(
-        description="Placeholder element for compositional extensions",
-        default=None,
-        alias="_compositional",
     )
     versionNeeded: Optional[Boolean] = Field(
         description="If definitions are not stable",
         default=None,
     )
-    versionNeeded_ext: Optional[Element] = Field(
-        description="Placeholder element for versionNeeded extensions",
-        default=None,
-        alias="_versionNeeded",
-    )
     content: Optional[Code] = Field(
         description="not-present | example | fragment | complete | supplement",
         default=None,
-    )
-    content_ext: Optional[Element] = Field(
-        description="Placeholder element for content extensions",
-        default=None,
-        alias="_content",
     )
     supplements: Optional[Canonical] = Field(
         description="Canonical URL of Code System this adds designations and properties to",
         default=None,
     )
-    supplements_ext: Optional[Element] = Field(
-        description="Placeholder element for supplements extensions",
-        default=None,
-        alias="_supplements",
-    )
     count: Optional[UnsignedInt] = Field(
         description="Total concepts in the code system",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     filter: Optional[ListType[CodeSystemFilter]] = Field(
         description="Filter that can be used in a value set",

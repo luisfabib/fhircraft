@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -29,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
     """
     Information about the use of the medicinal product in relation to other therapies described as part of the contraindication.
@@ -43,7 +36,6 @@ class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
         description="Reference to a specific medication, substance etc. as part of an indication or contraindication",
         default=None,
     )
-
 
 class ClinicalUseDefinitionContraindication(BackboneElement):
     """
@@ -77,7 +69,6 @@ class ClinicalUseDefinitionContraindication(BackboneElement):
         default=None,
     )
 
-
 class ClinicalUseDefinitionIndicationOtherTherapy(BackboneElement):
     """
     Information about the use of the medicinal product in relation to other therapies described as part of the indication.
@@ -91,7 +82,6 @@ class ClinicalUseDefinitionIndicationOtherTherapy(BackboneElement):
         description="Reference to a specific medication, substance etc. as part of an indication or contraindication",
         default=None,
     )
-
 
 class ClinicalUseDefinitionIndication(BackboneElement):
     """
@@ -121,11 +111,6 @@ class ClinicalUseDefinitionIndication(BackboneElement):
     durationString: Optional[String] = Field(
         description="Timing or duration information",
         default=None,
-    )
-    durationString_ext: Optional[Element] = Field(
-        description="Placeholder element for durationString extensions",
-        default=None,
-        alias="_durationString",
     )
     undesirableEffect: Optional[ListType[Reference]] = Field(
         description="An unwanted side effect or negative outcome of the subject of this resource when being used for this indication",
@@ -158,7 +143,6 @@ class ClinicalUseDefinitionIndication(BackboneElement):
             required=False,
         )
 
-
 class ClinicalUseDefinitionInteractionInteractant(BackboneElement):
     """
     The specific medication, product, food, substance etc. or laboratory test that interacts.
@@ -189,7 +173,6 @@ class ClinicalUseDefinitionInteractionInteractant(BackboneElement):
             required=True,
         )
 
-
 class ClinicalUseDefinitionInteraction(BackboneElement):
     """
     Specifics for when this is an interaction.
@@ -218,7 +201,6 @@ class ClinicalUseDefinitionInteraction(BackboneElement):
         default=None,
     )
 
-
 class ClinicalUseDefinitionUndesirableEffect(BackboneElement):
     """
     Describe the possible undesirable effects (negative outcomes) from the use of the medicinal product as treatment.
@@ -237,7 +219,6 @@ class ClinicalUseDefinitionUndesirableEffect(BackboneElement):
         default=None,
     )
 
-
 class ClinicalUseDefinitionWarning(BackboneElement):
     """
     A critical piece of information about environmental, health or physical risks or hazards that serve as caution to the user. For example 'Do not operate heavy machinery', 'May cause drowsiness', or 'Get medical advice/attention if you feel unwell'.
@@ -247,16 +228,10 @@ class ClinicalUseDefinitionWarning(BackboneElement):
         description="A textual definition of this warning, with formatting",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     code: Optional[CodeableConcept] = Field(
         description="A coded or unformatted textual definition of this warning",
         default=None,
     )
-
 
 class ClinicalUseDefinition(DomainResource):
     """
@@ -274,11 +249,6 @@ class ClinicalUseDefinition(DomainResource):
     type: Optional[Code] = Field(
         description="indication | contraindication | interaction | undesirable-effect | warning",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description='A categorisation of the issue, primarily for dividing warnings into subject heading areas such as "Pregnancy", "Overdose"',
@@ -311,11 +281,6 @@ class ClinicalUseDefinition(DomainResource):
     library: Optional[ListType[Canonical]] = Field(
         description="Logic used by the clinical use definition",
         default=None,
-    )
-    library_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
     )
     undesirableEffect: Optional[ClinicalUseDefinitionUndesirableEffect] = Field(
         description="A possible negative outcome from the use of this treatment",

@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -25,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
     """
     Vaccine date recommendations.  For example, earliest date to administer, latest date to administer, etc.
@@ -39,12 +32,6 @@ class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
         description="Recommended date",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class ImmunizationRecommendationRecommendation(BackboneElement):
     """
@@ -81,55 +68,25 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Protocol details",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     series: Optional[String] = Field(
         description="Name of vaccination series",
         default=None,
-    )
-    series_ext: Optional[Element] = Field(
-        description="Placeholder element for series extensions",
-        default=None,
-        alias="_series",
     )
     doseNumberPositiveInt: Optional[PositiveInt] = Field(
         description="Recommended dose number within series",
         default=None,
     )
-    doseNumberPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberPositiveInt extensions",
-        default=None,
-        alias="_doseNumberPositiveInt",
-    )
     doseNumberString: Optional[String] = Field(
         description="Recommended dose number within series",
         default=None,
-    )
-    doseNumberString_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberString extensions",
-        default=None,
-        alias="_doseNumberString",
     )
     seriesDosesPositiveInt: Optional[PositiveInt] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
-    seriesDosesPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesPositiveInt extensions",
-        default=None,
-        alias="_seriesDosesPositiveInt",
-    )
     seriesDosesString: Optional[String] = Field(
         description="Recommended number of doses for immunity",
         default=None,
-    )
-    seriesDosesString_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesString extensions",
-        default=None,
-        alias="_seriesDosesString",
     )
     supportingImmunization: Optional[ListType[Reference]] = Field(
         description="Past immunizations supporting recommendation",
@@ -172,7 +129,6 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
             required=False,
         )
 
-
 class ImmunizationRecommendation(DomainResource):
     """
     A patient's point-in-time set of recommendations (i.e. forecasting) according to a published schedule with optional supporting justification.
@@ -207,11 +163,6 @@ class ImmunizationRecommendation(DomainResource):
     date: Optional[DateTime] = Field(
         description="Date recommendation(s) created",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     authority: Optional[Reference] = Field(
         description="Who is responsible for protocol",

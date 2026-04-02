@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ManufacturedItemDefinitionProperty(BackboneElement):
     """
@@ -49,19 +42,9 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -83,7 +66,6 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
             field_name_base="value",
             required=False,
         )
-
 
 class ManufacturedItemDefinition(DomainResource):
     """
@@ -115,11 +97,6 @@ class ManufacturedItemDefinition(DomainResource):
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     manufacturedDoseForm: Optional[CodeableConcept] = Field(
         description="Dose form as manufactured (before any necessary transformation)",

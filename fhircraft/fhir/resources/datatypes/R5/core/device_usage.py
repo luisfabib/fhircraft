@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -24,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DeviceUsageAdherence(BackboneElement):
     """
     This indicates how or if the device is being used.
@@ -38,7 +37,6 @@ class DeviceUsageAdherence(BackboneElement):
         description="lost | stolen | prescribed | broken | burned | forgot",
         default=None,
     )
-
 
 class DeviceUsage(DomainResource):
     """
@@ -60,11 +58,6 @@ class DeviceUsage(DomainResource):
     status: Optional[Code] = Field(
         description="active | completed | not-done | entered-in-error +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the statement - classifying how the statement is made",
@@ -94,19 +87,9 @@ class DeviceUsage(DomainResource):
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
-    )
     dateAsserted: Optional[DateTime] = Field(
         description="When the statement was made (and recorded)",
         default=None,
-    )
-    dateAsserted_ext: Optional[Element] = Field(
-        description="Placeholder element for dateAsserted extensions",
-        default=None,
-        alias="_dateAsserted",
     )
     usageStatus: Optional[CodeableConcept] = Field(
         description="The status of the device usage, for example always, sometimes, never. This is not the same as the status of the statement",

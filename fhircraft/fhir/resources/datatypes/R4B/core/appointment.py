@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    UnsignedInt,
-    Instant,
-    PositiveInt,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -27,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class AppointmentParticipant(BackboneElement):
     """
@@ -46,25 +37,14 @@ class AppointmentParticipant(BackboneElement):
         description="required | optional | information-only",
         default=None,
     )
-    required_ext: Optional[Element] = Field(
-        description="Placeholder element for required extensions",
-        default=None,
-        alias="_required",
-    )
     status: Optional[Code] = Field(
         description="accepted | declined | tentative | needs-action",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     period: Optional[Period] = Field(
         description="Participation period of the actor",
         default=None,
     )
-
 
 class Appointment(DomainResource):
     """
@@ -94,11 +74,6 @@ class Appointment(DomainResource):
     status: Optional[Code] = Field(
         description="proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     cancelationReason: Optional[CodeableConcept] = Field(
         description="The coded reason for the appointment being cancelled",
@@ -132,19 +107,9 @@ class Appointment(DomainResource):
         description="Used to make informed decisions if needing to re-prioritize",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     description: Optional[String] = Field(
         description="Shown on a subject line in a meeting request, or appointment list",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     supportingInformation: Optional[ListType[Reference]] = Field(
         description="Additional information to support the appointment",
@@ -154,28 +119,13 @@ class Appointment(DomainResource):
         description="When appointment is to take place",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
     end: Optional[Instant] = Field(
         description="When appointment is to conclude",
         default=None,
     )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
-    )
     minutesDuration: Optional[PositiveInt] = Field(
         description="Can be less than start/end (e.g. estimate)",
         default=None,
-    )
-    minutesDuration_ext: Optional[Element] = Field(
-        description="Placeholder element for minutesDuration extensions",
-        default=None,
-        alias="_minutesDuration",
     )
     slot: Optional[ListType[Reference]] = Field(
         description="The slots that this appointment is filling",
@@ -185,28 +135,13 @@ class Appointment(DomainResource):
         description="The date that this appointment was initially created",
         default=None,
     )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
-    )
     comment: Optional[String] = Field(
         description="Additional comments",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
-    )
     patientInstruction: Optional[String] = Field(
         description="Detailed information and instructions for the patient",
         default=None,
-    )
-    patientInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for patientInstruction extensions",
-        default=None,
-        alias="_patientInstruction",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="The service request this appointment is allocated to assess",

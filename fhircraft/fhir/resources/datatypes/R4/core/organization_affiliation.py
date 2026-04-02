@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class OrganizationAffiliation(DomainResource):
     """
@@ -49,11 +48,6 @@ class OrganizationAffiliation(DomainResource):
     active: Optional[Boolean] = Field(
         description="Whether this organization affiliation record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     period: Optional[Period] = Field(
         description="The period during which the participatingOrganization is affiliated with the primary organization",

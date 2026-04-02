@@ -4,17 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Integer,
-    Canonical,
-    Id,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -32,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class TestScriptOrigin(BackboneElement):
     """
     An abstract server used in operations within this test script in the origin element.
@@ -42,16 +31,10 @@ class TestScriptOrigin(BackboneElement):
         description="The index of the abstract origin server starting at 1",
         default=None,
     )
-    index_ext: Optional[Element] = Field(
-        description="Placeholder element for index extensions",
-        default=None,
-        alias="_index",
-    )
     profile: Optional[Coding] = Field(
         description="FHIR-Client | FHIR-SDC-FormFiller",
         default=None,
     )
-
 
 class TestScriptDestination(BackboneElement):
     """
@@ -62,16 +45,10 @@ class TestScriptDestination(BackboneElement):
         description="The index of the abstract destination server starting at 1",
         default=None,
     )
-    index_ext: Optional[Element] = Field(
-        description="Placeholder element for index extensions",
-        default=None,
-        alias="_index",
-    )
     profile: Optional[Coding] = Field(
         description="FHIR-Server | FHIR-SDC-FormManager | FHIR-SDC-FormReceiver | FHIR-SDC-FormProcessor",
         default=None,
     )
-
 
 class TestScriptMetadataLink(BackboneElement):
     """
@@ -82,21 +59,10 @@ class TestScriptMetadataLink(BackboneElement):
         description="URL to the specification",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     description: Optional[String] = Field(
         description="Short description",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-
 
 class TestScriptMetadataCapability(BackboneElement):
     """
@@ -107,66 +73,30 @@ class TestScriptMetadataCapability(BackboneElement):
         description="Are the capabilities required?",
         default=None,
     )
-    required_ext: Optional[Element] = Field(
-        description="Placeholder element for required extensions",
-        default=None,
-        alias="_required",
-    )
     validated: Optional[Boolean] = Field(
         description="Are the capabilities validated?",
         default=None,
-    )
-    validated_ext: Optional[Element] = Field(
-        description="Placeholder element for validated extensions",
-        default=None,
-        alias="_validated",
     )
     description: Optional[String] = Field(
         description="The expected capabilities of the server",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     origin: Optional[ListType[Integer]] = Field(
         description="Which origin server these requirements apply to",
         default=None,
-    )
-    origin_ext: Optional[Element] = Field(
-        description="Placeholder element for origin extensions",
-        default=None,
-        alias="_origin",
     )
     destination: Optional[Integer] = Field(
         description="Which server these requirements apply to",
         default=None,
     )
-    destination_ext: Optional[Element] = Field(
-        description="Placeholder element for destination extensions",
-        default=None,
-        alias="_destination",
-    )
     link: Optional[ListType[Uri]] = Field(
         description="Links to the FHIR specification",
         default=None,
-    )
-    link_ext: Optional[Element] = Field(
-        description="Placeholder element for link extensions",
-        default=None,
-        alias="_link",
     )
     capabilities: Optional[Canonical] = Field(
         description="Required Capability Statement",
         default=None,
     )
-    capabilities_ext: Optional[Element] = Field(
-        description="Placeholder element for capabilities extensions",
-        default=None,
-        alias="_capabilities",
-    )
-
 
 class TestScriptMetadata(BackboneElement):
     """
@@ -182,7 +112,6 @@ class TestScriptMetadata(BackboneElement):
         default=None,
     )
 
-
 class TestScriptFixture(BackboneElement):
     """
     Fixture in the test script - by reference (uri). All fixtures are required for the test script to execute.
@@ -192,25 +121,14 @@ class TestScriptFixture(BackboneElement):
         description="Whether or not to implicitly create the fixture during setup",
         default=None,
     )
-    autocreate_ext: Optional[Element] = Field(
-        description="Placeholder element for autocreate extensions",
-        default=None,
-        alias="_autocreate",
-    )
     autodelete: Optional[Boolean] = Field(
         description="Whether or not to implicitly delete the fixture during teardown",
         default=None,
-    )
-    autodelete_ext: Optional[Element] = Field(
-        description="Placeholder element for autodelete extensions",
-        default=None,
-        alias="_autodelete",
     )
     resource: Optional[Reference] = Field(
         description="Reference of the resource",
         default=None,
     )
-
 
 class TestScriptVariable(BackboneElement):
     """
@@ -221,75 +139,34 @@ class TestScriptVariable(BackboneElement):
         description="Descriptive name for this variable",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     defaultValue: Optional[String] = Field(
         description="Default, hard-coded, or user-defined value for this variable",
         default=None,
-    )
-    defaultValue_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValue extensions",
-        default=None,
-        alias="_defaultValue",
     )
     description: Optional[String] = Field(
         description="Natural language description of the variable",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     expression: Optional[String] = Field(
         description="The FHIRPath expression against the fixture body",
         default=None,
-    )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
     )
     headerField: Optional[String] = Field(
         description="HTTP header field name for source",
         default=None,
     )
-    headerField_ext: Optional[Element] = Field(
-        description="Placeholder element for headerField extensions",
-        default=None,
-        alias="_headerField",
-    )
     hint: Optional[String] = Field(
         description="Hint help text for default value to enter",
         default=None,
-    )
-    hint_ext: Optional[Element] = Field(
-        description="Placeholder element for hint extensions",
-        default=None,
-        alias="_hint",
     )
     path: Optional[String] = Field(
         description="XPath or JSONPath against the fixture body",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
     sourceId: Optional[Id] = Field(
         description="Fixture Id of source expression or headerField within this variable",
         default=None,
     )
-    sourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceId extensions",
-        default=None,
-        alias="_sourceId",
-    )
-
 
 class TestScriptSetupActionOperation(BackboneElement):
     """
@@ -304,91 +181,41 @@ class TestScriptSetupActionOperation(BackboneElement):
         description="Resource type",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
     label: Optional[String] = Field(
         description="Tracking/logging operation label",
         default=None,
-    )
-    label_ext: Optional[Element] = Field(
-        description="Placeholder element for label extensions",
-        default=None,
-        alias="_label",
     )
     description: Optional[String] = Field(
         description="Tracking/reporting operation description",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     accept: Optional[Code] = Field(
         description="Mime type to accept in the payload of the response, with charset etc.",
         default=None,
-    )
-    accept_ext: Optional[Element] = Field(
-        description="Placeholder element for accept extensions",
-        default=None,
-        alias="_accept",
     )
     contentType: Optional[Code] = Field(
         description="Mime type of the request payload contents, with charset etc.",
         default=None,
     )
-    contentType_ext: Optional[Element] = Field(
-        description="Placeholder element for contentType extensions",
-        default=None,
-        alias="_contentType",
-    )
     destination: Optional[Integer] = Field(
         description="Server responding to the request",
         default=None,
-    )
-    destination_ext: Optional[Element] = Field(
-        description="Placeholder element for destination extensions",
-        default=None,
-        alias="_destination",
     )
     encodeRequestUrl: Optional[Boolean] = Field(
         description="Whether or not to send the request url in encoded format",
         default=None,
     )
-    encodeRequestUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for encodeRequestUrl extensions",
-        default=None,
-        alias="_encodeRequestUrl",
-    )
     method: Optional[Code] = Field(
         description="delete | get | options | patch | post | put | head",
         default=None,
-    )
-    method_ext: Optional[Element] = Field(
-        description="Placeholder element for method extensions",
-        default=None,
-        alias="_method",
     )
     origin: Optional[Integer] = Field(
         description="Server initiating the request",
         default=None,
     )
-    origin_ext: Optional[Element] = Field(
-        description="Placeholder element for origin extensions",
-        default=None,
-        alias="_origin",
-    )
     params: Optional[String] = Field(
         description="Explicitly defined path parameters",
         default=None,
-    )
-    params_ext: Optional[Element] = Field(
-        description="Placeholder element for params extensions",
-        default=None,
-        alias="_params",
     )
     requestHeader: Optional[ListType["TestScriptSetupActionOperationRequestHeader"]] = (
         Field(
@@ -400,48 +227,22 @@ class TestScriptSetupActionOperation(BackboneElement):
         description="Fixture Id of mapped request",
         default=None,
     )
-    requestId_ext: Optional[Element] = Field(
-        description="Placeholder element for requestId extensions",
-        default=None,
-        alias="_requestId",
-    )
     responseId: Optional[Id] = Field(
         description="Fixture Id of mapped response",
         default=None,
-    )
-    responseId_ext: Optional[Element] = Field(
-        description="Placeholder element for responseId extensions",
-        default=None,
-        alias="_responseId",
     )
     sourceId: Optional[Id] = Field(
         description="Fixture Id of body for PUT and POST requests",
         default=None,
     )
-    sourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceId extensions",
-        default=None,
-        alias="_sourceId",
-    )
     targetId: Optional[Id] = Field(
         description="Id of fixture used for extracting the [id],  [type], and [vid] for GET requests",
         default=None,
-    )
-    targetId_ext: Optional[Element] = Field(
-        description="Placeholder element for targetId extensions",
-        default=None,
-        alias="_targetId",
     )
     url: Optional[String] = Field(
         description="Request URL",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-
 
 class TestScriptSetupActionAssert(BackboneElement):
     """
@@ -452,201 +253,90 @@ class TestScriptSetupActionAssert(BackboneElement):
         description="Tracking/logging assertion label",
         default=None,
     )
-    label_ext: Optional[Element] = Field(
-        description="Placeholder element for label extensions",
-        default=None,
-        alias="_label",
-    )
     description: Optional[String] = Field(
         description="Tracking/reporting assertion description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     direction: Optional[Code] = Field(
         description="response | request",
         default=None,
     )
-    direction_ext: Optional[Element] = Field(
-        description="Placeholder element for direction extensions",
-        default=None,
-        alias="_direction",
-    )
     compareToSourceId: Optional[String] = Field(
         description="Id of the source fixture to be evaluated",
         default=None,
-    )
-    compareToSourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for compareToSourceId extensions",
-        default=None,
-        alias="_compareToSourceId",
     )
     compareToSourceExpression: Optional[String] = Field(
         description="The FHIRPath expression to evaluate against the source fixture",
         default=None,
     )
-    compareToSourceExpression_ext: Optional[Element] = Field(
-        description="Placeholder element for compareToSourceExpression extensions",
-        default=None,
-        alias="_compareToSourceExpression",
-    )
     compareToSourcePath: Optional[String] = Field(
         description="XPath or JSONPath expression to evaluate against the source fixture",
         default=None,
-    )
-    compareToSourcePath_ext: Optional[Element] = Field(
-        description="Placeholder element for compareToSourcePath extensions",
-        default=None,
-        alias="_compareToSourcePath",
     )
     contentType: Optional[Code] = Field(
         description="Mime type to compare against the \u0027Content-Type\u0027 header",
         default=None,
     )
-    contentType_ext: Optional[Element] = Field(
-        description="Placeholder element for contentType extensions",
-        default=None,
-        alias="_contentType",
-    )
     expression: Optional[String] = Field(
         description="The FHIRPath expression to be evaluated",
         default=None,
-    )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
     )
     headerField: Optional[String] = Field(
         description="HTTP header field name",
         default=None,
     )
-    headerField_ext: Optional[Element] = Field(
-        description="Placeholder element for headerField extensions",
-        default=None,
-        alias="_headerField",
-    )
     minimumId: Optional[String] = Field(
         description="Fixture Id of minimum content resource",
         default=None,
-    )
-    minimumId_ext: Optional[Element] = Field(
-        description="Placeholder element for minimumId extensions",
-        default=None,
-        alias="_minimumId",
     )
     navigationLinks: Optional[Boolean] = Field(
         description="Perform validation on navigation links?",
         default=None,
     )
-    navigationLinks_ext: Optional[Element] = Field(
-        description="Placeholder element for navigationLinks extensions",
-        default=None,
-        alias="_navigationLinks",
-    )
     operator: Optional[Code] = Field(
         description="equals | notEquals | in | notIn | greaterThan | lessThan | empty | notEmpty | contains | notContains | eval",
         default=None,
-    )
-    operator_ext: Optional[Element] = Field(
-        description="Placeholder element for operator extensions",
-        default=None,
-        alias="_operator",
     )
     path: Optional[String] = Field(
         description="XPath or JSONPath expression",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
     requestMethod: Optional[Code] = Field(
         description="delete | get | options | patch | post | put | head",
         default=None,
-    )
-    requestMethod_ext: Optional[Element] = Field(
-        description="Placeholder element for requestMethod extensions",
-        default=None,
-        alias="_requestMethod",
     )
     requestURL: Optional[String] = Field(
         description="Request URL comparison value",
         default=None,
     )
-    requestURL_ext: Optional[Element] = Field(
-        description="Placeholder element for requestURL extensions",
-        default=None,
-        alias="_requestURL",
-    )
     resource: Optional[Code] = Field(
         description="Resource type",
         default=None,
-    )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
     )
     response: Optional[Code] = Field(
         description="okay | created | noContent | notModified | bad | forbidden | notFound | methodNotAllowed | conflict | gone | preconditionFailed | unprocessable",
         default=None,
     )
-    response_ext: Optional[Element] = Field(
-        description="Placeholder element for response extensions",
-        default=None,
-        alias="_response",
-    )
     responseCode: Optional[String] = Field(
         description="HTTP response code to test",
         default=None,
-    )
-    responseCode_ext: Optional[Element] = Field(
-        description="Placeholder element for responseCode extensions",
-        default=None,
-        alias="_responseCode",
     )
     sourceId: Optional[Id] = Field(
         description="Fixture Id of source expression or headerField",
         default=None,
     )
-    sourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceId extensions",
-        default=None,
-        alias="_sourceId",
-    )
     validateProfileId: Optional[Id] = Field(
         description="Profile Id of validation profile reference",
         default=None,
-    )
-    validateProfileId_ext: Optional[Element] = Field(
-        description="Placeholder element for validateProfileId extensions",
-        default=None,
-        alias="_validateProfileId",
     )
     value: Optional[String] = Field(
         description="The value to compare to",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     warningOnly: Optional[Boolean] = Field(
         description="Will this assert produce a warning only on error?",
         default=None,
     )
-    warningOnly_ext: Optional[Element] = Field(
-        description="Placeholder element for warningOnly extensions",
-        default=None,
-        alias="_warningOnly",
-    )
-
 
 class TestScriptSetupAction(BackboneElement):
     """
@@ -663,7 +353,6 @@ class TestScriptSetupAction(BackboneElement):
         alias="assert",
     )
 
-
 class TestScriptSetup(BackboneElement):
     """
     A series of required setup operations before tests are executed.
@@ -674,7 +363,6 @@ class TestScriptSetup(BackboneElement):
         default=None,
     )
 
-
 class TestScriptSetupActionOperationRequestHeader(BackboneElement):
     """
     Header elements would be used to set HTTP headers.
@@ -684,21 +372,10 @@ class TestScriptSetupActionOperationRequestHeader(BackboneElement):
         description="HTTP header field name",
         default=None,
     )
-    field_ext: Optional[Element] = Field(
-        description="Placeholder element for field extensions",
-        default=None,
-        alias="_field",
-    )
     value: Optional[String] = Field(
         description="HTTP headerfield value",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class TestScriptTestActionOperation(BackboneElement):
     """
@@ -713,91 +390,41 @@ class TestScriptTestActionOperation(BackboneElement):
         description="Resource type",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
     label: Optional[String] = Field(
         description="Tracking/logging operation label",
         default=None,
-    )
-    label_ext: Optional[Element] = Field(
-        description="Placeholder element for label extensions",
-        default=None,
-        alias="_label",
     )
     description: Optional[String] = Field(
         description="Tracking/reporting operation description",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     accept: Optional[Code] = Field(
         description="Mime type to accept in the payload of the response, with charset etc.",
         default=None,
-    )
-    accept_ext: Optional[Element] = Field(
-        description="Placeholder element for accept extensions",
-        default=None,
-        alias="_accept",
     )
     contentType: Optional[Code] = Field(
         description="Mime type of the request payload contents, with charset etc.",
         default=None,
     )
-    contentType_ext: Optional[Element] = Field(
-        description="Placeholder element for contentType extensions",
-        default=None,
-        alias="_contentType",
-    )
     destination: Optional[Integer] = Field(
         description="Server responding to the request",
         default=None,
-    )
-    destination_ext: Optional[Element] = Field(
-        description="Placeholder element for destination extensions",
-        default=None,
-        alias="_destination",
     )
     encodeRequestUrl: Optional[Boolean] = Field(
         description="Whether or not to send the request url in encoded format",
         default=None,
     )
-    encodeRequestUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for encodeRequestUrl extensions",
-        default=None,
-        alias="_encodeRequestUrl",
-    )
     method: Optional[Code] = Field(
         description="delete | get | options | patch | post | put | head",
         default=None,
-    )
-    method_ext: Optional[Element] = Field(
-        description="Placeholder element for method extensions",
-        default=None,
-        alias="_method",
     )
     origin: Optional[Integer] = Field(
         description="Server initiating the request",
         default=None,
     )
-    origin_ext: Optional[Element] = Field(
-        description="Placeholder element for origin extensions",
-        default=None,
-        alias="_origin",
-    )
     params: Optional[String] = Field(
         description="Explicitly defined path parameters",
         default=None,
-    )
-    params_ext: Optional[Element] = Field(
-        description="Placeholder element for params extensions",
-        default=None,
-        alias="_params",
     )
     requestHeader: Optional[ListType[TestScriptSetupActionOperationRequestHeader]] = (
         Field(
@@ -809,48 +436,22 @@ class TestScriptTestActionOperation(BackboneElement):
         description="Fixture Id of mapped request",
         default=None,
     )
-    requestId_ext: Optional[Element] = Field(
-        description="Placeholder element for requestId extensions",
-        default=None,
-        alias="_requestId",
-    )
     responseId: Optional[Id] = Field(
         description="Fixture Id of mapped response",
         default=None,
-    )
-    responseId_ext: Optional[Element] = Field(
-        description="Placeholder element for responseId extensions",
-        default=None,
-        alias="_responseId",
     )
     sourceId: Optional[Id] = Field(
         description="Fixture Id of body for PUT and POST requests",
         default=None,
     )
-    sourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceId extensions",
-        default=None,
-        alias="_sourceId",
-    )
     targetId: Optional[Id] = Field(
         description="Id of fixture used for extracting the [id],  [type], and [vid] for GET requests",
         default=None,
-    )
-    targetId_ext: Optional[Element] = Field(
-        description="Placeholder element for targetId extensions",
-        default=None,
-        alias="_targetId",
     )
     url: Optional[String] = Field(
         description="Request URL",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-
 
 class TestScriptTestActionAssert(BackboneElement):
     """
@@ -861,201 +462,90 @@ class TestScriptTestActionAssert(BackboneElement):
         description="Tracking/logging assertion label",
         default=None,
     )
-    label_ext: Optional[Element] = Field(
-        description="Placeholder element for label extensions",
-        default=None,
-        alias="_label",
-    )
     description: Optional[String] = Field(
         description="Tracking/reporting assertion description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     direction: Optional[Code] = Field(
         description="response | request",
         default=None,
     )
-    direction_ext: Optional[Element] = Field(
-        description="Placeholder element for direction extensions",
-        default=None,
-        alias="_direction",
-    )
     compareToSourceId: Optional[String] = Field(
         description="Id of the source fixture to be evaluated",
         default=None,
-    )
-    compareToSourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for compareToSourceId extensions",
-        default=None,
-        alias="_compareToSourceId",
     )
     compareToSourceExpression: Optional[String] = Field(
         description="The FHIRPath expression to evaluate against the source fixture",
         default=None,
     )
-    compareToSourceExpression_ext: Optional[Element] = Field(
-        description="Placeholder element for compareToSourceExpression extensions",
-        default=None,
-        alias="_compareToSourceExpression",
-    )
     compareToSourcePath: Optional[String] = Field(
         description="XPath or JSONPath expression to evaluate against the source fixture",
         default=None,
-    )
-    compareToSourcePath_ext: Optional[Element] = Field(
-        description="Placeholder element for compareToSourcePath extensions",
-        default=None,
-        alias="_compareToSourcePath",
     )
     contentType: Optional[Code] = Field(
         description="Mime type to compare against the \u0027Content-Type\u0027 header",
         default=None,
     )
-    contentType_ext: Optional[Element] = Field(
-        description="Placeholder element for contentType extensions",
-        default=None,
-        alias="_contentType",
-    )
     expression: Optional[String] = Field(
         description="The FHIRPath expression to be evaluated",
         default=None,
-    )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
     )
     headerField: Optional[String] = Field(
         description="HTTP header field name",
         default=None,
     )
-    headerField_ext: Optional[Element] = Field(
-        description="Placeholder element for headerField extensions",
-        default=None,
-        alias="_headerField",
-    )
     minimumId: Optional[String] = Field(
         description="Fixture Id of minimum content resource",
         default=None,
-    )
-    minimumId_ext: Optional[Element] = Field(
-        description="Placeholder element for minimumId extensions",
-        default=None,
-        alias="_minimumId",
     )
     navigationLinks: Optional[Boolean] = Field(
         description="Perform validation on navigation links?",
         default=None,
     )
-    navigationLinks_ext: Optional[Element] = Field(
-        description="Placeholder element for navigationLinks extensions",
-        default=None,
-        alias="_navigationLinks",
-    )
     operator: Optional[Code] = Field(
         description="equals | notEquals | in | notIn | greaterThan | lessThan | empty | notEmpty | contains | notContains | eval",
         default=None,
-    )
-    operator_ext: Optional[Element] = Field(
-        description="Placeholder element for operator extensions",
-        default=None,
-        alias="_operator",
     )
     path: Optional[String] = Field(
         description="XPath or JSONPath expression",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
     requestMethod: Optional[Code] = Field(
         description="delete | get | options | patch | post | put | head",
         default=None,
-    )
-    requestMethod_ext: Optional[Element] = Field(
-        description="Placeholder element for requestMethod extensions",
-        default=None,
-        alias="_requestMethod",
     )
     requestURL: Optional[String] = Field(
         description="Request URL comparison value",
         default=None,
     )
-    requestURL_ext: Optional[Element] = Field(
-        description="Placeholder element for requestURL extensions",
-        default=None,
-        alias="_requestURL",
-    )
     resource: Optional[Code] = Field(
         description="Resource type",
         default=None,
-    )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
     )
     response: Optional[Code] = Field(
         description="okay | created | noContent | notModified | bad | forbidden | notFound | methodNotAllowed | conflict | gone | preconditionFailed | unprocessable",
         default=None,
     )
-    response_ext: Optional[Element] = Field(
-        description="Placeholder element for response extensions",
-        default=None,
-        alias="_response",
-    )
     responseCode: Optional[String] = Field(
         description="HTTP response code to test",
         default=None,
-    )
-    responseCode_ext: Optional[Element] = Field(
-        description="Placeholder element for responseCode extensions",
-        default=None,
-        alias="_responseCode",
     )
     sourceId: Optional[Id] = Field(
         description="Fixture Id of source expression or headerField",
         default=None,
     )
-    sourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceId extensions",
-        default=None,
-        alias="_sourceId",
-    )
     validateProfileId: Optional[Id] = Field(
         description="Profile Id of validation profile reference",
         default=None,
-    )
-    validateProfileId_ext: Optional[Element] = Field(
-        description="Placeholder element for validateProfileId extensions",
-        default=None,
-        alias="_validateProfileId",
     )
     value: Optional[String] = Field(
         description="The value to compare to",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
     warningOnly: Optional[Boolean] = Field(
         description="Will this assert produce a warning only on error?",
         default=None,
     )
-    warningOnly_ext: Optional[Element] = Field(
-        description="Placeholder element for warningOnly extensions",
-        default=None,
-        alias="_warningOnly",
-    )
-
 
 class TestScriptTestAction(BackboneElement):
     """
@@ -1072,7 +562,6 @@ class TestScriptTestAction(BackboneElement):
         alias="assert",
     )
 
-
 class TestScriptTest(BackboneElement):
     """
     A test in this script.
@@ -1082,25 +571,14 @@ class TestScriptTest(BackboneElement):
         description="Tracking/logging name of this test",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     description: Optional[String] = Field(
         description="Tracking/reporting short description of the test",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     action: Optional[ListType[TestScriptTestAction]] = Field(
         description="A test operation or assert to perform",
         default=None,
     )
-
 
 class TestScriptTeardownAction(BackboneElement):
     """
@@ -1112,7 +590,6 @@ class TestScriptTeardownAction(BackboneElement):
         default=None,
     )
 
-
 class TestScriptTeardown(BackboneElement):
     """
     A series of operations required to clean up after all the tests are executed (successfully or otherwise).
@@ -1122,7 +599,6 @@ class TestScriptTeardown(BackboneElement):
         description="One or more teardown operations to perform",
         default=None,
     )
-
 
 class TestScript(DomainResource):
     """
@@ -1149,11 +625,6 @@ class TestScript(DomainResource):
         description="Canonical identifier for this test script, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[Identifier] = Field(
         description="Additional identifier for the test script",
         default=None,
@@ -1162,64 +633,29 @@ class TestScript(DomainResource):
         description="Business version of the test script",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     name: Optional[String] = Field(
         description="Name for this test script (computer friendly)",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     title: Optional[String] = Field(
         description="Name for this test script (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -1228,11 +664,6 @@ class TestScript(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the test script",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -1246,19 +677,9 @@ class TestScript(DomainResource):
         description="Why this test script is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     origin: Optional[ListType[TestScriptOrigin]] = Field(
         description="An abstract server representing a client or sender in a message exchange",

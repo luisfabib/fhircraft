@@ -3,14 +3,13 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneType,
     Element,
     Period,
     CodeableConcept,
 )
-
 
 class MarketingStatus(BackboneType):
     """
@@ -38,9 +37,4 @@ class MarketingStatus(BackboneType):
     restoreDate: Optional[DateTime] = Field(
         description="The date when the Medicinal Product is placed on the market by the Marketing Authorization Holder (or where applicable, the manufacturer/distributor) in a country and/or jurisdiction shall be provided A complete date consisting of day, month and year shall be specified using the ISO 8601 date format NOTE \u201cPlaced on the market\u201d refers to the release of the Medicinal Product into the distribution chain",
         default=None,
-    )
-    restoreDate_ext: Optional[Element] = Field(
-        description="Placeholder element for restoreDate extensions",
-        default=None,
-        alias="_restoreDate",
     )

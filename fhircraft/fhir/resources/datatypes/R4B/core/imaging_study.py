@@ -4,14 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    UnsignedInt,
-    Id,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ImagingStudySeriesPerformer(BackboneElement):
     """
     Indicates who or what performed the series and how they were involved.
@@ -43,7 +35,6 @@ class ImagingStudySeriesPerformer(BackboneElement):
         default=None,
     )
 
-
 class ImagingStudySeriesInstance(BackboneElement):
     """
     A single SOP instance within the series, e.g. an image, or presentation state.
@@ -53,11 +44,6 @@ class ImagingStudySeriesInstance(BackboneElement):
         description="DICOM SOP Instance UID",
         default=None,
     )
-    uid_ext: Optional[Element] = Field(
-        description="Placeholder element for uid extensions",
-        default=None,
-        alias="_uid",
-    )
     sopClass: Optional[Coding] = Field(
         description="DICOM class type",
         default=None,
@@ -66,21 +52,10 @@ class ImagingStudySeriesInstance(BackboneElement):
         description="The number of this instance in the series",
         default=None,
     )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
-    )
     title: Optional[String] = Field(
         description="Description of instance",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-
 
 class ImagingStudySeries(BackboneElement):
     """
@@ -91,19 +66,9 @@ class ImagingStudySeries(BackboneElement):
         description="DICOM Series Instance UID for the series",
         default=None,
     )
-    uid_ext: Optional[Element] = Field(
-        description="Placeholder element for uid extensions",
-        default=None,
-        alias="_uid",
-    )
     number: Optional[UnsignedInt] = Field(
         description="Numeric identifier of this series",
         default=None,
-    )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
     )
     modality: Optional[Coding] = Field(
         description="The modality of the instances in the series",
@@ -113,19 +78,9 @@ class ImagingStudySeries(BackboneElement):
         description="A short human readable summary of the series",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     numberOfInstances: Optional[UnsignedInt] = Field(
         description="Number of Series Related Instances",
         default=None,
-    )
-    numberOfInstances_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfInstances extensions",
-        default=None,
-        alias="_numberOfInstances",
     )
     endpoint: Optional[ListType[Reference]] = Field(
         description="Series access endpoint",
@@ -147,11 +102,6 @@ class ImagingStudySeries(BackboneElement):
         description="When the series started",
         default=None,
     )
-    started_ext: Optional[Element] = Field(
-        description="Placeholder element for started extensions",
-        default=None,
-        alias="_started",
-    )
     performer: Optional[ListType[ImagingStudySeriesPerformer]] = Field(
         description="Who performed the series",
         default=None,
@@ -160,7 +110,6 @@ class ImagingStudySeries(BackboneElement):
         description="A single SOP instance from the series",
         default=None,
     )
-
 
 class ImagingStudy(DomainResource):
     """
@@ -191,11 +140,6 @@ class ImagingStudy(DomainResource):
         description="registered | available | cancelled | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     modality: Optional[ListType[Coding]] = Field(
         description="All series modality if actual acquisition modalities",
         default=None,
@@ -211,11 +155,6 @@ class ImagingStudy(DomainResource):
     started: Optional[DateTime] = Field(
         description="When the study was started",
         default=None,
-    )
-    started_ext: Optional[Element] = Field(
-        description="Placeholder element for started extensions",
-        default=None,
-        alias="_started",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled",
@@ -237,19 +176,9 @@ class ImagingStudy(DomainResource):
         description="Number of Study Related Series",
         default=None,
     )
-    numberOfSeries_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfSeries extensions",
-        default=None,
-        alias="_numberOfSeries",
-    )
     numberOfInstances: Optional[UnsignedInt] = Field(
         description="Number of Study Related Instances",
         default=None,
-    )
-    numberOfInstances_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfInstances extensions",
-        default=None,
-        alias="_numberOfInstances",
     )
     procedureReference: Optional[Reference] = Field(
         description="The performed Procedure reference",
@@ -278,11 +207,6 @@ class ImagingStudy(DomainResource):
     description: Optional[String] = Field(
         description="Institution-generated description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     series: Optional[ListType[ImagingStudySeries]] = Field(
         description="Each study has one or more series of instances",

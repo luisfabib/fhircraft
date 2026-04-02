@@ -3,13 +3,12 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     BackboneElement,
     Period,
 )
-
 
 class AvailabilityAvailableTime(BackboneElement):
     """
@@ -33,7 +32,6 @@ class AvailabilityAvailableTime(BackboneElement):
         default=None,
     )
 
-
 class AvailabilityNotAvailableTime(BackboneElement):
     """
     Not available during this time due to provided reason
@@ -42,16 +40,10 @@ class AvailabilityNotAvailableTime(BackboneElement):
     description: String = Field(
         description="Reason presented to the user explaining why time not available",
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     during: Optional[Period] = Field(
         description="Service not available from this date",
         default=None,
     )
-
 
 class Availability(Element):
     """

@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Boolean,
-    Integer,
-    Date,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -34,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
     """
     The legal status of supply of the packaged item as classified by the regulator.
@@ -48,7 +38,6 @@ class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
         description="The place where the legal status of supply applies",
         default=None,
     )
-
 
 class PackagedProductDefinitionPackagingProperty(BackboneElement):
     """
@@ -71,19 +60,9 @@ class PackagedProductDefinitionPackagingProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -106,7 +85,6 @@ class PackagedProductDefinitionPackagingProperty(BackboneElement):
             required=False,
         )
 
-
 class PackagedProductDefinitionPackagingContainedItem(BackboneElement):
     """
     The item(s) within the packaging.
@@ -120,7 +98,6 @@ class PackagedProductDefinitionPackagingContainedItem(BackboneElement):
         description="The number of this type of item within this packaging or for continuous items such as liquids it is the quantity (for example 25ml). See also PackagedProductDefinition.containedItemQuantity (especially the long definition)",
         default=None,
     )
-
 
 class PackagedProductDefinitionPackaging(BackboneElement):
     """
@@ -139,19 +116,9 @@ class PackagedProductDefinitionPackaging(BackboneElement):
         description="Is this a part of the packaging (e.g. a cap or bottle stopper), rather than the packaging itself (e.g. a bottle or vial)",
         default=None,
     )
-    componentPart_ext: Optional[Element] = Field(
-        description="Placeholder element for componentPart extensions",
-        default=None,
-        alias="_componentPart",
-    )
     quantity: Optional[Integer] = Field(
         description="The quantity of this level of packaging in the package that contains it (with the outermost level being 1)",
         default=None,
-    )
-    quantity_ext: Optional[Element] = Field(
-        description="Placeholder element for quantity extensions",
-        default=None,
-        alias="_quantity",
     )
     material: Optional[ListType[CodeableConcept]] = Field(
         description="Material type of the package item",
@@ -185,7 +152,6 @@ class PackagedProductDefinitionPackaging(BackboneElement):
         default=None,
     )
 
-
 class PackagedProductDefinitionCharacteristic(BackboneElement):
     """
     Allows the key features to be recorded, such as "hospital pack", "nurse prescribable", "calendar pack".
@@ -207,19 +173,9 @@ class PackagedProductDefinitionCharacteristic(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -242,7 +198,6 @@ class PackagedProductDefinitionCharacteristic(BackboneElement):
             required=False,
         )
 
-
 class PackagedProductDefinition(DomainResource):
     """
     A medically related item or items, in a container or package.
@@ -260,11 +215,6 @@ class PackagedProductDefinition(DomainResource):
         description="A name for this package. Typically as listed in a drug formulary, catalogue, inventory etc",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     type: Optional[CodeableConcept] = Field(
         description="A high level category e.g. medicinal product, raw material, shipping container etc",
         default=None,
@@ -281,11 +231,6 @@ class PackagedProductDefinition(DomainResource):
         description="The date at which the given status became applicable",
         default=None,
     )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
-    )
     containedItemQuantity: Optional[ListType[Quantity]] = Field(
         description="A total of the complete count of contained items of a particular type/form, independent of sub-packaging or organization. This can be considered as the pack size. See also packaging.containedItem.amount (especially the long definition)",
         default=None,
@@ -293,11 +238,6 @@ class PackagedProductDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="Textual description. Note that this is not the name of the package or product",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     legalStatusOfSupply: Optional[
         ListType[PackagedProductDefinitionLegalStatusOfSupply]
@@ -312,11 +252,6 @@ class PackagedProductDefinition(DomainResource):
     copackagedIndicator: Optional[Boolean] = Field(
         description="Identifies if the drug product is supplied with another item such as a diluent or adjuvant",
         default=None,
-    )
-    copackagedIndicator_ext: Optional[Element] = Field(
-        description="Placeholder element for copackagedIndicator extensions",
-        default=None,
-        alias="_copackagedIndicator",
     )
     manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this package type (multiple means these are all possible manufacturers)",

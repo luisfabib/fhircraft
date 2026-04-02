@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CatalogEntryRelatedEntry(BackboneElement):
     """
     Used for example, to point to a substance, or to a device used to administer a medication.
@@ -36,16 +29,10 @@ class CatalogEntryRelatedEntry(BackboneElement):
         description="triggers | is-replaced-by",
         default=None,
     )
-    relationtype_ext: Optional[Element] = Field(
-        description="Placeholder element for relationtype extensions",
-        default=None,
-        alias="_relationtype",
-    )
     item: Optional[Reference] = Field(
         description="The reference to the related item",
         default=None,
     )
-
 
 class CatalogEntry(DomainResource):
     """
@@ -80,11 +67,6 @@ class CatalogEntry(DomainResource):
         description="Whether the entry represents an orderable item",
         default=None,
     )
-    orderable_ext: Optional[Element] = Field(
-        description="Placeholder element for orderable extensions",
-        default=None,
-        alias="_orderable",
-    )
     referencedItem: Optional[Reference] = Field(
         description="The item that is being defined",
         default=None,
@@ -101,11 +83,6 @@ class CatalogEntry(DomainResource):
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     validityPeriod: Optional[Period] = Field(
         description="The time period in which this catalog entry is expected to be active",
         default=None,
@@ -114,19 +91,9 @@ class CatalogEntry(DomainResource):
         description="The date until which this catalog entry is expected to be active",
         default=None,
     )
-    validTo_ext: Optional[Element] = Field(
-        description="Placeholder element for validTo extensions",
-        default=None,
-        alias="_validTo",
-    )
     lastUpdated: Optional[DateTime] = Field(
         description="When was this catalog last updated",
         default=None,
-    )
-    lastUpdated_ext: Optional[Element] = Field(
-        description="Placeholder element for lastUpdated extensions",
-        default=None,
-        alias="_lastUpdated",
     )
     additionalCharacteristic: Optional[ListType[CodeableConcept]] = Field(
         description="Additional characteristics of the catalog entry",

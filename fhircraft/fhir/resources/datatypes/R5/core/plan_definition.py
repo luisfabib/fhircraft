@@ -5,18 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Canonical,
-    DateTime,
-    Markdown,
-    Date,
-    Integer,
-    Id,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -46,7 +35,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PlanDefinitionGoalTarget(BackboneElement):
     """
     Indicates what should be done and within what timeframe.
@@ -72,28 +60,13 @@ class PlanDefinitionGoalTarget(BackboneElement):
         description="The target value to be achieved",
         default=None,
     )
-    detailString_ext: Optional[Element] = Field(
-        description="Placeholder element for detailString extensions",
-        default=None,
-        alias="_detailString",
-    )
     detailBoolean: Optional[Boolean] = Field(
         description="The target value to be achieved",
         default=None,
     )
-    detailBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for detailBoolean extensions",
-        default=None,
-        alias="_detailBoolean",
-    )
     detailInteger: Optional[Integer] = Field(
         description="The target value to be achieved",
         default=None,
-    )
-    detailInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for detailInteger extensions",
-        default=None,
-        alias="_detailInteger",
     )
     detailRatio: Optional[Ratio] = Field(
         description="The target value to be achieved",
@@ -127,7 +100,6 @@ class PlanDefinitionGoalTarget(BackboneElement):
             field_name_base="detail",
             required=False,
         )
-
 
 class PlanDefinitionGoal(BackboneElement):
     """
@@ -163,7 +135,6 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
 
-
 class PlanDefinitionActorOption(BackboneElement):
     """
     The characteristics of the candidates that could serve as the actor.
@@ -173,19 +144,9 @@ class PlanDefinitionActorOption(BackboneElement):
         description="careteam | device | group | healthcareservice | location | organization | patient | practitioner | practitionerrole | relatedperson",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     typeCanonical: Optional[Canonical] = Field(
         description="Who or what can participate",
         default=None,
-    )
-    typeCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for typeCanonical extensions",
-        default=None,
-        alias="_typeCanonical",
     )
     typeReference: Optional[Reference] = Field(
         description="Who or what can participate",
@@ -196,7 +157,6 @@ class PlanDefinitionActorOption(BackboneElement):
         default=None,
     )
 
-
 class PlanDefinitionActor(BackboneElement):
     """
     Actors represent the individuals or groups involved in the execution of the defined set of activities.
@@ -206,25 +166,14 @@ class PlanDefinitionActor(BackboneElement):
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     description: Optional[Markdown] = Field(
         description="Describes the actor",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     option: Optional[ListType[PlanDefinitionActorOption]] = Field(
         description="Who or what can be this actor",
         default=None,
     )
-
 
 class PlanDefinitionActionCondition(BackboneElement):
     """
@@ -235,16 +184,10 @@ class PlanDefinitionActionCondition(BackboneElement):
         description="applicability | start | stop",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
     expression: Optional[Expression] = Field(
         description="Boolean-valued expression",
         default=None,
     )
-
 
 class PlanDefinitionActionInput(BackboneElement):
     """
@@ -255,11 +198,6 @@ class PlanDefinitionActionInput(BackboneElement):
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     requirement: Optional[DataRequirement] = Field(
         description="What data is provided",
         default=None,
@@ -268,12 +206,6 @@ class PlanDefinitionActionInput(BackboneElement):
         description="What data is provided",
         default=None,
     )
-    relatedData_ext: Optional[Element] = Field(
-        description="Placeholder element for relatedData extensions",
-        default=None,
-        alias="_relatedData",
-    )
-
 
 class PlanDefinitionActionOutput(BackboneElement):
     """
@@ -284,11 +216,6 @@ class PlanDefinitionActionOutput(BackboneElement):
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     requirement: Optional[DataRequirement] = Field(
         description="What data is provided",
         default=None,
@@ -297,12 +224,6 @@ class PlanDefinitionActionOutput(BackboneElement):
         description="What data is provided",
         default=None,
     )
-    relatedData_ext: Optional[Element] = Field(
-        description="Placeholder element for relatedData extensions",
-        default=None,
-        alias="_relatedData",
-    )
-
 
 class PlanDefinitionActionRelatedAction(BackboneElement):
     """
@@ -313,28 +234,13 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
         description="What action is this related to",
         default=None,
     )
-    targetId_ext: Optional[Element] = Field(
-        description="Placeholder element for targetId extensions",
-        default=None,
-        alias="_targetId",
-    )
     relationship: Optional[Code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
     )
-    relationship_ext: Optional[Element] = Field(
-        description="Placeholder element for relationship extensions",
-        default=None,
-        alias="_relationship",
-    )
     endRelationship: Optional[Code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
-    )
-    endRelationship_ext: Optional[Element] = Field(
-        description="Placeholder element for endRelationship extensions",
-        default=None,
-        alias="_endRelationship",
     )
     offsetDuration: Optional[Duration] = Field(
         description="Time offset for the relationship",
@@ -361,7 +267,6 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
             required=False,
         )
 
-
 class PlanDefinitionActionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
@@ -371,28 +276,13 @@ class PlanDefinitionActionParticipant(BackboneElement):
         description="What actor",
         default=None,
     )
-    actorId_ext: Optional[Element] = Field(
-        description="Placeholder element for actorId extensions",
-        default=None,
-        alias="_actorId",
-    )
     type: Optional[Code] = Field(
         description="careteam | device | group | healthcareservice | location | organization | patient | practitioner | practitionerrole | relatedperson",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     typeCanonical: Optional[Canonical] = Field(
         description="Who or what can participate",
         default=None,
-    )
-    typeCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for typeCanonical extensions",
-        default=None,
-        alias="_typeCanonical",
     )
     typeReference: Optional[Reference] = Field(
         description="Who or what can participate",
@@ -407,7 +297,6 @@ class PlanDefinitionActionParticipant(BackboneElement):
         default=None,
     )
 
-
 class PlanDefinitionActionDynamicValue(BackboneElement):
     """
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
@@ -417,16 +306,10 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
         description="The path to the element to be set dynamically",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
     expression: Optional[Expression] = Field(
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
-
 
 class PlanDefinitionAction(BackboneElement):
     """
@@ -437,55 +320,25 @@ class PlanDefinitionAction(BackboneElement):
         description="Unique id for the action in the PlanDefinition",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     prefix: Optional[String] = Field(
         description="User-visible prefix for the action (e.g. 1. or A.)",
         default=None,
-    )
-    prefix_ext: Optional[Element] = Field(
-        description="Placeholder element for prefix extensions",
-        default=None,
-        alias="_prefix",
     )
     title: Optional[String] = Field(
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     description: Optional[Markdown] = Field(
         description="Brief description of the action",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     textEquivalent: Optional[Markdown] = Field(
         description="Static text equivalent of the action, used if the dynamic aspects cannot be interpreted by the receiving system",
         default=None,
     )
-    textEquivalent_ext: Optional[Element] = Field(
-        description="Placeholder element for textEquivalent extensions",
-        default=None,
-        alias="_textEquivalent",
-    )
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     code: Optional[CodeableConcept] = Field(
         description="Code representing the meaning of the action or sub-actions",
@@ -503,11 +356,6 @@ class PlanDefinitionAction(BackboneElement):
         description="What goals this action supports",
         default=None,
     )
-    goalId_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for goalId extensions",
-        default=None,
-        alias="_goalId",
-    )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of individual the action is focused on",
         default=None,
@@ -519,11 +367,6 @@ class PlanDefinitionAction(BackboneElement):
     subjectCanonical: Optional[Canonical] = Field(
         description="Type of individual the action is focused on",
         default=None,
-    )
-    subjectCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for subjectCanonical extensions",
-        default=None,
-        alias="_subjectCanonical",
     )
     trigger: Optional[ListType[TriggerDefinition]] = Field(
         description="When the action should be triggered",
@@ -577,73 +420,33 @@ class PlanDefinitionAction(BackboneElement):
         description="visual-group | logical-group | sentence-group",
         default=None,
     )
-    groupingBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for groupingBehavior extensions",
-        default=None,
-        alias="_groupingBehavior",
-    )
     selectionBehavior: Optional[Code] = Field(
         description="any | all | all-or-none | exactly-one | at-most-one | one-or-more",
         default=None,
-    )
-    selectionBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for selectionBehavior extensions",
-        default=None,
-        alias="_selectionBehavior",
     )
     requiredBehavior: Optional[Code] = Field(
         description="must | could | must-unless-documented",
         default=None,
     )
-    requiredBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for requiredBehavior extensions",
-        default=None,
-        alias="_requiredBehavior",
-    )
     precheckBehavior: Optional[Code] = Field(
         description="yes | no",
         default=None,
-    )
-    precheckBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for precheckBehavior extensions",
-        default=None,
-        alias="_precheckBehavior",
     )
     cardinalityBehavior: Optional[Code] = Field(
         description="single | multiple",
         default=None,
     )
-    cardinalityBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for cardinalityBehavior extensions",
-        default=None,
-        alias="_cardinalityBehavior",
-    )
     definitionCanonical: Optional[Canonical] = Field(
         description="Description of the activity to be performed",
         default=None,
-    )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
     )
     definitionUri: Optional[Uri] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionUri_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionUri extensions",
-        default=None,
-        alias="_definitionUri",
-    )
     transform: Optional[Canonical] = Field(
         description="Transform to apply the template",
         default=None,
-    )
-    transform_ext: Optional[Element] = Field(
-        description="Placeholder element for transform extensions",
-        default=None,
-        alias="_transform",
     )
     dynamicValue: Optional[ListType[PlanDefinitionActionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
@@ -702,7 +505,6 @@ class PlanDefinitionAction(BackboneElement):
             required=False,
         )
 
-
 class PlanDefinition(DomainResource):
     """
     This resource allows for the definition of various types of plans as a sharable, consumable, and executable artifact. The resource is general enough to support the description of a broad range of clinical and non-clinical artifacts such as clinical decision support rules, order sets, protocols, and drug quality specifications.
@@ -716,11 +518,6 @@ class PlanDefinition(DomainResource):
         description="Canonical identifier for this plan definition, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the plan definition",
         default=None,
@@ -729,19 +526,9 @@ class PlanDefinition(DomainResource):
         description="Business version of the plan definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -751,28 +538,13 @@ class PlanDefinition(DomainResource):
         description="Name for this plan definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this plan definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     subtitle: Optional[String] = Field(
         description="Subordinate title of the plan definition",
         default=None,
-    )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
     )
     type: Optional[CodeableConcept] = Field(
         description="order-set | clinical-protocol | eca-rule | workflow-definition",
@@ -782,19 +554,9 @@ class PlanDefinition(DomainResource):
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of individual the plan definition is focused on",
@@ -808,28 +570,13 @@ class PlanDefinition(DomainResource):
         description="Type of individual the plan definition is focused on",
         default=None,
     )
-    subjectCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for subjectCanonical extensions",
-        default=None,
-        alias="_subjectCanonical",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -838,11 +585,6 @@ class PlanDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the plan definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -856,55 +598,25 @@ class PlanDefinition(DomainResource):
         description="Why this plan definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     usage: Optional[Markdown] = Field(
         description="Describes the clinical usage of the plan",
         default=None,
-    )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
     )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
-    )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
     )
     approvalDate: Optional[Date] = Field(
         description="When the plan definition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the plan definition was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the plan definition is expected to be used",
@@ -938,11 +650,6 @@ class PlanDefinition(DomainResource):
         description="Logic used by the plan definition",
         default=None,
     )
-    library_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
-    )
     goal: Optional[ListType[PlanDefinitionGoal]] = Field(
         description="What the plan is trying to accomplish",
         default=None,
@@ -958,11 +665,6 @@ class PlanDefinition(DomainResource):
     asNeededBoolean: Optional[Boolean] = Field(
         description="Preconditions for service",
         default=None,
-    )
-    asNeededBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeededBoolean extensions",
-        default=None,
-        alias="_asNeededBoolean",
     )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",

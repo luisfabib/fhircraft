@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -24,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
     """
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
@@ -34,30 +33,14 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
         description="The identifier that is to be associated with every Device that references this DeviceDefintiion for the issuer and jurisdication porvided in the DeviceDefinition.udiDeviceIdentifier",
         default=None,
     )
-    deviceIdentifier_ext: Optional[Element] = Field(
-        description="Placeholder element for deviceIdentifier extensions",
-        default=None,
-        alias="_deviceIdentifier",
-    )
     issuer: Optional[Uri] = Field(
         description="The organization that assigns the identifier algorithm",
         default=None,
-    )
-    issuer_ext: Optional[Element] = Field(
-        description="Placeholder element for issuer extensions",
-        default=None,
-        alias="_issuer",
     )
     jurisdiction: Optional[Uri] = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
         default=None,
     )
-    jurisdiction_ext: Optional[Element] = Field(
-        description="Placeholder element for jurisdiction extensions",
-        default=None,
-        alias="_jurisdiction",
-    )
-
 
 class DeviceDefinitionDeviceName(BackboneElement):
     """
@@ -68,21 +51,10 @@ class DeviceDefinitionDeviceName(BackboneElement):
         description="The name of the device",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     type: Optional[Code] = Field(
         description="udi-label-name | user-friendly-name | patient-reported-name | manufacturer-name | model-name | other",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-
 
 class DeviceDefinitionSpecialization(BackboneElement):
     """
@@ -93,21 +65,10 @@ class DeviceDefinitionSpecialization(BackboneElement):
         description="The standard that is used to operate and communicate",
         default=None,
     )
-    systemType_ext: Optional[Element] = Field(
-        description="Placeholder element for systemType extensions",
-        default=None,
-        alias="_systemType",
-    )
     version: Optional[String] = Field(
         description="The version of the standard that is used to operate and communicate",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-
 
 class DeviceDefinitionCapability(BackboneElement):
     """
@@ -122,7 +83,6 @@ class DeviceDefinitionCapability(BackboneElement):
         description="Description of capability",
         default=None,
     )
-
 
 class DeviceDefinitionProperty(BackboneElement):
     """
@@ -142,7 +102,6 @@ class DeviceDefinitionProperty(BackboneElement):
         default=None,
     )
 
-
 class DeviceDefinitionMaterial(BackboneElement):
     """
     A substance used to create the material(s) of which the device is made.
@@ -156,21 +115,10 @@ class DeviceDefinitionMaterial(BackboneElement):
         description="Indicates an alternative material of the device",
         default=None,
     )
-    alternate_ext: Optional[Element] = Field(
-        description="Placeholder element for alternate extensions",
-        default=None,
-        alias="_alternate",
-    )
     allergenicIndicator: Optional[Boolean] = Field(
         description="Whether the substance is a known or suspected allergen",
         default=None,
     )
-    allergenicIndicator_ext: Optional[Element] = Field(
-        description="Placeholder element for allergenicIndicator extensions",
-        default=None,
-        alias="_allergenicIndicator",
-    )
-
 
 class DeviceDefinition(DomainResource):
     """
@@ -207,11 +155,6 @@ class DeviceDefinition(DomainResource):
         description="Name of device manufacturer",
         default=None,
     )
-    manufacturerString_ext: Optional[Element] = Field(
-        description="Placeholder element for manufacturerString extensions",
-        default=None,
-        alias="_manufacturerString",
-    )
     manufacturerReference: Optional[Reference] = Field(
         description="Name of device manufacturer",
         default=None,
@@ -224,11 +167,6 @@ class DeviceDefinition(DomainResource):
         description="The model number for the device",
         default=None,
     )
-    modelNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for modelNumber extensions",
-        default=None,
-        alias="_modelNumber",
-    )
     type: Optional[CodeableConcept] = Field(
         description="What kind of device or device system this is",
         default=None,
@@ -240,11 +178,6 @@ class DeviceDefinition(DomainResource):
     version: Optional[ListType[String]] = Field(
         description="Available versions",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     safety: Optional[ListType[CodeableConcept]] = Field(
         description="Safety characteristics of the device",
@@ -283,19 +216,9 @@ class DeviceDefinition(DomainResource):
         description="Network address to contact device",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     onlineInformation: Optional[Uri] = Field(
         description="Access to on-line information",
         default=None,
-    )
-    onlineInformation_ext: Optional[Element] = Field(
-        description="Placeholder element for onlineInformation extensions",
-        default=None,
-        alias="_onlineInformation",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Device notes and comments",

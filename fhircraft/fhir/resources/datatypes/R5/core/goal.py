@@ -5,14 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-    Integer,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -32,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class GoalTarget(BackboneElement):
     """
@@ -59,28 +51,13 @@ class GoalTarget(BackboneElement):
         description="The target value to be achieved",
         default=None,
     )
-    detailString_ext: Optional[Element] = Field(
-        description="Placeholder element for detailString extensions",
-        default=None,
-        alias="_detailString",
-    )
     detailBoolean: Optional[Boolean] = Field(
         description="The target value to be achieved",
         default=None,
     )
-    detailBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for detailBoolean extensions",
-        default=None,
-        alias="_detailBoolean",
-    )
     detailInteger: Optional[Integer] = Field(
         description="The target value to be achieved",
         default=None,
-    )
-    detailInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for detailInteger extensions",
-        default=None,
-        alias="_detailInteger",
     )
     detailRatio: Optional[Ratio] = Field(
         description="The target value to be achieved",
@@ -89,11 +66,6 @@ class GoalTarget(BackboneElement):
     dueDate: Optional[Date] = Field(
         description="Reach goal on or before",
         default=None,
-    )
-    dueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for dueDate extensions",
-        default=None,
-        alias="_dueDate",
     )
     dueDuration: Optional[Duration] = Field(
         description="Reach goal on or before",
@@ -140,7 +112,6 @@ class GoalTarget(BackboneElement):
             required=False,
         )
 
-
 class Goal(DomainResource):
     """
     Describes the intended objective(s) for a patient, group or organization care, for example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, etc.
@@ -158,11 +129,6 @@ class Goal(DomainResource):
         description="proposed | planned | accepted | active | on-hold | completed | cancelled | entered-in-error | rejected",
         default=None,
     )
-    lifecycleStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for lifecycleStatus extensions",
-        default=None,
-        alias="_lifecycleStatus",
-    )
     achievementStatus: Optional[CodeableConcept] = Field(
         description="in-progress | improving | worsening | no-change | achieved | sustaining | not-achieved | no-progress | not-attainable",
         default=None,
@@ -174,11 +140,6 @@ class Goal(DomainResource):
     continuous: Optional[Boolean] = Field(
         description="After meeting the goal, ongoing activity is needed to sustain the goal objective",
         default=None,
-    )
-    continuous_ext: Optional[Element] = Field(
-        description="Placeholder element for continuous extensions",
-        default=None,
-        alias="_continuous",
     )
     priority: Optional[CodeableConcept] = Field(
         description="high-priority | medium-priority | low-priority",
@@ -196,11 +157,6 @@ class Goal(DomainResource):
         description="When goal pursuit begins",
         default=None,
     )
-    startDate_ext: Optional[Element] = Field(
-        description="Placeholder element for startDate extensions",
-        default=None,
-        alias="_startDate",
-    )
     startCodeableConcept: Optional[CodeableConcept] = Field(
         description="When goal pursuit begins",
         default=None,
@@ -213,19 +169,9 @@ class Goal(DomainResource):
         description="When goal status took effect",
         default=None,
     )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
-    )
     statusReason: Optional[String] = Field(
         description="Reason for current status",
         default=None,
-    )
-    statusReason_ext: Optional[Element] = Field(
-        description="Placeholder element for statusReason extensions",
-        default=None,
-        alias="_statusReason",
     )
     source: Optional[Reference] = Field(
         description="Who\u0027s responsible for creating Goal?",

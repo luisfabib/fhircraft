@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -25,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CompositionAttester(BackboneElement):
     """
     A participant who has attested to the accuracy of the composition/document.
@@ -39,16 +38,10 @@ class CompositionAttester(BackboneElement):
         description="When the composition was attested",
         default=None,
     )
-    time_ext: Optional[Element] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
-    )
     party: Optional[Reference] = Field(
         description="Who attested the composition",
         default=None,
     )
-
 
 class CompositionEvent(BackboneElement):
     """
@@ -64,7 +57,6 @@ class CompositionEvent(BackboneElement):
         default=None,
     )
 
-
 class CompositionSection(BackboneElement):
     """
     The root of the sections that make up the composition.
@@ -73,11 +65,6 @@ class CompositionSection(BackboneElement):
     title: Optional[String] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     code: Optional[CodeableConcept] = Field(
         description="Classification of section (recommended)",
@@ -112,7 +99,6 @@ class CompositionSection(BackboneElement):
         default=None,
     )
 
-
 class Composition(DomainResource):
     """
     A set of healthcare-related information that is assembled together into a single logical package that provides a single coherent statement of meaning, establishes its own context and that has clinical attestation with regard to who is making the statement. A Composition defines the structure and narrative content necessary for a document. However, a Composition alone does not constitute a document. Rather, the Composition must be the first entry in a Bundle where Bundle.type=document, and any other resources referenced from Composition must be included as subsequent entries in the Bundle (for example Patient, Practitioner, Encounter, etc.).
@@ -126,11 +112,6 @@ class Composition(DomainResource):
         description="Canonical identifier for this Composition, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Version-independent identifier for the Composition",
         default=None,
@@ -139,19 +120,9 @@ class Composition(DomainResource):
         description="An explicitly assigned identifer of a variation of the content in the Composition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     status: Optional[Code] = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of composition (LOINC if possible)",
@@ -173,11 +144,6 @@ class Composition(DomainResource):
         description="Composition editing time",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
@@ -190,19 +156,9 @@ class Composition(DomainResource):
         description="Name for this Composition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Human Readable name/title",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="For any additional notes",

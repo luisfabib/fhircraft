@@ -5,14 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -31,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PersonCommunication(BackboneElement):
     """
     A language which may be used to communicate with the person about his or her health.
@@ -45,12 +37,6 @@ class PersonCommunication(BackboneElement):
         description="Language preference indicator",
         default=None,
     )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
-    )
-
 
 class PersonLink(BackboneElement):
     """
@@ -65,12 +51,6 @@ class PersonLink(BackboneElement):
         description="level1 | level2 | level3 | level4",
         default=None,
     )
-    assurance_ext: Optional[Element] = Field(
-        description="Placeholder element for assurance extensions",
-        default=None,
-        alias="_assurance",
-    )
-
 
 class Person(DomainResource):
     """
@@ -89,11 +69,6 @@ class Person(DomainResource):
         description="This person\u0027s record is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     name: Optional[ListType[HumanName]] = Field(
         description="A name associated with the person",
         default=None,
@@ -106,37 +81,17 @@ class Person(DomainResource):
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
     birthDate: Optional[Date] = Field(
         description="The date on which the person was born",
         default=None,
-    )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
     )
     deceasedBoolean: Optional[Boolean] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
-    deceasedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedBoolean extensions",
-        default=None,
-        alias="_deceasedBoolean",
-    )
     deceasedDateTime: Optional[DateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
-    )
-    deceasedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedDateTime extensions",
-        default=None,
-        alias="_deceasedDateTime",
     )
     address: Optional[ListType[Address]] = Field(
         description="One or more addresses for the person",

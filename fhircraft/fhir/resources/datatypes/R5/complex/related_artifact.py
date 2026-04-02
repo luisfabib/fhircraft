@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     DataType,
     CodeableConcept,
@@ -11,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Attachment,
     Reference,
 )
-
 
 class RelatedArtifact(DataType):
     """
@@ -24,11 +23,6 @@ class RelatedArtifact(DataType):
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     classifier: Optional[List[CodeableConcept]] = Field(
         description="Additional classifiers",
         default=None,
@@ -37,28 +31,13 @@ class RelatedArtifact(DataType):
         description="Short label",
         default=None,
     )
-    label_ext: Optional[Element] = Field(
-        description="Placeholder element for label extensions",
-        default=None,
-        alias="_label",
-    )
     display: Optional[String] = Field(
         description="Brief description of the related artifact",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
     citation: Optional[Markdown] = Field(
         description="Bibliographic citation for the artifact",
         default=None,
-    )
-    citation_ext: Optional[Element] = Field(
-        description="Placeholder element for citation extensions",
-        default=None,
-        alias="_citation",
     )
     document: Optional[Attachment] = Field(
         description="What document is being referenced",
@@ -68,11 +47,6 @@ class RelatedArtifact(DataType):
         description="What artifact is being referenced",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
     resourceReference: Optional[Reference] = Field(
         description="What artifact, if not a conformance resource",
         default=None,
@@ -81,17 +55,7 @@ class RelatedArtifact(DataType):
         description="draft | active | retired | unknown",
         default=None,
     )
-    publicationStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for publicationStatus extensions",
-        default=None,
-        alias="_publicationStatus",
-    )
     publicationDate: Optional[Date] = Field(
         description="Date of publication of the artifact being referred to",
         default=None,
-    )
-    publicationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for publicationDate extensions",
-        default=None,
-        alias="_publicationDate",
     )

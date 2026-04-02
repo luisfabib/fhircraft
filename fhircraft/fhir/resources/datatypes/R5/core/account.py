@@ -4,15 +4,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Code,
-    PositiveInt,
-    Markdown,
-    Boolean,
-    DateTime,
-    Instant,
-)
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Identifier,
@@ -24,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Money,
 )
 from .domain_resource import DomainResource
-
 
 class AccountCoverage(BackboneElement):
     """
@@ -39,12 +30,6 @@ class AccountCoverage(BackboneElement):
         description="The priority of the coverage in the context of this account",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
-
 
 class AccountGuarantor(BackboneElement):
     """
@@ -59,16 +44,10 @@ class AccountGuarantor(BackboneElement):
         description="Credit or other hold applied",
         default=None,
     )
-    onHold_ext: Optional[Element] = Field(
-        description="Placeholder element for onHold extensions",
-        default=None,
-        alias="_onHold",
-    )
     period: Optional[Period] = Field(
         description="Guarantee account during",
         default=None,
     )
-
 
 class AccountDiagnosis(BackboneElement):
     """
@@ -79,11 +58,6 @@ class AccountDiagnosis(BackboneElement):
         description="Ranking of the diagnosis (for each type)",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     condition: Optional[CodeableReference] = Field(
         description="The diagnosis relevant to the account",
         default=None,
@@ -91,11 +65,6 @@ class AccountDiagnosis(BackboneElement):
     dateOfDiagnosis: Optional[DateTime] = Field(
         description="Date of the diagnosis (when coded diagnosis)",
         default=None,
-    )
-    dateOfDiagnosis_ext: Optional[Element] = Field(
-        description="Placeholder element for dateOfDiagnosis extensions",
-        default=None,
-        alias="_dateOfDiagnosis",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Type that this diagnosis has relevant to the account (e.g. admission, billing, discharge \u2026)",
@@ -105,16 +74,10 @@ class AccountDiagnosis(BackboneElement):
         description="Diagnosis present on Admission",
         default=None,
     )
-    onAdmission_ext: Optional[Element] = Field(
-        description="Placeholder element for onAdmission extensions",
-        default=None,
-        alias="_onAdmission",
-    )
     packageCode: Optional[ListType[CodeableConcept]] = Field(
         description="Package Code specific for billing",
         default=None,
     )
-
 
 class AccountProcedure(BackboneElement):
     """
@@ -125,11 +88,6 @@ class AccountProcedure(BackboneElement):
         description="Ranking of the procedure (for each type)",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     code: Optional[CodeableReference] = Field(
         description="The procedure relevant to the account",
         default=None,
@@ -137,11 +95,6 @@ class AccountProcedure(BackboneElement):
     dateOfService: Optional[DateTime] = Field(
         description="Date of the procedure (when coded procedure)",
         default=None,
-    )
-    dateOfService_ext: Optional[Element] = Field(
-        description="Placeholder element for dateOfService extensions",
-        default=None,
-        alias="_dateOfService",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="How this procedure value should be used in charging the account",
@@ -156,7 +109,6 @@ class AccountProcedure(BackboneElement):
         default=None,
     )
 
-
 class AccountRelatedAccount(BackboneElement):
     """
     Other associated accounts related to this account.
@@ -170,7 +122,6 @@ class AccountRelatedAccount(BackboneElement):
         description="Reference to an associated Account",
         default=None,
     )
-
 
 class AccountBalance(BackboneElement):
     """
@@ -191,16 +142,10 @@ class AccountBalance(BackboneElement):
         description="Estimated balance",
         default=None,
     )
-    estimate_ext: Optional[Element] = Field(
-        description="Placeholder element for estimate extensions",
-        default=None,
-        alias="_estimate",
-    )
     amount: Optional[Money] = Field(
         description="Calculated amount",
         default=None,
     )
-
 
 class Account(DomainResource):
     """
@@ -219,11 +164,6 @@ class Account(DomainResource):
         description="active | inactive | entered-in-error | on-hold | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     billingStatus: Optional[CodeableConcept] = Field(
         description="Tracks the lifecycle of the account through the billing process",
         default=None,
@@ -235,11 +175,6 @@ class Account(DomainResource):
     name: Optional[String] = Field(
         description="Human-readable label",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     subject: Optional[ListType[Reference]] = Field(
         description="The entity that caused the expenses",
@@ -260,11 +195,6 @@ class Account(DomainResource):
     description: Optional[Markdown] = Field(
         description="Explanation of purpose/use",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     guarantor: Optional[ListType[AccountGuarantor]] = Field(
         description="The parties ultimately responsible for balancing the Account",
@@ -293,11 +223,6 @@ class Account(DomainResource):
     calculatedAt: Optional[Instant] = Field(
         description="Time the balance amount was calculated",
         default=None,
-    )
-    calculatedAt_ext: Optional[Element] = Field(
-        description="Placeholder element for calculatedAt extensions",
-        default=None,
-        alias="_calculatedAt",
     )
 
     @model_validator(mode="after")

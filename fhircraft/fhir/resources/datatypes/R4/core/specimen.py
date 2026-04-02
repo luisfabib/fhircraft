@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -23,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SpecimenCollection(BackboneElement):
     """
     Details concerning the specimen collection.
@@ -36,11 +35,6 @@ class SpecimenCollection(BackboneElement):
     collectedDateTime: Optional[DateTime] = Field(
         description="Collection time",
         default=None,
-    )
-    collectedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for collectedDateTime extensions",
-        default=None,
-        alias="_collectedDateTime",
     )
     collectedPeriod: Optional[Period] = Field(
         description="Collection time",
@@ -103,7 +97,6 @@ class SpecimenCollection(BackboneElement):
             required=False,
         )
 
-
 class SpecimenProcessing(BackboneElement):
     """
     Details concerning processing and processing steps for the specimen.
@@ -112,11 +105,6 @@ class SpecimenProcessing(BackboneElement):
     description: Optional[String] = Field(
         description="Textual description of procedure",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     procedure: Optional[CodeableConcept] = Field(
         description="Indicates the treatment step  applied to the specimen",
@@ -129,11 +117,6 @@ class SpecimenProcessing(BackboneElement):
     timeDateTime: Optional[DateTime] = Field(
         description="Date and time of specimen processing",
         default=None,
-    )
-    timeDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timeDateTime extensions",
-        default=None,
-        alias="_timeDateTime",
     )
     timePeriod: Optional[Period] = Field(
         description="Date and time of specimen processing",
@@ -156,7 +139,6 @@ class SpecimenProcessing(BackboneElement):
             required=False,
         )
 
-
 class SpecimenContainer(BackboneElement):
     """
     The container holding the specimen.  The recursive nature of containers; i.e. blood in tube in tray in rack is not addressed here.
@@ -169,11 +151,6 @@ class SpecimenContainer(BackboneElement):
     description: Optional[String] = Field(
         description="Textual description of the container",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of container directly associated with specimen",
@@ -212,7 +189,6 @@ class SpecimenContainer(BackboneElement):
             required=False,
         )
 
-
 class Specimen(DomainResource):
     """
     A sample to be used for analysis.
@@ -246,11 +222,6 @@ class Specimen(DomainResource):
         description="available | unavailable | unsatisfactory | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Kind of material that forms the specimen",
         default=None,
@@ -262,11 +233,6 @@ class Specimen(DomainResource):
     receivedTime: Optional[DateTime] = Field(
         description="The time when specimen was received for processing",
         default=None,
-    )
-    receivedTime_ext: Optional[Element] = Field(
-        description="Placeholder element for receivedTime extensions",
-        default=None,
-        alias="_receivedTime",
     )
     parent: Optional[ListType[Reference]] = Field(
         description="Specimen from which this specimen originated",

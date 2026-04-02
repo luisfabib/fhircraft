@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-    PositiveInt,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -32,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class InvoiceParticipant(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -47,7 +38,6 @@ class InvoiceParticipant(BackboneElement):
         default=None,
     )
 
-
 class InvoiceLineItem(BackboneElement):
     """
     Each line item represents one charge for goods and services rendered. Details such.ofType(date), code and amount are found in the referenced ChargeItem resource.
@@ -57,19 +47,9 @@ class InvoiceLineItem(BackboneElement):
         description="Sequence number of line item",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     servicedDate: Optional[Date] = Field(
         description="Service data or period",
         default=None,
-    )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Service data or period",
@@ -120,7 +100,6 @@ class InvoiceLineItem(BackboneElement):
             required=True,
         )
 
-
 class Invoice(DomainResource):
     """
     Invoice containing collected ChargeItems from an Account with calculated individual and total price for Billing purpose.
@@ -138,19 +117,9 @@ class Invoice(DomainResource):
         description="draft | issued | balanced | cancelled | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     cancelledReason: Optional[String] = Field(
         description="Reason for cancellation of this Invoice",
         default=None,
-    )
-    cancelledReason_ext: Optional[Element] = Field(
-        description="Placeholder element for cancelledReason extensions",
-        default=None,
-        alias="_cancelledReason",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of Invoice",
@@ -168,28 +137,13 @@ class Invoice(DomainResource):
         description="DEPRICATED",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     creation: Optional[DateTime] = Field(
         description="When posted",
         default=None,
     )
-    creation_ext: Optional[Element] = Field(
-        description="Placeholder element for creation extensions",
-        default=None,
-        alias="_creation",
-    )
     periodDate: Optional[Date] = Field(
         description="Billing date or period",
         default=None,
-    )
-    periodDate_ext: Optional[Element] = Field(
-        description="Placeholder element for periodDate extensions",
-        default=None,
-        alias="_periodDate",
     )
     periodPeriod: Optional[Period] = Field(
         description="Billing date or period",
@@ -226,11 +180,6 @@ class Invoice(DomainResource):
     paymentTerms: Optional[Markdown] = Field(
         description="Payment details",
         default=None,
-    )
-    paymentTerms_ext: Optional[Element] = Field(
-        description="Placeholder element for paymentTerms extensions",
-        default=None,
-        alias="_paymentTerms",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the invoice",

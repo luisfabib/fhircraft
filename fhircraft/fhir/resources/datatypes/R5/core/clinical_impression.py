@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -23,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ClinicalImpressionFinding(BackboneElement):
     """
     Specific findings or diagnoses that were considered likely or relevant to ongoing treatment.
@@ -37,12 +36,6 @@ class ClinicalImpressionFinding(BackboneElement):
         description="Which investigations support finding",
         default=None,
     )
-    basis_ext: Optional[Element] = Field(
-        description="Placeholder element for basis extensions",
-        default=None,
-        alias="_basis",
-    )
-
 
 class ClinicalImpression(DomainResource):
     """
@@ -61,11 +54,6 @@ class ClinicalImpression(DomainResource):
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
@@ -73,11 +61,6 @@ class ClinicalImpression(DomainResource):
     description: Optional[String] = Field(
         description="Why/how the assessment was performed",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     subject: Optional[Reference] = Field(
         description="Patient or group assessed",
@@ -91,11 +74,6 @@ class ClinicalImpression(DomainResource):
         description="Time of assessment",
         default=None,
     )
-    effectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveDateTime extensions",
-        default=None,
-        alias="_effectiveDateTime",
-    )
     effectivePeriod: Optional[Period] = Field(
         description="Time of assessment",
         default=None,
@@ -103,11 +81,6 @@ class ClinicalImpression(DomainResource):
     date: Optional[DateTime] = Field(
         description="When the assessment was documented",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     performer: Optional[Reference] = Field(
         description="The clinician performing the assessment",
@@ -129,19 +102,9 @@ class ClinicalImpression(DomainResource):
         description="Clinical Protocol followed",
         default=None,
     )
-    protocol_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for protocol extensions",
-        default=None,
-        alias="_protocol",
-    )
     summary: Optional[String] = Field(
         description="Summary of the assessment",
         default=None,
-    )
-    summary_ext: Optional[Element] = Field(
-        description="Placeholder element for summary extensions",
-        default=None,
-        alias="_summary",
     )
     finding: Optional[ListType[ClinicalImpressionFinding]] = Field(
         description="Possible or likely findings and diagnoses",

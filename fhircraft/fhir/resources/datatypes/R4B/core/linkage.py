@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class LinkageItem(BackboneElement):
     """
     Identifies which record considered as the reference to the same real-world occurrence as well as how the items should be evaluated within the collection of linked items.
@@ -27,16 +26,10 @@ class LinkageItem(BackboneElement):
         description="source | alternate | historical",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     resource: Optional[Reference] = Field(
         description="Resource being linked",
         default=None,
     )
-
 
 class Linkage(DomainResource):
     """
@@ -62,11 +55,6 @@ class Linkage(DomainResource):
     active: Optional[Boolean] = Field(
         description="Whether this linkage assertion is active or not",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     author: Optional[Reference] = Field(
         description="Who is responsible for linkages",

@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicinalProductPharmaceuticalCharacteristics(BackboneElement):
     """
     Characteristics e.g. a products onset of action.
@@ -36,7 +35,6 @@ class MedicinalProductPharmaceuticalCharacteristics(BackboneElement):
         description="The status of characteristic e.g. assigned or pending",
         default=None,
     )
-
 
 class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriod(
     BackboneElement
@@ -57,12 +55,6 @@ class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawal
         description="Extra information about the withdrawal period",
         default=None,
     )
-    supportingInformation_ext: Optional[Element] = Field(
-        description="Placeholder element for supportingInformation extensions",
-        default=None,
-        alias="_supportingInformation",
-    )
-
 
 class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies(BackboneElement):
     """
@@ -81,7 +73,6 @@ class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies(BackboneE
         description="A species specific time during which consumption of animal product is not appropriate",
         default=None,
     )
-
 
 class MedicinalProductPharmaceuticalRouteOfAdministration(BackboneElement):
     """
@@ -118,7 +109,6 @@ class MedicinalProductPharmaceuticalRouteOfAdministration(BackboneElement):
         description="A species for which this route applies",
         default=None,
     )
-
 
 class MedicinalProductPharmaceutical(DomainResource):
     """

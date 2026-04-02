@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import Field
 
 from fhircraft.fhir.resources.base import FHIRPrimitiveModel
-from fhircraft.fhir.resources.datatypes.R4.complex import Element
+from fhircraft.fhir.resources.datatypes.R4.complex.element import Element
 
 
 class Xhtml(Element, FHIRPrimitiveModel):

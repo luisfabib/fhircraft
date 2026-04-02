@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubstanceSourceMaterialFractionDescription(BackboneElement):
     """
     Many complex materials are fractions of parts of plants, animals, or minerals. Fraction elements are often necessary to define both Substances and Specified Group 1 Substances. For substances derived from Plants, fraction information will be captured at the Substance information level ( . Oils, Juices and Exudates). Additional information for Extracts, such as extraction solvent composition, will be captured at the Specified Substance Group 1 information level. For plasma-derived products fraction information will be captured at the Substance and the Specified Substance Group 1 levels.
@@ -28,16 +27,10 @@ class SubstanceSourceMaterialFractionDescription(BackboneElement):
         description="This element is capturing information about the fraction of a plant part, or human plasma for fractionation",
         default=None,
     )
-    fraction_ext: Optional[Element] = Field(
-        description="Placeholder element for fraction extensions",
-        default=None,
-        alias="_fraction",
-    )
     materialType: Optional[CodeableConcept] = Field(
         description="The specific type of the material constituting the component. For Herbal preparations the particulars of the extracts (liquid/dry) is described in Specified Substance Group 1",
         default=None,
     )
-
 
 class SubstanceSourceMaterialOrganismAuthor(BackboneElement):
     """
@@ -52,12 +45,6 @@ class SubstanceSourceMaterialOrganismAuthor(BackboneElement):
         description="The author of an organism species shall be specified. The author year of an organism shall also be specified when applicable; refers to the year in which the first author(s) published the infraspecific plant/animal name (of any rank)",
         default=None,
     )
-    authorDescription_ext: Optional[Element] = Field(
-        description="Placeholder element for authorDescription extensions",
-        default=None,
-        alias="_authorDescription",
-    )
-
 
 class SubstanceSourceMaterialOrganismHybrid(BackboneElement):
     """
@@ -68,43 +55,22 @@ class SubstanceSourceMaterialOrganismHybrid(BackboneElement):
         description="The identifier of the maternal species constituting the hybrid organism shall be specified based on a controlled vocabulary. For plants, the parents aren\u2019t always known, and it is unlikely that it will be known which is maternal and which is paternal",
         default=None,
     )
-    maternalOrganismId_ext: Optional[Element] = Field(
-        description="Placeholder element for maternalOrganismId extensions",
-        default=None,
-        alias="_maternalOrganismId",
-    )
     maternalOrganismName: Optional[String] = Field(
         description="The name of the maternal species constituting the hybrid organism shall be specified. For plants, the parents aren\u2019t always known, and it is unlikely that it will be known which is maternal and which is paternal",
         default=None,
-    )
-    maternalOrganismName_ext: Optional[Element] = Field(
-        description="Placeholder element for maternalOrganismName extensions",
-        default=None,
-        alias="_maternalOrganismName",
     )
     paternalOrganismId: Optional[String] = Field(
         description="The identifier of the paternal species constituting the hybrid organism shall be specified based on a controlled vocabulary",
         default=None,
     )
-    paternalOrganismId_ext: Optional[Element] = Field(
-        description="Placeholder element for paternalOrganismId extensions",
-        default=None,
-        alias="_paternalOrganismId",
-    )
     paternalOrganismName: Optional[String] = Field(
         description="The name of the paternal species constituting the hybrid organism shall be specified",
         default=None,
-    )
-    paternalOrganismName_ext: Optional[Element] = Field(
-        description="Placeholder element for paternalOrganismName extensions",
-        default=None,
-        alias="_paternalOrganismName",
     )
     hybridType: Optional[CodeableConcept] = Field(
         description="The hybrid type of an organism shall be specified",
         default=None,
     )
-
 
 class SubstanceSourceMaterialOrganismOrganismGeneral(BackboneElement):
     """
@@ -128,7 +94,6 @@ class SubstanceSourceMaterialOrganismOrganismGeneral(BackboneElement):
         description="The order of an organism shall be specified,",
         default=None,
     )
-
 
 class SubstanceSourceMaterialOrganism(BackboneElement):
     """
@@ -155,11 +120,6 @@ class SubstanceSourceMaterialOrganism(BackboneElement):
         description="The intraspecific description of an organism shall be specified based on a controlled vocabulary. For Influenza Vaccine, the intraspecific description shall contain the syntax of the antigen in line with the WHO convention",
         default=None,
     )
-    intraspecificDescription_ext: Optional[Element] = Field(
-        description="Placeholder element for intraspecificDescription extensions",
-        default=None,
-        alias="_intraspecificDescription",
-    )
     author: Optional[ListType[SubstanceSourceMaterialOrganismAuthor]] = Field(
         description="4.9.13.6.1 Author type (Conditional)",
         default=None,
@@ -172,7 +132,6 @@ class SubstanceSourceMaterialOrganism(BackboneElement):
         description="4.9.13.7.1 Kingdom (Conditional)",
         default=None,
     )
-
 
 class SubstanceSourceMaterialPartDescription(BackboneElement):
     """
@@ -187,7 +146,6 @@ class SubstanceSourceMaterialPartDescription(BackboneElement):
         description="The detailed anatomic location when the part can be extracted from different anatomical locations of the organism. Multiple alternative locations may apply",
         default=None,
     )
-
 
 class SubstanceSourceMaterial(DomainResource):
     """
@@ -230,11 +188,6 @@ class SubstanceSourceMaterial(DomainResource):
         description="The organism accepted Scientific name shall be provided based on the organism taxonomy",
         default=None,
     )
-    organismName_ext: Optional[Element] = Field(
-        description="Placeholder element for organismName extensions",
-        default=None,
-        alias="_organismName",
-    )
     parentSubstanceId: Optional[ListType[Identifier]] = Field(
         description="The parent of the herbal drug Ginkgo biloba, Leaf is the substance ID of the substance (fresh) of Ginkgo biloba L. or Ginkgo biloba L. (Whole plant)",
         default=None,
@@ -243,11 +196,6 @@ class SubstanceSourceMaterial(DomainResource):
         description="The parent substance of the Herbal Drug, or Herbal preparation",
         default=None,
     )
-    parentSubstanceName_ext: Optional[Element] = Field(
-        description="Placeholder element for parentSubstanceName extensions",
-        default=None,
-        alias="_parentSubstanceName",
-    )
     countryOfOrigin: Optional[ListType[CodeableConcept]] = Field(
         description="The country where the plant material is harvested or the countries where the plasma is sourced from as laid down in accordance with the Plasma Master File. For \u201cPlasma-derived substances\u201d the attribute country of origin provides information about the countries used for the manufacturing of the Cryopoor plama or Crioprecipitate",
         default=None,
@@ -255,11 +203,6 @@ class SubstanceSourceMaterial(DomainResource):
     geographicalLocation: Optional[ListType[String]] = Field(
         description="The place/region where the plant is harvested or the places/regions where the animal source material has its habitat",
         default=None,
-    )
-    geographicalLocation_ext: Optional[Element] = Field(
-        description="Placeholder element for geographicalLocation extensions",
-        default=None,
-        alias="_geographicalLocation",
     )
     developmentStage: Optional[CodeableConcept] = Field(
         description="Stage of life for animals, plants, insects and microorganisms. This information shall be provided only when the substance is significantly different in these stages (e.g. foetal bovine serum)",

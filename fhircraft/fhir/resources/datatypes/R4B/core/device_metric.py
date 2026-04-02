@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DeviceMetricCalibration(BackboneElement):
     """
     Describes the calibrations that have been performed or that are required to be performed.
@@ -30,30 +29,14 @@ class DeviceMetricCalibration(BackboneElement):
         description="unspecified | offset | gain | two-point",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     state: Optional[Code] = Field(
         description="not-calibrated | calibration-required | calibrated | unspecified",
         default=None,
-    )
-    state_ext: Optional[Element] = Field(
-        description="Placeholder element for state extensions",
-        default=None,
-        alias="_state",
     )
     time: Optional[Instant] = Field(
         description="Describes the time last calibration has been performed",
         default=None,
     )
-    time_ext: Optional[Element] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
-    )
-
 
 class DeviceMetric(DomainResource):
     """
@@ -100,28 +83,13 @@ class DeviceMetric(DomainResource):
         description="on | off | standby | entered-in-error",
         default=None,
     )
-    operationalStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for operationalStatus extensions",
-        default=None,
-        alias="_operationalStatus",
-    )
     color: Optional[Code] = Field(
         description="black | red | green | yellow | blue | magenta | cyan | white",
         default=None,
     )
-    color_ext: Optional[Element] = Field(
-        description="Placeholder element for color extensions",
-        default=None,
-        alias="_color",
-    )
     category: Optional[Code] = Field(
         description="measurement | setting | calculation | unspecified",
         default=None,
-    )
-    category_ext: Optional[Element] = Field(
-        description="Placeholder element for category extensions",
-        default=None,
-        alias="_category",
     )
     measurementPeriod: Optional[Timing] = Field(
         description="Describes the measurement repetition time",

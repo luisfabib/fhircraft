@@ -4,16 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Id,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -31,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class StructureDefinitionMapping(BackboneElement):
     """
     An external specification that the content is mapped to.
@@ -41,39 +31,18 @@ class StructureDefinitionMapping(BackboneElement):
         description="Internal id when this mapping is used",
         default=None,
     )
-    identity_ext: Optional[Element] = Field(
-        description="Placeholder element for identity extensions",
-        default=None,
-        alias="_identity",
-    )
     uri: Optional[Uri] = Field(
         description="Identifies what this mapping refers to",
         default=None,
-    )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
     )
     name: Optional[String] = Field(
         description="Names what this mapping refers to",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     comment: Optional[String] = Field(
         description="Versions, Issues, Scope limitations etc.",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
-    )
-
 
 class StructureDefinitionContext(BackboneElement):
     """
@@ -84,21 +53,10 @@ class StructureDefinitionContext(BackboneElement):
         description="fhirpath | element | extension",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     expression: Optional[String] = Field(
         description="Where the extension can be used in instances",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-
 
 class StructureDefinitionSnapshot(BackboneElement):
     """
@@ -110,7 +68,6 @@ class StructureDefinitionSnapshot(BackboneElement):
         default=None,
     )
 
-
 class StructureDefinitionDifferential(BackboneElement):
     """
     A differential view is expressed relative to the base StructureDefinition - a statement of differences that it applies.
@@ -120,7 +77,6 @@ class StructureDefinitionDifferential(BackboneElement):
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
-
 
 class StructureDefinition(DomainResource):
     """
@@ -147,11 +103,6 @@ class StructureDefinition(DomainResource):
         description="Canonical identifier for this structure definition, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure definition",
         default=None,
@@ -160,64 +111,29 @@ class StructureDefinition(DomainResource):
         description="Business version of the structure definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     name: Optional[String] = Field(
         description="Name for this structure definition (computer friendly)",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     title: Optional[String] = Field(
         description="Name for this structure definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -226,11 +142,6 @@ class StructureDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the structure definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -244,19 +155,9 @@ class StructureDefinition(DomainResource):
         description="Why this structure definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     keyword: Optional[ListType[Coding]] = Field(
         description="Assist with indexing and finding",
@@ -266,11 +167,6 @@ class StructureDefinition(DomainResource):
         description="FHIR Version this StructureDefinition targets",
         default=None,
     )
-    fhirVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for fhirVersion extensions",
-        default=None,
-        alias="_fhirVersion",
-    )
     mapping: Optional[ListType[StructureDefinitionMapping]] = Field(
         description="External specification that the content is mapped to",
         default=None,
@@ -279,19 +175,9 @@ class StructureDefinition(DomainResource):
         description="primitive-type | complex-type | resource | logical",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
     abstract: Optional[Boolean] = Field(
         description="Whether the structure is abstract",
         default=None,
-    )
-    abstract_ext: Optional[Element] = Field(
-        description="Placeholder element for abstract extensions",
-        default=None,
-        alias="_abstract",
     )
     context: Optional[ListType[StructureDefinitionContext]] = Field(
         description="If an extension, where it can be used in instances",
@@ -301,37 +187,17 @@ class StructureDefinition(DomainResource):
         description="FHIRPath invariants - when the extension can be used",
         default=None,
     )
-    contextInvariant_ext: Optional[Element] = Field(
-        description="Placeholder element for contextInvariant extensions",
-        default=None,
-        alias="_contextInvariant",
-    )
     type: Optional[Uri] = Field(
         description="Type defined or constrained by this structure",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     baseDefinition: Optional[Canonical] = Field(
         description="Definition that this type is constrained/specialized from",
         default=None,
     )
-    baseDefinition_ext: Optional[Element] = Field(
-        description="Placeholder element for baseDefinition extensions",
-        default=None,
-        alias="_baseDefinition",
-    )
     derivation: Optional[Code] = Field(
         description="specialization | constraint - How relates to base definition",
         default=None,
-    )
-    derivation_ext: Optional[Element] = Field(
-        description="Placeholder element for derivation extensions",
-        default=None,
-        alias="_derivation",
     )
     snapshot: Optional[StructureDefinitionSnapshot] = Field(
         description="Snapshot view of the structure",

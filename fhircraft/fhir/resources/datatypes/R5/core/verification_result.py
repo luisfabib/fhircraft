@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class VerificationResultPrimarySource(BackboneElement):
     """
@@ -53,11 +46,6 @@ class VerificationResultPrimarySource(BackboneElement):
         description="When the target was validated against the primary source",
         default=None,
     )
-    validationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for validationDate extensions",
-        default=None,
-        alias="_validationDate",
-    )
     canPushUpdates: Optional[CodeableConcept] = Field(
         description="yes | no | undetermined",
         default=None,
@@ -66,7 +54,6 @@ class VerificationResultPrimarySource(BackboneElement):
         description="specific | any | source",
         default=None,
     )
-
 
 class VerificationResultAttestation(BackboneElement):
     """
@@ -89,28 +76,13 @@ class VerificationResultAttestation(BackboneElement):
         description="The date the information was attested to",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     sourceIdentityCertificate: Optional[String] = Field(
         description="A digital identity certificate associated with the attestation source",
         default=None,
     )
-    sourceIdentityCertificate_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceIdentityCertificate extensions",
-        default=None,
-        alias="_sourceIdentityCertificate",
-    )
     proxyIdentityCertificate: Optional[String] = Field(
         description="A digital identity certificate associated with the proxy entity submitting attested information on behalf of the attestation source",
         default=None,
-    )
-    proxyIdentityCertificate_ext: Optional[Element] = Field(
-        description="Placeholder element for proxyIdentityCertificate extensions",
-        default=None,
-        alias="_proxyIdentityCertificate",
     )
     proxySignature: Optional[Signature] = Field(
         description="Proxy signature (digital or image)",
@@ -120,7 +92,6 @@ class VerificationResultAttestation(BackboneElement):
         description="Attester signature (digital or image)",
         default=None,
     )
-
 
 class VerificationResultValidator(BackboneElement):
     """
@@ -135,16 +106,10 @@ class VerificationResultValidator(BackboneElement):
         description="A digital identity certificate associated with the validator",
         default=None,
     )
-    identityCertificate_ext: Optional[Element] = Field(
-        description="Placeholder element for identityCertificate extensions",
-        default=None,
-        alias="_identityCertificate",
-    )
     attestationSignature: Optional[Signature] = Field(
         description="Validator signature (digital or image)",
         default=None,
     )
-
 
 class VerificationResult(DomainResource):
     """
@@ -163,11 +128,6 @@ class VerificationResult(DomainResource):
         description="The fhirpath location(s) within the resource that was validated",
         default=None,
     )
-    targetLocation_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for targetLocation extensions",
-        default=None,
-        alias="_targetLocation",
-    )
     need: Optional[CodeableConcept] = Field(
         description="none | initial | periodic",
         default=None,
@@ -176,19 +136,9 @@ class VerificationResult(DomainResource):
         description="attested | validated | in-process | req-revalid | val-fail | reval-fail | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusDate: Optional[DateTime] = Field(
         description="When the validation status was updated",
         default=None,
-    )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
     )
     validationType: Optional[CodeableConcept] = Field(
         description="nothing | primary | multiple",
@@ -206,19 +156,9 @@ class VerificationResult(DomainResource):
         description="The date/time validation was last completed (including failed validations)",
         default=None,
     )
-    lastPerformed_ext: Optional[Element] = Field(
-        description="Placeholder element for lastPerformed extensions",
-        default=None,
-        alias="_lastPerformed",
-    )
     nextScheduled: Optional[Date] = Field(
         description="The date when target is next validated, if appropriate",
         default=None,
-    )
-    nextScheduled_ext: Optional[Element] = Field(
-        description="Placeholder element for nextScheduled extensions",
-        default=None,
-        alias="_nextScheduled",
     )
     failureAction: Optional[CodeableConcept] = Field(
         description="fatal | warn | rec-only | none",

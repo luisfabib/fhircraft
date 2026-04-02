@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Integer
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubstanceNucleicAcidSubunitLinkage(BackboneElement):
     """
     The linkages between sugar residues will also be captured.
@@ -29,11 +28,6 @@ class SubstanceNucleicAcidSubunitLinkage(BackboneElement):
         description="The entity that links the sugar residues together should also be captured for nearly all naturally occurring nucleic acid the linkage is a phosphate group. For many synthetic oligonucleotides phosphorothioate linkages are often seen. Linkage connectivity is assumed to be 3\u2019-5\u2019. If the linkage is either 3\u2019-3\u2019 or 5\u2019-5\u2019 this should be specified",
         default=None,
     )
-    connectivity_ext: Optional[Element] = Field(
-        description="Placeholder element for connectivity extensions",
-        default=None,
-        alias="_connectivity",
-    )
     identifier: Optional[Identifier] = Field(
         description="Each linkage will be registered as a fragment and have an ID",
         default=None,
@@ -42,21 +36,10 @@ class SubstanceNucleicAcidSubunitLinkage(BackboneElement):
         description="Each linkage will be registered as a fragment and have at least one name. A single name shall be assigned to each linkage",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     residueSite: Optional[String] = Field(
         description="Residues shall be captured as described in 5.3.6.8.3",
         default=None,
     )
-    residueSite_ext: Optional[Element] = Field(
-        description="Placeholder element for residueSite extensions",
-        default=None,
-        alias="_residueSite",
-    )
-
 
 class SubstanceNucleicAcidSubunitSugar(BackboneElement):
     """
@@ -71,21 +54,10 @@ class SubstanceNucleicAcidSubunitSugar(BackboneElement):
         description="The name of the sugar or sugar-like component that make up the nucleotide",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     residueSite: Optional[String] = Field(
         description="The residues that contain a given sugar will be captured. The order of given residues will be captured in the 5\u2018-3\u2018direction consistent with the base sequences listed above",
         default=None,
     )
-    residueSite_ext: Optional[Element] = Field(
-        description="Placeholder element for residueSite extensions",
-        default=None,
-        alias="_residueSite",
-    )
-
 
 class SubstanceNucleicAcidSubunit(BackboneElement):
     """
@@ -96,28 +68,13 @@ class SubstanceNucleicAcidSubunit(BackboneElement):
         description="Index of linear sequences of nucleic acids in order of decreasing length. Sequences of the same length will be ordered by molecular weight. Subunits that have identical sequences will be repeated and have sequential subscripts",
         default=None,
     )
-    subunit_ext: Optional[Element] = Field(
-        description="Placeholder element for subunit extensions",
-        default=None,
-        alias="_subunit",
-    )
     sequence: Optional[String] = Field(
         description="Actual nucleotide sequence notation from 5\u0027 to 3\u0027 end using standard single letter codes. In addition to the base sequence, sugar and type of phosphate or non-phosphate linkage should also be captured",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     length: Optional[Integer] = Field(
         description="The length of the sequence shall be captured",
         default=None,
-    )
-    length_ext: Optional[Element] = Field(
-        description="Placeholder element for length extensions",
-        default=None,
-        alias="_length",
     )
     sequenceAttachment: Optional[Attachment] = Field(
         description="(TBC)",
@@ -139,7 +96,6 @@ class SubstanceNucleicAcidSubunit(BackboneElement):
         description="5.3.6.8.1 Sugar ID (Mandatory)",
         default=None,
     )
-
 
 class SubstanceNucleicAcid(DomainResource):
     """
@@ -170,19 +126,9 @@ class SubstanceNucleicAcid(DomainResource):
         description="The number of linear sequences of nucleotides linked through phosphodiester bonds shall be described. Subunits would be strands of nucleic acids that are tightly associated typically through Watson-Crick base pairing. NOTE: If not specified in the reference source, the assumption is that there is 1 subunit",
         default=None,
     )
-    numberOfSubunits_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfSubunits extensions",
-        default=None,
-        alias="_numberOfSubunits",
-    )
     areaOfHybridisation: Optional[String] = Field(
         description="The area of hybridisation shall be described if applicable for double stranded RNA or DNA. The number associated with the subunit followed by the number associated to the residue shall be specified in increasing order. The underscore \u201c\u201d shall be used as separator as follows: \u201cSubunitnumber Residue\u201d",
         default=None,
-    )
-    areaOfHybridisation_ext: Optional[Element] = Field(
-        description="Placeholder element for areaOfHybridisation extensions",
-        default=None,
-        alias="_areaOfHybridisation",
     )
     oligoNucleotideType: Optional[CodeableConcept] = Field(
         description="(TBC)",

@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -27,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class OrganizationQualification(BackboneElement):
     """
@@ -53,7 +46,6 @@ class OrganizationQualification(BackboneElement):
         default=None,
     )
 
-
 class Organization(DomainResource):
     """
     A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.
@@ -71,11 +63,6 @@ class Organization(DomainResource):
         description="Whether the organization\u0027s record is still in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of organization",
         default=None,
@@ -84,28 +71,13 @@ class Organization(DomainResource):
         description="Name used for the organization",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     alias: Optional[ListType[String]] = Field(
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
     )
-    alias_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
-    )
     description: Optional[Markdown] = Field(
         description="Additional details about the Organization that could be displayed as further information to identify the Organization beyond its name",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details for the Organization",

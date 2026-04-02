@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -23,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationAdministrationPerformer(BackboneElement):
     """
     Indicates who or what performed the medication administration and how they were involved.
@@ -38,7 +37,6 @@ class MedicationAdministrationPerformer(BackboneElement):
         default=None,
     )
 
-
 class MedicationAdministrationDosage(BackboneElement):
     """
     Describes the medication dosage information details e.g. dose, rate, site, route, etc.
@@ -47,11 +45,6 @@ class MedicationAdministrationDosage(BackboneElement):
     text: Optional[String] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     site: Optional[CodeableConcept] = Field(
         description="Body site administered to",
@@ -94,7 +87,6 @@ class MedicationAdministrationDosage(BackboneElement):
             required=False,
         )
 
-
 class MedicationAdministration(DomainResource):
     """
     Describes the event of a patient consuming or otherwise being administered a medication.  This may be as simple as swallowing a tablet or it may be a long running infusion.  Related resources tie this event to the authorizing prescription, and the specific encounter between patient and health care practitioner.
@@ -124,11 +116,6 @@ class MedicationAdministration(DomainResource):
         description="Instantiates protocol or definition",
         default=None,
     )
-    instantiates_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiates extensions",
-        default=None,
-        alias="_instantiates",
-    )
     partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
@@ -136,11 +123,6 @@ class MedicationAdministration(DomainResource):
     status: Optional[Code] = Field(
         description="in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason administration not performed",
@@ -173,11 +155,6 @@ class MedicationAdministration(DomainResource):
     effectiveDateTime: Optional[DateTime] = Field(
         description="Start and end time of administration",
         default=None,
-    )
-    effectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveDateTime extensions",
-        default=None,
-        alias="_effectiveDateTime",
     )
     effectivePeriod: Optional[Period] = Field(
         description="Start and end time of administration",

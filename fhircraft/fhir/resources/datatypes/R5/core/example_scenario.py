@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -31,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ExampleScenarioActor(BackboneElement):
     """
     A system or person who shares or receives an instance within the scenario.
@@ -41,39 +32,18 @@ class ExampleScenarioActor(BackboneElement):
         description="ID or acronym of the actor",
         default=None,
     )
-    key_ext: Optional[Element] = Field(
-        description="Placeholder element for key extensions",
-        default=None,
-        alias="_key",
-    )
     type: Optional[Code] = Field(
         description="person | system",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     title: Optional[String] = Field(
         description="Label for actor when rendering",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     description: Optional[Markdown] = Field(
         description="Details about actor",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-
 
 class ExampleScenarioInstanceVersion(BackboneElement):
     """
@@ -84,34 +54,18 @@ class ExampleScenarioInstanceVersion(BackboneElement):
         description="ID or acronym of the version",
         default=None,
     )
-    key_ext: Optional[Element] = Field(
-        description="Placeholder element for key extensions",
-        default=None,
-        alias="_key",
-    )
     title: Optional[String] = Field(
         description="Label for instance version",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     description: Optional[Markdown] = Field(
         description="Details about version",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     content: Optional[Reference] = Field(
         description="Example instance version data",
         default=None,
     )
-
 
 class ExampleScenarioInstanceContainedInstance(BackboneElement):
     """
@@ -122,21 +76,10 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
         description="Key of contained instance",
         default=None,
     )
-    instanceReference_ext: Optional[Element] = Field(
-        description="Placeholder element for instanceReference extensions",
-        default=None,
-        alias="_instanceReference",
-    )
     versionReference: Optional[String] = Field(
         description="Key of contained instance version",
         default=None,
     )
-    versionReference_ext: Optional[Element] = Field(
-        description="Placeholder element for versionReference extensions",
-        default=None,
-        alias="_versionReference",
-    )
-
 
 class ExampleScenarioInstance(BackboneElement):
     """
@@ -147,11 +90,6 @@ class ExampleScenarioInstance(BackboneElement):
         description="ID or acronym of the instance",
         default=None,
     )
-    key_ext: Optional[Element] = Field(
-        description="Placeholder element for key extensions",
-        default=None,
-        alias="_key",
-    )
     structureType: Optional[Coding] = Field(
         description="Data structure for example",
         default=None,
@@ -160,46 +98,21 @@ class ExampleScenarioInstance(BackboneElement):
         description="E.g. 4.0.1",
         default=None,
     )
-    structureVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for structureVersion extensions",
-        default=None,
-        alias="_structureVersion",
-    )
     structureProfileCanonical: Optional[Canonical] = Field(
         description="Rules instance adheres to",
         default=None,
-    )
-    structureProfileCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for structureProfileCanonical extensions",
-        default=None,
-        alias="_structureProfileCanonical",
     )
     structureProfileUri: Optional[Uri] = Field(
         description="Rules instance adheres to",
         default=None,
     )
-    structureProfileUri_ext: Optional[Element] = Field(
-        description="Placeholder element for structureProfileUri extensions",
-        default=None,
-        alias="_structureProfileUri",
-    )
     title: Optional[String] = Field(
         description="Label for instance",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     description: Optional[Markdown] = Field(
         description="Human-friendly description of the instance",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     content: Optional[Reference] = Field(
         description="Example instance data",
@@ -232,7 +145,6 @@ class ExampleScenarioInstance(BackboneElement):
             required=False,
         )
 
-
 class ExampleScenarioProcessStepOperationRequest(BackboneElement):
     """
     A reference to the instance that is transmitted from requester to receiver as part of the invocation of the operation.
@@ -242,21 +154,10 @@ class ExampleScenarioProcessStepOperationRequest(BackboneElement):
         description="Key of contained instance",
         default=None,
     )
-    instanceReference_ext: Optional[Element] = Field(
-        description="Placeholder element for instanceReference extensions",
-        default=None,
-        alias="_instanceReference",
-    )
     versionReference: Optional[String] = Field(
         description="Key of contained instance version",
         default=None,
     )
-    versionReference_ext: Optional[Element] = Field(
-        description="Placeholder element for versionReference extensions",
-        default=None,
-        alias="_versionReference",
-    )
-
 
 class ExampleScenarioProcessStepOperation(BackboneElement):
     """
@@ -271,55 +172,25 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         description="Label for step",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     initiator: Optional[String] = Field(
         description="Who starts the operation",
         default=None,
-    )
-    initiator_ext: Optional[Element] = Field(
-        description="Placeholder element for initiator extensions",
-        default=None,
-        alias="_initiator",
     )
     receiver: Optional[String] = Field(
         description="Who receives the operation",
         default=None,
     )
-    receiver_ext: Optional[Element] = Field(
-        description="Placeholder element for receiver extensions",
-        default=None,
-        alias="_receiver",
-    )
     description: Optional[Markdown] = Field(
         description="Human-friendly description of the operation",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     initiatorActive: Optional[Boolean] = Field(
         description="Initiator stays active?",
         default=None,
     )
-    initiatorActive_ext: Optional[Element] = Field(
-        description="Placeholder element for initiatorActive extensions",
-        default=None,
-        alias="_initiatorActive",
-    )
     receiverActive: Optional[Boolean] = Field(
         description="Receiver stays active?",
         default=None,
-    )
-    receiverActive_ext: Optional[Element] = Field(
-        description="Placeholder element for receiverActive extensions",
-        default=None,
-        alias="_receiverActive",
     )
     request: Optional[ExampleScenarioProcessStepOperationRequest] = Field(
         description="Instance transmitted on invocation",
@@ -330,7 +201,6 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         default=None,
     )
 
-
 class ExampleScenarioProcessStepAlternative(BackboneElement):
     """
     Indicates an alternative step that can be taken instead of the sub-process, scenario or operation.  E.g. to represent non-happy-path/exceptional/atypical circumstances.
@@ -340,25 +210,14 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
         description="Label for alternative",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     description: Optional[Markdown] = Field(
         description="Human-readable description of option",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     step: Optional[ListType["ExampleScenarioProcessStep"]] = Field(
         description="Alternative action(s)",
         default=None,
     )
-
 
 class ExampleScenarioProcessStep(BackboneElement):
     """
@@ -369,11 +228,6 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Sequential number of the step",
         default=None,
     )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
-    )
     process: Optional["ExampleScenarioProcess"] = Field(
         description="Step is nested process",
         default=None,
@@ -381,11 +235,6 @@ class ExampleScenarioProcessStep(BackboneElement):
     workflow: Optional[Canonical] = Field(
         description="Step is nested workflow",
         default=None,
-    )
-    workflow_ext: Optional[Element] = Field(
-        description="Placeholder element for workflow extensions",
-        default=None,
-        alias="_workflow",
     )
     operation: Optional[ExampleScenarioProcessStepOperation] = Field(
         description="Step is simple action",
@@ -399,12 +248,6 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Pause in the flow?",
         default=None,
     )
-    pause_ext: Optional[Element] = Field(
-        description="Placeholder element for pause extensions",
-        default=None,
-        alias="_pause",
-    )
-
 
 class ExampleScenarioProcess(BackboneElement):
     """
@@ -415,43 +258,22 @@ class ExampleScenarioProcess(BackboneElement):
         description="Label for procss",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     description: Optional[Markdown] = Field(
         description="Human-friendly description of the process",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     preConditions: Optional[Markdown] = Field(
         description="Status before process starts",
         default=None,
     )
-    preConditions_ext: Optional[Element] = Field(
-        description="Placeholder element for preConditions extensions",
-        default=None,
-        alias="_preConditions",
-    )
     postConditions: Optional[Markdown] = Field(
         description="Status after successful completion",
         default=None,
-    )
-    postConditions_ext: Optional[Element] = Field(
-        description="Placeholder element for postConditions extensions",
-        default=None,
-        alias="_postConditions",
     )
     step: Optional[ListType[ExampleScenarioProcessStep]] = Field(
         description="Event within of the process",
         default=None,
     )
-
 
 class ExampleScenario(DomainResource):
     """
@@ -466,11 +288,6 @@ class ExampleScenario(DomainResource):
         description="Canonical identifier for this example scenario, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the example scenario",
         default=None,
@@ -479,19 +296,9 @@ class ExampleScenario(DomainResource):
         description="Business version of the example scenario",
         default=None,
     )
-    version_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -501,55 +308,25 @@ class ExampleScenario(DomainResource):
         description="To be removed?",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this example scenario (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -558,11 +335,6 @@ class ExampleScenario(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the ExampleScenario",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -576,28 +348,13 @@ class ExampleScenario(DomainResource):
         description="The purpose of the example, e.g. to illustrate a scenario",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
-    )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
     )
     actor: Optional[ListType[ExampleScenarioActor]] = Field(
         description="Individual involved in exchange",

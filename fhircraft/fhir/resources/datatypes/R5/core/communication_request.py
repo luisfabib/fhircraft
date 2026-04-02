@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -29,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class CommunicationRequestPayload(BackboneElement):
     """
@@ -65,7 +58,6 @@ class CommunicationRequestPayload(BackboneElement):
             required=True,
         )
 
-
 class CommunicationRequest(DomainResource):
     """
     A request to convey information; e.g. the CDS system proposes that an alert be sent to a responsible provider, the CDS system proposes that the public health agency be notified about a reportable condition.
@@ -95,11 +87,6 @@ class CommunicationRequest(DomainResource):
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
@@ -107,11 +94,6 @@ class CommunicationRequest(DomainResource):
     intent: Optional[Code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Message category",
@@ -121,19 +103,9 @@ class CommunicationRequest(DomainResource):
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     doNotPerform: Optional[Boolean] = Field(
         description="True if request is prohibiting action",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     medium: Optional[ListType[CodeableConcept]] = Field(
         description="A channel of communication",
@@ -159,11 +131,6 @@ class CommunicationRequest(DomainResource):
         description="When scheduled",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
     occurrencePeriod: Optional[Period] = Field(
         description="When scheduled",
         default=None,
@@ -171,11 +138,6 @@ class CommunicationRequest(DomainResource):
     authoredOn: Optional[DateTime] = Field(
         description="When request transitioned to being actionable",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Who asks for the information to be shared",

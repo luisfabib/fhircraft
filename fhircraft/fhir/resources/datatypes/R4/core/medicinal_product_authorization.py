@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class MedicinalProductAuthorizationJurisdictionalAuthorization(BackboneElement):
     """
@@ -47,7 +46,6 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization(BackboneElement):
         default=None,
     )
 
-
 class MedicinalProductAuthorizationProcedure(BackboneElement):
     """
     The regulatory procedure for granting or amending a marketing authorization.
@@ -69,11 +67,6 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
         description="Date of procedure",
         default=None,
     )
-    dateDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for dateDateTime extensions",
-        default=None,
-        alias="_dateDateTime",
-    )
     application: Optional[ListType["MedicinalProductAuthorizationProcedure"]] = Field(
         description="Applcations submitted to obtain a marketing authorization",
         default=None,
@@ -94,7 +87,6 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
             field_name_base="date",
             required=False,
         )
-
 
 class MedicinalProductAuthorization(DomainResource):
     """
@@ -143,19 +135,9 @@ class MedicinalProductAuthorization(DomainResource):
         description="The date at which the given status has become applicable",
         default=None,
     )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
-    )
     restoreDate: Optional[DateTime] = Field(
         description="The date when a suspended the marketing or the marketing authorization of the product is anticipated to be restored",
         default=None,
-    )
-    restoreDate_ext: Optional[Element] = Field(
-        description="Placeholder element for restoreDate extensions",
-        default=None,
-        alias="_restoreDate",
     )
     validityPeriod: Optional[Period] = Field(
         description="The beginning of the time period in which the marketing authorization is in the specific status shall be specified A complete date consisting of day, month and year shall be specified using the ISO 8601 date format",
@@ -169,19 +151,9 @@ class MedicinalProductAuthorization(DomainResource):
         description="The date when the first authorization was granted by a Medicines Regulatory Agency",
         default=None,
     )
-    dateOfFirstAuthorization_ext: Optional[Element] = Field(
-        description="Placeholder element for dateOfFirstAuthorization extensions",
-        default=None,
-        alias="_dateOfFirstAuthorization",
-    )
     internationalBirthDate: Optional[DateTime] = Field(
         description="Date of first marketing authorization for a company\u0027s new medicinal product in any country in the World",
         default=None,
-    )
-    internationalBirthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for internationalBirthDate extensions",
-        default=None,
-        alias="_internationalBirthDate",
     )
     legalBasis: Optional[CodeableConcept] = Field(
         description="The legal framework against which this authorization is granted",

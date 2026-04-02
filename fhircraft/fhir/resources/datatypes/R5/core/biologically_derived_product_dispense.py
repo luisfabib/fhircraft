@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class BiologicallyDerivedProductDispensePerformer(BackboneElement):
     """
     Indicates who or what performed an action.
@@ -36,7 +35,6 @@ class BiologicallyDerivedProductDispensePerformer(BackboneElement):
         description="Who performed the action",
         default=None,
     )
-
 
 class BiologicallyDerivedProductDispense(DomainResource):
     """
@@ -64,11 +62,6 @@ class BiologicallyDerivedProductDispense(DomainResource):
     status: Optional[Code] = Field(
         description="preparation | in-progress | allocated | issued | unfulfilled | returned | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     originRelationshipType: Optional[CodeableConcept] = Field(
         description="Relationship between the donor and intended recipient",
@@ -102,19 +95,9 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="When product was selected/matched",
         default=None,
     )
-    preparedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for preparedDate extensions",
-        default=None,
-        alias="_preparedDate",
-    )
     whenHandedOver: Optional[DateTime] = Field(
         description="When the product was dispatched",
         default=None,
-    )
-    whenHandedOver_ext: Optional[Element] = Field(
-        description="Placeholder element for whenHandedOver extensions",
-        default=None,
-        alias="_whenHandedOver",
     )
     destination: Optional[Reference] = Field(
         description="Where the product was dispatched to",
@@ -127,9 +110,4 @@ class BiologicallyDerivedProductDispense(DomainResource):
     usageInstruction: Optional[String] = Field(
         description="Specific instructions for use",
         default=None,
-    )
-    usageInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for usageInstruction extensions",
-        default=None,
-        alias="_usageInstruction",
     )

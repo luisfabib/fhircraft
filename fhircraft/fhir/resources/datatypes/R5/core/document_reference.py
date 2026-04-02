@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    DateTime,
-    Markdown,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -32,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DocumentReferenceAttester(BackboneElement):
     """
     A participant who has authenticated the accuracy of the document.
@@ -46,16 +37,10 @@ class DocumentReferenceAttester(BackboneElement):
         description="When the document was attested",
         default=None,
     )
-    time_ext: Optional[Element] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
-    )
     party: Optional[Reference] = Field(
         description="Who attested the document",
         default=None,
     )
-
 
 class DocumentReferenceRelatesTo(BackboneElement):
     """
@@ -71,7 +56,6 @@ class DocumentReferenceRelatesTo(BackboneElement):
         default=None,
     )
 
-
 class DocumentReferenceContentProfile(BackboneElement):
     """
     An identifier of the document constraints, encoding, structure, and template that the document conforms to beyond the base format indicated in the mimeType.
@@ -85,19 +69,9 @@ class DocumentReferenceContentProfile(BackboneElement):
         description="Code|uri|canonical",
         default=None,
     )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
-    )
     valueCanonical: Optional[Canonical] = Field(
         description="Code|uri|canonical",
         default=None,
-    )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
     )
 
     @property
@@ -116,7 +90,6 @@ class DocumentReferenceContentProfile(BackboneElement):
             required=True,
         )
 
-
 class DocumentReferenceContent(BackboneElement):
     """
     The document and format referenced.  If there are multiple content element repetitions, these must all represent the same document in different format, or attachment metadata.
@@ -130,7 +103,6 @@ class DocumentReferenceContent(BackboneElement):
         description="Content profile rules for the document",
         default=None,
     )
-
 
 class DocumentReference(DomainResource):
     """
@@ -149,11 +121,6 @@ class DocumentReference(DomainResource):
         description="An explicitly assigned identifer of a variation of the content in the DocumentReference",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Procedure that caused this media to be created",
         default=None,
@@ -162,19 +129,9 @@ class DocumentReference(DomainResource):
         description="current | superseded | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     docStatus: Optional[Code] = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
         default=None,
-    )
-    docStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for docStatus extensions",
-        default=None,
-        alias="_docStatus",
     )
     modality: Optional[ListType[CodeableConcept]] = Field(
         description="Imaging modality used",
@@ -220,11 +177,6 @@ class DocumentReference(DomainResource):
         description="When this document reference was created",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the document",
         default=None,
@@ -244,11 +196,6 @@ class DocumentReference(DomainResource):
     description: Optional[Markdown] = Field(
         description="Human-readable description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Document security-tags",

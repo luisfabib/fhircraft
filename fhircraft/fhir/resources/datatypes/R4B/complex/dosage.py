@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     CodeableConcept,
@@ -13,7 +13,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Ratio,
     Timing,
 )
-
 
 class DosageDoseAndRate(BackboneElement):
     """
@@ -77,7 +76,6 @@ class DosageDoseAndRate(BackboneElement):
             base="rate",
         )
 
-
 class Dosage(BackboneElement):
     """
     How the medication is/was taken or should be taken
@@ -89,19 +87,9 @@ class Dosage(BackboneElement):
         description="The order of the dosage instructions",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     text: Optional[String] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     additionalInstruction: Optional[List[CodeableConcept]] = Field(
         description='Supplemental instruction or warnings to the patient - e.g. "with meals", "may cause drowsiness"',
@@ -110,11 +98,6 @@ class Dosage(BackboneElement):
     patientInstruction: Optional[String] = Field(
         description="Patient or consumer oriented instructions",
         default=None,
-    )
-    patientInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for patientInstruction extensions",
-        default=None,
-        alias="_patientInstruction",
     )
     timing: Optional["Timing"] = Field(
         description="When medication should be administered",

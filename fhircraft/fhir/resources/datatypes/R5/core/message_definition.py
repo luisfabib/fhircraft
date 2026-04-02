@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-    UnsignedInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -31,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MessageDefinitionFocus(BackboneElement):
     """
     Identifies the resource (or resources) that are being addressed by the event.  For example, the Encounter for an admit message or two Account records for a merge.
@@ -41,39 +31,18 @@ class MessageDefinitionFocus(BackboneElement):
         description="Type of resource",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     profile: Optional[Canonical] = Field(
         description="Profile that must be adhered to by focus",
         default=None,
-    )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
     min: Optional[UnsignedInt] = Field(
         description="Minimum number of focuses of this type",
         default=None,
     )
-    min_ext: Optional[Element] = Field(
-        description="Placeholder element for min extensions",
-        default=None,
-        alias="_min",
-    )
     max: Optional[String] = Field(
         description="Maximum number of focuses of this type",
         default=None,
     )
-    max_ext: Optional[Element] = Field(
-        description="Placeholder element for max extensions",
-        default=None,
-        alias="_max",
-    )
-
 
 class MessageDefinitionAllowedResponse(BackboneElement):
     """
@@ -84,21 +53,10 @@ class MessageDefinitionAllowedResponse(BackboneElement):
         description="Reference to allowed message definition response",
         default=None,
     )
-    message_ext: Optional[Element] = Field(
-        description="Placeholder element for message extensions",
-        default=None,
-        alias="_message",
-    )
     situation: Optional[Markdown] = Field(
         description="When should this response be used",
         default=None,
     )
-    situation_ext: Optional[Element] = Field(
-        description="Placeholder element for situation extensions",
-        default=None,
-        alias="_situation",
-    )
-
 
 class MessageDefinition(DomainResource):
     """
@@ -113,11 +71,6 @@ class MessageDefinition(DomainResource):
         description="The cannonical URL for a given MessageDefinition",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for a given MessageDefinition",
         default=None,
@@ -126,19 +79,9 @@ class MessageDefinition(DomainResource):
         description="Business version of the message definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -148,64 +91,29 @@ class MessageDefinition(DomainResource):
         description="Name for this message definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this message definition (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     replaces: Optional[ListType[Canonical]] = Field(
         description="Takes the place of",
         default=None,
     )
-    replaces_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for replaces extensions",
-        default=None,
-        alias="_replaces",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -214,11 +122,6 @@ class MessageDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the message definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -232,46 +135,21 @@ class MessageDefinition(DomainResource):
         description="Why this message definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
     base: Optional[Canonical] = Field(
         description="Definition this one is based on",
         default=None,
     )
-    base_ext: Optional[Element] = Field(
-        description="Placeholder element for base extensions",
-        default=None,
-        alias="_base",
-    )
     parent: Optional[ListType[Canonical]] = Field(
         description="Protocol/workflow this is part of",
         default=None,
-    )
-    parent_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for parent extensions",
-        default=None,
-        alias="_parent",
     )
     eventCoding: Optional[Coding] = Field(
         description="Event code  or link to the EventDefinition",
@@ -281,19 +159,9 @@ class MessageDefinition(DomainResource):
         description="Event code  or link to the EventDefinition",
         default=None,
     )
-    eventUri_ext: Optional[Element] = Field(
-        description="Placeholder element for eventUri extensions",
-        default=None,
-        alias="_eventUri",
-    )
     category: Optional[Code] = Field(
         description="consequence | currency | notification",
         default=None,
-    )
-    category_ext: Optional[Element] = Field(
-        description="Placeholder element for category extensions",
-        default=None,
-        alias="_category",
     )
     focus: Optional[ListType[MessageDefinitionFocus]] = Field(
         description="Resource(s) that are the subject of the event",
@@ -303,11 +171,6 @@ class MessageDefinition(DomainResource):
         description="always | on-error | never | on-success",
         default=None,
     )
-    responseRequired_ext: Optional[Element] = Field(
-        description="Placeholder element for responseRequired extensions",
-        default=None,
-        alias="_responseRequired",
-    )
     allowedResponse: Optional[ListType[MessageDefinitionAllowedResponse]] = Field(
         description="Responses to this message",
         default=None,
@@ -315,11 +178,6 @@ class MessageDefinition(DomainResource):
     graph: Optional[Canonical] = Field(
         description="Canonical reference to a GraphDefinition",
         default=None,
-    )
-    graph_ext: Optional[Element] = Field(
-        description="Placeholder element for graph extensions",
-        default=None,
-        alias="_graph",
     )
 
     @property

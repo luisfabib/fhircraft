@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -27,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CommunicationPayload(BackboneElement):
     """
     Text, attachment(s), or resource(s) that was communicated to the recipient.
@@ -36,11 +29,6 @@ class CommunicationPayload(BackboneElement):
     contentString: Optional[String] = Field(
         description="Message part content",
         default=None,
-    )
-    contentString_ext: Optional[Element] = Field(
-        description="Placeholder element for contentString extensions",
-        default=None,
-        alias="_contentString",
     )
     contentAttachment: Optional[Attachment] = Field(
         description="Message part content",
@@ -66,7 +54,6 @@ class CommunicationPayload(BackboneElement):
             field_name_base="content",
             required=True,
         )
-
 
 class Communication(DomainResource):
     """
@@ -97,19 +84,9 @@ class Communication(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this communication",
@@ -127,11 +104,6 @@ class Communication(DomainResource):
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
@@ -143,11 +115,6 @@ class Communication(DomainResource):
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     medium: Optional[ListType[CodeableConcept]] = Field(
         description="A channel of communication",
@@ -173,19 +140,9 @@ class Communication(DomainResource):
         description="When sent",
         default=None,
     )
-    sent_ext: Optional[Element] = Field(
-        description="Placeholder element for sent extensions",
-        default=None,
-        alias="_sent",
-    )
     received: Optional[DateTime] = Field(
         description="When received",
         default=None,
-    )
-    received_ext: Optional[Element] = Field(
-        description="Placeholder element for received extensions",
-        default=None,
-        alias="_received",
     )
     recipient: Optional[ListType[Reference]] = Field(
         description="Message recipient",

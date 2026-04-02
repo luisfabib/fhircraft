@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class MedicinalProductInteractionInteractant(BackboneElement):
     """
@@ -49,7 +48,6 @@ class MedicinalProductInteractionInteractant(BackboneElement):
             required=True,
         )
 
-
 class MedicinalProductInteraction(DomainResource):
     """
     The interactions of the medicinal product with other medicinal products, or other forms of interactions.
@@ -80,11 +78,6 @@ class MedicinalProductInteraction(DomainResource):
     description: Optional[String] = Field(
         description="The interaction described",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     interactant: Optional[ListType[MedicinalProductInteractionInteractant]] = Field(
         description="The specific medication, food or laboratory test that interacts",

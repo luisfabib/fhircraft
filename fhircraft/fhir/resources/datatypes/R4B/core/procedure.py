@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ProcedurePerformer(BackboneElement):
     """
@@ -48,7 +41,6 @@ class ProcedurePerformer(BackboneElement):
         default=None,
     )
 
-
 class ProcedureFocalDevice(BackboneElement):
     """
     A device that is implanted, removed or otherwise manipulated (calibration, battery replacement, fitting a prosthesis, attaching a wound-vac, etc.) as a focal portion of the Procedure.
@@ -62,7 +54,6 @@ class ProcedureFocalDevice(BackboneElement):
         description="Device that was changed",
         default=None,
     )
-
 
 class Procedure(DomainResource):
     """
@@ -93,19 +84,9 @@ class Procedure(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="A request for this procedure",
@@ -118,11 +99,6 @@ class Procedure(DomainResource):
     status: Optional[Code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -148,11 +124,6 @@ class Procedure(DomainResource):
         description="When the procedure was performed",
         default=None,
     )
-    performedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for performedDateTime extensions",
-        default=None,
-        alias="_performedDateTime",
-    )
     performedPeriod: Optional[Period] = Field(
         description="When the procedure was performed",
         default=None,
@@ -160,11 +131,6 @@ class Procedure(DomainResource):
     performedString: Optional[String] = Field(
         description="When the procedure was performed",
         default=None,
-    )
-    performedString_ext: Optional[Element] = Field(
-        description="Placeholder element for performedString extensions",
-        default=None,
-        alias="_performedString",
     )
     performedAge: Optional[Age] = Field(
         description="When the procedure was performed",

@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-    Decimal,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -29,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class InvoiceParticipant(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -44,7 +35,6 @@ class InvoiceParticipant(BackboneElement):
         default=None,
     )
 
-
 class InvoiceLineItemPriceComponent(BackboneElement):
     """
     The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice as to how the prices have been calculated.
@@ -54,11 +44,6 @@ class InvoiceLineItemPriceComponent(BackboneElement):
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     code: Optional[CodeableConcept] = Field(
         description="Code identifying the specific component",
         default=None,
@@ -67,16 +52,10 @@ class InvoiceLineItemPriceComponent(BackboneElement):
         description="Factor used for calculating this component",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
     amount: Optional[Money] = Field(
         description="Monetary amount associated with this component",
         default=None,
     )
-
 
 class InvoiceLineItem(BackboneElement):
     """
@@ -86,11 +65,6 @@ class InvoiceLineItem(BackboneElement):
     sequence: Optional[PositiveInt] = Field(
         description="Sequence number of line item",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     chargeItemReference: Optional[Reference] = Field(
         description="Reference to ChargeItem containing details of this line item or an inline billing code",
@@ -121,7 +95,6 @@ class InvoiceLineItem(BackboneElement):
             required=True,
         )
 
-
 class InvoiceTotalPriceComponent(BackboneElement):
     """
     The total amount for the Invoice may be calculated as the sum of the line items with surcharges/deductions that apply in certain conditions.  The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the total price was calculated.
@@ -131,11 +104,6 @@ class InvoiceTotalPriceComponent(BackboneElement):
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     code: Optional[CodeableConcept] = Field(
         description="Code identifying the specific component",
         default=None,
@@ -144,16 +112,10 @@ class InvoiceTotalPriceComponent(BackboneElement):
         description="Factor used for calculating this component",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
     amount: Optional[Money] = Field(
         description="Monetary amount associated with this component",
         default=None,
     )
-
 
 class Invoice(DomainResource):
     """
@@ -184,19 +146,9 @@ class Invoice(DomainResource):
         description="draft | issued | balanced | cancelled | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     cancelledReason: Optional[String] = Field(
         description="Reason for cancellation of this Invoice",
         default=None,
-    )
-    cancelledReason_ext: Optional[Element] = Field(
-        description="Placeholder element for cancelledReason extensions",
-        default=None,
-        alias="_cancelledReason",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of Invoice",
@@ -213,11 +165,6 @@ class Invoice(DomainResource):
     date: Optional[DateTime] = Field(
         description="Invoice date / posting date",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     participant: Optional[ListType[InvoiceParticipant]] = Field(
         description="Participant in creation of this Invoice",
@@ -250,11 +197,6 @@ class Invoice(DomainResource):
     paymentTerms: Optional[Markdown] = Field(
         description="Payment details",
         default=None,
-    )
-    paymentTerms_ext: Optional[Element] = Field(
-        description="Placeholder element for paymentTerms extensions",
-        default=None,
-        alias="_paymentTerms",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the invoice",

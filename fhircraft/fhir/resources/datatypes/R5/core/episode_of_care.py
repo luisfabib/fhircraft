@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class EpisodeOfCareStatusHistory(BackboneElement):
     """
     The history of statuses that the EpisodeOfCare has been through (without requiring processing the history of the resource).
@@ -32,16 +31,10 @@ class EpisodeOfCareStatusHistory(BackboneElement):
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     period: Optional[Period] = Field(
         description="Duration the EpisodeOfCare was in the specified status",
         default=None,
     )
-
 
 class EpisodeOfCareReason(BackboneElement):
     """
@@ -57,7 +50,6 @@ class EpisodeOfCareReason(BackboneElement):
         default=None,
     )
 
-
 class EpisodeOfCareDiagnosis(BackboneElement):
     """
     The list of medical conditions that were addressed during the episode of care.
@@ -71,7 +63,6 @@ class EpisodeOfCareDiagnosis(BackboneElement):
         description="Role that this diagnosis has within the episode of care (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-
 
 class EpisodeOfCare(DomainResource):
     """
@@ -89,11 +80,6 @@ class EpisodeOfCare(DomainResource):
     status: Optional[Code] = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusHistory: Optional[ListType[EpisodeOfCareStatusHistory]] = Field(
         description="Past list of status codes (the current status may be included to cover the start date of the status)",

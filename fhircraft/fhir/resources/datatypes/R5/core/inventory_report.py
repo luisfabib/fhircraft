@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -23,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class InventoryReportInventoryListingItem(BackboneElement):
     """
@@ -43,7 +42,6 @@ class InventoryReportInventoryListingItem(BackboneElement):
         default=None,
     )
 
-
 class InventoryReportInventoryListing(BackboneElement):
     """
     An inventory listing section (grouped by any of the attributes).
@@ -61,16 +59,10 @@ class InventoryReportInventoryListing(BackboneElement):
         description="The date and time when the items were counted",
         default=None,
     )
-    countingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for countingDateTime extensions",
-        default=None,
-        alias="_countingDateTime",
-    )
     item: Optional[ListType[InventoryReportInventoryListingItem]] = Field(
         description="The item or items in this listing",
         default=None,
     )
-
 
 class InventoryReport(DomainResource):
     """
@@ -89,19 +81,9 @@ class InventoryReport(DomainResource):
         description="draft | requested | active | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     countType: Optional[Code] = Field(
         description="snapshot | difference",
         default=None,
-    )
-    countType_ext: Optional[Element] = Field(
-        description="Placeholder element for countType extensions",
-        default=None,
-        alias="_countType",
     )
     operationType: Optional[CodeableConcept] = Field(
         description="addition | subtraction",
@@ -114,11 +96,6 @@ class InventoryReport(DomainResource):
     reportedDateTime: Optional[DateTime] = Field(
         description="When the report has been submitted",
         default=None,
-    )
-    reportedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for reportedDateTime extensions",
-        default=None,
-        alias="_reportedDateTime",
     )
     reporter: Optional[Reference] = Field(
         description="Who submits the report",

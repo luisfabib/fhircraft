@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Attachment,
@@ -11,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Quantity,
 )
-
 
 class ProdCharacteristic(BackboneElement):
     """
@@ -48,28 +47,13 @@ class ProdCharacteristic(BackboneElement):
         description="Where applicable, the shape can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used",
         default=None,
     )
-    shape_ext: Optional[Element] = Field(
-        description="Placeholder element for shape extensions",
-        default=None,
-        alias="_shape",
-    )
     color: Optional[List[String]] = Field(
         description="Where applicable, the color can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used",
         default=None,
     )
-    color_ext: Optional[List[Optional[Element]]] = Field(
-        description="Placeholder element for color extensions",
-        default=None,
-        alias="_color",
-    )
     imprint: Optional[List[String]] = Field(
         description="Where applicable, the imprint can be specified as text",
         default=None,
-    )
-    imprint_ext: Optional[List[Optional[Element]]] = Field(
-        description="Placeholder element for imprint extensions",
-        default=None,
-        alias="_imprint",
     )
     image: Optional[List[Attachment]] = Field(
         description="Where applicable, the image can be provided The format of the image attachment shall be specified by regional implementations",

@@ -5,28 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    PositiveInt,
-    Base64Binary,
-    Boolean,
-    Date,
-    Decimal,
-    Id,
-    Instant,
-    Integer,
-    Integer64,
-    Markdown,
-    Oid,
-    Time,
-    UnsignedInt,
-    Url,
-    Uuid,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -71,7 +50,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class TransportRestriction(BackboneElement):
     """
     If the Transport.focus is a request resource and the transport is seeking fulfillment (i.e. is asking for the request to be actioned), this element identifies any limitations on what parts of the referenced request should be actioned.
@@ -81,11 +59,6 @@ class TransportRestriction(BackboneElement):
         description="How many times to repeat",
         default=None,
     )
-    repetitions_ext: Optional[Element] = Field(
-        description="Placeholder element for repetitions extensions",
-        default=None,
-        alias="_repetitions",
-    )
     period: Optional[Period] = Field(
         description="When fulfillment sought",
         default=None,
@@ -94,7 +67,6 @@ class TransportRestriction(BackboneElement):
         description="For whom is fulfillment sought?",
         default=None,
     )
-
 
 class TransportInput(BackboneElement):
     """
@@ -109,91 +81,41 @@ class TransportInput(BackboneElement):
         description="Content to use in performing the transport",
         default=None,
     )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueCanonical: Optional[Canonical] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
-    )
     valueCode: Optional[Code] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
     )
     valueDate: Optional[Date] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
     valueId: Optional[Id] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
     )
     valueInstant: Optional[Instant] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInstant extensions",
-        default=None,
-        alias="_valueInstant",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueInteger64: Optional[Integer64] = Field(
         description="Content to use in performing the transport",
@@ -203,82 +125,37 @@ class TransportInput(BackboneElement):
         description="Content to use in performing the transport",
         default=None,
     )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
-    )
     valueOid: Optional[Oid] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueOid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueOid extensions",
-        default=None,
-        alias="_valueOid",
     )
     valuePositiveInt: Optional[PositiveInt] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valuePositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valuePositiveInt extensions",
-        default=None,
-        alias="_valuePositiveInt",
-    )
     valueString: Optional[String] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueTime: Optional[Time] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
     valueUnsignedInt: Optional[UnsignedInt] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUnsignedInt extensions",
-        default=None,
-        alias="_valueUnsignedInt",
     )
     valueUri: Optional[Uri] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
-    )
     valueUrl: Optional[Url] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
     valueUuid: Optional[Uuid] = Field(
         description="Content to use in performing the transport",
         default=None,
-    )
-    valueUuid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUuid extensions",
-        default=None,
-        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="Content to use in performing the transport",
@@ -487,7 +364,6 @@ class TransportInput(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class TransportOutput(BackboneElement):
     """
@@ -502,91 +378,41 @@ class TransportOutput(BackboneElement):
         description="Result of output",
         default=None,
     )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="Result of output",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueCanonical: Optional[Canonical] = Field(
         description="Result of output",
         default=None,
     )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
-    )
     valueCode: Optional[Code] = Field(
         description="Result of output",
         default=None,
-    )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
     )
     valueDate: Optional[Date] = Field(
         description="Result of output",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Result of output",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Result of output",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
     valueId: Optional[Id] = Field(
         description="Result of output",
         default=None,
-    )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
     )
     valueInstant: Optional[Instant] = Field(
         description="Result of output",
         default=None,
     )
-    valueInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInstant extensions",
-        default=None,
-        alias="_valueInstant",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Result of output",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueInteger64: Optional[Integer64] = Field(
         description="Result of output",
@@ -596,82 +422,37 @@ class TransportOutput(BackboneElement):
         description="Result of output",
         default=None,
     )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
-    )
     valueOid: Optional[Oid] = Field(
         description="Result of output",
         default=None,
-    )
-    valueOid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueOid extensions",
-        default=None,
-        alias="_valueOid",
     )
     valuePositiveInt: Optional[PositiveInt] = Field(
         description="Result of output",
         default=None,
     )
-    valuePositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valuePositiveInt extensions",
-        default=None,
-        alias="_valuePositiveInt",
-    )
     valueString: Optional[String] = Field(
         description="Result of output",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueTime: Optional[Time] = Field(
         description="Result of output",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
     valueUnsignedInt: Optional[UnsignedInt] = Field(
         description="Result of output",
         default=None,
-    )
-    valueUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUnsignedInt extensions",
-        default=None,
-        alias="_valueUnsignedInt",
     )
     valueUri: Optional[Uri] = Field(
         description="Result of output",
         default=None,
     )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
-    )
     valueUrl: Optional[Url] = Field(
         description="Result of output",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
     valueUuid: Optional[Uuid] = Field(
         description="Result of output",
         default=None,
-    )
-    valueUuid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUuid extensions",
-        default=None,
-        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="Result of output",
@@ -880,7 +661,6 @@ class TransportOutput(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class Transport(DomainResource):
     """
@@ -899,19 +679,9 @@ class Transport(DomainResource):
         description="Formal definition of transport",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[Uri] = Field(
         description="Formal definition of transport",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this transport",
@@ -929,11 +699,6 @@ class Transport(DomainResource):
         description="in-progress | completed | abandoned | cancelled | planned | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
@@ -942,19 +707,9 @@ class Transport(DomainResource):
         description="unknown | proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     code: Optional[CodeableConcept] = Field(
         description="Transport Type",
@@ -963,11 +718,6 @@ class Transport(DomainResource):
     description: Optional[String] = Field(
         description="Human-readable explanation of transport",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     focus: Optional[Reference] = Field(
         description="What transport is acting on",
@@ -986,28 +736,13 @@ class Transport(DomainResource):
         description="Completion time of the event (the occurrence)",
         default=None,
     )
-    completionTime_ext: Optional[Element] = Field(
-        description="Placeholder element for completionTime extensions",
-        default=None,
-        alias="_completionTime",
-    )
     authoredOn: Optional[DateTime] = Field(
         description="Transport Creation Date",
         default=None,
     )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
-    )
     lastModified: Optional[DateTime] = Field(
         description="Transport Last Modified Date",
         default=None,
-    )
-    lastModified_ext: Optional[Element] = Field(
-        description="Placeholder element for lastModified extensions",
-        default=None,
-        alias="_lastModified",
     )
     requester: Optional[Reference] = Field(
         description="Who is asking for transport to be done",

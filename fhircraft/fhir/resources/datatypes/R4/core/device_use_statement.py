@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class DeviceUseStatement(DomainResource):
     """
@@ -55,11 +54,6 @@ class DeviceUseStatement(DomainResource):
         description="active | completed | entered-in-error +",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     subject: Optional[Reference] = Field(
         description="Patient using device",
         default=None,
@@ -80,19 +74,9 @@ class DeviceUseStatement(DomainResource):
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
-    )
     recordedOn: Optional[DateTime] = Field(
         description="When statement was recorded",
         default=None,
-    )
-    recordedOn_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedOn extensions",
-        default=None,
-        alias="_recordedOn",
     )
     source: Optional[Reference] = Field(
         description="Who made the statement",

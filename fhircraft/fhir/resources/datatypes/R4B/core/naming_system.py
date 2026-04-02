@@ -4,14 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -27,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class NamingSystemUniqueId(BackboneElement):
     """
     Indicates how the system may be identified when referenced in electronic exchange.
@@ -37,43 +29,22 @@ class NamingSystemUniqueId(BackboneElement):
         description="oid | uuid | uri | other",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     value: Optional[String] = Field(
         description="The unique identifier",
         default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
     )
     preferred: Optional[Boolean] = Field(
         description="Is this the id that should be used for this type",
         default=None,
     )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
-    )
     comment: Optional[String] = Field(
         description="Notes about identifier usage",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     period: Optional[Period] = Field(
         description="When is identifier valid?",
         default=None,
     )
-
 
 class NamingSystem(DomainResource):
     """
@@ -100,46 +71,21 @@ class NamingSystem(DomainResource):
         description="Name for this naming system (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     kind: Optional[Code] = Field(
         description="codesystem | identifier | root",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -149,11 +95,6 @@ class NamingSystem(DomainResource):
         description="Who maintains system namespace?",
         default=None,
     )
-    responsible_ext: Optional[Element] = Field(
-        description="Placeholder element for responsible extensions",
-        default=None,
-        alias="_responsible",
-    )
     type: Optional[CodeableConcept] = Field(
         description="e.g. driver,  provider,  patient, bank etc.",
         default=None,
@@ -161,11 +102,6 @@ class NamingSystem(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the naming system",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -178,11 +114,6 @@ class NamingSystem(DomainResource):
     usage: Optional[String] = Field(
         description="How/where is it used",
         default=None,
-    )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
     )
     uniqueId: Optional[ListType[NamingSystemUniqueId]] = Field(
         description="Unique identifiers used for system",

@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DetectedIssueEvidence(BackboneElement):
     """
     Supporting evidence or manifestations that provide the basis for identifying the detected issue such as a GuidanceResponse or MeasureReport.
@@ -35,7 +34,6 @@ class DetectedIssueEvidence(BackboneElement):
         default=None,
     )
 
-
 class DetectedIssueMitigation(BackboneElement):
     """
     Indicates an action that has been taken or is committed to reduce or eliminate the likelihood of the risk identified by the detected issue from manifesting.  Can also reflect an observation of known mitigating factors that may reduce/eliminate the need for any action.
@@ -49,16 +47,10 @@ class DetectedIssueMitigation(BackboneElement):
         description="Date committed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     author: Optional[Reference] = Field(
         description="Who is committing?",
         default=None,
     )
-
 
 class DetectedIssue(DomainResource):
     """
@@ -89,11 +81,6 @@ class DetectedIssue(DomainResource):
         description="registered | preliminary | final | amended +",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     code: Optional[CodeableConcept] = Field(
         description="Issue Category, e.g. drug-drug, duplicate therapy, etc.",
         default=None,
@@ -102,11 +89,6 @@ class DetectedIssue(DomainResource):
         description="high | moderate | low",
         default=None,
     )
-    severity_ext: Optional[Element] = Field(
-        description="Placeholder element for severity extensions",
-        default=None,
-        alias="_severity",
-    )
     patient: Optional[Reference] = Field(
         description="Associated patient",
         default=None,
@@ -114,11 +96,6 @@ class DetectedIssue(DomainResource):
     identifiedDateTime: Optional[DateTime] = Field(
         description="When identified",
         default=None,
-    )
-    identifiedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for identifiedDateTime extensions",
-        default=None,
-        alias="_identifiedDateTime",
     )
     identifiedPeriod: Optional[Period] = Field(
         description="When identified",
@@ -140,19 +117,9 @@ class DetectedIssue(DomainResource):
         description="Description and context",
         default=None,
     )
-    detail_ext: Optional[Element] = Field(
-        description="Placeholder element for detail extensions",
-        default=None,
-        alias="_detail",
-    )
     reference: Optional[Uri] = Field(
         description="Authority for issue",
         default=None,
-    )
-    reference_ext: Optional[Element] = Field(
-        description="Placeholder element for reference extensions",
-        default=None,
-        alias="_reference",
     )
     mitigation: Optional[ListType[DetectedIssueMitigation]] = Field(
         description="Step taken to address",

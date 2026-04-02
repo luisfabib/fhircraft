@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SubstanceReferenceInformationGene(BackboneElement):
     """
@@ -40,7 +39,6 @@ class SubstanceReferenceInformationGene(BackboneElement):
         default=None,
     )
 
-
 class SubstanceReferenceInformationGeneElement(BackboneElement):
     """
     Todo.
@@ -58,7 +56,6 @@ class SubstanceReferenceInformationGeneElement(BackboneElement):
         description="Todo",
         default=None,
     )
-
 
 class SubstanceReferenceInformationClassification(BackboneElement):
     """
@@ -81,7 +78,6 @@ class SubstanceReferenceInformationClassification(BackboneElement):
         description="Todo",
         default=None,
     )
-
 
 class SubstanceReferenceInformationTarget(BackboneElement):
     """
@@ -120,11 +116,6 @@ class SubstanceReferenceInformationTarget(BackboneElement):
         description="Todo",
         default=None,
     )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
-    )
     amountType: Optional[CodeableConcept] = Field(
         description="Todo",
         default=None,
@@ -149,7 +140,6 @@ class SubstanceReferenceInformationTarget(BackboneElement):
             field_name_base="amount",
             required=False,
         )
-
 
 class SubstanceReferenceInformation(DomainResource):
     """
@@ -177,11 +167,6 @@ class SubstanceReferenceInformation(DomainResource):
     comment: Optional[String] = Field(
         description="Todo",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     gene: Optional[ListType[SubstanceReferenceInformationGene]] = Field(
         description="Todo",

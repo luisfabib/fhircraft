@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubstanceInstance(BackboneElement):
     """
     Substance may be used to describe a kind of substance, or a specific package/container of the substance: an instance.
@@ -35,16 +34,10 @@ class SubstanceInstance(BackboneElement):
         description="When no longer valid to use",
         default=None,
     )
-    expiry_ext: Optional[Element] = Field(
-        description="Placeholder element for expiry extensions",
-        default=None,
-        alias="_expiry",
-    )
     quantity: Optional[Quantity] = Field(
         description="Amount of substance in the package",
         default=None,
     )
-
 
 class SubstanceIngredient(BackboneElement):
     """
@@ -80,7 +73,6 @@ class SubstanceIngredient(BackboneElement):
             required=True,
         )
 
-
 class Substance(DomainResource):
     """
     A homogeneous material with a definite composition.
@@ -110,11 +102,6 @@ class Substance(DomainResource):
         description="active | inactive | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="What class/type of substance this is",
         default=None,
@@ -126,11 +113,6 @@ class Substance(DomainResource):
     description: Optional[String] = Field(
         description="Textual description of the substance, comments",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     instance: Optional[ListType[SubstanceInstance]] = Field(
         description="If this describes a specific package/container of the substance",

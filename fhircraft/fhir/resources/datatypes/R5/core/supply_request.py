@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -30,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SupplyRequestParameter(BackboneElement):
     """
@@ -57,11 +50,6 @@ class SupplyRequestParameter(BackboneElement):
         description="Value of detail",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
 
     @property
     def value(self):
@@ -78,7 +66,6 @@ class SupplyRequestParameter(BackboneElement):
             field_name_base="value",
             required=False,
         )
-
 
 class SupplyRequest(DomainResource):
     """
@@ -97,11 +84,6 @@ class SupplyRequest(DomainResource):
         description="draft | active | suspended +",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     basedOn: Optional[ListType[Reference]] = Field(
         description="What other request is fulfilled by this supply request",
         default=None,
@@ -113,11 +95,6 @@ class SupplyRequest(DomainResource):
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     deliverFor: Optional[Reference] = Field(
         description="The patient for who the supply request is for",
@@ -139,11 +116,6 @@ class SupplyRequest(DomainResource):
         description="When the request should be fulfilled",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
     occurrencePeriod: Optional[Period] = Field(
         description="When the request should be fulfilled",
         default=None,
@@ -155,11 +127,6 @@ class SupplyRequest(DomainResource):
     authoredOn: Optional[DateTime] = Field(
         description="When the request was made",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Individual making the request",

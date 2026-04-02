@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -25,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class GuidanceResponse(DomainResource):
     """
@@ -60,19 +53,9 @@ class GuidanceResponse(DomainResource):
         description="What guidance was requested",
         default=None,
     )
-    moduleUri_ext: Optional[Element] = Field(
-        description="Placeholder element for moduleUri extensions",
-        default=None,
-        alias="_moduleUri",
-    )
     moduleCanonical: Optional[Canonical] = Field(
         description="What guidance was requested",
         default=None,
-    )
-    moduleCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for moduleCanonical extensions",
-        default=None,
-        alias="_moduleCanonical",
     )
     moduleCodeableConcept: Optional[CodeableConcept] = Field(
         description="What guidance was requested",
@@ -81,11 +64,6 @@ class GuidanceResponse(DomainResource):
     status: Optional[Code] = Field(
         description="success | data-requested | data-required | in-progress | failure | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     subject: Optional[Reference] = Field(
         description="Patient the request was performed for",
@@ -98,11 +76,6 @@ class GuidanceResponse(DomainResource):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When the guidance response was processed",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     performer: Optional[Reference] = Field(
         description="Device returning the guidance",

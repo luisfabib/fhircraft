@@ -4,17 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -33,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ChargeItemDefinitionApplicability(BackboneElement):
     """
     Expressions that describe applicability criteria for the billing code.
@@ -42,11 +31,6 @@ class ChargeItemDefinitionApplicability(BackboneElement):
     description: Optional[String] = Field(
         description="Natural language description of the condition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     language: Optional[String] = Field(
         description="Language of the expression",
@@ -57,12 +41,6 @@ class ChargeItemDefinitionApplicability(BackboneElement):
         description="Boolean-valued expression",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-
 
 class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
     """
@@ -73,11 +51,6 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
         description="Natural language description of the condition",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     language: Optional[String] = Field(
         description="Language of the expression",
         default=None,
@@ -87,12 +60,6 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
         description="Boolean-valued expression",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-
 
 class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
     """
@@ -103,11 +70,6 @@ class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     code: Optional[CodeableConcept] = Field(
         description="Code identifying the specific component",
         default=None,
@@ -116,16 +78,10 @@ class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
         description="Factor used for calculating this component",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
     amount: Optional[Money] = Field(
         description="Monetary amount associated with this component",
         default=None,
     )
-
 
 class ChargeItemDefinitionPropertyGroup(BackboneElement):
     """
@@ -144,7 +100,6 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
         description="Components of total line item price",
         default=None,
     )
-
 
 class ChargeItemDefinition(DomainResource):
     """
@@ -171,11 +126,6 @@ class ChargeItemDefinition(DomainResource):
         description="Canonical identifier for this charge item definition, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the charge item definition",
         default=None,
@@ -184,82 +134,37 @@ class ChargeItemDefinition(DomainResource):
         description="Business version of the charge item definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     title: Optional[String] = Field(
         description="Name for this charge item definition (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     derivedFromUri: Optional[ListType[Uri]] = Field(
         description="Underlying externally-defined charge item definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[Element] = Field(
-        description="Placeholder element for derivedFromUri extensions",
-        default=None,
-        alias="_derivedFromUri",
-    )
     partOf: Optional[ListType[Canonical]] = Field(
         description="A larger definition of which this particular definition is a component or step",
         default=None,
-    )
-    partOf_ext: Optional[Element] = Field(
-        description="Placeholder element for partOf extensions",
-        default=None,
-        alias="_partOf",
     )
     replaces: Optional[ListType[Canonical]] = Field(
         description="Completed or terminated request(s) whose function is taken by this new request",
         default=None,
     )
-    replaces_ext: Optional[Element] = Field(
-        description="Placeholder element for replaces extensions",
-        default=None,
-        alias="_replaces",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -268,11 +173,6 @@ class ChargeItemDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the charge item definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -286,28 +186,13 @@ class ChargeItemDefinition(DomainResource):
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the charge item definition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the charge item definition was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the charge item definition is expected to be used",

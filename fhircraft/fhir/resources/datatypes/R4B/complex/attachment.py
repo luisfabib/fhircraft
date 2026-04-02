@@ -3,9 +3,8 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex.element import Element
-
 
 class Attachment(Element):
     """
@@ -18,73 +17,33 @@ class Attachment(Element):
         description="Mime type of the content, with charset etc.",
         default=None,
     )
-    contentType_ext: Optional[Element] = Field(
-        description="Placeholder element for contentType extensions",
-        default=None,
-        alias="_contentType",
-    )
     language: Optional[Code] = Field(
         description="Human language of the content (BCP-47)",
         default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
     )
     data: Optional[Base64Binary] = Field(
         description="Data inline, base64ed",
         default=None,
     )
-    data_ext: Optional[Element] = Field(
-        description="Placeholder element for data extensions",
-        default=None,
-        alias="_data",
-    )
     url: Optional[Url] = Field(
         description="Uri where the data can be found",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     size: Optional[UnsignedInt] = Field(
         description="Number of bytes of content (if url provided)",
         default=None,
     )
-    size_ext: Optional[Element] = Field(
-        description="Placeholder element for size extensions",
-        default=None,
-        alias="_size",
-    )
     hash: Optional[Base64Binary] = Field(
         description="Hash of the data (sha-1, base64ed)",
         default=None,
-    )
-    hash_ext: Optional[Element] = Field(
-        description="Placeholder element for hash extensions",
-        default=None,
-        alias="_hash",
     )
     title: Optional[String] = Field(
         description="Label to display in place of the data",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     creation: Optional[DateTime] = Field(
         description="Date attachment was first created",
         default=None,
-    )
-    creation_ext: Optional[Element] = Field(
-        description="Placeholder element for creation extensions",
-        default=None,
-        alias="_creation",
     )
 
     @model_validator(mode="after")

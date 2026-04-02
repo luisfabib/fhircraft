@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -24,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class InsurancePlanContact(BackboneElement):
     """
@@ -48,7 +47,6 @@ class InsurancePlanContact(BackboneElement):
         default=None,
     )
 
-
 class InsurancePlanCoverageBenefitLimit(BackboneElement):
     """
     The specific limits on the benefit.
@@ -63,7 +61,6 @@ class InsurancePlanCoverageBenefitLimit(BackboneElement):
         default=None,
     )
 
-
 class InsurancePlanCoverageBenefit(BackboneElement):
     """
     Specific benefits under this type of coverage.
@@ -77,16 +74,10 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         description="Referral requirements",
         default=None,
     )
-    requirement_ext: Optional[Element] = Field(
-        description="Placeholder element for requirement extensions",
-        default=None,
-        alias="_requirement",
-    )
     limit: Optional[ListType[InsurancePlanCoverageBenefitLimit]] = Field(
         description="Benefit limits",
         default=None,
     )
-
 
 class InsurancePlanCoverage(BackboneElement):
     """
@@ -106,7 +97,6 @@ class InsurancePlanCoverage(BackboneElement):
         default=None,
     )
 
-
 class InsurancePlanPlanGeneralCost(BackboneElement):
     """
     Overall costs associated with the plan.
@@ -120,11 +110,6 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         description="Number of enrollees",
         default=None,
     )
-    groupSize_ext: Optional[Element] = Field(
-        description="Placeholder element for groupSize extensions",
-        default=None,
-        alias="_groupSize",
-    )
     cost: Optional[Money] = Field(
         description="Cost value",
         default=None,
@@ -133,12 +118,6 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         description="Additional cost information",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
-    )
-
 
 class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
     """
@@ -162,7 +141,6 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         default=None,
     )
 
-
 class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
     """
     List of the specific benefits under this category of benefit.
@@ -177,7 +155,6 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
         default=None,
     )
 
-
 class InsurancePlanPlanSpecificCost(BackboneElement):
     """
     Costs associated with the coverage provided by the product.
@@ -191,7 +168,6 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
         description="Benefits list",
         default=None,
     )
-
 
 class InsurancePlanPlan(BackboneElement):
     """
@@ -223,7 +199,6 @@ class InsurancePlanPlan(BackboneElement):
         default=None,
     )
 
-
 class InsurancePlan(DomainResource):
     """
     Details of a Health Insurance product/plan provided by an organization.
@@ -253,11 +228,6 @@ class InsurancePlan(DomainResource):
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of product",
         default=None,
@@ -266,19 +236,9 @@ class InsurancePlan(DomainResource):
         description="Official name",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     alias: Optional[ListType[String]] = Field(
         description="Alternate names",
         default=None,
-    )
-    alias_ext: Optional[Element] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
     )
     period: Optional[Period] = Field(
         description="When the product is available",

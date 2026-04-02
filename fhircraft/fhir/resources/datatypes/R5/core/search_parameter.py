@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -30,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SearchParameterComponent(BackboneElement):
     """
     Used to define the parts of a composite search parameter.
@@ -40,21 +31,10 @@ class SearchParameterComponent(BackboneElement):
         description="Defines how the part works",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
     expression: Optional[String] = Field(
         description="Subexpression relative to main expression",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-
 
 class SearchParameter(DomainResource):
     """
@@ -69,11 +49,6 @@ class SearchParameter(DomainResource):
         description="Canonical identifier for this search parameter, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the search parameter (business identifier)",
         default=None,
@@ -82,19 +57,9 @@ class SearchParameter(DomainResource):
         description="Business version of the search parameter",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -104,64 +69,29 @@ class SearchParameter(DomainResource):
         description="Name for this search parameter (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this search parameter (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     derivedFrom: Optional[Canonical] = Field(
         description="Original definition for the search parameter",
         default=None,
     )
-    derivedFrom_ext: Optional[Element] = Field(
-        description="Placeholder element for derivedFrom extensions",
-        default=None,
-        alias="_derivedFrom",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -170,11 +100,6 @@ class SearchParameter(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the search parameter",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -188,136 +113,61 @@ class SearchParameter(DomainResource):
         description="Why this search parameter is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
     code: Optional[Code] = Field(
         description="Recommended name for parameter in search url",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     base: Optional[ListType[Code]] = Field(
         description="The resource type(s) this search parameter applies to",
         default=None,
     )
-    base_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for base extensions",
-        default=None,
-        alias="_base",
-    )
     type: Optional[Code] = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     expression: Optional[String] = Field(
         description="FHIRPath expression that extracts the values",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
     processingMode: Optional[Code] = Field(
         description="normal | phonetic | other",
         default=None,
-    )
-    processingMode_ext: Optional[Element] = Field(
-        description="Placeholder element for processingMode extensions",
-        default=None,
-        alias="_processingMode",
     )
     constraint: Optional[String] = Field(
         description="FHIRPath expression that constraints the usage of this SearchParamete",
         default=None,
     )
-    constraint_ext: Optional[Element] = Field(
-        description="Placeholder element for constraint extensions",
-        default=None,
-        alias="_constraint",
-    )
     target: Optional[ListType[Code]] = Field(
         description="Types of resource (if a resource reference)",
         default=None,
-    )
-    target_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for target extensions",
-        default=None,
-        alias="_target",
     )
     multipleOr: Optional[Boolean] = Field(
         description="Allow multiple values per parameter (or)",
         default=None,
     )
-    multipleOr_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleOr extensions",
-        default=None,
-        alias="_multipleOr",
-    )
     multipleAnd: Optional[Boolean] = Field(
         description="Allow multiple parameters (and)",
         default=None,
-    )
-    multipleAnd_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleAnd extensions",
-        default=None,
-        alias="_multipleAnd",
     )
     comparator: Optional[ListType[Code]] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
     modifier: Optional[ListType[Code]] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    modifier_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for modifier extensions",
-        default=None,
-        alias="_modifier",
-    )
     chain: Optional[ListType[String]] = Field(
         description="Chained names supported",
         default=None,
-    )
-    chain_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for chain extensions",
-        default=None,
-        alias="_chain",
     )
     component: Optional[ListType[SearchParameterComponent]] = Field(
         description="For Composite resources to define the parts",

@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    Url,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -23,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubscriptionChannel(BackboneElement):
     """
     Details where to send notifications when resources are received that meet the criteria.
@@ -33,39 +26,18 @@ class SubscriptionChannel(BackboneElement):
         description="rest-hook | websocket | email | sms | message",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     endpoint: Optional[Url] = Field(
         description="Where the channel points to",
         default=None,
-    )
-    endpoint_ext: Optional[Element] = Field(
-        description="Placeholder element for endpoint extensions",
-        default=None,
-        alias="_endpoint",
     )
     payload: Optional[Code] = Field(
         description="MIME type to send, or omit for no payload",
         default=None,
     )
-    payload_ext: Optional[Element] = Field(
-        description="Placeholder element for payload extensions",
-        default=None,
-        alias="_payload",
-    )
     header: Optional[ListType[String]] = Field(
         description="Usage depends on the channel type",
         default=None,
     )
-    header_ext: Optional[Element] = Field(
-        description="Placeholder element for header extensions",
-        default=None,
-        alias="_header",
-    )
-
 
 class Subscription(DomainResource):
     """
@@ -92,11 +64,6 @@ class Subscription(DomainResource):
         description="requested | active | error | off",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     contact: Optional[ListType[ContactPoint]] = Field(
         description="Contact details for source (e.g. troubleshooting)",
         default=None,
@@ -105,37 +72,17 @@ class Subscription(DomainResource):
         description="When to automatically delete the subscription",
         default=None,
     )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
-    )
     reason: Optional[String] = Field(
         description="Description of why this subscription was created",
         default=None,
-    )
-    reason_ext: Optional[Element] = Field(
-        description="Placeholder element for reason extensions",
-        default=None,
-        alias="_reason",
     )
     criteria: Optional[String] = Field(
         description="Rule for server push",
         default=None,
     )
-    criteria_ext: Optional[Element] = Field(
-        description="Placeholder element for criteria extensions",
-        default=None,
-        alias="_criteria",
-    )
     error: Optional[String] = Field(
         description="Latest error note",
         default=None,
-    )
-    error_ext: Optional[Element] = Field(
-        description="Placeholder element for error extensions",
-        default=None,
-        alias="_error",
     )
     channel: Optional[SubscriptionChannel] = Field(
         description="The channel on which to report matches to the criteria",

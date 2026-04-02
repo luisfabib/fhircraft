@@ -5,19 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Decimal,
-    Integer,
-    Time,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -38,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class QuestionnaireItemEnableWhen(BackboneElement):
     """
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
@@ -48,82 +35,37 @@ class QuestionnaireItemEnableWhen(BackboneElement):
         description="The linkId of question that determines whether item is enabled/disabled",
         default=None,
     )
-    question_ext: Optional[Element] = Field(
-        description="Placeholder element for question extensions",
-        default=None,
-        alias="_question",
-    )
     operator: Optional[Code] = Field(
         description="exists | = | != | \u003e | \u003c | \u003e= | \u003c=",
         default=None,
-    )
-    operator_ext: Optional[Element] = Field(
-        description="Placeholder element for operator extensions",
-        default=None,
-        alias="_operator",
     )
     answerBoolean: Optional[Boolean] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for answerBoolean extensions",
-        default=None,
-        alias="_answerBoolean",
-    )
     answerDecimal: Optional[Decimal] = Field(
         description="Value for question comparison based on operator",
         default=None,
-    )
-    answerDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for answerDecimal extensions",
-        default=None,
-        alias="_answerDecimal",
     )
     answerInteger: Optional[Integer] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for answerInteger extensions",
-        default=None,
-        alias="_answerInteger",
-    )
     answerDate: Optional[Date] = Field(
         description="Value for question comparison based on operator",
         default=None,
-    )
-    answerDate_ext: Optional[Element] = Field(
-        description="Placeholder element for answerDate extensions",
-        default=None,
-        alias="_answerDate",
     )
     answerDateTime: Optional[DateTime] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for answerDateTime extensions",
-        default=None,
-        alias="_answerDateTime",
-    )
     answerTime: Optional[Time] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerTime_ext: Optional[Element] = Field(
-        description="Placeholder element for answerTime extensions",
-        default=None,
-        alias="_answerTime",
-    )
     answerString: Optional[String] = Field(
         description="Value for question comparison based on operator",
         default=None,
-    )
-    answerString_ext: Optional[Element] = Field(
-        description="Placeholder element for answerString extensions",
-        default=None,
-        alias="_answerString",
     )
     answerCoding: Optional[Coding] = Field(
         description="Value for question comparison based on operator",
@@ -165,7 +107,6 @@ class QuestionnaireItemEnableWhen(BackboneElement):
             required=True,
         )
 
-
 class QuestionnaireItemAnswerOption(BackboneElement):
     """
     One of the permitted answers for the question.
@@ -175,37 +116,17 @@ class QuestionnaireItemAnswerOption(BackboneElement):
         description="Answer value",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
     valueDate: Optional[Date] = Field(
         description="Answer value",
         default=None,
-    )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
     )
     valueTime: Optional[Time] = Field(
         description="Answer value",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
     valueString: Optional[String] = Field(
         description="Answer value",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueCoding: Optional[Coding] = Field(
         description="Answer value",
@@ -218,11 +139,6 @@ class QuestionnaireItemAnswerOption(BackboneElement):
     initialSelected: Optional[Boolean] = Field(
         description="Whether option is selected by default",
         default=None,
-    )
-    initialSelected_ext: Optional[Element] = Field(
-        description="Placeholder element for initialSelected extensions",
-        default=None,
-        alias="_initialSelected",
     )
 
     @property
@@ -241,7 +157,6 @@ class QuestionnaireItemAnswerOption(BackboneElement):
             required=True,
         )
 
-
 class QuestionnaireItemInitial(BackboneElement):
     """
     One or more values that should be pre-populated in the answer when initially rendering the questionnaire for user input.
@@ -251,73 +166,33 @@ class QuestionnaireItemInitial(BackboneElement):
         description="Actual value for initializing the question",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueDecimal: Optional[Decimal] = Field(
         description="Actual value for initializing the question",
         default=None,
-    )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
     )
     valueInteger: Optional[Integer] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
     valueDate: Optional[Date] = Field(
         description="Actual value for initializing the question",
         default=None,
-    )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
     )
     valueDateTime: Optional[DateTime] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
     valueTime: Optional[Time] = Field(
         description="Actual value for initializing the question",
         default=None,
-    )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
     )
     valueString: Optional[String] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueUri: Optional[Uri] = Field(
         description="Actual value for initializing the question",
         default=None,
-    )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Actual value for initializing the question",
@@ -365,7 +240,6 @@ class QuestionnaireItemInitial(BackboneElement):
             required=True,
         )
 
-
 class QuestionnaireItem(BackboneElement):
     """
     A particular question, question grouping or display text that is part of the questionnaire.
@@ -375,19 +249,9 @@ class QuestionnaireItem(BackboneElement):
         description="Unique id for item in questionnaire",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     definition: Optional[Uri] = Field(
         description="ElementDefinition - details for the item",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
     code: Optional[ListType[Coding]] = Field(
         description="Corresponding concept for this item in a terminology",
@@ -397,28 +261,13 @@ class QuestionnaireItem(BackboneElement):
         description='E.g. "1(a)", "2.5.3"',
         default=None,
     )
-    prefix_ext: Optional[Element] = Field(
-        description="Placeholder element for prefix extensions",
-        default=None,
-        alias="_prefix",
-    )
     text: Optional[String] = Field(
         description="Primary text for the item",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
     type: Optional[Code] = Field(
         description="group | display | boolean | decimal | integer | date | dateTime +",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     enableWhen: Optional[ListType[QuestionnaireItemEnableWhen]] = Field(
         description="Only allow data when",
@@ -428,73 +277,33 @@ class QuestionnaireItem(BackboneElement):
         description="all | any",
         default=None,
     )
-    enableBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for enableBehavior extensions",
-        default=None,
-        alias="_enableBehavior",
-    )
     disabledDisplay: Optional[Code] = Field(
         description="hidden | protected",
         default=None,
-    )
-    disabledDisplay_ext: Optional[Element] = Field(
-        description="Placeholder element for disabledDisplay extensions",
-        default=None,
-        alias="_disabledDisplay",
     )
     required: Optional[Boolean] = Field(
         description="Whether the item must be included in data results",
         default=None,
     )
-    required_ext: Optional[Element] = Field(
-        description="Placeholder element for required extensions",
-        default=None,
-        alias="_required",
-    )
     repeats: Optional[Boolean] = Field(
         description="Whether the item may repeat",
         default=None,
-    )
-    repeats_ext: Optional[Element] = Field(
-        description="Placeholder element for repeats extensions",
-        default=None,
-        alias="_repeats",
     )
     readOnly: Optional[Boolean] = Field(
         description="Don\u0027t allow human editing",
         default=None,
     )
-    readOnly_ext: Optional[Element] = Field(
-        description="Placeholder element for readOnly extensions",
-        default=None,
-        alias="_readOnly",
-    )
     maxLength: Optional[Integer] = Field(
         description="No more than these many characters",
         default=None,
-    )
-    maxLength_ext: Optional[Element] = Field(
-        description="Placeholder element for maxLength extensions",
-        default=None,
-        alias="_maxLength",
     )
     answerConstraint: Optional[Code] = Field(
         description="optionsOnly | optionsOrType | optionsOrString",
         default=None,
     )
-    answerConstraint_ext: Optional[Element] = Field(
-        description="Placeholder element for answerConstraint extensions",
-        default=None,
-        alias="_answerConstraint",
-    )
     answerValueSet: Optional[Canonical] = Field(
         description="ValueSet containing permitted answers",
         default=None,
-    )
-    answerValueSet_ext: Optional[Element] = Field(
-        description="Placeholder element for answerValueSet extensions",
-        default=None,
-        alias="_answerValueSet",
     )
     answerOption: Optional[ListType[QuestionnaireItemAnswerOption]] = Field(
         description="Permitted answer",
@@ -509,7 +318,6 @@ class QuestionnaireItem(BackboneElement):
         default=None,
     )
 
-
 class Questionnaire(DomainResource):
     """
     A structured set of questions intended to guide the collection of answers from end-users. Questionnaires provide detailed control over order, presentation, phraseology and grouping to allow coherent, consistent data collection.
@@ -523,11 +331,6 @@ class Questionnaire(DomainResource):
         description="Canonical identifier for this questionnaire, represented as an absolute URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for questionnaire",
         default=None,
@@ -536,19 +339,9 @@ class Questionnaire(DomainResource):
         description="Business version of the questionnaire",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -558,73 +351,33 @@ class Questionnaire(DomainResource):
         description="Name for this questionnaire (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this questionnaire (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     derivedFrom: Optional[ListType[Canonical]] = Field(
         description="Based on Questionnaire",
         default=None,
     )
-    derivedFrom_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for derivedFrom extensions",
-        default=None,
-        alias="_derivedFrom",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     subjectType: Optional[ListType[Code]] = Field(
         description="Resource that can be subject of QuestionnaireResponse",
         default=None,
-    )
-    subjectType_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for subjectType extensions",
-        default=None,
-        alias="_subjectType",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -633,11 +386,6 @@ class Questionnaire(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the questionnaire",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -651,46 +399,21 @@ class Questionnaire(DomainResource):
         description="Why this questionnaire is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the questionnaire was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the questionnaire was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the questionnaire is expected to be used",

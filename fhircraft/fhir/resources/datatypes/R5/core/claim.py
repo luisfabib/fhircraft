@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-    Boolean,
-    Date,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -35,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ClaimRelated(BackboneElement):
     """
     Other claims which are related to this claim such as prior submissions or claims for related services or for the same event.
@@ -54,7 +44,6 @@ class ClaimRelated(BackboneElement):
         default=None,
     )
 
-
 class ClaimPayee(BackboneElement):
     """
     The party to be reimbursed for cost of the products and services according to the terms of the policy.
@@ -69,7 +58,6 @@ class ClaimPayee(BackboneElement):
         default=None,
     )
 
-
 class ClaimEvent(BackboneElement):
     """
     Information code for an event with a corresponding date or period.
@@ -82,11 +70,6 @@ class ClaimEvent(BackboneElement):
     whenDateTime: Optional[DateTime] = Field(
         description="Occurance date or period",
         default=None,
-    )
-    whenDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for whenDateTime extensions",
-        default=None,
-        alias="_whenDateTime",
     )
     whenPeriod: Optional[Period] = Field(
         description="Occurance date or period",
@@ -109,7 +92,6 @@ class ClaimEvent(BackboneElement):
             required=True,
         )
 
-
 class ClaimCareTeam(BackboneElement):
     """
     The members of the team who provided the products and services.
@@ -119,11 +101,6 @@ class ClaimCareTeam(BackboneElement):
         description="Order of care team",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     provider: Optional[Reference] = Field(
         description="Practitioner or organization",
         default=None,
@@ -131,11 +108,6 @@ class ClaimCareTeam(BackboneElement):
     responsible: Optional[Boolean] = Field(
         description="Indicator of the lead practitioner",
         default=None,
-    )
-    responsible_ext: Optional[Element] = Field(
-        description="Placeholder element for responsible extensions",
-        default=None,
-        alias="_responsible",
     )
     role: Optional[CodeableConcept] = Field(
         description="Function within the team",
@@ -146,7 +118,6 @@ class ClaimCareTeam(BackboneElement):
         default=None,
     )
 
-
 class ClaimSupportingInfo(BackboneElement):
     """
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
@@ -155,11 +126,6 @@ class ClaimSupportingInfo(BackboneElement):
     sequence: Optional[PositiveInt] = Field(
         description="Information instance identifier",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     category: Optional[CodeableConcept] = Field(
         description="Classification of the supplied information",
@@ -173,11 +139,6 @@ class ClaimSupportingInfo(BackboneElement):
         description="When it occurred",
         default=None,
     )
-    timingDate_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDate extensions",
-        default=None,
-        alias="_timingDate",
-    )
     timingPeriod: Optional[Period] = Field(
         description="When it occurred",
         default=None,
@@ -186,19 +147,9 @@ class ClaimSupportingInfo(BackboneElement):
         description="Data to be provided",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueString: Optional[String] = Field(
         description="Data to be provided",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Data to be provided",
@@ -253,7 +204,6 @@ class ClaimSupportingInfo(BackboneElement):
             required=False,
         )
 
-
 class ClaimDiagnosis(BackboneElement):
     """
     Information about diagnoses relevant to the claim items.
@@ -262,11 +212,6 @@ class ClaimDiagnosis(BackboneElement):
     sequence: Optional[PositiveInt] = Field(
         description="Diagnosis instance identifier",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     diagnosisCodeableConcept: Optional[CodeableConcept] = Field(
         description="Nature of illness or problem",
@@ -301,7 +246,6 @@ class ClaimDiagnosis(BackboneElement):
             required=True,
         )
 
-
 class ClaimProcedure(BackboneElement):
     """
     Procedures performed on the patient relevant to the billing items with the claim.
@@ -311,11 +255,6 @@ class ClaimProcedure(BackboneElement):
         description="Procedure instance identifier",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
         default=None,
@@ -323,11 +262,6 @@ class ClaimProcedure(BackboneElement):
     date: Optional[DateTime] = Field(
         description="When the procedure was performed",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     procedureCodeableConcept: Optional[CodeableConcept] = Field(
         description="Specific clinical procedure",
@@ -358,7 +292,6 @@ class ClaimProcedure(BackboneElement):
             required=True,
         )
 
-
 class ClaimInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services specified on the claim.
@@ -368,19 +301,9 @@ class ClaimInsurance(BackboneElement):
         description="Insurance instance identifier",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     focal: Optional[Boolean] = Field(
         description="Coverage to be used for adjudication",
         default=None,
-    )
-    focal_ext: Optional[Element] = Field(
-        description="Placeholder element for focal extensions",
-        default=None,
-        alias="_focal",
     )
     identifier: Optional[Identifier] = Field(
         description="Pre-assigned Claim number",
@@ -394,25 +317,14 @@ class ClaimInsurance(BackboneElement):
         description="Additional provider contract number",
         default=None,
     )
-    businessArrangement_ext: Optional[Element] = Field(
-        description="Placeholder element for businessArrangement extensions",
-        default=None,
-        alias="_businessArrangement",
-    )
     preAuthRef: Optional[ListType[String]] = Field(
         description="Prior authorization reference number",
         default=None,
-    )
-    preAuthRef_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
     )
     claimResponse: Optional[Reference] = Field(
         description="Adjudication results",
         default=None,
     )
-
 
 class ClaimAccident(BackboneElement):
     """
@@ -422,11 +334,6 @@ class ClaimAccident(BackboneElement):
     date: Optional[Date] = Field(
         description="When the incident occurred",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     type: Optional[CodeableConcept] = Field(
         description="The nature of the accident",
@@ -457,7 +364,6 @@ class ClaimAccident(BackboneElement):
             required=False,
         )
 
-
 class ClaimItemBodySite(BackboneElement):
     """
     Physical location where the service is performed or applies.
@@ -472,7 +378,6 @@ class ClaimItemBodySite(BackboneElement):
         default=None,
     )
 
-
 class ClaimItemDetailSubDetail(BackboneElement):
     """
     A claim detail line. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
@@ -481,11 +386,6 @@ class ClaimItemDetailSubDetail(BackboneElement):
     sequence: Optional[PositiveInt] = Field(
         description="Item instance identifier",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
@@ -530,11 +430,6 @@ class ClaimItemDetailSubDetail(BackboneElement):
     factor: Optional[Decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     tax: Optional[Money] = Field(
         description="Total tax",
@@ -549,7 +444,6 @@ class ClaimItemDetailSubDetail(BackboneElement):
         default=None,
     )
 
-
 class ClaimItemDetail(BackboneElement):
     """
     A claim detail line. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
@@ -558,11 +452,6 @@ class ClaimItemDetail(BackboneElement):
     sequence: Optional[PositiveInt] = Field(
         description="Item instance identifier",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
@@ -607,11 +496,6 @@ class ClaimItemDetail(BackboneElement):
     factor: Optional[Decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     tax: Optional[Money] = Field(
         description="Total tax",
@@ -630,7 +514,6 @@ class ClaimItemDetail(BackboneElement):
         default=None,
     )
 
-
 class ClaimItem(BackboneElement):
     """
     A claim line. Either a simple  product or service or a 'group' of details which can each be a simple items or groups of sub-details.
@@ -640,11 +523,6 @@ class ClaimItem(BackboneElement):
         description="Item instance identifier",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
@@ -653,37 +531,17 @@ class ClaimItem(BackboneElement):
         description="Applicable careTeam members",
         default=None,
     )
-    careTeamSequence_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for careTeamSequence extensions",
-        default=None,
-        alias="_careTeamSequence",
-    )
     diagnosisSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable diagnoses",
         default=None,
-    )
-    diagnosisSequence_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for diagnosisSequence extensions",
-        default=None,
-        alias="_diagnosisSequence",
     )
     procedureSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable procedures",
         default=None,
     )
-    procedureSequence_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for procedureSequence extensions",
-        default=None,
-        alias="_procedureSequence",
-    )
     informationSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception and supporting information",
         default=None,
-    )
-    informationSequence_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for informationSequence extensions",
-        default=None,
-        alias="_informationSequence",
     )
     revenue: Optional[CodeableConcept] = Field(
         description="Revenue or cost center code",
@@ -717,11 +575,6 @@ class ClaimItem(BackboneElement):
         description="Date or dates of service or product delivery",
         default=None,
     )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
-    )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",
         default=None,
@@ -753,11 +606,6 @@ class ClaimItem(BackboneElement):
     factor: Optional[Decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     tax: Optional[Money] = Field(
         description="Total tax",
@@ -816,7 +664,6 @@ class ClaimItem(BackboneElement):
             required=False,
         )
 
-
 class Claim(DomainResource):
     """
     A provider issued list of professional services and products which have been provided, or are to be provided, to a patient which is sent to an insurer for reimbursement.
@@ -838,11 +685,6 @@ class Claim(DomainResource):
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Category or discipline",
         default=None,
@@ -855,11 +697,6 @@ class Claim(DomainResource):
         description="claim | preauthorization | predetermination",
         default=None,
     )
-    use_ext: Optional[Element] = Field(
-        description="Placeholder element for use extensions",
-        default=None,
-        alias="_use",
-    )
     patient: Optional[Reference] = Field(
         description="The recipient of the products and services",
         default=None,
@@ -871,11 +708,6 @@ class Claim(DomainResource):
     created: Optional[DateTime] = Field(
         description="Resource creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     enterer: Optional[Reference] = Field(
         description="Author of the claim",

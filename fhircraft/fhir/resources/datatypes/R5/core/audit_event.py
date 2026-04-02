@@ -5,17 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Instant,
-    Boolean,
-    Base64Binary,
-    Integer,
-    Time,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -34,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class AuditEventOutcome(BackboneElement):
     """
     Indicates whether the event succeeded or failed. A free text descripiton can be given in outcome.text.
@@ -48,7 +37,6 @@ class AuditEventOutcome(BackboneElement):
         description="Additional outcome detail",
         default=None,
     )
-
 
 class AuditEventAgent(BackboneElement):
     """
@@ -71,11 +59,6 @@ class AuditEventAgent(BackboneElement):
         description="Whether user is initiator",
         default=None,
     )
-    requestor_ext: Optional[Element] = Field(
-        description="Placeholder element for requestor extensions",
-        default=None,
-        alias="_requestor",
-    )
     location: Optional[Reference] = Field(
         description="The agent location when the event occurred",
         default=None,
@@ -83,11 +66,6 @@ class AuditEventAgent(BackboneElement):
     policy: Optional[ListType[Uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
-    )
-    policy_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for policy extensions",
-        default=None,
-        alias="_policy",
     )
     networkReference: Optional[Reference] = Field(
         description="This agent network location for the activity",
@@ -97,19 +75,9 @@ class AuditEventAgent(BackboneElement):
         description="This agent network location for the activity",
         default=None,
     )
-    networkUri_ext: Optional[Element] = Field(
-        description="Placeholder element for networkUri extensions",
-        default=None,
-        alias="_networkUri",
-    )
     networkString: Optional[String] = Field(
         description="This agent network location for the activity",
         default=None,
-    )
-    networkString_ext: Optional[Element] = Field(
-        description="Placeholder element for networkString extensions",
-        default=None,
-        alias="_networkString",
     )
     authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Allowable authorization for this agent",
@@ -132,7 +100,6 @@ class AuditEventAgent(BackboneElement):
             required=False,
         )
 
-
 class AuditEventSource(BackboneElement):
     """
     The actor that is reporting the event.
@@ -150,7 +117,6 @@ class AuditEventSource(BackboneElement):
         description="The type of source where event originated",
         default=None,
     )
-
 
 class AuditEventEntityDetail(BackboneElement):
     """
@@ -173,28 +139,13 @@ class AuditEventEntityDetail(BackboneElement):
         description="Property value",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="Property value",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Property value",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Property value",
@@ -208,19 +159,9 @@ class AuditEventEntityDetail(BackboneElement):
         description="Property value",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Property value",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
     valuePeriod: Optional[Period] = Field(
         description="Property value",
@@ -229,11 +170,6 @@ class AuditEventEntityDetail(BackboneElement):
     valueBase64Binary: Optional[Base64Binary] = Field(
         description="Property value",
         default=None,
-    )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
     )
 
     @property
@@ -264,7 +200,6 @@ class AuditEventEntityDetail(BackboneElement):
             required=True,
         )
 
-
 class AuditEventEntityAgent(BackboneElement):
     """
     The entity is attributed to an agent to express the agent's responsibility for that entity in the activity. This is most used to indicate when persistence media (the entity) are used by an agent. For example when importing data from a device, the device would be described in an entity, and the user importing data from that media would be indicated as the entity.agent.
@@ -286,11 +221,6 @@ class AuditEventEntityAgent(BackboneElement):
         description="Whether user is initiator",
         default=None,
     )
-    requestor_ext: Optional[Element] = Field(
-        description="Placeholder element for requestor extensions",
-        default=None,
-        alias="_requestor",
-    )
     location: Optional[Reference] = Field(
         description="The agent location when the event occurred",
         default=None,
@@ -298,11 +228,6 @@ class AuditEventEntityAgent(BackboneElement):
     policy: Optional[ListType[Uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
-    )
-    policy_ext: Optional[Element] = Field(
-        description="Placeholder element for policy extensions",
-        default=None,
-        alias="_policy",
     )
     networkReference: Optional[Reference] = Field(
         description="This agent network location for the activity",
@@ -312,19 +237,9 @@ class AuditEventEntityAgent(BackboneElement):
         description="This agent network location for the activity",
         default=None,
     )
-    networkUri_ext: Optional[Element] = Field(
-        description="Placeholder element for networkUri extensions",
-        default=None,
-        alias="_networkUri",
-    )
     networkString: Optional[String] = Field(
         description="This agent network location for the activity",
         default=None,
-    )
-    networkString_ext: Optional[Element] = Field(
-        description="Placeholder element for networkString extensions",
-        default=None,
-        alias="_networkString",
     )
     authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Allowable authorization for this agent",
@@ -347,7 +262,6 @@ class AuditEventEntityAgent(BackboneElement):
             required=False,
         )
 
-
 class AuditEventEntity(BackboneElement):
     """
     Specific instances of data or objects that have been accessed.
@@ -369,11 +283,6 @@ class AuditEventEntity(BackboneElement):
         description="Query parameters",
         default=None,
     )
-    query_ext: Optional[Element] = Field(
-        description="Placeholder element for query extensions",
-        default=None,
-        alias="_query",
-    )
     detail: Optional[ListType[AuditEventEntityDetail]] = Field(
         description="Additional Information about the entity",
         default=None,
@@ -382,7 +291,6 @@ class AuditEventEntity(BackboneElement):
         description="Entity is attributed to this agent",
         default=None,
     )
-
 
 class AuditEvent(DomainResource):
     """
@@ -405,19 +313,9 @@ class AuditEvent(DomainResource):
         description="Type of action performed during the event",
         default=None,
     )
-    action_ext: Optional[Element] = Field(
-        description="Placeholder element for action extensions",
-        default=None,
-        alias="_action",
-    )
     severity: Optional[Code] = Field(
         description="emergency | alert | critical | error | warning | notice | informational | debug",
         default=None,
-    )
-    severity_ext: Optional[Element] = Field(
-        description="Placeholder element for severity extensions",
-        default=None,
-        alias="_severity",
     )
     occurredPeriod: Optional[Period] = Field(
         description="When the activity occurred",
@@ -427,19 +325,9 @@ class AuditEvent(DomainResource):
         description="When the activity occurred",
         default=None,
     )
-    occurredDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurredDateTime extensions",
-        default=None,
-        alias="_occurredDateTime",
-    )
     recorded: Optional[Instant] = Field(
         description="Time when the event was recorded",
         default=None,
-    )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
     )
     outcome: Optional[AuditEventOutcome] = Field(
         description="Whether the event succeeded or failed",

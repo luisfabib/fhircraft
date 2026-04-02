@@ -1,20 +1,13 @@
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 
 from typing import List as ListType, Optional
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    Code,
-    Decimal,
-    Instant,
-    String,
-    UnsignedInt,
-    Uri,
-)
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     Element,
@@ -23,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Meta,
 )
 from .resource import Resource
-
 
 class BundleLink(BackboneElement):
     """
@@ -34,21 +26,10 @@ class BundleLink(BackboneElement):
         description="See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1",
         default=None,
     )
-    relation_ext: Optional[Element] = Field(
-        description="Placeholder element for relation extensions",
-        default=None,
-        alias="_relation",
-    )
     url: Optional[Uri] = Field(
         description="Reference details for the link",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-
 
 class BundleEntryLink(BackboneElement):
     """
@@ -59,21 +40,10 @@ class BundleEntryLink(BackboneElement):
         description="See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1",
         default=None,
     )
-    relation_ext: Optional[Element] = Field(
-        description="Placeholder element for relation extensions",
-        default=None,
-        alias="_relation",
-    )
     url: Optional[Uri] = Field(
         description="Reference details for the link",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-
 
 class BundleEntrySearch(BackboneElement):
     """
@@ -84,21 +54,10 @@ class BundleEntrySearch(BackboneElement):
         description="match | include | outcome - why this is in the result set",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
     score: Optional[Decimal] = Field(
         description="Search ranking (between 0 and 1)",
         default=None,
     )
-    score_ext: Optional[Element] = Field(
-        description="Placeholder element for score extensions",
-        default=None,
-        alias="_score",
-    )
-
 
 class BundleEntryRequest(BackboneElement):
     """
@@ -109,57 +68,26 @@ class BundleEntryRequest(BackboneElement):
         description="GET | HEAD | POST | PUT | DELETE | PATCH",
         default=None,
     )
-    method_ext: Optional[Element] = Field(
-        description="Placeholder element for method extensions",
-        default=None,
-        alias="_method",
-    )
     url: Optional[Uri] = Field(
         description="URL for HTTP equivalent of this entry",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     ifNoneMatch: Optional[String] = Field(
         description="For managing cache currency",
         default=None,
     )
-    ifNoneMatch_ext: Optional[Element] = Field(
-        description="Placeholder element for ifNoneMatch extensions",
-        default=None,
-        alias="_ifNoneMatch",
-    )
     ifModifiedSince: Optional[Instant] = Field(
         description="For managing cache currency",
         default=None,
-    )
-    ifModifiedSince_ext: Optional[Element] = Field(
-        description="Placeholder element for ifModifiedSince extensions",
-        default=None,
-        alias="_ifModifiedSince",
     )
     ifMatch: Optional[String] = Field(
         description="For managing update contention",
         default=None,
     )
-    ifMatch_ext: Optional[Element] = Field(
-        description="Placeholder element for ifMatch extensions",
-        default=None,
-        alias="_ifMatch",
-    )
     ifNoneExist: Optional[String] = Field(
         description="For conditional creates",
         default=None,
     )
-    ifNoneExist_ext: Optional[Element] = Field(
-        description="Placeholder element for ifNoneExist extensions",
-        default=None,
-        alias="_ifNoneExist",
-    )
-
 
 class BundleEntryResponse(BackboneElement):
     """
@@ -170,43 +98,22 @@ class BundleEntryResponse(BackboneElement):
         description="Status response code (text optional)",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     location: Optional[Uri] = Field(
         description="The location (if the operation returns a location)",
         default=None,
-    )
-    location_ext: Optional[Element] = Field(
-        description="Placeholder element for location extensions",
-        default=None,
-        alias="_location",
     )
     etag: Optional[String] = Field(
         description="The Etag for the resource (if relevant)",
         default=None,
     )
-    etag_ext: Optional[Element] = Field(
-        description="Placeholder element for etag extensions",
-        default=None,
-        alias="_etag",
-    )
     lastModified: Optional[Instant] = Field(
         description="Server\u0027s date time modified",
         default=None,
-    )
-    lastModified_ext: Optional[Element] = Field(
-        description="Placeholder element for lastModified extensions",
-        default=None,
-        alias="_lastModified",
     )
     outcome: Optional[Resource] = Field(
         description="OperationOutcome with hints and warnings (for batch/transaction)",
         default=None,
     )
-
 
 class BundleEntry(BackboneElement):
     """
@@ -220,11 +127,6 @@ class BundleEntry(BackboneElement):
     fullUrl: Optional[Uri] = Field(
         description="URI for resource (Absolute URL server address or URI for UUID/OID)",
         default=None,
-    )
-    fullUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for fullUrl extensions",
-        default=None,
-        alias="_fullUrl",
     )
     resource: Optional[Resource] = Field(
         description="A resource in the bundle",
@@ -243,7 +145,6 @@ class BundleEntry(BackboneElement):
         default=None,
     )
 
-
 class Bundle(Resource):
     """
     A container for a collection of resources.
@@ -261,28 +162,13 @@ class Bundle(Resource):
         description="document | message | transaction | transaction-response | batch | batch-response | history | searchset | collection",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     timestamp: Optional[Instant] = Field(
         description="When the bundle was assembled",
         default=None,
     )
-    timestamp_ext: Optional[Element] = Field(
-        description="Placeholder element for timestamp extensions",
-        default=None,
-        alias="_timestamp",
-    )
     total: Optional[UnsignedInt] = Field(
         description="If search, the total number of matches",
         default=None,
-    )
-    total_ext: Optional[Element] = Field(
-        description="Placeholder element for total extensions",
-        default=None,
-        alias="_total",
     )
     link: Optional[ListType[BundleLink]] = Field(
         description="Links related to this Bundle",

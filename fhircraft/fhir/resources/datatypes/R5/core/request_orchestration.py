@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Markdown,
-    Id,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -38,7 +30,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class RequestOrchestrationActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria, or start/stop conditions for the action.
@@ -48,16 +39,10 @@ class RequestOrchestrationActionCondition(BackboneElement):
         description="applicability | start | stop",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
     expression: Optional[Expression] = Field(
         description="Boolean-valued expression",
         default=None,
     )
-
 
 class RequestOrchestrationActionInput(BackboneElement):
     """
@@ -68,11 +53,6 @@ class RequestOrchestrationActionInput(BackboneElement):
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     requirement: Optional[DataRequirement] = Field(
         description="What data is provided",
         default=None,
@@ -81,12 +61,6 @@ class RequestOrchestrationActionInput(BackboneElement):
         description="What data is provided",
         default=None,
     )
-    relatedData_ext: Optional[Element] = Field(
-        description="Placeholder element for relatedData extensions",
-        default=None,
-        alias="_relatedData",
-    )
-
 
 class RequestOrchestrationActionOutput(BackboneElement):
     """
@@ -97,11 +71,6 @@ class RequestOrchestrationActionOutput(BackboneElement):
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     requirement: Optional[DataRequirement] = Field(
         description="What data is provided",
         default=None,
@@ -110,12 +79,6 @@ class RequestOrchestrationActionOutput(BackboneElement):
         description="What data is provided",
         default=None,
     )
-    relatedData_ext: Optional[Element] = Field(
-        description="Placeholder element for relatedData extensions",
-        default=None,
-        alias="_relatedData",
-    )
-
 
 class RequestOrchestrationActionRelatedAction(BackboneElement):
     """
@@ -126,28 +89,13 @@ class RequestOrchestrationActionRelatedAction(BackboneElement):
         description="What action this is related to",
         default=None,
     )
-    targetId_ext: Optional[Element] = Field(
-        description="Placeholder element for targetId extensions",
-        default=None,
-        alias="_targetId",
-    )
     relationship: Optional[Code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
     )
-    relationship_ext: Optional[Element] = Field(
-        description="Placeholder element for relationship extensions",
-        default=None,
-        alias="_relationship",
-    )
     endRelationship: Optional[Code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
-    )
-    endRelationship_ext: Optional[Element] = Field(
-        description="Placeholder element for endRelationship extensions",
-        default=None,
-        alias="_endRelationship",
     )
     offsetDuration: Optional[Duration] = Field(
         description="Time offset for the relationship",
@@ -174,7 +122,6 @@ class RequestOrchestrationActionRelatedAction(BackboneElement):
             required=False,
         )
 
-
 class RequestOrchestrationActionParticipant(BackboneElement):
     """
     The participant that should perform or be responsible for this action.
@@ -184,19 +131,9 @@ class RequestOrchestrationActionParticipant(BackboneElement):
         description="careteam | device | group | healthcareservice | location | organization | patient | practitioner | practitionerrole | relatedperson",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     typeCanonical: Optional[Canonical] = Field(
         description="Who or what can participate",
         default=None,
-    )
-    typeCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for typeCanonical extensions",
-        default=None,
-        alias="_typeCanonical",
     )
     typeReference: Optional[Reference] = Field(
         description="Who or what can participate",
@@ -213,11 +150,6 @@ class RequestOrchestrationActionParticipant(BackboneElement):
     actorCanonical: Optional[Canonical] = Field(
         description="Who/what is participating?",
         default=None,
-    )
-    actorCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for actorCanonical extensions",
-        default=None,
-        alias="_actorCanonical",
     )
     actorReference: Optional[Reference] = Field(
         description="Who/what is participating?",
@@ -240,7 +172,6 @@ class RequestOrchestrationActionParticipant(BackboneElement):
             required=False,
         )
 
-
 class RequestOrchestrationActionDynamicValue(BackboneElement):
     """
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
@@ -250,16 +181,10 @@ class RequestOrchestrationActionDynamicValue(BackboneElement):
         description="The path to the element to be set dynamically",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
     expression: Optional[Expression] = Field(
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
-
 
 class RequestOrchestrationAction(BackboneElement):
     """
@@ -270,55 +195,25 @@ class RequestOrchestrationAction(BackboneElement):
         description="Pointer to specific item from the PlanDefinition",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     prefix: Optional[String] = Field(
         description="User-visible prefix for the action (e.g. 1. or A.)",
         default=None,
-    )
-    prefix_ext: Optional[Element] = Field(
-        description="Placeholder element for prefix extensions",
-        default=None,
-        alias="_prefix",
     )
     title: Optional[String] = Field(
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     description: Optional[Markdown] = Field(
         description="Short description of the action",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     textEquivalent: Optional[Markdown] = Field(
         description="Static text equivalent of the action, used if the dynamic aspects cannot be interpreted by the receiving system",
         default=None,
     )
-    textEquivalent_ext: Optional[Element] = Field(
-        description="Placeholder element for textEquivalent extensions",
-        default=None,
-        alias="_textEquivalent",
-    )
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     code: Optional[ListType[CodeableConcept]] = Field(
         description="Code representing the meaning of the action or sub-actions",
@@ -351,11 +246,6 @@ class RequestOrchestrationAction(BackboneElement):
     timingDateTime: Optional[DateTime] = Field(
         description="When the action should take place",
         default=None,
-    )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
     )
     timingAge: Optional[Age] = Field(
         description="When the action should take place",
@@ -393,46 +283,21 @@ class RequestOrchestrationAction(BackboneElement):
         description="visual-group | logical-group | sentence-group",
         default=None,
     )
-    groupingBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for groupingBehavior extensions",
-        default=None,
-        alias="_groupingBehavior",
-    )
     selectionBehavior: Optional[Code] = Field(
         description="any | all | all-or-none | exactly-one | at-most-one | one-or-more",
         default=None,
-    )
-    selectionBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for selectionBehavior extensions",
-        default=None,
-        alias="_selectionBehavior",
     )
     requiredBehavior: Optional[Code] = Field(
         description="must | could | must-unless-documented",
         default=None,
     )
-    requiredBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for requiredBehavior extensions",
-        default=None,
-        alias="_requiredBehavior",
-    )
     precheckBehavior: Optional[Code] = Field(
         description="yes | no",
         default=None,
     )
-    precheckBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for precheckBehavior extensions",
-        default=None,
-        alias="_precheckBehavior",
-    )
     cardinalityBehavior: Optional[Code] = Field(
         description="single | multiple",
         default=None,
-    )
-    cardinalityBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for cardinalityBehavior extensions",
-        default=None,
-        alias="_cardinalityBehavior",
     )
     resource: Optional[Reference] = Field(
         description="The target of the action",
@@ -442,28 +307,13 @@ class RequestOrchestrationAction(BackboneElement):
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
-    )
     definitionUri: Optional[Uri] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionUri_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionUri extensions",
-        default=None,
-        alias="_definitionUri",
-    )
     transform: Optional[Canonical] = Field(
         description="Transform to apply the template",
         default=None,
-    )
-    transform_ext: Optional[Element] = Field(
-        description="Placeholder element for transform extensions",
-        default=None,
-        alias="_transform",
     )
     dynamicValue: Optional[ListType[RequestOrchestrationActionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
@@ -506,7 +356,6 @@ class RequestOrchestrationAction(BackboneElement):
             required=False,
         )
 
-
 class RequestOrchestration(DomainResource):
     """
     A set of related requests that can be used to capture intended activities that have inter-dependencies such as "give this medication after that one".
@@ -524,19 +373,9 @@ class RequestOrchestration(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal, or order",
@@ -554,28 +393,13 @@ class RequestOrchestration(DomainResource):
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     intent: Optional[Code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     code: Optional[CodeableConcept] = Field(
         description="What\u0027s being requested/ordered",
@@ -592,11 +416,6 @@ class RequestOrchestration(DomainResource):
     authoredOn: Optional[DateTime] = Field(
         description="When the request orchestration was authored",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     author: Optional[Reference] = Field(
         description="Device or practitioner that authored the request orchestration",

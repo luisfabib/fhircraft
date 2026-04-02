@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -25,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class AllergyIntoleranceParticipant(BackboneElement):
     """
     Indicates who or what participated in the activities related to the allergy or intolerance and how they were involved.
@@ -39,7 +38,6 @@ class AllergyIntoleranceParticipant(BackboneElement):
         description="Who or what participated in the activities related to the allergy or intolerance",
         default=None,
     )
-
 
 class AllergyIntoleranceReaction(BackboneElement):
     """
@@ -58,28 +56,13 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Description of the event as a whole",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     onset: Optional[DateTime] = Field(
         description="Date(/time) when manifestations showed",
         default=None,
     )
-    onset_ext: Optional[Element] = Field(
-        description="Placeholder element for onset extensions",
-        default=None,
-        alias="_onset",
-    )
     severity: Optional[Code] = Field(
         description="mild | moderate | severe (of event as a whole)",
         default=None,
-    )
-    severity_ext: Optional[Element] = Field(
-        description="Placeholder element for severity extensions",
-        default=None,
-        alias="_severity",
     )
     exposureRoute: Optional[CodeableConcept] = Field(
         description="How the subject was exposed to the substance",
@@ -89,7 +72,6 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Text about event not captured in other fields",
         default=None,
     )
-
 
 class AllergyIntolerance(DomainResource):
     """
@@ -120,19 +102,9 @@ class AllergyIntolerance(DomainResource):
         description="food | medication | environment | biologic",
         default=None,
     )
-    category_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for category extensions",
-        default=None,
-        alias="_category",
-    )
     criticality: Optional[Code] = Field(
         description="low | high | unable-to-assess",
         default=None,
-    )
-    criticality_ext: Optional[Element] = Field(
-        description="Placeholder element for criticality extensions",
-        default=None,
-        alias="_criticality",
     )
     code: Optional[CodeableConcept] = Field(
         description="Code that identifies the allergy or intolerance",
@@ -150,11 +122,6 @@ class AllergyIntolerance(DomainResource):
         description="When allergy or intolerance was identified",
         default=None,
     )
-    onsetDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for onsetDateTime extensions",
-        default=None,
-        alias="_onsetDateTime",
-    )
     onsetAge: Optional[Age] = Field(
         description="When allergy or intolerance was identified",
         default=None,
@@ -171,19 +138,9 @@ class AllergyIntolerance(DomainResource):
         description="When allergy or intolerance was identified",
         default=None,
     )
-    onsetString_ext: Optional[Element] = Field(
-        description="Placeholder element for onsetString extensions",
-        default=None,
-        alias="_onsetString",
-    )
     recordedDate: Optional[DateTime] = Field(
         description="Date allergy or intolerance was first recorded",
         default=None,
-    )
-    recordedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedDate extensions",
-        default=None,
-        alias="_recordedDate",
     )
     participant: Optional[ListType[AllergyIntoleranceParticipant]] = Field(
         description="Who or what participated in the activities related to the allergy or intolerance and how they were involved",
@@ -192,11 +149,6 @@ class AllergyIntolerance(DomainResource):
     lastOccurrence: Optional[DateTime] = Field(
         description="Date(/time) of last known occurrence of a reaction",
         default=None,
-    )
-    lastOccurrence_ext: Optional[Element] = Field(
-        description="Placeholder element for lastOccurrence extensions",
-        default=None,
-        alias="_lastOccurrence",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Additional text not captured in other fields",

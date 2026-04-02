@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import Field, field_validator
 
 from fhircraft.fhir.resources.base import FHIRPrimitiveModel
-from fhircraft.fhir.resources.datatypes.R4B.complex import Element
+from fhircraft.fhir.resources.datatypes.R4B.complex.element import Element
 
 _DECIMAL_PATTERN = r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$"
 

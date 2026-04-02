@@ -2,9 +2,8 @@ from typing import Optional
 
 from pydantic import Field
 
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex.element import Element
-
 
 class xhtml(Element):
     """

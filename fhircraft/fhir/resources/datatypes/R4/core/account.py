@@ -1,4 +1,4 @@
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 import fhircraft.fhir.resources.validators as fhir_validators
 
 from pydantic import Field, model_validator
@@ -13,13 +13,7 @@ from typing import Optional, List as ListType
 from .resource import Resource
 from .domain_resource import DomainResource
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    PositiveInt,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -32,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Period,
     BackboneElement,
 )
-
 
 class AccountCoverage(BackboneElement):
     """
@@ -47,12 +40,6 @@ class AccountCoverage(BackboneElement):
         description="The priority of the coverage in the context of this account",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
-
 
 class AccountGuarantor(BackboneElement):
     """
@@ -67,16 +54,10 @@ class AccountGuarantor(BackboneElement):
         description="Credit or other hold applied",
         default=None,
     )
-    onHold_ext: Optional[Element] = Field(
-        description="Placeholder element for onHold extensions",
-        default=None,
-        alias="_onHold",
-    )
     period: Optional[Period] = Field(
         description="Guarantee account during",
         default=None,
     )
-
 
 class Account(DomainResource):
     """
@@ -107,11 +88,6 @@ class Account(DomainResource):
         description="active | inactive | entered-in-error | on-hold | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[CodeableConcept] = Field(
         description="E.g. patient, expense, depreciation",
         default=None,
@@ -119,11 +95,6 @@ class Account(DomainResource):
     name: Optional[String] = Field(
         description="Human-readable label",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     subject: Optional[ListType[Reference]] = Field(
         description="The entity that caused the expenses",
@@ -144,11 +115,6 @@ class Account(DomainResource):
     description: Optional[String] = Field(
         description="Explanation of purpose/use",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     guarantor: Optional[ListType[AccountGuarantor]] = Field(
         description="The parties ultimately responsible for balancing the Account",

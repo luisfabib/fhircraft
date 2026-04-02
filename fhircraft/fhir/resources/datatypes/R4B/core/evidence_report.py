@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -31,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class EvidenceReportSubjectCharacteristic(BackboneElement):
     """
@@ -54,11 +47,6 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         description="Characteristic value",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueQuantity: Optional[Quantity] = Field(
         description="Characteristic value",
         default=None,
@@ -70,11 +58,6 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
     exclude: Optional[Boolean] = Field(
         description="Is used to express not the characteristic",
         default=None,
-    )
-    exclude_ext: Optional[Element] = Field(
-        description="Placeholder element for exclude extensions",
-        default=None,
-        alias="_exclude",
     )
     period: Optional[Period] = Field(
         description="Timeframe for the characteristic",
@@ -97,7 +80,6 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
             required=True,
         )
 
-
 class EvidenceReportSubject(BackboneElement):
     """
     Specifies the subject or focus of the report. Answers "What is this report about?".
@@ -112,7 +94,6 @@ class EvidenceReportSubject(BackboneElement):
         default=None,
     )
 
-
 class EvidenceReportRelatesTo(BackboneElement):
     """
     Relationships that this composition has with other compositions or documents that already exist.
@@ -121,11 +102,6 @@ class EvidenceReportRelatesTo(BackboneElement):
     code: Optional[Code] = Field(
         description="replaces | amends | appends | transforms | replacedWith | amendedWith | appendedWith | transformedWith",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     targetIdentifier: Optional[Identifier] = Field(
         description="Target of the relationship",
@@ -152,7 +128,6 @@ class EvidenceReportRelatesTo(BackboneElement):
             required=True,
         )
 
-
 class EvidenceReportSection(BackboneElement):
     """
     The root of the sections that make up the composition.
@@ -161,11 +136,6 @@ class EvidenceReportSection(BackboneElement):
     title: Optional[String] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     focus: Optional[CodeableConcept] = Field(
         description="Classification of section (recommended)",
@@ -186,11 +156,6 @@ class EvidenceReportSection(BackboneElement):
     mode: Optional[Code] = Field(
         description="working | snapshot | changes",
         default=None,
-    )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
     )
     orderedBy: Optional[CodeableConcept] = Field(
         description="Order of section entries",
@@ -217,7 +182,6 @@ class EvidenceReportSection(BackboneElement):
         default=None,
     )
 
-
 class EvidenceReport(DomainResource):
     """
     The EvidenceReport Resource is a specialized container for a collection of resources and codable concepts, adapted to support compositions of Evidence, EvidenceVariable, and Citation resources and related concepts.
@@ -243,19 +207,9 @@ class EvidenceReport(DomainResource):
         description="Canonical identifier for this EvidenceReport, represented as a globally unique URI",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -277,11 +231,6 @@ class EvidenceReport(DomainResource):
         description="Citation for this report",
         default=None,
     )
-    citeAsMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for citeAsMarkdown extensions",
-        default=None,
-        alias="_citeAsMarkdown",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Kind of report",
         default=None,
@@ -301,11 +250,6 @@ class EvidenceReport(DomainResource):
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",

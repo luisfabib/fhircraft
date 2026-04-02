@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class DeviceAssociationOperation(BackboneElement):
     """
@@ -39,7 +38,6 @@ class DeviceAssociationOperation(BackboneElement):
         description="Begin and end dates and times for the device\u0027s operation",
         default=None,
     )
-
 
 class DeviceAssociation(DomainResource):
     """

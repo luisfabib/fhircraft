@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class Schedule(DomainResource):
     """
@@ -49,11 +48,6 @@ class Schedule(DomainResource):
         description="Whether this schedule is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="High-level category",
         default=None,
@@ -77,9 +71,4 @@ class Schedule(DomainResource):
     comment: Optional[String] = Field(
         description="Comments on availability",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )

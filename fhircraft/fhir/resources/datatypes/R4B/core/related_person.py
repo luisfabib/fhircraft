@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -30,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class RelatedPersonCommunication(BackboneElement):
     """
     A language which may be used to communicate with about the patient's health.
@@ -44,12 +37,6 @@ class RelatedPersonCommunication(BackboneElement):
         description="Language preference indicator",
         default=None,
     )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
-    )
-
 
 class RelatedPerson(DomainResource):
     """
@@ -80,11 +67,6 @@ class RelatedPerson(DomainResource):
         description="Whether this related person\u0027s record is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     patient: Optional[Reference] = Field(
         description="The patient this person is related to",
         default=None,
@@ -105,19 +87,9 @@ class RelatedPerson(DomainResource):
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
     birthDate: Optional[Date] = Field(
         description="The date on which the related person was born",
         default=None,
-    )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
     )
     address: Optional[ListType[Address]] = Field(
         description="Address where the related person can be contacted or visited",

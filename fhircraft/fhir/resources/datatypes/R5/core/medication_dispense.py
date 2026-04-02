@@ -5,14 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -31,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationDispensePerformer(BackboneElement):
     """
     Indicates who or what performed the event.
@@ -46,7 +38,6 @@ class MedicationDispensePerformer(BackboneElement):
         default=None,
     )
 
-
 class MedicationDispenseSubstitution(BackboneElement):
     """
     Indicates whether or not substitution was made as part of the dispense.  In some cases, substitution will be expected but does not happen, in other cases substitution is not expected but does happen.  This block explains what substitution did or did not happen and why.  If nothing is specified, substitution was not done.
@@ -55,11 +46,6 @@ class MedicationDispenseSubstitution(BackboneElement):
     wasSubstituted: Optional[Boolean] = Field(
         description="Whether a substitution was or was not performed on the dispense",
         default=None,
-    )
-    wasSubstituted_ext: Optional[Element] = Field(
-        description="Placeholder element for wasSubstituted extensions",
-        default=None,
-        alias="_wasSubstituted",
     )
     type: Optional[CodeableConcept] = Field(
         description="Code signifying whether a different drug was dispensed from what was prescribed",
@@ -73,7 +59,6 @@ class MedicationDispenseSubstitution(BackboneElement):
         description="Who is responsible for the substitution",
         default=None,
     )
-
 
 class MedicationDispense(DomainResource):
     """
@@ -100,11 +85,6 @@ class MedicationDispense(DomainResource):
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     notPerformedReason: Optional[CodeableReference] = Field(
         description="Why a dispense was not performed",
         default=None,
@@ -112,11 +92,6 @@ class MedicationDispense(DomainResource):
     statusChanged: Optional[DateTime] = Field(
         description="When the status changed",
         default=None,
-    )
-    statusChanged_ext: Optional[Element] = Field(
-        description="Placeholder element for statusChanged extensions",
-        default=None,
-        alias="_statusChanged",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of medication dispense",
@@ -166,28 +141,13 @@ class MedicationDispense(DomainResource):
         description="When the recording of the dispense started",
         default=None,
     )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
-    )
     whenPrepared: Optional[DateTime] = Field(
         description="When product was packaged and reviewed",
         default=None,
     )
-    whenPrepared_ext: Optional[Element] = Field(
-        description="Placeholder element for whenPrepared extensions",
-        default=None,
-        alias="_whenPrepared",
-    )
     whenHandedOver: Optional[DateTime] = Field(
         description="When product was given out",
         default=None,
-    )
-    whenHandedOver_ext: Optional[Element] = Field(
-        description="Placeholder element for whenHandedOver extensions",
-        default=None,
-        alias="_whenHandedOver",
     )
     destination: Optional[Reference] = Field(
         description="Where the medication was/will be sent",
@@ -204,11 +164,6 @@ class MedicationDispense(DomainResource):
     renderedDosageInstruction: Optional[Markdown] = Field(
         description="Full representation of the dosage instructions",
         default=None,
-    )
-    renderedDosageInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for renderedDosageInstruction extensions",
-        default=None,
-        alias="_renderedDosageInstruction",
     )
     dosageInstruction: Optional[ListType[Dosage]] = Field(
         description="How the medication is to be used by the patient or administered by the caregiver",

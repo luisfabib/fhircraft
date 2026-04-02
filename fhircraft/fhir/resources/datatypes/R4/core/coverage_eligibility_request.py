@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    DateTime,
-    PositiveInt,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -30,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CoverageEligibilityRequestSupportingInfo(BackboneElement):
     """
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
@@ -40,11 +31,6 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
         description="Information instance identifier",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     information: Optional[Reference] = Field(
         description="Data to be provided",
         default=None,
@@ -53,12 +39,6 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
         description="Applies to all items",
         default=None,
     )
-    appliesToAll_ext: Optional[Element] = Field(
-        description="Placeholder element for appliesToAll extensions",
-        default=None,
-        alias="_appliesToAll",
-    )
-
 
 class CoverageEligibilityRequestInsurance(BackboneElement):
     """
@@ -69,11 +49,6 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         description="Applicable coverage",
         default=None,
     )
-    focal_ext: Optional[Element] = Field(
-        description="Placeholder element for focal extensions",
-        default=None,
-        alias="_focal",
-    )
     coverage: Optional[Reference] = Field(
         description="Insurance information",
         default=None,
@@ -82,12 +57,6 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         description="Additional provider contract number",
         default=None,
     )
-    businessArrangement_ext: Optional[Element] = Field(
-        description="Placeholder element for businessArrangement extensions",
-        default=None,
-        alias="_businessArrangement",
-    )
-
 
 class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
     """
@@ -119,7 +88,6 @@ class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
             required=False,
         )
 
-
 class CoverageEligibilityRequestItem(BackboneElement):
     """
     Service categories or billable services for which benefit details and/or an authorization prior to service delivery may be required by the payor.
@@ -128,11 +96,6 @@ class CoverageEligibilityRequestItem(BackboneElement):
     supportingInfoSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception or supporting information",
         default=None,
-    )
-    supportingInfoSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for supportingInfoSequence extensions",
-        default=None,
-        alias="_supportingInfoSequence",
     )
     category: Optional[CodeableConcept] = Field(
         description="Benefit classification",
@@ -171,7 +134,6 @@ class CoverageEligibilityRequestItem(BackboneElement):
         default=None,
     )
 
-
 class CoverageEligibilityRequest(DomainResource):
     """
     The CoverageEligibilityRequest provides patient and insurance coverage information to an insurer for them to respond, in the form of an CoverageEligibilityResponse, with information regarding whether the stated coverage is valid and in-force and optionally to provide the insurance details of the policy.
@@ -203,11 +165,6 @@ class CoverageEligibilityRequest(DomainResource):
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     priority: Optional[CodeableConcept] = Field(
         description="Desired processing priority",
         default=None,
@@ -215,11 +172,6 @@ class CoverageEligibilityRequest(DomainResource):
     purpose: Optional[ListType[Code]] = Field(
         description="auth-requirements | benefits | discovery | validation",
         default=None,
-    )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
     )
     patient: Optional[Reference] = Field(
         description="Intended recipient of products and services",
@@ -229,11 +181,6 @@ class CoverageEligibilityRequest(DomainResource):
         description="Estimated date or dates of service",
         default=None,
     )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
-    )
     servicedPeriod: Optional[Period] = Field(
         description="Estimated date or dates of service",
         default=None,
@@ -241,11 +188,6 @@ class CoverageEligibilityRequest(DomainResource):
     created: Optional[DateTime] = Field(
         description="Creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     enterer: Optional[Reference] = Field(
         description="Author",

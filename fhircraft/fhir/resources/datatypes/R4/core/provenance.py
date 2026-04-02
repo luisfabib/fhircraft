@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Instant,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -25,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ProvenanceAgent(BackboneElement):
     """
@@ -49,7 +42,6 @@ class ProvenanceAgent(BackboneElement):
         default=None,
     )
 
-
 class ProvenanceEntityAgent(BackboneElement):
     """
     The entity is attributed to an agent to express the agent's responsibility for that entity, possibly along with other agents. This description can be understood as shorthand for saying that the agent was responsible for the activity which generated the entity.
@@ -72,7 +64,6 @@ class ProvenanceEntityAgent(BackboneElement):
         default=None,
     )
 
-
 class ProvenanceEntity(BackboneElement):
     """
     An entity used in this activity.
@@ -82,11 +73,6 @@ class ProvenanceEntity(BackboneElement):
         description="derivation | revision | quotation | source | removal",
         default=None,
     )
-    role_ext: Optional[Element] = Field(
-        description="Placeholder element for role extensions",
-        default=None,
-        alias="_role",
-    )
     what: Optional[Reference] = Field(
         description="Identity of entity",
         default=None,
@@ -95,7 +81,6 @@ class ProvenanceEntity(BackboneElement):
         description="Entity is attributed to this agent",
         default=None,
     )
-
 
 class Provenance(DomainResource):
     """
@@ -130,28 +115,13 @@ class Provenance(DomainResource):
         description="When the activity occurred",
         default=None,
     )
-    occurredDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurredDateTime extensions",
-        default=None,
-        alias="_occurredDateTime",
-    )
     recorded: Optional[Instant] = Field(
         description="When the activity was recorded / updated",
         default=None,
     )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
-    )
     policy: Optional[ListType[Uri]] = Field(
         description="Policy or plan the activity was defined by",
         default=None,
-    )
-    policy_ext: Optional[Element] = Field(
-        description="Placeholder element for policy extensions",
-        default=None,
-        alias="_policy",
     )
     location: Optional[Reference] = Field(
         description="Where the activity occurred, if relevant",

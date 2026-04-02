@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import Field, field_validator
 
 from fhircraft.fhir.resources.base import FHIRPrimitiveModel
-from fhircraft.fhir.resources.datatypes.R5.complex import PrimitiveType
+from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 from fhircraft.fhir.resources.datatypes import (
     YEAR_REGEX,
     MONTH_REGEX,

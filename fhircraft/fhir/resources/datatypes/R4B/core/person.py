@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PersonLink(BackboneElement):
     """
     Link to a resource that concerns the same actual person.
@@ -42,12 +35,6 @@ class PersonLink(BackboneElement):
         description="level1 | level2 | level3 | level4",
         default=None,
     )
-    assurance_ext: Optional[Element] = Field(
-        description="Placeholder element for assurance extensions",
-        default=None,
-        alias="_assurance",
-    )
-
 
 class Person(DomainResource):
     """
@@ -86,19 +73,9 @@ class Person(DomainResource):
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
     birthDate: Optional[Date] = Field(
         description="The date on which the person was born",
         default=None,
-    )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
     )
     address: Optional[ListType[Address]] = Field(
         description="One or more addresses for the person",
@@ -115,11 +92,6 @@ class Person(DomainResource):
     active: Optional[Boolean] = Field(
         description="This person\u0027s record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     link: Optional[ListType[PersonLink]] = Field(
         description="Link to a resource that concerns the same actual person",

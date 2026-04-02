@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-    DateTime,
-    Integer,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -32,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class PatientContact(BackboneElement):
     """
@@ -59,11 +50,6 @@ class PatientContact(BackboneElement):
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
     organization: Optional[Reference] = Field(
         description="Organization that is associated with the contact",
         default=None,
@@ -72,7 +58,6 @@ class PatientContact(BackboneElement):
         description="The period during which this contact person or organization is valid to be contacted relating to this patient",
         default=None,
     )
-
 
 class PatientCommunication(BackboneElement):
     """
@@ -87,12 +72,6 @@ class PatientCommunication(BackboneElement):
         description="Language preference indicator",
         default=None,
     )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
-    )
-
 
 class PatientLink(BackboneElement):
     """
@@ -107,12 +86,6 @@ class PatientLink(BackboneElement):
         description="replaced-by | replaces | refer | seealso",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-
 
 class Patient(DomainResource):
     """
@@ -131,11 +104,6 @@ class Patient(DomainResource):
         description="Whether this patient\u0027s record is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     name: Optional[ListType[HumanName]] = Field(
         description="A name associated with the patient",
         default=None,
@@ -148,37 +116,17 @@ class Patient(DomainResource):
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
     birthDate: Optional[Date] = Field(
         description="The date of birth for the individual",
         default=None,
-    )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
     )
     deceasedBoolean: Optional[Boolean] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
-    deceasedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedBoolean extensions",
-        default=None,
-        alias="_deceasedBoolean",
-    )
     deceasedDateTime: Optional[DateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
-    )
-    deceasedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedDateTime extensions",
-        default=None,
-        alias="_deceasedDateTime",
     )
     address: Optional[ListType[Address]] = Field(
         description="An address for the individual",
@@ -192,19 +140,9 @@ class Patient(DomainResource):
         description="Whether patient is part of a multiple birth",
         default=None,
     )
-    multipleBirthBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleBirthBoolean extensions",
-        default=None,
-        alias="_multipleBirthBoolean",
-    )
     multipleBirthInteger: Optional[Integer] = Field(
         description="Whether patient is part of a multiple birth",
         default=None,
-    )
-    multipleBirthInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleBirthInteger extensions",
-        default=None,
-        alias="_multipleBirthInteger",
     )
     photo: Optional[ListType[Attachment]] = Field(
         description="Image of the patient",

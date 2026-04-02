@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Code,
-    Markdown,
-    Date,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Duration,
 )
 from .domain_resource import DomainResource
-
 
 class AdministrableProductDefinitionProperty(BackboneElement):
     """
@@ -49,28 +42,13 @@ class AdministrableProductDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueMarkdown: Optional[Markdown] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -109,7 +87,6 @@ class AdministrableProductDefinitionProperty(BackboneElement):
             required=False,
         )
 
-
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod(
     BackboneElement
 ):
@@ -129,12 +106,6 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
         description="Extra information about the withdrawal period",
         default=None,
     )
-    supportingInformation_ext: Optional[Element] = Field(
-        description="Placeholder element for supportingInformation extensions",
-        default=None,
-        alias="_supportingInformation",
-    )
-
 
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneElement):
     """
@@ -153,7 +124,6 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneE
         description="A species specific time during which consumption of animal product is not appropriate",
         default=None,
     )
-
 
 class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
     """
@@ -191,7 +161,6 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
         default=None,
     )
 
-
 class AdministrableProductDefinition(DomainResource):
     """
     A medicinal product in the final form which is suitable for administering to a patient (after any mixing of multiple components, dissolution etc. has been performed).
@@ -210,11 +179,6 @@ class AdministrableProductDefinition(DomainResource):
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     formOf: Optional[ListType[Reference]] = Field(
         description="References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product",
@@ -243,11 +207,6 @@ class AdministrableProductDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="A general description of the product, when in its final form, suitable for administration e.g. effervescent blue liquid, to be swallowed",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     property_: Optional[ListType[AdministrableProductDefinitionProperty]] = Field(
         description="Characteristics e.g. a product\u0027s onset of action",

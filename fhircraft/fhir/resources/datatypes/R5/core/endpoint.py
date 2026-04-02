@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Url
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class EndpointPayload(BackboneElement):
     """
     The set of payloads that are provided/available at this endpoint.
@@ -36,12 +35,6 @@ class EndpointPayload(BackboneElement):
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    mimeType_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for mimeType extensions",
-        default=None,
-        alias="_mimeType",
-    )
-
 
 class Endpoint(DomainResource):
     """
@@ -60,11 +53,6 @@ class Endpoint(DomainResource):
         description="active | suspended | error | off | entered-in-error | test",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     connectionType: Optional[ListType[CodeableConcept]] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
         default=None,
@@ -73,19 +61,9 @@ class Endpoint(DomainResource):
         description="A name that this endpoint can be identified by",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     description: Optional[String] = Field(
         description="Additional details about the endpoint that could be displayed as further information to identify the description beyond its name",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     environmentType: Optional[ListType[CodeableConcept]] = Field(
         description="The type of environment(s) exposed at this endpoint",
@@ -111,17 +89,7 @@ class Endpoint(DomainResource):
         description="The technical base address for connecting to this endpoint",
         default=None,
     )
-    address_ext: Optional[Element] = Field(
-        description="Placeholder element for address extensions",
-        default=None,
-        alias="_address",
-    )
     header: Optional[ListType[String]] = Field(
         description="Usage depends on the channel type",
         default=None,
-    )
-    header_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for header extensions",
-        default=None,
-        alias="_header",
     )

@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Integer,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -32,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class TestPlanDependency(BackboneElement):
     """
     The required criteria to execute the test plan - e.g. preconditions, previous tests...
@@ -42,16 +33,10 @@ class TestPlanDependency(BackboneElement):
         description="Description of the dependency criterium",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     predecessor: Optional[Reference] = Field(
         description="Link to predecessor test plans",
         default=None,
     )
-
 
 class TestPlanTestCaseDependency(BackboneElement):
     """
@@ -62,16 +47,10 @@ class TestPlanTestCaseDependency(BackboneElement):
         description="Description of the criteria",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     predecessor: Optional[Reference] = Field(
         description="Link to predecessor test plans",
         default=None,
     )
-
 
 class TestPlanTestCaseTestRunScript(BackboneElement):
     """
@@ -85,11 +64,6 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
     sourceString: Optional[String] = Field(
         description="The actual content of the cases - references to TestScripts or externally defined content",
         default=None,
-    )
-    sourceString_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceString extensions",
-        default=None,
-        alias="_sourceString",
     )
     sourceReference: Optional[Reference] = Field(
         description="The actual content of the cases - references to TestScripts or externally defined content",
@@ -112,7 +86,6 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
             required=False,
         )
 
-
 class TestPlanTestCaseTestRun(BackboneElement):
     """
     The actual test to be executed.
@@ -122,16 +95,10 @@ class TestPlanTestCaseTestRun(BackboneElement):
         description="The narrative description of the tests",
         default=None,
     )
-    narrative_ext: Optional[Element] = Field(
-        description="Placeholder element for narrative extensions",
-        default=None,
-        alias="_narrative",
-    )
     script: Optional[TestPlanTestCaseTestRunScript] = Field(
         description="The test cases in a structured language e.g. gherkin, Postman, or FHIR TestScript",
         default=None,
     )
-
 
 class TestPlanTestCaseTestData(BackboneElement):
     """
@@ -150,11 +117,6 @@ class TestPlanTestCaseTestData(BackboneElement):
         description="Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc",
         default=None,
     )
-    sourceString_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceString extensions",
-        default=None,
-        alias="_sourceString",
-    )
     sourceReference: Optional[Reference] = Field(
         description="Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc",
         default=None,
@@ -175,7 +137,6 @@ class TestPlanTestCaseTestData(BackboneElement):
             field_name_base="source",
             required=False,
         )
-
 
 class TestPlanTestCaseAssertion(BackboneElement):
     """
@@ -195,7 +156,6 @@ class TestPlanTestCaseAssertion(BackboneElement):
         default=None,
     )
 
-
 class TestPlanTestCase(BackboneElement):
     """
     The individual test cases that are part of this plan, when they they are made explicit.
@@ -204,11 +164,6 @@ class TestPlanTestCase(BackboneElement):
     sequence: Optional[Integer] = Field(
         description="Sequence of test case in the test plan",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     scope: Optional[ListType[Reference]] = Field(
         description="The scope or artifact covered by the case",
@@ -231,7 +186,6 @@ class TestPlanTestCase(BackboneElement):
         default=None,
     )
 
-
 class TestPlan(DomainResource):
     """
     A plan for executing testing on an artifact or specifications
@@ -245,11 +199,6 @@ class TestPlan(DomainResource):
         description="Canonical identifier for this test plan, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier identifier for the test plan",
         default=None,
@@ -258,19 +207,9 @@ class TestPlan(DomainResource):
         description="Business version of the test plan",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -280,55 +219,25 @@ class TestPlan(DomainResource):
         description="Name for this test plan (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this test plan (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -337,11 +246,6 @@ class TestPlan(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the test plan",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -355,28 +259,13 @@ class TestPlan(DomainResource):
         description="Why this test plan is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
-    )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the Test Plan - can be acceptance, unit, performance",
@@ -390,11 +279,6 @@ class TestPlan(DomainResource):
         description="A description of test tools to be used in the test plan - narrative for now",
         default=None,
     )
-    testTools_ext: Optional[Element] = Field(
-        description="Placeholder element for testTools extensions",
-        default=None,
-        alias="_testTools",
-    )
     dependency: Optional[ListType[TestPlanDependency]] = Field(
         description="The required criteria to execute the test plan - e.g. preconditions, previous tests",
         default=None,
@@ -402,11 +286,6 @@ class TestPlan(DomainResource):
     exitCriteria: Optional[Markdown] = Field(
         description="The threshold or criteria for the test plan to be considered successfully executed - narrative",
         default=None,
-    )
-    exitCriteria_ext: Optional[Element] = Field(
-        description="Placeholder element for exitCriteria extensions",
-        default=None,
-        alias="_exitCriteria",
     )
     testCase: Optional[ListType[TestPlanTestCase]] = Field(
         description="The test cases that constitute this plan",

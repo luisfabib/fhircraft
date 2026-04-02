@@ -3,10 +3,9 @@ from typing import List as ListType, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import Extension, Narrative
 from .resource import Resource
-
 
 class DomainResource(Resource):
     """

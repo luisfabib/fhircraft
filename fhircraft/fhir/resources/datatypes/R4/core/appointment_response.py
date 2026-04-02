@@ -5,7 +5,7 @@ NoneType = type(None)
 
 from typing import Optional, List as ListType
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class AppointmentResponse(DomainResource):
     """
@@ -53,19 +52,9 @@ class AppointmentResponse(DomainResource):
         description="Time from appointment, or requested new start time",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
     end: Optional[Instant] = Field(
         description="Time from appointment, or requested new end time",
         default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
     participantType: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in the appointment",
@@ -79,19 +68,9 @@ class AppointmentResponse(DomainResource):
         description="accepted | declined | tentative | needs-action",
         default=None,
     )
-    participantStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for participantStatus extensions",
-        default=None,
-        alias="_participantStatus",
-    )
     comment: Optional[String] = Field(
         description="Additional comments",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
 
     @model_validator(mode="after")

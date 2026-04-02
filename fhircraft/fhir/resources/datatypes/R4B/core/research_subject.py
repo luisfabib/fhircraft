@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ResearchSubject(DomainResource):
     """
@@ -48,11 +47,6 @@ class ResearchSubject(DomainResource):
         description="candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     period: Optional[Period] = Field(
         description="Start and end of participation",
         default=None,
@@ -69,19 +63,9 @@ class ResearchSubject(DomainResource):
         description="What path should be followed",
         default=None,
     )
-    assignedArm_ext: Optional[Element] = Field(
-        description="Placeholder element for assignedArm extensions",
-        default=None,
-        alias="_assignedArm",
-    )
     actualArm: Optional[String] = Field(
         description="What path was followed",
         default=None,
-    )
-    actualArm_ext: Optional[Element] = Field(
-        description="Placeholder element for actualArm extensions",
-        default=None,
-        alias="_actualArm",
     )
     consent: Optional[Reference] = Field(
         description="Agreement to participate in study",

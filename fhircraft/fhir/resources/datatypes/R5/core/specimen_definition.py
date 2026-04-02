@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -35,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
     """
@@ -67,7 +57,6 @@ class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
             required=True,
         )
 
-
 class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     """
     The specimen's container.
@@ -89,11 +78,6 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="The description of the kind of container",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     capacity: Optional[Quantity] = Field(
         description="The capacity of this kind of container",
         default=None,
@@ -106,11 +90,6 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Minimum volume",
         default=None,
     )
-    minimumVolumeString_ext: Optional[Element] = Field(
-        description="Placeholder element for minimumVolumeString extensions",
-        default=None,
-        alias="_minimumVolumeString",
-    )
     additive: Optional[ListType[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,
@@ -118,11 +97,6 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     preparation: Optional[Markdown] = Field(
         description="Special processing applied to the container for this specimen type",
         default=None,
-    )
-    preparation_ext: Optional[Element] = Field(
-        description="Placeholder element for preparation extensions",
-        default=None,
-        alias="_preparation",
     )
 
     @property
@@ -140,7 +114,6 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
             field_name_base="minimumVolume",
             required=False,
         )
-
 
 class SpecimenDefinitionTypeTestedHandling(BackboneElement):
     """
@@ -163,12 +136,6 @@ class SpecimenDefinitionTypeTestedHandling(BackboneElement):
         description="Preservation instruction",
         default=None,
     )
-    instruction_ext: Optional[Element] = Field(
-        description="Placeholder element for instruction extensions",
-        default=None,
-        alias="_instruction",
-    )
-
 
 class SpecimenDefinitionTypeTested(BackboneElement):
     """
@@ -179,11 +146,6 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Primary or secondary specimen",
         default=None,
     )
-    isDerived_ext: Optional[Element] = Field(
-        description="Placeholder element for isDerived extensions",
-        default=None,
-        alias="_isDerived",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Type of intended specimen",
         default=None,
@@ -191,11 +153,6 @@ class SpecimenDefinitionTypeTested(BackboneElement):
     preference: Optional[Code] = Field(
         description="preferred | alternate",
         default=None,
-    )
-    preference_ext: Optional[Element] = Field(
-        description="Placeholder element for preference extensions",
-        default=None,
-        alias="_preference",
     )
     container: Optional[SpecimenDefinitionTypeTestedContainer] = Field(
         description="The specimen\u0027s container",
@@ -205,11 +162,6 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Requirements for specimen delivery and special handling",
         default=None,
     )
-    requirement_ext: Optional[Element] = Field(
-        description="Placeholder element for requirement extensions",
-        default=None,
-        alias="_requirement",
-    )
     retentionTime: Optional[Duration] = Field(
         description="The usual time for retaining this kind of specimen",
         default=None,
@@ -217,11 +169,6 @@ class SpecimenDefinitionTypeTested(BackboneElement):
     singleUse: Optional[Boolean] = Field(
         description="Specimen for single use only",
         default=None,
-    )
-    singleUse_ext: Optional[Element] = Field(
-        description="Placeholder element for singleUse extensions",
-        default=None,
-        alias="_singleUse",
     )
     rejectionCriterion: Optional[ListType[CodeableConcept]] = Field(
         description="Criterion specified for specimen rejection",
@@ -236,7 +183,6 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         default=None,
     )
 
-
 class SpecimenDefinition(DomainResource):
     """
     A kind of specimen with associated set of requirements.
@@ -250,11 +196,6 @@ class SpecimenDefinition(DomainResource):
         description="Logical canonical URL to reference this SpecimenDefinition (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[Identifier] = Field(
         description="Business identifier",
         default=None,
@@ -263,19 +204,9 @@ class SpecimenDefinition(DomainResource):
         description="Business version of the SpecimenDefinition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -285,55 +216,25 @@ class SpecimenDefinition(DomainResource):
         description="Name for this {{title}} (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this SpecimenDefinition (Human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     derivedFromCanonical: Optional[ListType[Canonical]] = Field(
         description="Based on FHIR definition of another SpecimenDefinition",
         default=None,
     )
-    derivedFromCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for derivedFromCanonical extensions",
-        default=None,
-        alias="_derivedFromCanonical",
-    )
     derivedFromUri: Optional[ListType[Uri]] = Field(
         description="Based on external definition",
         default=None,
-    )
-    derivedFromUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for derivedFromUri extensions",
-        default=None,
-        alias="_derivedFromUri",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="If this SpecimenDefinition is not for real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of subject for specimen collection",
@@ -347,19 +248,9 @@ class SpecimenDefinition(DomainResource):
         description="Date status first applied",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="The name of the individual or organization that published the SpecimenDefinition",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -368,11 +259,6 @@ class SpecimenDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the SpecimenDefinition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="Content intends to support these contexts",
@@ -386,46 +272,21 @@ class SpecimenDefinition(DomainResource):
         description="Why this SpecimenDefinition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
     approvalDate: Optional[Date] = Field(
         description="When SpecimenDefinition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="The date on which the asset content was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="The effective date range for the SpecimenDefinition",
@@ -442,11 +303,6 @@ class SpecimenDefinition(DomainResource):
     timeAspect: Optional[String] = Field(
         description="Time aspect for collection",
         default=None,
-    )
-    timeAspect_ext: Optional[Element] = Field(
-        description="Placeholder element for timeAspect extensions",
-        default=None,
-        alias="_timeAspect",
     )
     collection: Optional[ListType[CodeableConcept]] = Field(
         description="Specimen collection procedure",

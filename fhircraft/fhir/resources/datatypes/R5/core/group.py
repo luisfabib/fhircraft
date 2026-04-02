@@ -5,14 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-    UnsignedInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -29,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class GroupCharacteristic(BackboneElement):
     """
@@ -48,11 +40,6 @@ class GroupCharacteristic(BackboneElement):
         description="Value held by characteristic",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueQuantity: Optional[Quantity] = Field(
         description="Value held by characteristic",
         default=None,
@@ -68,11 +55,6 @@ class GroupCharacteristic(BackboneElement):
     exclude: Optional[Boolean] = Field(
         description="Group includes or excludes",
         default=None,
-    )
-    exclude_ext: Optional[Element] = Field(
-        description="Placeholder element for exclude extensions",
-        default=None,
-        alias="_exclude",
     )
     period: Optional[Period] = Field(
         description="Period over which characteristic is tested",
@@ -95,7 +77,6 @@ class GroupCharacteristic(BackboneElement):
             required=True,
         )
 
-
 class GroupMember(BackboneElement):
     """
     Identifies the resource instances that are members of the group.
@@ -113,12 +94,6 @@ class GroupMember(BackboneElement):
         description="If member is no longer in group",
         default=None,
     )
-    inactive_ext: Optional[Element] = Field(
-        description="Placeholder element for inactive extensions",
-        default=None,
-        alias="_inactive",
-    )
-
 
 class Group(DomainResource):
     """
@@ -137,28 +112,13 @@ class Group(DomainResource):
         description="Whether this group\u0027s record is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     type: Optional[Code] = Field(
         description="person | animal | practitioner | device | careteam | healthcareservice | location | organization | relatedperson | specimen",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     membership: Optional[Code] = Field(
         description="definitional | enumerated",
         default=None,
-    )
-    membership_ext: Optional[Element] = Field(
-        description="Placeholder element for membership extensions",
-        default=None,
-        alias="_membership",
     )
     code: Optional[CodeableConcept] = Field(
         description="Kind of Group members",
@@ -168,28 +128,13 @@ class Group(DomainResource):
         description="Label for Group",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     description: Optional[Markdown] = Field(
         description="Natural language description of the group",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     quantity: Optional[UnsignedInt] = Field(
         description="Number of members",
         default=None,
-    )
-    quantity_ext: Optional[Element] = Field(
-        description="Placeholder element for quantity extensions",
-        default=None,
-        alias="_quantity",
     )
     managingEntity: Optional[Reference] = Field(
         description="Entity that is the custodian of the Group\u0027s definition",

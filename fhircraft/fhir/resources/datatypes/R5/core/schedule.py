@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class Schedule(DomainResource):
     """
@@ -45,11 +38,6 @@ class Schedule(DomainResource):
         description="Whether this schedule is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="High-level category",
         default=None,
@@ -66,11 +54,6 @@ class Schedule(DomainResource):
         description="Human-readable label",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     actor: Optional[ListType[Reference]] = Field(
         description="Resource(s) that availability information is being provided for",
         default=None,
@@ -82,9 +65,4 @@ class Schedule(DomainResource):
     comment: Optional[Markdown] = Field(
         description="Comments on availability",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )

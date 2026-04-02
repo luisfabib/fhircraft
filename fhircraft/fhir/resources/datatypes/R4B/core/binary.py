@@ -4,12 +4,7 @@ from typing import Optional
 NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Base64Binary,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -31,11 +26,6 @@ class Binary(Resource):
         description="MimeType of the binary content",
         default=None,
     )
-    contentType_ext: Optional[Element] = Field(
-        description="Placeholder element for contentType extensions",
-        default=None,
-        alias="_contentType",
-    )
     securityContext: Optional[Reference] = Field(
         description="Identifies another resource to use as proxy when enforcing access control",
         default=None,
@@ -43,10 +33,5 @@ class Binary(Resource):
     data: Optional[Base64Binary] = Field(
         description="The actual content",
         default=None,
-    )
-    data_ext: Optional[Element] = Field(
-        description="Placeholder element for data extensions",
-        default=None,
-        alias="_data",
     )
 

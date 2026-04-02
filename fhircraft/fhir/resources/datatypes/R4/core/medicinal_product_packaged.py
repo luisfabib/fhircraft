@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -23,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicinalProductPackagedBatchIdentifier(BackboneElement):
     """
     Batch numbering.
@@ -37,7 +36,6 @@ class MedicinalProductPackagedBatchIdentifier(BackboneElement):
         description="A number appearing on the immediate packaging (and not the outer packaging)",
         default=None,
     )
-
 
 class MedicinalProductPackagedPackageItem(BackboneElement):
     """
@@ -93,7 +91,6 @@ class MedicinalProductPackagedPackageItem(BackboneElement):
         default=None,
     )
 
-
 class MedicinalProductPackaged(DomainResource):
     """
     A medicinal product in a container or package.
@@ -126,11 +123,6 @@ class MedicinalProductPackaged(DomainResource):
     description: Optional[String] = Field(
         description="Textual description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     legalStatusOfSupply: Optional[CodeableConcept] = Field(
         description="The legal status of supply of the medicinal product as classified by the regulator",

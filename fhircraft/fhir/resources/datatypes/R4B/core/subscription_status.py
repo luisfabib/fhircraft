@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -24,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubscriptionStatusNotificationEvent(BackboneElement):
     """
     Detailed information about events relevant to this subscription notification.
@@ -34,19 +27,9 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
         description="Event number",
         default=None,
     )
-    eventNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for eventNumber extensions",
-        default=None,
-        alias="_eventNumber",
-    )
     timestamp: Optional[Instant] = Field(
         description="The instant this event occurred",
         default=None,
-    )
-    timestamp_ext: Optional[Element] = Field(
-        description="Placeholder element for timestamp extensions",
-        default=None,
-        alias="_timestamp",
     )
     focus: Optional[Reference] = Field(
         description="The focus of this event",
@@ -56,7 +39,6 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
         description="Additional context for this event",
         default=None,
     )
-
 
 class SubscriptionStatus(DomainResource):
     """
@@ -83,28 +65,13 @@ class SubscriptionStatus(DomainResource):
         description="requested | active | error | off | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[Code] = Field(
         description="handshake | heartbeat | event-notification | query-status | query-event",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     eventsSinceSubscriptionStart: Optional[String] = Field(
         description="Events since the Subscription was created",
         default=None,
-    )
-    eventsSinceSubscriptionStart_ext: Optional[Element] = Field(
-        description="Placeholder element for eventsSinceSubscriptionStart extensions",
-        default=None,
-        alias="_eventsSinceSubscriptionStart",
     )
     notificationEvent: Optional[ListType[SubscriptionStatusNotificationEvent]] = Field(
         description="Detailed information about any events relevant to this notification",
@@ -117,11 +84,6 @@ class SubscriptionStatus(DomainResource):
     topic: Optional[Canonical] = Field(
         description="Reference to the SubscriptionTopic this notification relates to",
         default=None,
-    )
-    topic_ext: Optional[Element] = Field(
-        description="Placeholder element for topic extensions",
-        default=None,
-        alias="_topic",
     )
     error: Optional[ListType[CodeableConcept]] = Field(
         description="List of errors on the subscription",

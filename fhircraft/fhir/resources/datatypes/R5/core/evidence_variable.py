@@ -5,18 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Id,
-    Canonical,
-    PositiveInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -39,7 +28,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
     """
@@ -66,11 +54,6 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueQuantity: Optional[Quantity] = Field(
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
@@ -86,11 +69,6 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
     valueId: Optional[Id] = Field(
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
-    )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
     )
     offset: Optional[CodeableConcept] = Field(
         description="Reference point for valueQuantity or valueRange",
@@ -113,7 +91,6 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
             required=True,
         )
 
-
 class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
     """
     Defines the characteristic as a combination of two or more characteristics.
@@ -123,25 +100,14 @@ class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
         description="all-of | any-of | at-least | at-most | statistical | net-effect | dataset",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     threshold: Optional[PositiveInt] = Field(
         description='Provides the value of "n" when "at-least" or "at-most" codes are used',
         default=None,
-    )
-    threshold_ext: Optional[Element] = Field(
-        description="Placeholder element for threshold extensions",
-        default=None,
-        alias="_threshold",
     )
     characteristic: Optional[ListType["EvidenceVariableCharacteristic"]] = Field(
         description="A defining factor of the characteristic",
         default=None,
     )
-
 
 class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
     """
@@ -151,11 +117,6 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
     description: Optional[Markdown] = Field(
         description="Human readable description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
@@ -173,19 +134,9 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
         description="The event used as a base point (reference point) in time",
         default=None,
     )
-    eventDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for eventDateTime extensions",
-        default=None,
-        alias="_eventDateTime",
-    )
     eventId: Optional[Id] = Field(
         description="The event used as a base point (reference point) in time",
         default=None,
-    )
-    eventId_ext: Optional[Element] = Field(
-        description="Placeholder element for eventId extensions",
-        default=None,
-        alias="_eventId",
     )
     quantity: Optional[Quantity] = Field(
         description="Used to express the observation at a defined amount of time before or after the event",
@@ -212,7 +163,6 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
             required=False,
         )
 
-
 class EvidenceVariableCharacteristic(BackboneElement):
     """
     A defining factor of the EvidenceVariable. Multiple characteristics are applied with "and" semantics.
@@ -222,19 +172,9 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Label for internal linking",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     description: Optional[Markdown] = Field(
         description="Natural language description of the characteristic",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
@@ -244,11 +184,6 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Whether the characteristic is an inclusion criterion or exclusion criterion",
         default=None,
     )
-    exclude_ext: Optional[Element] = Field(
-        description="Placeholder element for exclude extensions",
-        default=None,
-        alias="_exclude",
-    )
     definitionReference: Optional[Reference] = Field(
         description="Defines the characteristic (without using type and value) by a Reference",
         default=None,
@@ -256,11 +191,6 @@ class EvidenceVariableCharacteristic(BackboneElement):
     definitionCanonical: Optional[Canonical] = Field(
         description="Defines the characteristic (without using type and value) by a Canonical",
         default=None,
-    )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
     )
     definitionCodeableConcept: Optional[CodeableConcept] = Field(
         description="Defines the characteristic (without using type and value) by a CodeableConcept",
@@ -273,11 +203,6 @@ class EvidenceVariableCharacteristic(BackboneElement):
     definitionId: Optional[Id] = Field(
         description="Defines the characteristic (without using type and value) by an id",
         default=None,
-    )
-    definitionId_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionId extensions",
-        default=None,
-        alias="_definitionId",
     )
     definitionByTypeAndValue: Optional[
         EvidenceVariableCharacteristicDefinitionByTypeAndValue
@@ -346,7 +271,6 @@ class EvidenceVariableCharacteristic(BackboneElement):
             required=False,
         )
 
-
 class EvidenceVariableCategory(BackboneElement):
     """
     A grouping for ordinal or polychotomous variables.
@@ -355,11 +279,6 @@ class EvidenceVariableCategory(BackboneElement):
     name: Optional[String] = Field(
         description="Description of the grouping",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Definition of the grouping",
@@ -390,7 +309,6 @@ class EvidenceVariableCategory(BackboneElement):
             required=False,
         )
 
-
 class EvidenceVariable(DomainResource):
     """
     The EvidenceVariable resource describes an element that knowledge (Evidence) is about.
@@ -404,11 +322,6 @@ class EvidenceVariable(DomainResource):
         description="Canonical identifier for this evidence variable, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the evidence variable",
         default=None,
@@ -417,19 +330,9 @@ class EvidenceVariable(DomainResource):
         description="Business version of the evidence variable",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
@@ -439,64 +342,29 @@ class EvidenceVariable(DomainResource):
         description="Name for this evidence variable (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Name for this evidence variable (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     shortTitle: Optional[String] = Field(
         description="Title for use in informal contexts",
         default=None,
     )
-    shortTitle_ext: Optional[Element] = Field(
-        description="Placeholder element for shortTitle extensions",
-        default=None,
-        alias="_shortTitle",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -505,11 +373,6 @@ class EvidenceVariable(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the evidence variable",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
@@ -523,46 +386,21 @@ class EvidenceVariable(DomainResource):
         description="Why this EvidenceVariable is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     copyrightLabel: Optional[String] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the resource was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the resource was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the resource is expected to be used",
@@ -592,11 +430,6 @@ class EvidenceVariable(DomainResource):
         description="Actual or conceptual",
         default=None,
     )
-    actual_ext: Optional[Element] = Field(
-        description="Placeholder element for actual extensions",
-        default=None,
-        alias="_actual",
-    )
     characteristic: Optional[ListType[EvidenceVariableCharacteristic]] = Field(
         description="A defining factor of the EvidenceVariable",
         default=None,
@@ -604,11 +437,6 @@ class EvidenceVariable(DomainResource):
     handling: Optional[Code] = Field(
         description="continuous | dichotomous | ordinal | polychotomous",
         default=None,
-    )
-    handling_ext: Optional[Element] = Field(
-        description="Placeholder element for handling extensions",
-        default=None,
-        alias="_handling",
     )
     category: Optional[ListType[EvidenceVariableCategory]] = Field(
         description="A grouping for ordinal or polychotomous variables",

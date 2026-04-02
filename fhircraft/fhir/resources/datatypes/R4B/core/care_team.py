@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class CareTeamParticipant(BackboneElement):
     """
@@ -44,7 +43,6 @@ class CareTeamParticipant(BackboneElement):
         description="Time period of participant",
         default=None,
     )
-
 
 class CareTeam(DomainResource):
     """
@@ -75,11 +73,6 @@ class CareTeam(DomainResource):
         description="proposed | active | suspended | inactive | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of team",
         default=None,
@@ -87,11 +80,6 @@ class CareTeam(DomainResource):
     name: Optional[String] = Field(
         description="Name of the team, such as crisis assessment team",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     subject: Optional[Reference] = Field(
         description="Who care team is for",

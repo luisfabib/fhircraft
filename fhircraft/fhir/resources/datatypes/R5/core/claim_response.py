@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-    Date,
-    Decimal,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -35,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ClaimResponseEvent(BackboneElement):
     """
     Information code for an event with a corresponding date or period.
@@ -48,11 +38,6 @@ class ClaimResponseEvent(BackboneElement):
     whenDateTime: Optional[DateTime] = Field(
         description="Occurance date or period",
         default=None,
-    )
-    whenDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for whenDateTime extensions",
-        default=None,
-        alias="_whenDateTime",
     )
     whenPeriod: Optional[Period] = Field(
         description="Occurance date or period",
@@ -75,7 +60,6 @@ class ClaimResponseEvent(BackboneElement):
             required=True,
         )
 
-
 class ClaimResponseItemReviewOutcome(BackboneElement):
     """
     The high-level results of the adjudication if adjudication has been performed.
@@ -93,16 +77,10 @@ class ClaimResponseItemReviewOutcome(BackboneElement):
         description="Preauthorization reference",
         default=None,
     )
-    preAuthRef_ext: Optional[Element] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
-    )
     preAuthPeriod: Optional[Period] = Field(
         description="Preauthorization reference effective period",
         default=None,
     )
-
 
 class ClaimResponseItemAdjudication(BackboneElement):
     """
@@ -126,7 +104,6 @@ class ClaimResponseItemAdjudication(BackboneElement):
         default=None,
     )
 
-
 class ClaimResponseItemDetailReviewOutcome(BackboneElement):
     """
     The high-level results of the adjudication if adjudication has been performed.
@@ -144,16 +121,10 @@ class ClaimResponseItemDetailReviewOutcome(BackboneElement):
         description="Preauthorization reference",
         default=None,
     )
-    preAuthRef_ext: Optional[Element] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
-    )
     preAuthPeriod: Optional[Period] = Field(
         description="Preauthorization reference effective period",
         default=None,
     )
-
 
 class ClaimResponseItemDetailAdjudication(BackboneElement):
     """
@@ -177,7 +148,6 @@ class ClaimResponseItemDetailAdjudication(BackboneElement):
         default=None,
     )
 
-
 class ClaimResponseItemDetailSubDetail(BackboneElement):
     """
     A sub-detail adjudication of a simple product or service.
@@ -187,11 +157,6 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         description="Claim sub-detail instance identifier",
         default=None,
     )
-    subDetailSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for subDetailSequence extensions",
-        default=None,
-        alias="_subDetailSequence",
-    )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
@@ -199,11 +164,6 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
     noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     reviewOutcome: Optional[ClaimResponseItemReviewOutcome] = Field(
         description="Subdetail level adjudication results",
@@ -214,7 +174,6 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         default=None,
     )
 
-
 class ClaimResponseItemDetail(BackboneElement):
     """
     A claim detail. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
@@ -224,11 +183,6 @@ class ClaimResponseItemDetail(BackboneElement):
         description="Claim detail instance identifier",
         default=None,
     )
-    detailSequence_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for detailSequence extensions",
-        default=None,
-        alias="_detailSequence",
-    )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
@@ -236,11 +190,6 @@ class ClaimResponseItemDetail(BackboneElement):
     noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     reviewOutcome: Optional[ClaimResponseItemDetailReviewOutcome] = Field(
         description="Detail level adjudication results",
@@ -255,7 +204,6 @@ class ClaimResponseItemDetail(BackboneElement):
         default=None,
     )
 
-
 class ClaimResponseItem(BackboneElement):
     """
     A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
@@ -265,11 +213,6 @@ class ClaimResponseItem(BackboneElement):
         description="Claim item instance identifier",
         default=None,
     )
-    itemSequence_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for itemSequence extensions",
-        default=None,
-        alias="_itemSequence",
-    )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
@@ -277,11 +220,6 @@ class ClaimResponseItem(BackboneElement):
     noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     reviewOutcome: Optional[ClaimResponseItemReviewOutcome] = Field(
         description="Adjudication results",
@@ -296,7 +234,6 @@ class ClaimResponseItem(BackboneElement):
         default=None,
     )
 
-
 class ClaimResponseAddItemBodySite(BackboneElement):
     """
     Physical location where the service is performed or applies.
@@ -310,7 +247,6 @@ class ClaimResponseAddItemBodySite(BackboneElement):
         description="Sub-location",
         default=None,
     )
-
 
 class ClaimResponseAddItemDetailSubDetail(BackboneElement):
     """
@@ -349,11 +285,6 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Price scaling factor",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
     tax: Optional[Money] = Field(
         description="Total tax",
         default=None,
@@ -366,11 +297,6 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Applicable note numbers",
         default=None,
     )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
-    )
     reviewOutcome: Optional[ClaimResponseItemReviewOutcome] = Field(
         description="Added items subdetail level adjudication results",
         default=None,
@@ -379,7 +305,6 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Added items subdetail adjudication",
         default=None,
     )
-
 
 class ClaimResponseAddItemDetail(BackboneElement):
     """
@@ -418,11 +343,6 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Price scaling factor",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
     tax: Optional[Money] = Field(
         description="Total tax",
         default=None,
@@ -434,11 +354,6 @@ class ClaimResponseAddItemDetail(BackboneElement):
     noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     reviewOutcome: Optional[ClaimResponseItemReviewOutcome] = Field(
         description="Added items detail level adjudication results",
@@ -453,7 +368,6 @@ class ClaimResponseAddItemDetail(BackboneElement):
         default=None,
     )
 
-
 class ClaimResponseAddItem(BackboneElement):
     """
     The first-tier service adjudications for payor added product or service lines.
@@ -463,28 +377,13 @@ class ClaimResponseAddItem(BackboneElement):
         description="Item sequence number",
         default=None,
     )
-    itemSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for itemSequence extensions",
-        default=None,
-        alias="_itemSequence",
-    )
     detailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Detail sequence number",
         default=None,
     )
-    detailSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for detailSequence extensions",
-        default=None,
-        alias="_detailSequence",
-    )
     subdetailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Subdetail sequence number",
         default=None,
-    )
-    subdetailSequence_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for subdetailSequence extensions",
-        default=None,
-        alias="_subdetailSequence",
     )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
@@ -522,11 +421,6 @@ class ClaimResponseAddItem(BackboneElement):
         description="Date or dates of service or product delivery",
         default=None,
     )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
-    )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",
         default=None,
@@ -555,11 +449,6 @@ class ClaimResponseAddItem(BackboneElement):
         description="Price scaling factor",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
     tax: Optional[Money] = Field(
         description="Total tax",
         default=None,
@@ -575,11 +464,6 @@ class ClaimResponseAddItem(BackboneElement):
     noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     reviewOutcome: Optional[ClaimResponseItemReviewOutcome] = Field(
         description="Added items adjudication results",
@@ -626,7 +510,6 @@ class ClaimResponseAddItem(BackboneElement):
             required=False,
         )
 
-
 class ClaimResponseTotal(BackboneElement):
     """
     Categorized monetary totals for the adjudication.
@@ -640,7 +523,6 @@ class ClaimResponseTotal(BackboneElement):
         description="Financial total for the category",
         default=None,
     )
-
 
 class ClaimResponsePayment(BackboneElement):
     """
@@ -663,11 +545,6 @@ class ClaimResponsePayment(BackboneElement):
         description="Expected date of payment",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     amount: Optional[Money] = Field(
         description="Payable amount after adjustment",
         default=None,
@@ -676,7 +553,6 @@ class ClaimResponsePayment(BackboneElement):
         description="Business identifier for the payment",
         default=None,
     )
-
 
 class ClaimResponseProcessNote(BackboneElement):
     """
@@ -687,11 +563,6 @@ class ClaimResponseProcessNote(BackboneElement):
         description="Note instance identifier",
         default=None,
     )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Note purpose",
         default=None,
@@ -700,16 +571,10 @@ class ClaimResponseProcessNote(BackboneElement):
         description="Note explanatory text",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
     language: Optional[CodeableConcept] = Field(
         description="Language of the text",
         default=None,
     )
-
 
 class ClaimResponseInsurance(BackboneElement):
     """
@@ -720,19 +585,9 @@ class ClaimResponseInsurance(BackboneElement):
         description="Insurance instance identifier",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
     focal: Optional[Boolean] = Field(
         description="Coverage to be used for adjudication",
         default=None,
-    )
-    focal_ext: Optional[Element] = Field(
-        description="Placeholder element for focal extensions",
-        default=None,
-        alias="_focal",
     )
     coverage: Optional[Reference] = Field(
         description="Insurance information",
@@ -742,16 +597,10 @@ class ClaimResponseInsurance(BackboneElement):
         description="Additional provider contract number",
         default=None,
     )
-    businessArrangement_ext: Optional[Element] = Field(
-        description="Placeholder element for businessArrangement extensions",
-        default=None,
-        alias="_businessArrangement",
-    )
     claimResponse: Optional[Reference] = Field(
         description="Adjudication results",
         default=None,
     )
-
 
 class ClaimResponseError(BackboneElement):
     """
@@ -762,28 +611,13 @@ class ClaimResponseError(BackboneElement):
         description="Item sequence number",
         default=None,
     )
-    itemSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for itemSequence extensions",
-        default=None,
-        alias="_itemSequence",
-    )
     detailSequence: Optional[PositiveInt] = Field(
         description="Detail sequence number",
         default=None,
     )
-    detailSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for detailSequence extensions",
-        default=None,
-        alias="_detailSequence",
-    )
     subDetailSequence: Optional[PositiveInt] = Field(
         description="Subdetail sequence number",
         default=None,
-    )
-    subDetailSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for subDetailSequence extensions",
-        default=None,
-        alias="_subDetailSequence",
     )
     code: Optional[CodeableConcept] = Field(
         description="Error code detailing processing issues",
@@ -793,12 +627,6 @@ class ClaimResponseError(BackboneElement):
         description="FHIRPath of element(s) related to issue",
         default=None,
     )
-    expression_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-
 
 class ClaimResponse(DomainResource):
     """
@@ -821,11 +649,6 @@ class ClaimResponse(DomainResource):
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[CodeableConcept] = Field(
         description="More granular claim type",
         default=None,
@@ -838,11 +661,6 @@ class ClaimResponse(DomainResource):
         description="claim | preauthorization | predetermination",
         default=None,
     )
-    use_ext: Optional[Element] = Field(
-        description="Placeholder element for use extensions",
-        default=None,
-        alias="_use",
-    )
     patient: Optional[Reference] = Field(
         description="The recipient of the products and services",
         default=None,
@@ -850,11 +668,6 @@ class ClaimResponse(DomainResource):
     created: Optional[DateTime] = Field(
         description="Response creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     insurer: Optional[Reference] = Field(
         description="Party responsible for reimbursement",
@@ -872,11 +685,6 @@ class ClaimResponse(DomainResource):
         description="queued | complete | error | partial",
         default=None,
     )
-    outcome_ext: Optional[Element] = Field(
-        description="Placeholder element for outcome extensions",
-        default=None,
-        alias="_outcome",
-    )
     decision: Optional[CodeableConcept] = Field(
         description="Result of the adjudication",
         default=None,
@@ -885,19 +693,9 @@ class ClaimResponse(DomainResource):
         description="Disposition Message",
         default=None,
     )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
-    )
     preAuthRef: Optional[String] = Field(
         description="Preauthorization reference",
         default=None,
-    )
-    preAuthRef_ext: Optional[Element] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
     )
     preAuthPeriod: Optional[Period] = Field(
         description="Preauthorization reference effective period",

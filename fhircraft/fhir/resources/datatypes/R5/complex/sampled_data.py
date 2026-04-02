@@ -3,9 +3,8 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import DataType, Element, Quantity
-
 
 class SampledData(DataType):
     """
@@ -22,82 +21,37 @@ class SampledData(DataType):
         description="Number of intervalUnits between samples",
         default=None,
     )
-    interval_ext: Optional[Element] = Field(
-        description="Placeholder element for interval extensions",
-        default=None,
-        alias="_interval",
-    )
     intervalUnit: Optional[Code] = Field(
         description="The measurement unit of the interval between samples",
         default=None,
-    )
-    intervalUnit_ext: Optional[Element] = Field(
-        description="Placeholder element for intervalUnit extensions",
-        default=None,
-        alias="_intervalUnit",
     )
     factor: Optional[Decimal] = Field(
         description="Multiply data by this before adding to origin",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
     lowerLimit: Optional[Decimal] = Field(
         description="Lower limit of detection",
         default=None,
-    )
-    lowerLimit_ext: Optional[Element] = Field(
-        description="Placeholder element for lowerLimit extensions",
-        default=None,
-        alias="_lowerLimit",
     )
     upperLimit: Optional[Decimal] = Field(
         description="Upper limit of detection",
         default=None,
     )
-    upperLimit_ext: Optional[Element] = Field(
-        description="Placeholder element for upperLimit extensions",
-        default=None,
-        alias="_upperLimit",
-    )
     dimensions: Optional[PositiveInt] = Field(
         description="Number of sample points at each time point",
         default=None,
-    )
-    dimensions_ext: Optional[Element] = Field(
-        description="Placeholder element for dimensions extensions",
-        default=None,
-        alias="_dimensions",
     )
     codeMap: Optional[Canonical] = Field(
         description="Defines the codes used in the data",
         default=None,
     )
-    codeMap_ext: Optional[Element] = Field(
-        description="Placeholder element for codeMap extensions",
-        default=None,
-        alias="_codeMap",
-    )
     offsets: Optional[String] = Field(
         description="Offsets, typically in time, at which data values were taken",
         default=None,
     )
-    offsets_ext: Optional[Element] = Field(
-        description="Placeholder element for offsets extensions",
-        default=None,
-        alias="_offsets",
-    )
     data: Optional[String] = Field(
         description='Decimal values with spaces, or "E" | "U" | "L", or another code',
         default=None,
-    )
-    data_ext: Optional[Element] = Field(
-        description="Placeholder element for data extensions",
-        default=None,
-        alias="_data",
     )
 
     @model_validator(mode="after")

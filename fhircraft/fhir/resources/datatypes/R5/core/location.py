@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -31,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class LocationPosition(BackboneElement):
     """
     The absolute geographic location of the Location, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
@@ -41,30 +34,14 @@ class LocationPosition(BackboneElement):
         description="Longitude with WGS84 datum",
         default=None,
     )
-    longitude_ext: Optional[Element] = Field(
-        description="Placeholder element for longitude extensions",
-        default=None,
-        alias="_longitude",
-    )
     latitude: Optional[Decimal] = Field(
         description="Latitude with WGS84 datum",
         default=None,
-    )
-    latitude_ext: Optional[Element] = Field(
-        description="Placeholder element for latitude extensions",
-        default=None,
-        alias="_latitude",
     )
     altitude: Optional[Decimal] = Field(
         description="Altitude with WGS84 datum",
         default=None,
     )
-    altitude_ext: Optional[Element] = Field(
-        description="Placeholder element for altitude extensions",
-        default=None,
-        alias="_altitude",
-    )
-
 
 class Location(DomainResource):
     """
@@ -83,11 +60,6 @@ class Location(DomainResource):
         description="active | suspended | inactive",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     operationalStatus: Optional[Coding] = Field(
         description="The operational status of the location (typically only for a bed/room)",
         default=None,
@@ -96,37 +68,17 @@ class Location(DomainResource):
         description="Name of the location as used by humans",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     alias: Optional[ListType[String]] = Field(
         description="A list of alternate names that the location is known as, or was known as, in the past",
         default=None,
-    )
-    alias_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
     )
     description: Optional[Markdown] = Field(
         description="Additional details about the location that could be displayed as further information to identify the location beyond its name",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     mode: Optional[Code] = Field(
         description="instance | kind",
         default=None,
-    )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of function performed",

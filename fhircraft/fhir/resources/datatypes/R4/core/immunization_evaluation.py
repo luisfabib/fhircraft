@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -23,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ImmunizationEvaluation(DomainResource):
     """
@@ -54,11 +47,6 @@ class ImmunizationEvaluation(DomainResource):
         description="completed | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     patient: Optional[Reference] = Field(
         description="Who this evaluation is for",
         default=None,
@@ -66,11 +54,6 @@ class ImmunizationEvaluation(DomainResource):
     date: Optional[DateTime] = Field(
         description="Date evaluation was performed",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     authority: Optional[Reference] = Field(
         description="Who is responsible for publishing the recommendations",
@@ -96,55 +79,25 @@ class ImmunizationEvaluation(DomainResource):
         description="Evaluation notes",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     series: Optional[String] = Field(
         description="Name of vaccine series",
         default=None,
-    )
-    series_ext: Optional[Element] = Field(
-        description="Placeholder element for series extensions",
-        default=None,
-        alias="_series",
     )
     doseNumberPositiveInt: Optional[PositiveInt] = Field(
         description="Dose number within series",
         default=None,
     )
-    doseNumberPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberPositiveInt extensions",
-        default=None,
-        alias="_doseNumberPositiveInt",
-    )
     doseNumberString: Optional[String] = Field(
         description="Dose number within series",
         default=None,
-    )
-    doseNumberString_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberString extensions",
-        default=None,
-        alias="_doseNumberString",
     )
     seriesDosesPositiveInt: Optional[PositiveInt] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
-    seriesDosesPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesPositiveInt extensions",
-        default=None,
-        alias="_seriesDosesPositiveInt",
-    )
     seriesDosesString: Optional[String] = Field(
         description="Recommended number of doses for immunity",
         default=None,
-    )
-    seriesDosesString_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesString extensions",
-        default=None,
-        alias="_seriesDosesString",
     )
 
     @property

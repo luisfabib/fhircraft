@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Canonical,
-    UnsignedInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -32,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationRequestDispenseRequestInitialFill(BackboneElement):
     """
     Indicates the quantity or duration for the first dispense of the medication.
@@ -46,7 +37,6 @@ class MedicationRequestDispenseRequestInitialFill(BackboneElement):
         description="First fill duration",
         default=None,
     )
-
 
 class MedicationRequestDispenseRequest(BackboneElement):
     """
@@ -69,11 +59,6 @@ class MedicationRequestDispenseRequest(BackboneElement):
         description="Number of refills authorized",
         default=None,
     )
-    numberOfRepeatsAllowed_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfRepeatsAllowed extensions",
-        default=None,
-        alias="_numberOfRepeatsAllowed",
-    )
     quantity: Optional[Quantity] = Field(
         description="Amount of medication to supply per dispense",
         default=None,
@@ -87,7 +72,6 @@ class MedicationRequestDispenseRequest(BackboneElement):
         default=None,
     )
 
-
 class MedicationRequestSubstitution(BackboneElement):
     """
     Indicates whether or not substitution can or should be part of the dispense. In some cases, substitution must happen, in other cases substitution must not happen. This block explains the prescriber's intent. If nothing is specified substitution may be done.
@@ -96,11 +80,6 @@ class MedicationRequestSubstitution(BackboneElement):
     allowedBoolean: Optional[Boolean] = Field(
         description="Whether substitution is allowed or not",
         default=None,
-    )
-    allowedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedBoolean extensions",
-        default=None,
-        alias="_allowedBoolean",
     )
     allowedCodeableConcept: Optional[CodeableConcept] = Field(
         description="Whether substitution is allowed or not",
@@ -126,7 +105,6 @@ class MedicationRequestSubstitution(BackboneElement):
             field_name_base="allowed",
             required=True,
         )
-
 
 class MedicationRequest(DomainResource):
     """
@@ -157,11 +135,6 @@ class MedicationRequest(DomainResource):
         description="active | on-hold | cancelled | completed | entered-in-error | stopped | draft | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
@@ -169,11 +142,6 @@ class MedicationRequest(DomainResource):
     intent: Optional[Code] = Field(
         description="proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of medication usage",
@@ -183,28 +151,13 @@ class MedicationRequest(DomainResource):
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     doNotPerform: Optional[Boolean] = Field(
         description="True if request is prohibiting action",
         default=None,
     )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
-    )
     reportedBoolean: Optional[Boolean] = Field(
         description="Reported rather than primary record",
         default=None,
-    )
-    reportedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for reportedBoolean extensions",
-        default=None,
-        alias="_reportedBoolean",
     )
     reportedReference: Optional[Reference] = Field(
         description="Reported rather than primary record",
@@ -234,11 +187,6 @@ class MedicationRequest(DomainResource):
         description="When request was initially authored",
         default=None,
     )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
-    )
     requester: Optional[Reference] = Field(
         description="Who/What requested the Request",
         default=None,
@@ -267,19 +215,9 @@ class MedicationRequest(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",

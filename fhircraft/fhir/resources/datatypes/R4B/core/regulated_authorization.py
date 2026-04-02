@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class RegulatedAuthorizationCase(BackboneElement):
     """
@@ -53,11 +46,6 @@ class RegulatedAuthorizationCase(BackboneElement):
         description="Relevant date for this case",
         default=None,
     )
-    dateDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for dateDateTime extensions",
-        default=None,
-        alias="_dateDateTime",
-    )
     application: Optional[ListType["RegulatedAuthorizationCase"]] = Field(
         description="Applications submitted to obtain a regulated authorization. Steps within the longer running case or procedure",
         default=None,
@@ -78,7 +66,6 @@ class RegulatedAuthorizationCase(BackboneElement):
             field_name_base="date",
             required=False,
         )
-
 
 class RegulatedAuthorization(DomainResource):
     """
@@ -117,11 +104,6 @@ class RegulatedAuthorization(DomainResource):
         description="General textual supporting information",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     region: Optional[ListType[CodeableConcept]] = Field(
         description="The territory in which the authorization has been granted",
         default=None,
@@ -133,11 +115,6 @@ class RegulatedAuthorization(DomainResource):
     statusDate: Optional[DateTime] = Field(
         description="The date at which the current status was assigned",
         default=None,
-    )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
     )
     validityPeriod: Optional[Period] = Field(
         description="The time period in which the regulatory approval etc. is in effect, e.g. a Marketing Authorization includes the date of authorization and/or expiration date",

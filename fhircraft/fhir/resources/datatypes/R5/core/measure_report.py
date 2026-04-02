@@ -5,15 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Integer,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -32,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MeasureReportGroupPopulation(BackboneElement):
     """
     The populations that make up the population group, one for each type of population appropriate for the measure.
@@ -42,11 +33,6 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="Pointer to specific population from Measure",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     code: Optional[CodeableConcept] = Field(
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
@@ -54,11 +40,6 @@ class MeasureReportGroupPopulation(BackboneElement):
     count: Optional[Integer] = Field(
         description="Size of the population",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     subjectResults: Optional[Reference] = Field(
         description="For subject-list reports, the subject results in this population",
@@ -73,7 +54,6 @@ class MeasureReportGroupPopulation(BackboneElement):
         default=None,
     )
 
-
 class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     """
     A stratifier component value.
@@ -82,11 +62,6 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     linkId: Optional[String] = Field(
         description="Pointer to specific stratifier component from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="What stratifier component of the group",
@@ -99,11 +74,6 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     valueBoolean: Optional[Boolean] = Field(
         description="The stratum component value, e.g. male",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The stratum component value, e.g. male",
@@ -134,7 +104,6 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
             required=True,
         )
 
-
 class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
     """
     The populations that make up the stratum, one for each type of population appropriate to the measure.
@@ -144,11 +113,6 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="Pointer to specific population from Measure",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     code: Optional[CodeableConcept] = Field(
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
@@ -156,11 +120,6 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
     count: Optional[Integer] = Field(
         description="Size of the population",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     subjectResults: Optional[Reference] = Field(
         description="For subject-list reports, the subject results in this population",
@@ -175,7 +134,6 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         default=None,
     )
 
-
 class MeasureReportGroupStratifierStratum(BackboneElement):
     """
     This element contains the results for a single stratum within the stratifier. For example, when stratifying on administrative gender, there will be four strata, one for each possible gender value.
@@ -188,11 +146,6 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
     valueBoolean: Optional[Boolean] = Field(
         description="The stratum value, e.g. male",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The stratum value, e.g. male",
@@ -223,11 +176,6 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
     measureScoreDateTime: Optional[DateTime] = Field(
         description="What score this stratum achieved",
         default=None,
-    )
-    measureScoreDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for measureScoreDateTime extensions",
-        default=None,
-        alias="_measureScoreDateTime",
     )
     measureScoreCodeableConcept: Optional[CodeableConcept] = Field(
         description="What score this stratum achieved",
@@ -278,7 +226,6 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
             required=False,
         )
 
-
 class MeasureReportGroupStratifier(BackboneElement):
     """
     When a measure includes multiple stratifiers, there will be a stratifier group for each stratifier defined by the measure.
@@ -287,11 +234,6 @@ class MeasureReportGroupStratifier(BackboneElement):
     linkId: Optional[String] = Field(
         description="Pointer to specific stratifier from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="What stratifier of the group",
@@ -302,7 +244,6 @@ class MeasureReportGroupStratifier(BackboneElement):
         default=None,
     )
 
-
 class MeasureReportGroup(BackboneElement):
     """
     The results of the calculation, one for each population group in the measure.
@@ -311,11 +252,6 @@ class MeasureReportGroup(BackboneElement):
     linkId: Optional[String] = Field(
         description="Pointer to specific group from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="Meaning of the group",
@@ -336,11 +272,6 @@ class MeasureReportGroup(BackboneElement):
     measureScoreDateTime: Optional[DateTime] = Field(
         description="What score this group achieved",
         default=None,
-    )
-    measureScoreDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for measureScoreDateTime extensions",
-        default=None,
-        alias="_measureScoreDateTime",
     )
     measureScoreCodeableConcept: Optional[CodeableConcept] = Field(
         description="What score this group achieved",
@@ -379,7 +310,6 @@ class MeasureReportGroup(BackboneElement):
             required=False,
         )
 
-
 class MeasureReport(DomainResource):
     """
     The MeasureReport resource contains the results of the calculation of a measure; and optionally a reference to the resources involved in that calculation.
@@ -397,37 +327,17 @@ class MeasureReport(DomainResource):
         description="complete | pending | error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[Code] = Field(
         description="individual | subject-list | summary | data-exchange",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     dataUpdateType: Optional[Code] = Field(
         description="incremental | snapshot",
         default=None,
     )
-    dataUpdateType_ext: Optional[Element] = Field(
-        description="Placeholder element for dataUpdateType extensions",
-        default=None,
-        alias="_dataUpdateType",
-    )
     measure: Optional[Canonical] = Field(
         description="What measure was calculated",
         default=None,
-    )
-    measure_ext: Optional[Element] = Field(
-        description="Placeholder element for measure extensions",
-        default=None,
-        alias="_measure",
     )
     subject: Optional[Reference] = Field(
         description="What individual(s) the report is for",
@@ -436,11 +346,6 @@ class MeasureReport(DomainResource):
     date: Optional[DateTime] = Field(
         description="When the measure was calculated",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     reporter: Optional[Reference] = Field(
         description="Who is reporting the data",

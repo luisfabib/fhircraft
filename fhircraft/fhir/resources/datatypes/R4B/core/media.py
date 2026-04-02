@@ -4,15 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Instant,
-    PositiveInt,
-    Decimal,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class Media(DomainResource):
     """
@@ -67,11 +58,6 @@ class Media(DomainResource):
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     type: Optional[CodeableConcept] = Field(
         description="Classification of media as image, video, or audio",
         default=None,
@@ -96,11 +82,6 @@ class Media(DomainResource):
         description="When Media was collected",
         default=None,
     )
-    createdDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for createdDateTime extensions",
-        default=None,
-        alias="_createdDateTime",
-    )
     createdPeriod: Optional[Period] = Field(
         description="When Media was collected",
         default=None,
@@ -108,11 +89,6 @@ class Media(DomainResource):
     issued: Optional[Instant] = Field(
         description="Date/Time this version was made available",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     operator: Optional[Reference] = Field(
         description="The person who generated the image",
@@ -130,11 +106,6 @@ class Media(DomainResource):
         description="Name of the device/manufacturer",
         default=None,
     )
-    deviceName_ext: Optional[Element] = Field(
-        description="Placeholder element for deviceName extensions",
-        default=None,
-        alias="_deviceName",
-    )
     device: Optional[Reference] = Field(
         description="Observing Device",
         default=None,
@@ -143,37 +114,17 @@ class Media(DomainResource):
         description="Height of the image in pixels (photo/video)",
         default=None,
     )
-    height_ext: Optional[Element] = Field(
-        description="Placeholder element for height extensions",
-        default=None,
-        alias="_height",
-    )
     width: Optional[PositiveInt] = Field(
         description="Width of the image in pixels (photo/video)",
         default=None,
-    )
-    width_ext: Optional[Element] = Field(
-        description="Placeholder element for width extensions",
-        default=None,
-        alias="_width",
     )
     frames: Optional[PositiveInt] = Field(
         description="Number of frames if \u003e 1 (photo)",
         default=None,
     )
-    frames_ext: Optional[Element] = Field(
-        description="Placeholder element for frames extensions",
-        default=None,
-        alias="_frames",
-    )
     duration: Optional[Decimal] = Field(
         description="Length in seconds (audio / video)",
         default=None,
-    )
-    duration_ext: Optional[Element] = Field(
-        description="Placeholder element for duration extensions",
-        default=None,
-        alias="_duration",
     )
     content: Optional[Attachment] = Field(
         description="Actual Media - reference or data",

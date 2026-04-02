@@ -5,14 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-    Integer,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -33,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class BiologicallyDerivedProductCollection(BackboneElement):
     """
     How this product was collected.
@@ -50,11 +42,6 @@ class BiologicallyDerivedProductCollection(BackboneElement):
     collectedDateTime: Optional[DateTime] = Field(
         description="Time of product collection",
         default=None,
-    )
-    collectedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for collectedDateTime extensions",
-        default=None,
-        alias="_collectedDateTime",
     )
     collectedPeriod: Optional[Period] = Field(
         description="Time of product collection",
@@ -77,7 +64,6 @@ class BiologicallyDerivedProductCollection(BackboneElement):
             required=False,
         )
 
-
 class BiologicallyDerivedProductProperty(BackboneElement):
     """
     A property that is specific to this BiologicallyDerviedProduct instance.
@@ -91,19 +77,9 @@ class BiologicallyDerivedProductProperty(BackboneElement):
         description="Property values",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Property values",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Property values",
@@ -128,11 +104,6 @@ class BiologicallyDerivedProductProperty(BackboneElement):
     valueString: Optional[String] = Field(
         description="Property values",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Property values",
@@ -164,7 +135,6 @@ class BiologicallyDerivedProductProperty(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class BiologicallyDerivedProduct(DomainResource):
     """
@@ -209,11 +179,6 @@ class BiologicallyDerivedProduct(DomainResource):
         description="A unique identifier for an aliquot of a product",
         default=None,
     )
-    division_ext: Optional[Element] = Field(
-        description="Placeholder element for division extensions",
-        default=None,
-        alias="_division",
-    )
     productStatus: Optional[Coding] = Field(
         description="available | unavailable",
         default=None,
@@ -221,11 +186,6 @@ class BiologicallyDerivedProduct(DomainResource):
     expirationDate: Optional[DateTime] = Field(
         description="Date, and where relevant time, of expiration",
         default=None,
-    )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
     )
     collection: Optional[BiologicallyDerivedProductCollection] = Field(
         description="How this product was collected",

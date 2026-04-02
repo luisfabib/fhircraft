@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 
 from .element import Element
 from .codeable_concept import CodeableConcept
@@ -11,7 +11,6 @@ from .coding import Coding
 from .quantity import Quantity
 from .range import Range
 from .reference import Reference
-
 
 class UsageContext(Element):
     """

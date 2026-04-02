@@ -4,16 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -33,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MeasureGroupPopulation(BackboneElement):
     """
     A population criteria for the measure.
@@ -47,16 +37,10 @@ class MeasureGroupPopulation(BackboneElement):
         description="The human readable description of this population criteria",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     criteria: Optional[Expression] = Field(
         description="The criteria that defines this population",
         default=None,
     )
-
 
 class MeasureGroupStratifierComponent(BackboneElement):
     """
@@ -71,16 +55,10 @@ class MeasureGroupStratifierComponent(BackboneElement):
         description="The human readable description of this stratifier component",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     criteria: Optional[Expression] = Field(
         description="Component of how the measure should be stratified",
         default=None,
     )
-
 
 class MeasureGroupStratifier(BackboneElement):
     """
@@ -95,11 +73,6 @@ class MeasureGroupStratifier(BackboneElement):
         description="The human readable description of this stratifier",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     criteria: Optional[Expression] = Field(
         description="How the measure should be stratified",
         default=None,
@@ -108,7 +81,6 @@ class MeasureGroupStratifier(BackboneElement):
         description="Stratifier criteria component for the measure",
         default=None,
     )
-
 
 class MeasureGroup(BackboneElement):
     """
@@ -123,11 +95,6 @@ class MeasureGroup(BackboneElement):
         description="Summary description",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     population: Optional[ListType[MeasureGroupPopulation]] = Field(
         description="Population criteria",
         default=None,
@@ -136,7 +103,6 @@ class MeasureGroup(BackboneElement):
         description="Stratifier criteria for the measure",
         default=None,
     )
-
 
 class MeasureSupplementalData(BackboneElement):
     """
@@ -155,16 +121,10 @@ class MeasureSupplementalData(BackboneElement):
         description="The human readable description of this supplemental data",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     criteria: Optional[Expression] = Field(
         description="Expression describing additional data to be reported",
         default=None,
     )
-
 
 class Measure(DomainResource):
     """
@@ -191,11 +151,6 @@ class Measure(DomainResource):
         description="Canonical identifier for this measure, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the measure",
         default=None,
@@ -204,55 +159,25 @@ class Measure(DomainResource):
         description="Business version of the measure",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     name: Optional[String] = Field(
         description="Name for this measure (computer friendly)",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     title: Optional[String] = Field(
         description="Name for this measure (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     subtitle: Optional[String] = Field(
         description="Subordinate title of the measure",
         default=None,
-    )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
@@ -266,19 +191,9 @@ class Measure(DomainResource):
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -287,11 +202,6 @@ class Measure(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the measure",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -305,46 +215,21 @@ class Measure(DomainResource):
         description="Why this measure is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     usage: Optional[String] = Field(
         description="Describes the clinical usage of the measure",
         default=None,
-    )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
     )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the measure was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the measure was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the measure is expected to be used",
@@ -378,19 +263,9 @@ class Measure(DomainResource):
         description="Logic used by the measure",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
-    )
     disclaimer: Optional[Markdown] = Field(
         description="Disclaimer for use of the measure or its referenced content",
         default=None,
-    )
-    disclaimer_ext: Optional[Element] = Field(
-        description="Placeholder element for disclaimer extensions",
-        default=None,
-        alias="_disclaimer",
     )
     scoring: Optional[CodeableConcept] = Field(
         description="proportion | ratio | continuous-variable | cohort",
@@ -408,37 +283,17 @@ class Measure(DomainResource):
         description="How risk adjustment is applied for this measure",
         default=None,
     )
-    riskAdjustment_ext: Optional[Element] = Field(
-        description="Placeholder element for riskAdjustment extensions",
-        default=None,
-        alias="_riskAdjustment",
-    )
     rateAggregation: Optional[String] = Field(
         description="How is rate aggregation performed for this measure",
         default=None,
-    )
-    rateAggregation_ext: Optional[Element] = Field(
-        description="Placeholder element for rateAggregation extensions",
-        default=None,
-        alias="_rateAggregation",
     )
     rationale: Optional[Markdown] = Field(
         description="Detailed description of why the measure exists",
         default=None,
     )
-    rationale_ext: Optional[Element] = Field(
-        description="Placeholder element for rationale extensions",
-        default=None,
-        alias="_rationale",
-    )
     clinicalRecommendationStatement: Optional[Markdown] = Field(
         description="Summary of clinical guidelines",
         default=None,
-    )
-    clinicalRecommendationStatement_ext: Optional[Element] = Field(
-        description="Placeholder element for clinicalRecommendationStatement extensions",
-        default=None,
-        alias="_clinicalRecommendationStatement",
     )
     improvementNotation: Optional[CodeableConcept] = Field(
         description="increase | decrease",
@@ -448,19 +303,9 @@ class Measure(DomainResource):
         description="Defined terms used in the measure documentation",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
     guidance: Optional[Markdown] = Field(
         description="Additional guidance for implementers",
         default=None,
-    )
-    guidance_ext: Optional[Element] = Field(
-        description="Placeholder element for guidance extensions",
-        default=None,
-        alias="_guidance",
     )
     group: Optional[ListType[MeasureGroup]] = Field(
         description="Population criteria group",

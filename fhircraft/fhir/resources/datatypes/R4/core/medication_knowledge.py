@@ -4,14 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-    Base64Binary,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -30,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     """
     Associated or related knowledge about a medication.
@@ -45,7 +37,6 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         default=None,
     )
 
-
 class MedicationKnowledgeMonograph(BackboneElement):
     """
     Associated documentation about the medication.
@@ -59,7 +50,6 @@ class MedicationKnowledgeMonograph(BackboneElement):
         description="Associated documentation about the medication",
         default=None,
     )
-
 
 class MedicationKnowledgeIngredient(BackboneElement):
     """
@@ -77,11 +67,6 @@ class MedicationKnowledgeIngredient(BackboneElement):
     isActive: Optional[Boolean] = Field(
         description="Active ingredient indicator",
         default=None,
-    )
-    isActive_ext: Optional[Element] = Field(
-        description="Placeholder element for isActive extensions",
-        default=None,
-        alias="_isActive",
     )
     strength: Optional[Ratio] = Field(
         description="Quantity of ingredient present",
@@ -104,7 +89,6 @@ class MedicationKnowledgeIngredient(BackboneElement):
             required=True,
         )
 
-
 class MedicationKnowledgeCost(BackboneElement):
     """
     The price of the medication.
@@ -118,16 +102,10 @@ class MedicationKnowledgeCost(BackboneElement):
         description="The source or owner for the price information",
         default=None,
     )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
-    )
     cost: Optional[Money] = Field(
         description="The price of the medication",
         default=None,
     )
-
 
 class MedicationKnowledgeMonitoringProgram(BackboneElement):
     """
@@ -142,12 +120,6 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         description="Name of the reviewing program",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-
 
 class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
     """
@@ -162,7 +134,6 @@ class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
         description="Dosage for the medication for the specific guidelines",
         default=None,
     )
-
 
 class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
     BackboneElement
@@ -183,11 +154,6 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
         description="The specific characteristic",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
 
     @property
     def characteristic(self):
@@ -204,7 +170,6 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
             field_name_base="characteristic",
             required=True,
         )
-
 
 class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
     """
@@ -248,7 +213,6 @@ class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
             required=False,
         )
 
-
 class MedicationKnowledgeMedicineClassification(BackboneElement):
     """
     Categorization of the medication within a formulary or classification system.
@@ -263,7 +227,6 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         default=None,
     )
 
-
 class MedicationKnowledgePackaging(BackboneElement):
     """
     Information that only applies to packages (not products).
@@ -277,7 +240,6 @@ class MedicationKnowledgePackaging(BackboneElement):
         description="The number of product units the package would contain if fully loaded",
         default=None,
     )
-
 
 class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     """
@@ -296,11 +258,6 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
         description="Description of the characteristic",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueQuantity: Optional[Quantity] = Field(
         description="Description of the characteristic",
         default=None,
@@ -308,11 +265,6 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     valueBase64Binary: Optional[Base64Binary] = Field(
         description="Description of the characteristic",
         default=None,
-    )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
     )
 
     @property
@@ -331,7 +283,6 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
             required=False,
         )
 
-
 class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     """
     Specifies if changes are allowed when dispensing a medication from a regulatory perspective.
@@ -345,12 +296,6 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         description="Specifies if regulation allows for changes in the medication when dispensing",
         default=None,
     )
-    allowed_ext: Optional[Element] = Field(
-        description="Placeholder element for allowed extensions",
-        default=None,
-        alias="_allowed",
-    )
-
 
 class MedicationKnowledgeRegulatorySchedule(BackboneElement):
     """
@@ -361,7 +306,6 @@ class MedicationKnowledgeRegulatorySchedule(BackboneElement):
         description="Specifies the specific drug schedule",
         default=None,
     )
-
 
 class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     """
@@ -376,7 +320,6 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
         description="The period that applies to the maximum number of units",
         default=None,
     )
-
 
 class MedicationKnowledgeRegulatory(BackboneElement):
     """
@@ -400,7 +343,6 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         default=None,
     )
 
-
 class MedicationKnowledgeKinetics(BackboneElement):
     """
     The time course of drug absorption, distribution, metabolism and excretion of a medication from the body.
@@ -418,7 +360,6 @@ class MedicationKnowledgeKinetics(BackboneElement):
         description="Time required for concentration in the body to decrease by half",
         default=None,
     )
-
 
 class MedicationKnowledge(DomainResource):
     """
@@ -449,11 +390,6 @@ class MedicationKnowledge(DomainResource):
         description="active | inactive | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     manufacturer: Optional[Reference] = Field(
         description="Manufacturer of the item",
         default=None,
@@ -469,11 +405,6 @@ class MedicationKnowledge(DomainResource):
     synonym: Optional[ListType[String]] = Field(
         description="Additional names for a medication",
         default=None,
-    )
-    synonym_ext: Optional[Element] = Field(
-        description="Placeholder element for synonym extensions",
-        default=None,
-        alias="_synonym",
     )
     relatedMedicationKnowledge: Optional[
         ListType[MedicationKnowledgeRelatedMedicationKnowledge]
@@ -500,11 +431,6 @@ class MedicationKnowledge(DomainResource):
     preparationInstruction: Optional[Markdown] = Field(
         description="The instructions for preparing the medication",
         default=None,
-    )
-    preparationInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for preparationInstruction extensions",
-        default=None,
-        alias="_preparationInstruction",
     )
     intendedRoute: Optional[ListType[CodeableConcept]] = Field(
         description="The intended or approved route of administration",

@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Instant,
-    Url,
-    UnsignedInt,
-    PositiveInt,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -30,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubscriptionFilterBy(BackboneElement):
     """
     The filter properties to be applied to narrow the subscription topic stream.  When multiple filters are applied, evaluates to true if all the conditions applicable to that resource are met; otherwise it returns false (i.e., logical AND).
@@ -40,48 +30,22 @@ class SubscriptionFilterBy(BackboneElement):
         description="Allowed Resource (reference to definition) for this Subscription filter",
         default=None,
     )
-    resourceType_ext: Optional[Element] = Field(
-        description="Placeholder element for resourceType extensions",
-        default=None,
-        alias="_resourceType",
-    )
     filterParameter: Optional[String] = Field(
         description="Filter label defined in SubscriptionTopic",
         default=None,
-    )
-    filterParameter_ext: Optional[Element] = Field(
-        description="Placeholder element for filterParameter extensions",
-        default=None,
-        alias="_filterParameter",
     )
     comparator: Optional[Code] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[Element] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
     modifier: Optional[Code] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
-    )
-    modifier_ext: Optional[Element] = Field(
-        description="Placeholder element for modifier extensions",
-        default=None,
-        alias="_modifier",
     )
     value: Optional[String] = Field(
         description="Literal value or resource path",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class SubscriptionParameter(BackboneElement):
     """
@@ -92,21 +56,10 @@ class SubscriptionParameter(BackboneElement):
         description="Name (key) of the parameter",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     value: Optional[String] = Field(
         description="Value of the parameter to use or pass through",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class Subscription(DomainResource):
     """
@@ -125,28 +78,13 @@ class Subscription(DomainResource):
         description="Human readable name for this subscription",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     status: Optional[Code] = Field(
         description="requested | active | error | off | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     topic: Optional[Canonical] = Field(
         description="Reference to the subscription topic being subscribed to",
         default=None,
-    )
-    topic_ext: Optional[Element] = Field(
-        description="Placeholder element for topic extensions",
-        default=None,
-        alias="_topic",
     )
     contact: Optional[ListType[ContactPoint]] = Field(
         description="Contact details for source (e.g. troubleshooting)",
@@ -156,11 +94,6 @@ class Subscription(DomainResource):
         description="When to automatically delete the subscription",
         default=None,
     )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
-    )
     managingEntity: Optional[Reference] = Field(
         description="Entity responsible for Subscription changes",
         default=None,
@@ -168,11 +101,6 @@ class Subscription(DomainResource):
     reason: Optional[String] = Field(
         description="Description of why this subscription was created",
         default=None,
-    )
-    reason_ext: Optional[Element] = Field(
-        description="Placeholder element for reason extensions",
-        default=None,
-        alias="_reason",
     )
     filterBy: Optional[ListType[SubscriptionFilterBy]] = Field(
         description="Criteria for narrowing the subscription topic stream",
@@ -186,11 +114,6 @@ class Subscription(DomainResource):
         description="Where the channel points to",
         default=None,
     )
-    endpoint_ext: Optional[Element] = Field(
-        description="Placeholder element for endpoint extensions",
-        default=None,
-        alias="_endpoint",
-    )
     parameter: Optional[ListType[SubscriptionParameter]] = Field(
         description="Channel type",
         default=None,
@@ -199,46 +122,21 @@ class Subscription(DomainResource):
         description="Interval in seconds to send \u0027heartbeat\u0027 notification",
         default=None,
     )
-    heartbeatPeriod_ext: Optional[Element] = Field(
-        description="Placeholder element for heartbeatPeriod extensions",
-        default=None,
-        alias="_heartbeatPeriod",
-    )
     timeout: Optional[UnsignedInt] = Field(
         description="Timeout in seconds to attempt notification delivery",
         default=None,
-    )
-    timeout_ext: Optional[Element] = Field(
-        description="Placeholder element for timeout extensions",
-        default=None,
-        alias="_timeout",
     )
     contentType: Optional[Code] = Field(
         description="MIME type to send, or omit for no payload",
         default=None,
     )
-    contentType_ext: Optional[Element] = Field(
-        description="Placeholder element for contentType extensions",
-        default=None,
-        alias="_contentType",
-    )
     content: Optional[Code] = Field(
         description="empty | id-only | full-resource",
         default=None,
     )
-    content_ext: Optional[Element] = Field(
-        description="Placeholder element for content extensions",
-        default=None,
-        alias="_content",
-    )
     maxCount: Optional[PositiveInt] = Field(
         description="Maximum number of events that can be combined in a single notification",
         default=None,
-    )
-    maxCount_ext: Optional[Element] = Field(
-        description="Placeholder element for maxCount extensions",
-        default=None,
-        alias="_maxCount",
     )
 
     @model_validator(mode="after")

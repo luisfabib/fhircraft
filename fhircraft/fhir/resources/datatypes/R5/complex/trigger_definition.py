@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     DataType,
     Element,
@@ -13,7 +13,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Expression,
     CodeableConcept,
 )
-
 
 class TriggerDefinition(DataType):
     """
@@ -26,19 +25,9 @@ class TriggerDefinition(DataType):
         description="named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     name: Optional[String] = Field(
         description="Name or URI that identifies the event",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     code: Optional[CodeableConcept] = Field(
         description="Coded definition of the event",
@@ -47,11 +36,6 @@ class TriggerDefinition(DataType):
     subscriptionTopic: Optional[Canonical] = Field(
         description="What event",
         default=None,
-    )
-    subscriptionTopic_ext: Optional[Element] = Field(
-        description="Placeholder element for subscriptionTopic extensions",
-        default=None,
-        alias="_subscriptionTopic",
     )
     timingTiming: Optional[Timing] = Field(
         description="Timing of the event",

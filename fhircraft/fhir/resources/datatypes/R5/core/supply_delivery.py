@@ -5,7 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SupplyDeliverySuppliedItem(BackboneElement):
     """
@@ -58,7 +57,6 @@ class SupplyDeliverySuppliedItem(BackboneElement):
             required=False,
         )
 
-
 class SupplyDelivery(DomainResource):
     """
     Record of delivery of what is supplied.
@@ -84,11 +82,6 @@ class SupplyDelivery(DomainResource):
         description="in-progress | completed | abandoned | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     patient: Optional[Reference] = Field(
         description="Patient for whom the item is supplied",
         default=None,
@@ -104,11 +97,6 @@ class SupplyDelivery(DomainResource):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When event occurred",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When event occurred",

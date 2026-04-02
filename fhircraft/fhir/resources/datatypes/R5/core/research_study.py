@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Boolean,
-    UnsignedInt,
-    Id,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -33,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ResearchStudyLabel(BackboneElement):
     """
     Additional names for the study.
@@ -47,12 +37,6 @@ class ResearchStudyLabel(BackboneElement):
         description="The name",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class ResearchStudyAssociatedParty(BackboneElement):
     """
@@ -62,11 +46,6 @@ class ResearchStudyAssociatedParty(BackboneElement):
     name: Optional[String] = Field(
         description="Name of associated party",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     role: Optional[CodeableConcept] = Field(
         description="sponsor | lead-sponsor | sponsor-investigator | primary-investigator | collaborator | funding-source | general-contact | recruitment-contact | sub-investigator | study-director | study-chair",
@@ -85,7 +64,6 @@ class ResearchStudyAssociatedParty(BackboneElement):
         default=None,
     )
 
-
 class ResearchStudyProgressStatus(BackboneElement):
     """
     Status of study with time for that status.
@@ -99,16 +77,10 @@ class ResearchStudyProgressStatus(BackboneElement):
         description="Actual if true else anticipated",
         default=None,
     )
-    actual_ext: Optional[Element] = Field(
-        description="Placeholder element for actual extensions",
-        default=None,
-        alias="_actual",
-    )
     period: Optional[Period] = Field(
         description="Date range",
         default=None,
     )
-
 
 class ResearchStudyRecruitment(BackboneElement):
     """
@@ -119,19 +91,9 @@ class ResearchStudyRecruitment(BackboneElement):
         description="Estimated total number of participants to be enrolled",
         default=None,
     )
-    targetNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for targetNumber extensions",
-        default=None,
-        alias="_targetNumber",
-    )
     actualNumber: Optional[UnsignedInt] = Field(
         description="Actual total number of participants enrolled in study",
         default=None,
-    )
-    actualNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for actualNumber extensions",
-        default=None,
-        alias="_actualNumber",
     )
     eligibility: Optional[Reference] = Field(
         description="Inclusion and exclusion criteria",
@@ -142,7 +104,6 @@ class ResearchStudyRecruitment(BackboneElement):
         default=None,
     )
 
-
 class ResearchStudyComparisonGroup(BackboneElement):
     """
     Describes an expected event or sequence of events for one of the subjects of a study. E.g. for a living subject: exposure to drug A, wash-out, exposure to drug B, wash-out, follow-up. E.g. for a stability study: {store sample from lot A at 25 degrees for 1 month}, {store sample from lot A at 40 degrees for 1 month}.
@@ -152,19 +113,9 @@ class ResearchStudyComparisonGroup(BackboneElement):
         description="Allows the comparisonGroup for the study and the comparisonGroup for the subject to be linked easily",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     name: Optional[String] = Field(
         description="Label for study comparisonGroup",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     type: Optional[CodeableConcept] = Field(
         description="Categorization of study comparisonGroup",
@@ -173,11 +124,6 @@ class ResearchStudyComparisonGroup(BackboneElement):
     description: Optional[Markdown] = Field(
         description="Short explanation of study path",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     intendedExposure: Optional[ListType[Reference]] = Field(
         description="Interventions or exposures in this comparisonGroup or cohort",
@@ -188,7 +134,6 @@ class ResearchStudyComparisonGroup(BackboneElement):
         default=None,
     )
 
-
 class ResearchStudyObjective(BackboneElement):
     """
     A goal that the study is aiming to achieve in terms of a scientific question to be answered by the analysis of data collected during the study.
@@ -198,11 +143,6 @@ class ResearchStudyObjective(BackboneElement):
         description="Label for the objective",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     type: Optional[CodeableConcept] = Field(
         description="primary | secondary | exploratory",
         default=None,
@@ -211,12 +151,6 @@ class ResearchStudyObjective(BackboneElement):
         description="Description of the objective",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-
 
 class ResearchStudyOutcomeMeasure(BackboneElement):
     """
@@ -227,11 +161,6 @@ class ResearchStudyOutcomeMeasure(BackboneElement):
         description="Label for the outcome",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="primary | secondary | exploratory",
         default=None,
@@ -240,16 +169,10 @@ class ResearchStudyOutcomeMeasure(BackboneElement):
         description="Description of the outcome",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
     reference: Optional[Reference] = Field(
         description="Structured outcome definition",
         default=None,
     )
-
 
 class ResearchStudy(DomainResource):
     """
@@ -264,11 +187,6 @@ class ResearchStudy(DomainResource):
         description="Canonical identifier for this study resource",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for study",
         default=None,
@@ -277,28 +195,13 @@ class ResearchStudy(DomainResource):
         description="The business version for the study record",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     name: Optional[String] = Field(
         description="Name for this study (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
     title: Optional[String] = Field(
         description="Human readable name of the study",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     label: Optional[ListType[ResearchStudyLabel]] = Field(
         description="Additional names for the study",
@@ -320,19 +223,9 @@ class ResearchStudy(DomainResource):
         description="Date the resource last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     primaryPurposeType: Optional[CodeableConcept] = Field(
         description="treatment | prevention | diagnostic | supportive-care | screening | health-services-research | basic-science | device-feasibility",
@@ -366,19 +259,9 @@ class ResearchStudy(DomainResource):
         description="Brief text explaining the study",
         default=None,
     )
-    descriptionSummary_ext: Optional[Element] = Field(
-        description="Placeholder element for descriptionSummary extensions",
-        default=None,
-        alias="_descriptionSummary",
-    )
     description: Optional[Markdown] = Field(
         description="Detailed narrative of the study",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     period: Optional[Period] = Field(
         description="When the study began and ended",

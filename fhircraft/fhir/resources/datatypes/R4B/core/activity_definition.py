@@ -4,16 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Canonical,
-    DateTime,
-    Markdown,
-    Date,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -39,7 +30,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ActivityDefinitionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
@@ -49,16 +39,10 @@ class ActivityDefinitionParticipant(BackboneElement):
         description="patient | practitioner | related-person | device",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     role: Optional[CodeableConcept] = Field(
         description="E.g. Nurse, Surgeon, Parent, etc.",
         default=None,
     )
-
 
 class ActivityDefinitionDynamicValue(BackboneElement):
     """
@@ -69,16 +53,10 @@ class ActivityDefinitionDynamicValue(BackboneElement):
         description="The path to the element to be set dynamically",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
     expression: Optional[Expression] = Field(
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
-
 
 class ActivityDefinition(DomainResource):
     """
@@ -105,11 +83,6 @@ class ActivityDefinition(DomainResource):
         description="Canonical identifier for this activity definition, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the activity definition",
         default=None,
@@ -118,55 +91,25 @@ class ActivityDefinition(DomainResource):
         description="Business version of the activity definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
     name: Optional[String] = Field(
         description="Name for this activity definition (computer friendly)",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     title: Optional[String] = Field(
         description="Name for this activity definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
     subtitle: Optional[String] = Field(
         description="Subordinate title of the activity definition",
         default=None,
-    )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     experimental: Optional[Boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of individual the activity definition is intended for",
@@ -180,28 +123,13 @@ class ActivityDefinition(DomainResource):
         description="Type of individual the activity definition is intended for",
         default=None,
     )
-    subjectCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for subjectCanonical extensions",
-        default=None,
-        alias="_subjectCanonical",
-    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
     publisher: Optional[String] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -210,11 +138,6 @@ class ActivityDefinition(DomainResource):
     description: Optional[Markdown] = Field(
         description="Natural language description of the activity definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -228,46 +151,21 @@ class ActivityDefinition(DomainResource):
         description="Why this activity definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
     usage: Optional[String] = Field(
         description="Describes the clinical usage of the activity definition",
         default=None,
-    )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
     )
     copyright: Optional[Markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
     approvalDate: Optional[Date] = Field(
         description="When the activity definition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
     lastReviewDate: Optional[Date] = Field(
         description="When the activity definition was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the activity definition is expected to be used",
@@ -301,28 +199,13 @@ class ActivityDefinition(DomainResource):
         description="Logic used by the activity definition",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
-    )
     kind: Optional[Code] = Field(
         description="Kind of resource",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
     profile: Optional[Canonical] = Field(
         description="What profile the resource needs to conform to",
         default=None,
-    )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
     code: Optional[CodeableConcept] = Field(
         description="Detail type of activity",
@@ -332,28 +215,13 @@ class ActivityDefinition(DomainResource):
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
     priority: Optional[Code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     doNotPerform: Optional[Boolean] = Field(
         description="True if the activity should not be performed",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     timingTiming: Optional[Timing] = Field(
         description="When activity is to occur",
@@ -362,11 +230,6 @@ class ActivityDefinition(DomainResource):
     timingDateTime: Optional[DateTime] = Field(
         description="When activity is to occur",
         default=None,
-    )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
     )
     timingAge: Optional[Age] = Field(
         description="When activity is to occur",
@@ -427,11 +290,6 @@ class ActivityDefinition(DomainResource):
     transform: Optional[Canonical] = Field(
         description="Transform to apply the template",
         default=None,
-    )
-    transform_ext: Optional[Element] = Field(
-        description="Placeholder element for transform extensions",
-        default=None,
-        alias="_transform",
     )
     dynamicValue: Optional[ListType[ActivityDefinitionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",

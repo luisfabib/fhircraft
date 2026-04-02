@@ -4,18 +4,7 @@ from typing import Optional, List as ListType
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Boolean,
-    Decimal,
-    Integer,
-    Date,
-    Time,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -30,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class QuestionnaireResponseItemAnswer(BackboneElement):
     """
     The respondent's answer(s) to the question.
@@ -40,73 +28,33 @@ class QuestionnaireResponseItemAnswer(BackboneElement):
         description="Single-valued answer to the question",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueDecimal: Optional[Decimal] = Field(
         description="Single-valued answer to the question",
         default=None,
-    )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
     )
     valueInteger: Optional[Integer] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
     valueDate: Optional[Date] = Field(
         description="Single-valued answer to the question",
         default=None,
-    )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
     )
     valueDateTime: Optional[DateTime] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
     valueTime: Optional[Time] = Field(
         description="Single-valued answer to the question",
         default=None,
-    )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
     )
     valueString: Optional[String] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueUri: Optional[Uri] = Field(
         description="Single-valued answer to the question",
         default=None,
-    )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Single-valued answer to the question",
@@ -158,7 +106,6 @@ class QuestionnaireResponseItemAnswer(BackboneElement):
             required=False,
         )
 
-
 class QuestionnaireResponseItem(BackboneElement):
     """
     A group or question item from the original questionnaire for which answers are provided.
@@ -168,28 +115,13 @@ class QuestionnaireResponseItem(BackboneElement):
         description="Pointer to specific item from Questionnaire",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
     definition: Optional[Uri] = Field(
         description="ElementDefinition - details for the item",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
     text: Optional[String] = Field(
         description="Name for group or question text",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     answer: Optional[ListType[QuestionnaireResponseItemAnswer]] = Field(
         description="The response(s) to the question",
@@ -199,7 +131,6 @@ class QuestionnaireResponseItem(BackboneElement):
         description="Nested questionnaire response items",
         default=None,
     )
-
 
 class QuestionnaireResponse(DomainResource):
     """
@@ -238,19 +169,9 @@ class QuestionnaireResponse(DomainResource):
         description="Form being answered",
         default=None,
     )
-    questionnaire_ext: Optional[Element] = Field(
-        description="Placeholder element for questionnaire extensions",
-        default=None,
-        alias="_questionnaire",
-    )
     status: Optional[Code] = Field(
         description="in-progress | completed | amended | entered-in-error | stopped",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     subject: Optional[Reference] = Field(
         description="The subject of the questions",
@@ -263,11 +184,6 @@ class QuestionnaireResponse(DomainResource):
     authored: Optional[DateTime] = Field(
         description="Date the answers were gathered",
         default=None,
-    )
-    authored_ext: Optional[Element] = Field(
-        description="Placeholder element for authored extensions",
-        default=None,
-        alias="_authored",
     )
     author: Optional[Reference] = Field(
         description="Person who received and recorded the answers",

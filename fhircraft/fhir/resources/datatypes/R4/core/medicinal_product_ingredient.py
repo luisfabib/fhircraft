@@ -4,7 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
     """
@@ -46,11 +45,6 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         description="For when strength is measured at a particular point or distance",
         default=None,
     )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
-    )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
         default=None,
@@ -63,7 +57,6 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         description="Strength expressed in terms of a reference substance",
         default=None,
     )
-
 
 class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
     """
@@ -89,7 +82,6 @@ class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
         default=None,
     )
 
-
 class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
     BackboneElement
 ):
@@ -113,16 +105,10 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         description="For when strength is measured at a particular point or distance",
         default=None,
     )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
-    )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
         default=None,
     )
-
 
 class MedicinalProductIngredientSubstanceStrength(BackboneElement):
     """
@@ -149,11 +135,6 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
         description="For when strength is measured at a particular point or distance",
         default=None,
     )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
-    )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
         default=None,
@@ -164,7 +145,6 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
         description="Strength expressed in terms of a reference substance",
         default=None,
     )
-
 
 class MedicinalProductIngredientSubstance(BackboneElement):
     """
@@ -179,7 +159,6 @@ class MedicinalProductIngredientSubstance(BackboneElement):
         description="Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product",
         default=None,
     )
-
 
 class MedicinalProductIngredient(DomainResource):
     """
@@ -215,11 +194,6 @@ class MedicinalProductIngredient(DomainResource):
     allergenicIndicator: Optional[Boolean] = Field(
         description="If the ingredient is a known or suspected allergen",
         default=None,
-    )
-    allergenicIndicator_ext: Optional[Element] = Field(
-        description="Placeholder element for allergenicIndicator extensions",
-        default=None,
-        alias="_allergenicIndicator",
     )
     manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this Ingredient",

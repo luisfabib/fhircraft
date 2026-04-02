@@ -3,10 +3,9 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import Element
-
 
 class Period(Element):
     """
@@ -19,19 +18,9 @@ class Period(Element):
         description="Starting time with inclusive boundary",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
     end: Optional[DateTime] = Field(
         description="End time with inclusive boundary, if not ongoing",
         default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
 
     @model_validator(mode="after")

@@ -5,16 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Integer,
-    Decimal,
-    Boolean,
-    Url,
-    DateTime,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -36,7 +27,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class InventoryItemName(BackboneElement):
     """
     The item name(s) - the brand name, or common name, functional name, generic name.
@@ -55,12 +45,6 @@ class InventoryItemName(BackboneElement):
         description="The name or designation of the item",
         default=None,
     )
-    name_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-
 
 class InventoryItemResponsibleOrganization(BackboneElement):
     """
@@ -76,7 +60,6 @@ class InventoryItemResponsibleOrganization(BackboneElement):
         default=None,
     )
 
-
 class InventoryItemDescription(BackboneElement):
     """
     The descriptive characteristics of the inventory item.
@@ -91,12 +74,6 @@ class InventoryItemDescription(BackboneElement):
         description="Textual description of the item",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-
 
 class InventoryItemAssociation(BackboneElement):
     """
@@ -116,7 +93,6 @@ class InventoryItemAssociation(BackboneElement):
         default=None,
     )
 
-
 class InventoryItemCharacteristic(BackboneElement):
     """
     The descriptive or identifying characteristics of the item.
@@ -130,55 +106,25 @@ class InventoryItemCharacteristic(BackboneElement):
         description="The value of the attribute",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueInteger: Optional[Integer] = Field(
         description="The value of the attribute",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="The value of the attribute",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueUrl: Optional[Url] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="The value of the attribute",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The value of the attribute",
@@ -239,7 +185,6 @@ class InventoryItemCharacteristic(BackboneElement):
             required=True,
         )
 
-
 class InventoryItemInstance(BackboneElement):
     """
     Instances or occurrences of the product.
@@ -253,19 +198,9 @@ class InventoryItemInstance(BackboneElement):
         description="The lot or batch number of the item",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
     expiry: Optional[DateTime] = Field(
         description="The expiry date or date and time for the product",
         default=None,
-    )
-    expiry_ext: Optional[Element] = Field(
-        description="Placeholder element for expiry extensions",
-        default=None,
-        alias="_expiry",
     )
     subject: Optional[Reference] = Field(
         description="The subject that the item is associated with",
@@ -275,7 +210,6 @@ class InventoryItemInstance(BackboneElement):
         description="The location that the item is associated with",
         default=None,
     )
-
 
 class InventoryItem(DomainResource):
     """
@@ -293,11 +227,6 @@ class InventoryItem(DomainResource):
     status: Optional[Code] = Field(
         description="active | inactive | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Category or class of the item",

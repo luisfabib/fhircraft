@@ -5,14 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -31,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class NutritionIntakeConsumedItem(BackboneElement):
     """
@@ -62,16 +54,10 @@ class NutritionIntakeConsumedItem(BackboneElement):
         description="Flag to indicate if the food or fluid item was refused or otherwise not consumed",
         default=None,
     )
-    notConsumed_ext: Optional[Element] = Field(
-        description="Placeholder element for notConsumed extensions",
-        default=None,
-        alias="_notConsumed",
-    )
     notConsumedReason: Optional[CodeableConcept] = Field(
         description="Reason food or fluid was not consumed",
         default=None,
     )
-
 
 class NutritionIntakeIngredientLabel(BackboneElement):
     """
@@ -87,7 +73,6 @@ class NutritionIntakeIngredientLabel(BackboneElement):
         default=None,
     )
 
-
 class NutritionIntakePerformer(BackboneElement):
     """
     Who performed the intake and how they were involved.
@@ -101,7 +86,6 @@ class NutritionIntakePerformer(BackboneElement):
         description="Who performed the intake",
         default=None,
     )
-
 
 class NutritionIntake(DomainResource):
     """
@@ -120,19 +104,9 @@ class NutritionIntake(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
     instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfils plan, proposal or order",
@@ -145,11 +119,6 @@ class NutritionIntake(DomainResource):
     status: Optional[Code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for current status",
@@ -171,11 +140,6 @@ class NutritionIntake(DomainResource):
         description="The date/time or interval when the food or fluid is/was consumed",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
     occurrencePeriod: Optional[Period] = Field(
         description="The date/time or interval when the food or fluid is/was consumed",
         default=None,
@@ -184,19 +148,9 @@ class NutritionIntake(DomainResource):
         description="When the intake was recorded",
         default=None,
     )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
-    )
     reportedBoolean: Optional[Boolean] = Field(
         description="Person or organization that provided the information about the consumption of this food or fluid",
         default=None,
-    )
-    reportedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for reportedBoolean extensions",
-        default=None,
-        alias="_reportedBoolean",
     )
     reportedReference: Optional[Reference] = Field(
         description="Person or organization that provided the information about the consumption of this food or fluid",

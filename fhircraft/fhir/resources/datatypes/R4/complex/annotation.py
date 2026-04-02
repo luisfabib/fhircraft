@@ -4,9 +4,8 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4.complex import Element, Reference
-
 
 class Annotation(Element):
     """
@@ -27,19 +26,9 @@ class Annotation(Element):
         description="When the annotation was made",
         default=None,
     )
-    time_ext: Optional["Element"] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
-    )
     text: Optional[Markdown] = Field(
         description="The annotation  - text content (as markdown)",
         default=None,
-    )
-    text_ext: Optional["Element"] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
 
     @model_validator(mode="after")

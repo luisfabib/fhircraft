@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Id,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ResearchSubjectProgress(BackboneElement):
     """
@@ -53,21 +46,10 @@ class ResearchSubjectProgress(BackboneElement):
         description="State change date",
         default=None,
     )
-    startDate_ext: Optional[Element] = Field(
-        description="Placeholder element for startDate extensions",
-        default=None,
-        alias="_startDate",
-    )
     endDate: Optional[DateTime] = Field(
         description="State change date",
         default=None,
     )
-    endDate_ext: Optional[Element] = Field(
-        description="Placeholder element for endDate extensions",
-        default=None,
-        alias="_endDate",
-    )
-
 
 class ResearchSubject(DomainResource):
     """
@@ -85,11 +67,6 @@ class ResearchSubject(DomainResource):
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     progress: Optional[ListType[ResearchSubjectProgress]] = Field(
         description="Subject status",
@@ -111,19 +88,9 @@ class ResearchSubject(DomainResource):
         description="What path should be followed",
         default=None,
     )
-    assignedComparisonGroup_ext: Optional[Element] = Field(
-        description="Placeholder element for assignedComparisonGroup extensions",
-        default=None,
-        alias="_assignedComparisonGroup",
-    )
     actualComparisonGroup: Optional[Id] = Field(
         description="What path was followed",
         default=None,
-    )
-    actualComparisonGroup_ext: Optional[Element] = Field(
-        description="Placeholder element for actualComparisonGroup extensions",
-        default=None,
-        alias="_actualComparisonGroup",
     )
     consent: Optional[ListType[Reference]] = Field(
         description="Agreement to participate in study",

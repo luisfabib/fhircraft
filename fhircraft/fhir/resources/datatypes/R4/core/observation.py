@@ -4,16 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Instant,
-    Boolean,
-    Integer,
-    Time,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
@@ -34,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ObservationReferenceRange(BackboneElement):
     """
@@ -65,12 +55,6 @@ class ObservationReferenceRange(BackboneElement):
         description="Text based reference range in an observation",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
-
 
 class ObservationComponentReferenceRange(BackboneElement):
     """
@@ -101,12 +85,6 @@ class ObservationComponentReferenceRange(BackboneElement):
         description="Text based reference range in an observation",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
-
 
 class ObservationComponent(BackboneElement):
     """
@@ -129,28 +107,13 @@ class ObservationComponent(BackboneElement):
         description="Actual component result",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="Actual component result",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Actual component result",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Actual component result",
@@ -168,19 +131,9 @@ class ObservationComponent(BackboneElement):
         description="Actual component result",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Actual component result",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
     valuePeriod: Optional[Period] = Field(
         description="Actual component result",
@@ -227,7 +180,6 @@ class ObservationComponent(BackboneElement):
             required=False,
         )
 
-
 class Observation(DomainResource):
     """
     Measurements and simple assertions made about a patient, device or other subject.
@@ -265,11 +217,6 @@ class Observation(DomainResource):
         description="registered | preliminary | final | amended +",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of  type of observation",
         default=None,
@@ -294,11 +241,6 @@ class Observation(DomainResource):
         description="Clinically relevant time/time-period for observation",
         default=None,
     )
-    effectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveDateTime extensions",
-        default=None,
-        alias="_effectiveDateTime",
-    )
     effectivePeriod: Optional[Period] = Field(
         description="Clinically relevant time/time-period for observation",
         default=None,
@@ -311,19 +253,9 @@ class Observation(DomainResource):
         description="Clinically relevant time/time-period for observation",
         default=None,
     )
-    effectiveInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveInstant extensions",
-        default=None,
-        alias="_effectiveInstant",
-    )
     issued: Optional[Instant] = Field(
         description="Date/Time this version was made available",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     performer: Optional[ListType[Reference]] = Field(
         description="Who is responsible for the observation",
@@ -341,28 +273,13 @@ class Observation(DomainResource):
         description="Actual result",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="Actual result",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
     valueInteger: Optional[Integer] = Field(
         description="Actual result",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Actual result",
@@ -380,19 +297,9 @@ class Observation(DomainResource):
         description="Actual result",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
     valueDateTime: Optional[DateTime] = Field(
         description="Actual result",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
     valuePeriod: Optional[Period] = Field(
         description="Actual result",

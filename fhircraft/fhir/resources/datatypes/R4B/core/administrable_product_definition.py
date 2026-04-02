@@ -4,13 +4,7 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    Boolean,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class AdministrableProductDefinitionProperty(BackboneElement):
     """
@@ -51,19 +44,9 @@ class AdministrableProductDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -90,7 +73,6 @@ class AdministrableProductDefinitionProperty(BackboneElement):
             required=False,
         )
 
-
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod(
     BackboneElement
 ):
@@ -110,12 +92,6 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
         description="Extra information about the withdrawal period",
         default=None,
     )
-    supportingInformation_ext: Optional[Element] = Field(
-        description="Placeholder element for supportingInformation extensions",
-        default=None,
-        alias="_supportingInformation",
-    )
-
 
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneElement):
     """
@@ -134,7 +110,6 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneE
         description="A species specific time during which consumption of animal product is not appropriate",
         default=None,
     )
-
 
 class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
     """
@@ -172,7 +147,6 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
         default=None,
     )
 
-
 class AdministrableProductDefinition(DomainResource):
     """
     A medicinal product in the final form which is suitable for administering to a patient (after any mixing of multiple components, dissolution etc. has been performed).
@@ -203,11 +177,6 @@ class AdministrableProductDefinition(DomainResource):
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     formOf: Optional[ListType[Reference]] = Field(
         description="References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product",

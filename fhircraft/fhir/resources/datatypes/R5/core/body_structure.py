@@ -5,13 +5,7 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
+from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class BodyStructureIncludedStructure(BackboneElement):
     """
@@ -58,7 +51,6 @@ class BodyStructureIncludedStructure(BackboneElement):
         default=None,
     )
 
-
 class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
     BackboneElement
 ):
@@ -74,7 +66,6 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
         description="Measured distance from body landmark",
         default=None,
     )
-
 
 class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
     """
@@ -101,7 +92,6 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
         description="Relative landmark surface orientation",
         default=None,
     )
-
 
 class BodyStructureExcludedStructure(BackboneElement):
     """
@@ -131,7 +121,6 @@ class BodyStructureExcludedStructure(BackboneElement):
         default=None,
     )
 
-
 class BodyStructure(DomainResource):
     """
     Record details about an anatomical structure.  This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
@@ -149,11 +138,6 @@ class BodyStructure(DomainResource):
         description="Whether this record is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
     morphology: Optional[CodeableConcept] = Field(
         description="Kind of Structure",
         default=None,
@@ -169,11 +153,6 @@ class BodyStructure(DomainResource):
     description: Optional[Markdown] = Field(
         description="Text description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     image: Optional[ListType[Attachment]] = Field(
         description="Attached images",
