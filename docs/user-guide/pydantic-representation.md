@@ -18,7 +18,7 @@ Fhircraft uses Pydantic v2 to create strongly-typed Python representations of FH
 from pydantic import Field, model_validator
 from typing import Optional, List
 from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import Boolean, Code
+from fhircraft.fhir.resources.datatypes.R5.primitive import Boolean, Code
 from fhircraft.fhir.resources.datatypes.R5.complex import HumanName, Identifier
 
 class Patient(FHIRBaseModel):

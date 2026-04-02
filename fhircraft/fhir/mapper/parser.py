@@ -8,7 +8,6 @@ from typing import Literal
 import ply.yacc
 
 import fhircraft.fhir.path.engine.literals as literals
-import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
 from fhircraft.fhir.path.parser import FhirPathParser
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path

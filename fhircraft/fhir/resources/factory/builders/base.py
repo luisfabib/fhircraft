@@ -85,9 +85,6 @@ class TypeInformation:
     kind: str
     """The kind of FHIR type (e.g., "primitive", "complex", "resource"). """
 
-    requires_primitive_extension: bool = False
-    """Whether this type requires a corresponding primitive extension field. """
-
 
 @dataclass
 class ValidatorInformation:
@@ -438,48 +435,7 @@ class Builder(ABC):
         return TypeInformation(
             type=fhir_type,
             kind=kind,
-            requires_primitive_extension=(
-                not is_fhirpath_system_type and kind == "primitive"
-            ),
         )
-
-    def build_primitive_extension_placeholder(
-        self,
-        node: ElementNode,
-        name: str | None = None,
-    ) -> FieldInformation:
-        """
-        Build a placeholder field information for primitive type extensions.
-        Creates a FieldInformation object representing an extension placeholder for a primitive FHIR element.
-        The placeholder field allows storing extension data associated with primitive values.
-
-        Args:
-            node: ElementNode representing the primitive FHIR element for which to create an extension placeholder.
-            name: When provided, use this name instead of ``node.name``
-
-        Returns:
-            FieldInformation: Field information for the extension placeholder
-        """
-
-        # Process the name for the placeholder field
-        name = name if name is not None else node.name
-        original_name = f"_{name}"
-        placeholder_name = f"{name}_ext"
-        safe_placeholder_name, ext_alias = self.handle_python_keyword(placeholder_name)
-
-        # Get the appropriate Element type for the placeholder field
-        placeholder_type = get_fhir_type("Element", self.context.fhir_release)
-
-        info = self.build_field_information(
-            safe_placeholder_name,
-            node,
-            type=placeholder_type,
-            default=None,
-            alias=original_name,
-            validation_alias=ext_alias,
-            description=f"Placeholder element for {name} extensions",
-        )
-        return info
 
     def build_field_validators(
         self, node: ElementNode, safe_name: str

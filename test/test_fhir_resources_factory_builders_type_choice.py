@@ -69,12 +69,12 @@ def make_node(
 
 
 def make_type_info(
-    python_type, kind: str = "complex-type", requires_primitive_extension: bool = False
+    python_type,
+    kind: str = "complex-type",
 ):
     return TypeInformation(
         type=python_type,
         kind=kind,
-        requires_primitive_extension=requires_primitive_extension,
     )
 
 
@@ -143,20 +143,18 @@ def test_build__two_types_produce_two_fields(builder, index):
     node = make_node("value", type_codes=["Coding", "Quantity"])
     result = builder.build(node, index)
     # Two typed fields (no primitives, no placeholders)
-    typed_fields = [f for f in result.fields if not f.name.endswith("_ext")]
-    assert len(typed_fields) == 2
+    assert len(result.fields) == 2
 
 
 def test_build__three_types_produce_three_fields(builder, index):
     node = make_node("value", type_codes=["string", "Quantity", "CodeableConcept"])
     result = builder.build(node, index)
-    typed_fields = [f for f in result.fields if not f.name.endswith("_ext")]
-    assert len(typed_fields) == 3
+    assert len(result.fields) == 3
 
 
 def test_build__field_name_is_base_plus_type_name(builder, index):
     node = make_node("value", type_codes=["Quantity"])
-    ti = make_type_info(r4_complex.Quantity, "complex-type", False)
+    ti = make_type_info(r4_complex.Quantity, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     assert result.fields[0].name == "valueQuantity"
@@ -177,7 +175,7 @@ def test_build__boolean_type_field_name(builder, index):
 def test_build__two_types_field_names_reflect_their_types(builder, index):
     node = make_node("value", type_codes=["string", "Quantity"])
     result = builder.build(node, index)
-    names = {f.name for f in result.fields if not f.name.endswith("_ext")}
+    names = {f.name for f in result.fields}
     assert "valueString" in names
     assert "valueQuantity" in names
 
@@ -185,13 +183,13 @@ def test_build__two_types_field_names_reflect_their_types(builder, index):
 def test_build__different_base_name_used_in_field(builder, index):
     node = make_node("effective", type_codes=["dateTime"])
     result = builder.build(node, index)
-    names = [f.name for f in result.fields if not f.name.endswith("_ext")]
+    names = [f.name for f in result.fields]
     assert "effectiveDateTime" in names
 
 
 def test_build__non_keyword_typed_name_has_no_validation_alias(builder, index):
     node = make_node("value", type_codes=["Quantity"])
-    ti = make_type_info(r4_complex.Quantity, "complex-type", False)
+    ti = make_type_info(r4_complex.Quantity, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     assert result.fields[0].validation_alias is None
@@ -199,7 +197,7 @@ def test_build__non_keyword_typed_name_has_no_validation_alias(builder, index):
 
 def test_build__non_array_typed_field_annotation_is_optional(builder, index):
     node = make_node("value", type_codes=["Quantity"], is_array=False)
-    ti = make_type_info(r4_complex.Quantity, "complex-type", False)
+    ti = make_type_info(r4_complex.Quantity, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     assert result.fields[0].annotation == Optional[r4_complex.Quantity]
@@ -207,90 +205,10 @@ def test_build__non_array_typed_field_annotation_is_optional(builder, index):
 
 def test_build__array_typed_field_annotation_is_optional_list(builder, index):
     node = make_node("value", type_codes=["Quantity"], is_array=True)
-    ti = make_type_info(r4_complex.Quantity, "complex-type", False)
+    ti = make_type_info(r4_complex.Quantity, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     assert result.fields[0].annotation == Optional[List[r4_complex.Quantity]]
-
-
-def test_build__primitive_type_adds_ext_placeholder(builder, index):
-    node = make_node("value", type_codes=["string"])
-    result = builder.build(node, index)
-    names = [f.name for f in result.fields]
-    assert "valueString_ext" in names
-
-
-def test_build__non_primitive_type_does_not_add_placeholder(builder, index):
-    node = make_node("value", type_codes=["Quantity"])
-    ti = make_type_info(r4_complex.Quantity, "complex-type", False)
-    with patch.object(builder, "resolve_type", return_value=ti):
-        result = builder.build(node, index)
-    names = [f.name for f in result.fields]
-    assert "value_ext" not in names
-
-
-def test_build__primitive_placeholder_alias_is_underscore_name(builder, index):
-    node = make_node("value", type_codes=["string"])
-    result = builder.build(node, index)
-    placeholder = next(f for f in result.fields if f.name == "valueString_ext")
-    assert placeholder.alias == "_valueString"
-
-
-def test_build__primitive_type_ext_placeholder_does_not_use_base_name(builder, index):
-    """No base-name _ext placeholder should be emitted for a type-choice element."""
-    node = make_node("value", type_codes=["string"])
-    result = builder.build(node, index)
-    names = [f.name for f in result.fields]
-    assert "value_ext" not in names
-
-
-def test_build__primitive_type_ext_placeholder_uses_typed_name(builder, index):
-    """Ext placeholder for a type-choice primitive must use the full typed field name."""
-    node = make_node("value", type_codes=["string"])
-    result = builder.build(node, index)
-    names = [f.name for f in result.fields]
-    assert "valueString_ext" in names
-
-
-def test_build__primitive_type_ext_placeholder_alias_uses_typed_name(builder, index):
-    """Ext placeholder alias must be the underscore-prefixed typed field name."""
-    node = make_node("value", type_codes=["string"])
-    result = builder.build(node, index)
-    placeholder = next(f for f in result.fields if f.name == "valueString_ext")
-    assert placeholder.alias == "_valueString"
-
-
-def test_build__two_primitives_ext_placeholders_use_typed_names(builder, index):
-    """Each primitive type choice variant gets its own correctly named _ext placeholder."""
-    node = make_node("value", type_codes=["string", "boolean"])
-    result = builder.build(node, index)
-    ext_names = [f.name for f in result.fields if f.name.endswith("_ext")]
-    assert "valueString_ext" in ext_names
-    assert "valueBoolean_ext" in ext_names
-    assert "value_ext" not in ext_names
-
-
-def test_build__different_base_name_primitive_ext_uses_typed_name(builder, index):
-    """The correctly-typed _ext placeholder is generated regardless of the base name."""
-    node = make_node("effective", type_codes=["dateTime"])
-    result = builder.build(node, index)
-    names = [f.name for f in result.fields]
-    assert "effectiveDateTime_ext" in names
-    assert "effective_ext" not in names
-
-
-def test_build__two_types_one_primitive_adds_exactly_one_placeholder(builder, index):
-    node = make_node("value", type_codes=["string", "Quantity"])
-    result = builder.build(node, index)
-    ext_fields = [f for f in result.fields if f.name.endswith("_ext")]
-    assert len(ext_fields) == 1
-
-
-def test_build__two_primitive_types_add_two_placeholders(builder, index):
-    node = make_node("value", type_codes=["string", "boolean"])
-    result = builder.build(node, index)
-    ext_fields = [f for f in result.fields if f.name.endswith("_ext")]
-    assert len(ext_fields) == 2
 
 
 def test_build__type_choice_validator_added(builder, index):
@@ -339,8 +257,8 @@ def test_build__type_choice_validator_field_types_contain_all_resolved_types(
     builder, index
 ):
     node = make_node("value", type_codes=["string", "Quantity"])
-    ti1 = make_type_info(primitives.String, "primitive", True)
-    ti2 = make_type_info(r4_complex.Quantity, "complex-type", False)
+    ti1 = make_type_info(primitives.String, "primitive")
+    ti2 = make_type_info(r4_complex.Quantity, "complex-type")
     with patch.object(builder, "resolve_type", side_effect=[ti1, ti2]):
         result = builder.build(node, index)
     validator = next(
@@ -408,7 +326,7 @@ def test_build__pattern_on_typed_field_produces_pattern_validator(builder, index
     node = make_node(
         "value", type_codes=["Coding"], pattern={"system": "http://loinc.org"}
     )
-    ti = make_type_info(r4_complex.Coding, "complex-type", False)
+    ti = make_type_info(r4_complex.Coding, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     names = [v.name for v in result.validators]
@@ -429,7 +347,7 @@ def test_build__constraint_on_node_produces_model_validator(builder, index):
 
 def test_build__no_extra_validators_when_nothing_set(builder, index):
     node = make_node("value", type_codes=["Quantity"])
-    ti = make_type_info(r4_complex.Quantity, "complex-type", False)
+    ti = make_type_info(r4_complex.Quantity, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     # Only the type-choice validator should be present

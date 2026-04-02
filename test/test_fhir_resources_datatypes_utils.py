@@ -5,19 +5,13 @@ Test file demonstrating FHIR type checking and conversion utilities.
 import pytest
 from pydantic import ValidationError
 
-import fhircraft.fhir.resources.datatypes.primitives as primitives
+import fhircraft.fhir.resources.datatypes.R4.primitive as primitives
 from fhircraft.fhir.resources.datatypes.R4.complex import Coding
 from fhircraft.fhir.resources.datatypes.R4.core import Observation
-from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
-    ElementDefinitionSlicingDiscriminator,
-)
 from fhircraft.fhir.resources.datatypes.utils import (
-    get_primitive_type_by_name,
-    get_primitive_type_name,
     is_fhir_primitive_type,
     is_fhir_complex_type,
     is_fhir_resource_type,
-    list_primitive_types,
     is_fhir_primitive,
 )
 
@@ -429,28 +423,6 @@ def test_is_id(value, expected):
 )
 def test_is_markdown(value, expected):
     assert is_fhir_primitive_type(value, "markdown", "R4") == expected
-
-
-def test_utility_functions():
-    """Test utility functions for working with types."""
-
-    # Test getting type names
-    assert get_primitive_type_name(primitives.Boolean) == "Boolean"  # type: ignore
-    assert get_primitive_type_name(primitives.Integer) == "Integer"  # type: ignore
-
-    # Test getting types by name
-    boolean_type = get_primitive_type_by_name("Boolean")
-    assert boolean_type == primitives.Boolean
-
-    invalid_type = get_primitive_type_by_name("InvalidType")
-    assert invalid_type is None
-
-    # Test listing all types
-    type_names = list_primitive_types()
-    assert "Boolean" in type_names
-    assert "Integer" in type_names
-    assert "String" in type_names
-    assert len(type_names) > 15  # Should have many primitive types
 
 
 @pytest.mark.parametrize(

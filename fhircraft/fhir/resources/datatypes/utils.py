@@ -6,17 +6,14 @@ and to convert between different types. The core conversion logic is implemented
 and FHIRPath conversion functions use these utilities.
 """
 
-import importlib
 import re
-import warnings
 from datetime import date, datetime, time
-from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Type, Union
+from typing import TYPE_CHECKING, Any, Union
 from typing_extensions import TypeAliasType
 
 from pydantic import TypeAdapter, BaseModel, ValidationError
 
-import fhircraft.fhir.resources.datatypes.primitives as primitives
+import fhircraft.fhir.resources.datatypes as constants
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 
 if TYPE_CHECKING:
@@ -268,12 +265,12 @@ def to_date(value: Any) -> Union[str, None]:
     """
     if isinstance(value, str):
         # Check if it's already a valid date
-        date_pattern = rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$"
+        date_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?$"
         if re.match(date_pattern, value):
             return value
 
         # Check if it's a datetime that we can extract date from
-        datetime_pattern = rf"^({primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?)(T{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?)?$"
+        datetime_pattern = rf"^({constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?)(T{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?)?$"
         datetime_match = re.match(datetime_pattern, value)
         if datetime_match:
             return datetime_match.group(1)  # Extract date part
@@ -295,12 +292,12 @@ def to_datetime(value: Any) -> Union[str, None]:
     """
     if isinstance(value, str):
         # Check if it's already a valid datetime
-        datetime_pattern = rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?(T{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?)?$"
+        datetime_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?(T{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?)?$"
         if re.match(datetime_pattern, value):
             return value
 
         # Check if it's a date that we can convert to datetime
-        date_pattern = rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$"
+        date_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?$"
         if re.match(date_pattern, value):
             return value  # Date is a valid partial datetime
 
@@ -321,12 +318,12 @@ def to_time(value: Any) -> Union[str, None]:
     """
     if isinstance(value, str):
         # Check if it's already a valid time
-        time_pattern = rf"^{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?$"
+        time_pattern = rf"^{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?$"
         if re.match(time_pattern, value):
             return value
 
         # Check if it's a datetime/date that contains time info we can extract
-        datetime_pattern = rf"^({primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?)(T({primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?))$"
+        datetime_pattern = rf"^({constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?)(T({constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?))$"
         datetime_match = re.match(datetime_pattern, value)
         if datetime_match:
             return datetime_match.group(4)  # Extract time part
@@ -357,30 +354,3 @@ def to_string(value: Any) -> Union[str, None]:
             return None
     else:
         return None
-
-
-# Utility functions for working with type aliases
-def get_primitive_type_name(fhir_type: TypeAliasType) -> str:
-    """Get the string name of a FHIR primitive type."""
-    if hasattr(fhir_type, "__name__"):
-        return fhir_type.__name__
-    # Fallback: search primitives module
-    for name in dir(primitives):
-        if getattr(primitives, name) is fhir_type:
-            return name
-    return "Unknown"
-
-
-def get_primitive_type_by_name(type_name: str) -> Union[TypeAliasType, None]:
-    """Get a FHIR primitive type by its string name."""
-    return getattr(primitives, type_name, None)
-
-
-def list_primitive_types() -> list[str]:
-    """List all available FHIR primitive type names."""
-    return [
-        name
-        for name in dir(primitives)
-        if not name.startswith("_")
-        and isinstance(getattr(primitives, name), TypeAliasType)
-    ]

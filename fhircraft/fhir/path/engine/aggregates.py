@@ -3,8 +3,6 @@ FHIRPath supports a general-purpose aggregate function to enable the calculation
 """
 
 from typing import Any
-
-import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
