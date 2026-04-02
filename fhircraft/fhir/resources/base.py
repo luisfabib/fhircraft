@@ -1026,6 +1026,8 @@ class FHIRPrimitiveModel(FHIRBaseModel):
     def _coerce_scalar(cls, data: Any) -> Any:
         if data is not None and not isinstance(data, (dict, cls)):
             return {"value": data}
+        elif isinstance(data, cls):
+            return {"value": data.value}
         return data
 
     def __eq__(self, other: Any) -> bool:
