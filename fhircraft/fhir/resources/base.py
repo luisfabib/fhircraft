@@ -1,6 +1,7 @@
 from copy import copy
 import enum
 from functools import lru_cache
+import re
 import threading
 import warnings
 from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args, Literal
@@ -12,6 +13,7 @@ from pydantic.config import ExtraValues
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Field,
     ValidationError,
     PrivateAttr,
     model_validator,
@@ -1005,6 +1007,43 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({', '.join(self._get_repr_args())})"
+
+
+class FHIRPrimitiveModel(FHIRBaseModel):
+    """
+    Base class for FHIR primitive types.
+
+    FHIR primitives are represented as Pydantic models with a single `value` field that holds the actual primitive value.
+    This design allows us to attach extensions to primitive values while still treating them as simple types in most contexts.
+    """
+
+    value: Any = Field(..., description="The actual value")
+    _kind = "primitive"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_scalar(cls, data: Any) -> Any:
+        if data is not None and not isinstance(data, (dict, cls)):
+            return {"value": data}
+        return data
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, FHIRPrimitiveModel):
+            return self.value == other.value
+        return self.value == other
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
+    def __str__(self) -> str:
+        return str(self.value) if self.value is not None else ""
+
+    def __repr__(self) -> str:
+        return repr(self.value)
+
+    @model_serializer
+    def _serialize(self) -> Any:
+        return self.value
 
 
 class FHIRSliceModel(FHIRBaseModel):
