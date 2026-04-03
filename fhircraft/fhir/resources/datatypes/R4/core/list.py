@@ -4,8 +4,8 @@ from typing import List as ListType, Optional
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.base import FHIRBaseModel
 from ..primitive import *
+from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Annotation,
     BackboneElement,

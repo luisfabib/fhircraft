@@ -3,8 +3,8 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 from pydantic import Field
-from ..primitive import *
 
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     ContactDetail,

@@ -3,8 +3,8 @@ from typing import List, Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel
 from ..primitive import *
+from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.R4.complex import Element, Reference
 
 class Annotation(Element):

@@ -1,7 +1,6 @@
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
 
 from typing import List as ListType, Optional
 

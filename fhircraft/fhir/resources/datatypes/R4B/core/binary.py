@@ -4,8 +4,8 @@ from typing import Optional
 NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
 
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,

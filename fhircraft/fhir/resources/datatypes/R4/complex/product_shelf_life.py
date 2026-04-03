@@ -3,8 +3,8 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
 
+from ..primitive import *
 from .backbone_element import BackboneElement
 from .codeable_concept import CodeableConcept
 from .identifier import Identifier

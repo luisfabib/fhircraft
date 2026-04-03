@@ -1,10 +1,3 @@
-"""
-FHIR R5 Complex Data Types
-
-This module contains all the complex data types defined in the FHIR R5 specification.
-Each data type is defined in its own module for better organization and maintainability.
-"""
-
 # Important: import order matters to avoid circular import errors
 from .base import Base
 from .element import Element
@@ -149,3 +142,19 @@ __all__ = [
     "VirtualServiceDetail",
     "xhtml",
 ]
+
+# Ensure all forward references (e.g. "Extension" in Base/Element) are
+# resolved when types are imported directly from this package.
+from ..primitive import *
+
+import typing as _typing
+
+_ns = {
+    **vars(_typing),
+    **{k: v for k, v in globals().items() if not k.startswith("__")},
+}
+for _name in __all__:
+    _cls = globals().get(_name)
+    if _cls is not None and not getattr(_cls, "__pydantic_complete__", True):
+        _cls.model_rebuild(_types_namespace=_ns)
+del _name, _cls, _ns, _typing  # type: ignore

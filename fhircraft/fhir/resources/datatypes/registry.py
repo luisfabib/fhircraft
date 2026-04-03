@@ -165,9 +165,20 @@ class TypeRegistry:
         try:
             module = importlib.import_module(self._build_module_path(entry))
             obj: type = getattr(module, capitalize(entry.name))
-            # Trigger Pydantic model rebuild if forward refs are unresolved
+            # Trigger Pydantic model rebuild if forward refs are unresolved.
+            # We must pass an explicit namespace so that forward references like
+            # "Extension" (which only appear under TYPE_CHECKING in element.py)
+            # can be resolved regardless of which frame calls model_rebuild.
             if not getattr(obj, "__pydantic_complete__", True):
-                obj.model_rebuild()  # type: ignore[union-attr]
+                complex_pkg = importlib.import_module(
+                    f"fhircraft.fhir.resources.datatypes.{self.release}.complex"
+                )
+                prim_pkg = importlib.import_module(
+                    f"fhircraft.fhir.resources.datatypes.{self.release}.primitive"
+                )
+                obj.model_rebuild(  # type: ignore[union-attr]
+                    _types_namespace={**vars(prim_pkg), **vars(complex_pkg)}
+                )
             return obj
         except (ImportError, AttributeError):
             return None

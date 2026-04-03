@@ -1,6 +1,5 @@
 from pydantic import Field, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
 
 NoneType = type(None)
 

@@ -5,8 +5,8 @@ NoneType = type(None)
 
 from typing import Optional, List as ListType
 
-from ..primitive import *
 
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,

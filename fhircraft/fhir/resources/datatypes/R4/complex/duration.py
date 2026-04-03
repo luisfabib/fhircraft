@@ -1,8 +1,8 @@
 from pydantic import model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
 
+from ..primitive import *
 from .quantity import Quantity
 
 class Duration(Quantity):

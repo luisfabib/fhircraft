@@ -3,8 +3,8 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
 
+from ..primitive import *
 from .data_requirement import DataRequirement
 from .element import Element
 from .expression import Expression

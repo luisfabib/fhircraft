@@ -3,8 +3,8 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
 
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4.complex import Element
 
 class Period(Element):

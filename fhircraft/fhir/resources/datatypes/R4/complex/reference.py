@@ -3,8 +3,8 @@ from typing import Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
 
+from ..primitive import *
 from .element import Element
 
 if TYPE_CHECKING:

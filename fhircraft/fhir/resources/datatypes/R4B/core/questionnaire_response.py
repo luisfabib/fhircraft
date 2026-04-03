@@ -4,8 +4,8 @@ from typing import Optional, List as ListType
 
 NoneType = type(None)
 
-from ..primitive import *
 
+from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Extension,

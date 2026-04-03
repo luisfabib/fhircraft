@@ -2,13 +2,13 @@ from typing import List, Optional
 
 from pydantic import Field, model_validator
 
+from ..primitive import *
 from fhircraft.fhir.resources.validators import (
     get_type_choice_value_by_base,
     validate_element_constraint,
     validate_model_constraint,
     validate_type_choice_element,
 )
-from ..primitive import *
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Address,
     Age,

@@ -13,11 +13,11 @@ NoneType = type(None)
 
 # Dynamic modules
 
+from ..primitive import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
 from typing import Optional, Literal
 
-from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,

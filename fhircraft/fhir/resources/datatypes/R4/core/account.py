@@ -1,4 +1,3 @@
-from ..primitive import *
 import fhircraft.fhir.resources.validators as fhir_validators
 
 from pydantic import Field, model_validator
@@ -10,10 +9,10 @@ NoneType = type(None)
 # Dynamic modules
 from typing import Optional, List as ListType
 
+from ..primitive import *
 from .resource import Resource
 from .domain_resource import DomainResource
 
-from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,

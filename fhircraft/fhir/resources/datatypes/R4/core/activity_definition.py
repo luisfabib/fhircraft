@@ -6,10 +6,10 @@ NoneType = type(None)
 
 from typing import Optional, List as ListType, Literal
 
+from ..primitive import *
 from .resource import Resource
 from .domain_resource import DomainResource
 
-from ..primitive import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
