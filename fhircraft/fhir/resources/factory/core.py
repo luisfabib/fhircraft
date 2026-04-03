@@ -275,9 +275,9 @@ class FHIRModelFactory:
     ) -> type[BaseModel]:
         """Internal build method, assumes input is already normalised and validated."""
 
-        sd_url = structure_def.url or ""
-        sd_name = structure_def.name or ""
-        fhir_version = structure_def.fhirVersion or ""
+        sd_url = str(structure_def.url) or ""
+        sd_name = str(structure_def.name) or ""
+        fhir_version = str(structure_def.fhirVersion) or ""
 
         if not sd_name:
             raise ValueError("StructureDefinition must have a valid 'name'.")

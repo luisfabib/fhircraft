@@ -8,6 +8,7 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 
 from fhircraft.fhir.resources.datatypes.R4.complex import Element, Meta
 
+
 class Resource(FHIRBaseModel):
     """
     Base Resource
@@ -38,9 +39,8 @@ class Resource(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(list(self.__class__.model_fields.keys())),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
