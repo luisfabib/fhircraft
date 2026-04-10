@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -42,7 +42,7 @@ class VerificationResultPrimarySource(BackboneElement):
         description="successful | failed | unknown",
         default=None,
     )
-    validationDate: Optional[DateTime] = Field(
+    validationDate: Optional[fhir.dateTime] = Field(
         description="When the target was validated against the primary source",
         default=None,
     )
@@ -72,15 +72,15 @@ class VerificationResultAttestation(BackboneElement):
         description="The method by which attested information was submitted/retrieved",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="The date the information was attested to",
         default=None,
     )
-    sourceIdentityCertificate: Optional[String] = Field(
+    sourceIdentityCertificate: Optional[fhir.string] = Field(
         description="A digital identity certificate associated with the attestation source",
         default=None,
     )
-    proxyIdentityCertificate: Optional[String] = Field(
+    proxyIdentityCertificate: Optional[fhir.string] = Field(
         description="A digital identity certificate associated with the proxy entity submitting attested information on behalf of the attestation source",
         default=None,
     )
@@ -102,7 +102,7 @@ class VerificationResultValidator(BackboneElement):
         description="Reference to the organization validating information",
         default=None,
     )
-    identityCertificate: Optional[String] = Field(
+    identityCertificate: Optional[fhir.string] = Field(
         description="A digital identity certificate associated with the validator",
         default=None,
     )
@@ -124,7 +124,7 @@ class VerificationResult(DomainResource):
         description="A resource that was validated",
         default=None,
     )
-    targetLocation: Optional[ListType[String]] = Field(
+    targetLocation: Optional[ListType[fhir.string]] = Field(
         description="The fhirpath location(s) within the resource that was validated",
         default=None,
     )
@@ -132,11 +132,11 @@ class VerificationResult(DomainResource):
         description="none | initial | periodic",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="attested | validated | in-process | req-revalid | val-fail | reval-fail | entered-in-error",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="When the validation status was updated",
         default=None,
     )
@@ -152,11 +152,11 @@ class VerificationResult(DomainResource):
         description="Frequency of revalidation",
         default=None,
     )
-    lastPerformed: Optional[DateTime] = Field(
+    lastPerformed: Optional[fhir.dateTime] = Field(
         description="The date/time validation was last completed (including failed validations)",
         default=None,
     )
-    nextScheduled: Optional[Date] = Field(
+    nextScheduled: Optional[fhir.date_] = Field(
         description="The date when target is next validated, if appropriate",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -25,7 +25,7 @@ class CatalogEntryRelatedEntry(BackboneElement):
     Used for example, to point to a substance, or to a device used to administer a medication.
     """
 
-    relationtype: Optional[Code] = Field(
+    relationtype: Optional[fhir.code] = Field(
         description="triggers | is-replaced-by",
         default=None,
     )
@@ -63,7 +63,7 @@ class CatalogEntry(DomainResource):
         description="The type of item - medication, device, service, protocol or other",
         default=None,
     )
-    orderable: Optional[Boolean] = Field(
+    orderable: Optional[fhir.boolean] = Field(
         description="Whether the entry represents an orderable item",
         default=None,
     )
@@ -79,7 +79,7 @@ class CatalogEntry(DomainResource):
         description="Classification (category or class) of the item entry",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
@@ -87,11 +87,11 @@ class CatalogEntry(DomainResource):
         description="The time period in which this catalog entry is expected to be active",
         default=None,
     )
-    validTo: Optional[DateTime] = Field(
+    validTo: Optional[fhir.dateTime] = Field(
         description="The date until which this catalog entry is expected to be active",
         default=None,
     )
-    lastUpdated: Optional[DateTime] = Field(
+    lastUpdated: Optional[fhir.dateTime] = Field(
         description="When was this catalog last updated",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AllergyIntoleranceReaction(BackboneElement):
     """
     Details about each adverse reaction event linked to exposure to the identified substance.
@@ -36,15 +37,15 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Clinical symptoms/signs associated with the Event",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of the event as a whole",
         default=None,
     )
-    onset: Optional[DateTime] = Field(
+    onset: Optional[fhir.dateTime] = Field(
         description="Date(/time) when manifestations showed",
         default=None,
     )
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="mild | moderate | severe (of event as a whole)",
         default=None,
     )
@@ -56,6 +57,7 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Text about event not captured in other fields",
         default=None,
     )
+
 
 class AllergyIntolerance(DomainResource):
     """
@@ -90,20 +92,20 @@ class AllergyIntolerance(DomainResource):
         description="unconfirmed | confirmed | refuted | entered-in-error",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="allergy | intolerance - Underlying mechanism (if known)",
         default=None,
     )
-    category: Optional[ListType[Code]] = Field(
+    category: Optional[ListType[fhir.code]] = Field(
         description="food | medication | environment | biologic",
         default=None,
     )
-    criticality: Optional[Code] = Field(
+    criticality: Optional[fhir.code] = Field(
         description="low | high | unable-to-assess",
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code that identifies the allergy or intolerance",
+        description="code that identifies the allergy or intolerance",
         default=None,
     )
     patient: Optional[Reference] = Field(
@@ -114,7 +116,7 @@ class AllergyIntolerance(DomainResource):
         description="Encounter when the allergy or intolerance was asserted",
         default=None,
     )
-    onsetDateTime: Optional[DateTime] = Field(
+    onsetDateTime: Optional[fhir.dateTime] = Field(
         description="When allergy or intolerance was identified",
         default=None,
     )
@@ -130,11 +132,11 @@ class AllergyIntolerance(DomainResource):
         description="When allergy or intolerance was identified",
         default=None,
     )
-    onsetString: Optional[String] = Field(
+    onsetString: Optional[fhir.string] = Field(
         description="When allergy or intolerance was identified",
         default=None,
     )
-    recordedDate: Optional[DateTime] = Field(
+    recordedDate: Optional[fhir.dateTime] = Field(
         description="Date first version of the resource instance was recorded",
         default=None,
     )
@@ -146,7 +148,7 @@ class AllergyIntolerance(DomainResource):
         description="Source of the information about the allergy",
         default=None,
     )
-    lastOccurrence: Optional[DateTime] = Field(
+    lastOccurrence: Optional[fhir.dateTime] = Field(
         description="Date(/time) of last known occurrence of a reaction",
         default=None,
     )
@@ -170,7 +172,7 @@ class AllergyIntolerance(DomainResource):
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Range, String],
+            field_types=[fhir.dateTime, Age, Period, Range, fhir.string],
             field_name_base="onset",
             required=False,
         )

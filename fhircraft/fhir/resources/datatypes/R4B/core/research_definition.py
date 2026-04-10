@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class ResearchDefinition(DomainResource):
     """
@@ -43,39 +44,39 @@ class ResearchDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this research definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this research definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the research definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the research definition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this research definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this research definition (human friendly)",
         default=None,
     )
-    shortTitle: Optional[String] = Field(
+    shortTitle: Optional[fhir.string] = Field(
         description="Title for use in informal contexts",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the ResearchDefinition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
@@ -87,11 +88,11 @@ class ResearchDefinition(DomainResource):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -99,11 +100,11 @@ class ResearchDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the research definition",
         default=None,
     )
-    comment: Optional[ListType[String]] = Field(
+    comment: Optional[ListType[fhir.string]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
@@ -115,23 +116,23 @@ class ResearchDefinition(DomainResource):
         description="Intended jurisdiction for research definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this research definition is defined",
         default=None,
     )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="Describes the clinical usage of the ResearchDefinition",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the research definition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the research definition was last reviewed",
         default=None,
     )
@@ -163,7 +164,7 @@ class ResearchDefinition(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the ResearchDefinition",
         default=None,
     )

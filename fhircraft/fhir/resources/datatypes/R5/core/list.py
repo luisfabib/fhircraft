@@ -5,7 +5,7 @@ NoneType = type(None)
 
 from typing import List as ListType, Optional
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     BackboneElement,
@@ -18,6 +18,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ListEntry(BackboneElement):
     """
     Entries in this list.
@@ -27,11 +28,11 @@ class ListEntry(BackboneElement):
         description="Status/Workflow information about this item",
         default=None,
     )
-    deleted: Optional[Boolean] = Field(
+    deleted: Optional[fhir.boolean] = Field(
         description="If this item is actually marked as deleted",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When item added to list",
         default=None,
     )
@@ -39,6 +40,7 @@ class ListEntry(BackboneElement):
         description="Actual entry",
         default=None,
     )
+
 
 class List(DomainResource):
     """
@@ -65,15 +67,15 @@ class List(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | retired | entered-in-error",
         default=None,
     )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="working | snapshot | changes",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Descriptive name for the list",
         default=None,
     )
@@ -89,7 +91,7 @@ class List(DomainResource):
         description="Context in which list created",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the list was prepared",
         default=None,
     )

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
     """
     The starting materials - monomer(s) used in the synthesis of the polymer.
@@ -34,7 +35,7 @@ class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
         description="Substance high level category, e.g. chemical substance",
         default=None,
     )
-    isDefining: Optional[Boolean] = Field(
+    isDefining: Optional[fhir.boolean] = Field(
         description="Used to specify whether the attribute described is a defining element for the unique identification of the polymer",
         default=None,
     )
@@ -42,6 +43,7 @@ class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
         description="A percentage",
         default=None,
     )
+
 
 class SubstancePolymerMonomerSet(BackboneElement):
     """
@@ -59,6 +61,7 @@ class SubstancePolymerMonomerSet(BackboneElement):
         )
     )
 
+
 class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation(BackboneElement):
     """
     Applies to homopolymer and block co-polymers where the degree of polymerisation within a block can be described.
@@ -68,18 +71,19 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation(BackboneElement):
         description="The type of the degree of polymerisation shall be described, e.g. SRU/Polymer Ratio",
         default=None,
     )
-    average: Optional[Integer] = Field(
+    average: Optional[fhir.integer] = Field(
         description="An average amount of polymerisation",
         default=None,
     )
-    low: Optional[Integer] = Field(
+    low: Optional[fhir.integer] = Field(
         description="A low expected limit of the amount",
         default=None,
     )
-    high: Optional[Integer] = Field(
+    high: Optional[fhir.integer] = Field(
         description="A high expected limit of the amount",
         default=None,
     )
+
 
 class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
     """
@@ -90,7 +94,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
         description="The type of structure (e.g. Full, Partial, Representative)",
         default=None,
     )
-    representation: Optional[String] = Field(
+    representation: Optional[fhir.string] = Field(
         description="The structural representation as text string in a standard format e.g. InChI, SMILES, MOLFILE, CDX, SDF, PDB, mmCIF",
         default=None,
     )
@@ -103,12 +107,13 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
         default=None,
     )
 
+
 class SubstancePolymerRepeatRepeatUnit(BackboneElement):
     """
     An SRU - Structural Repeat Unit.
     """
 
-    unit: Optional[String] = Field(
+    unit: Optional[fhir.string] = Field(
         description="Structural repeat units are essential elements for defining polymers",
         default=None,
     )
@@ -116,7 +121,7 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         description="The orientation of the polymerisation, e.g. head-tail, head-head, random",
         default=None,
     )
-    amount: Optional[Integer] = Field(
+    amount: Optional[fhir.integer] = Field(
         description="Number of repeats of this unit",
         default=None,
     )
@@ -133,12 +138,13 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         default=None,
     )
 
+
 class SubstancePolymerRepeat(BackboneElement):
     """
     Specifies and quantifies the repeated units and their configuration.
     """
 
-    averageMolecularFormula: Optional[String] = Field(
+    averageMolecularFormula: Optional[fhir.string] = Field(
         description="A representation of an (average) molecular formula from a polymer",
         default=None,
     )
@@ -150,6 +156,7 @@ class SubstancePolymerRepeat(BackboneElement):
         description="An SRU - Structural Repeat Unit",
         default=None,
     )
+
 
 class SubstancePolymer(DomainResource):
     """
@@ -177,8 +184,8 @@ class SubstancePolymer(DomainResource):
         description="Descrtibes the copolymer sequence type (polymer connectivity)",
         default=None,
     )
-    modification: Optional[String] = Field(
-        description="Todo - this is intended to connect to a repeating full modification structure, also used by Protein and Nucleic Acid . String is just a placeholder",
+    modification: Optional[fhir.string] = Field(
+        description="Todo - this is intended to connect to a repeating full modification structure, also used by Protein and Nucleic Acid . string is just a placeholder",
         default=None,
     )
     monomerSet: Optional[ListType[SubstancePolymerMonomerSet]] = Field(

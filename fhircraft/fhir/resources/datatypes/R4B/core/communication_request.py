@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -27,7 +27,7 @@ class CommunicationRequestPayload(BackboneElement):
     Text, attachment(s), or resource(s) to be communicated to the recipient.
     """
 
-    contentString: Optional[String] = Field(
+    contentString: Optional[fhir.string] = Field(
         description="Message part content",
         default=None,
     )
@@ -51,7 +51,7 @@ class CommunicationRequestPayload(BackboneElement):
     def content_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Attachment, Reference],
+            field_types=[fhir.string, Attachment, Reference],
             field_name_base="content",
             required=True,
         )
@@ -93,7 +93,7 @@ class CommunicationRequest(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
@@ -105,11 +105,11 @@ class CommunicationRequest(DomainResource):
         description="Message category",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if request is prohibiting action",
         default=None,
     )
@@ -133,7 +133,7 @@ class CommunicationRequest(DomainResource):
         description="Message payload",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When scheduled",
         default=None,
     )
@@ -141,7 +141,7 @@ class CommunicationRequest(DomainResource):
         description="When scheduled",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When request transitioned to being actionable",
         default=None,
     )
@@ -181,7 +181,7 @@ class CommunicationRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="occurrence",
             required=False,
         )

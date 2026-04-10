@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -54,7 +54,7 @@ class EncounterHistory(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | in-progress | on-hold | discharged | completed | cancelled | discontinued | entered-in-error | unknown",
         default=None,
     )
@@ -83,11 +83,11 @@ class EncounterHistory(DomainResource):
         description="The actual start and end time associated with this set of values associated with the encounter",
         default=None,
     )
-    plannedStartDate: Optional[DateTime] = Field(
+    plannedStartDate: Optional[fhir.dateTime] = Field(
         description="The planned start date/time (or admission date) of the encounter",
         default=None,
     )
-    plannedEndDate: Optional[DateTime] = Field(
+    plannedEndDate: Optional[fhir.dateTime] = Field(
         description="The planned end date/time (or discharge date) of the encounter",
         default=None,
     )

@@ -13,7 +13,7 @@ NoneType = type(None)
 
 # Dynamic modules
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
 from typing import Optional, Literal
@@ -35,7 +35,7 @@ class Binary(Resource):
     _type = "Binary"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Binary"
 
-    contentType: Optional[Code] = Field(
+    contentType: Optional[fhir.code] = Field(
         description="MimeType of the binary content",
         default=None,
     )
@@ -43,7 +43,7 @@ class Binary(Resource):
         description="Identifies another resource to use as proxy when enforcing access control",
         default=None,
     )
-    data: Optional[Base64Binary] = Field(
+    data: Optional[fhir.base64Binary] = Field(
         description="The actual content",
         default=None,
     )

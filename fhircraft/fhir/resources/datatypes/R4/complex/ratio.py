@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .element import Element
 from .quantity import Quantity
 

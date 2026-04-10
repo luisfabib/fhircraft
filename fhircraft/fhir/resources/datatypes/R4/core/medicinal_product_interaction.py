@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -75,7 +75,7 @@ class MedicinalProductInteraction(DomainResource):
         description="The medication for which this is a described interaction",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="The interaction described",
         default=None,
     )

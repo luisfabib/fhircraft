@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class OrganizationAffiliation(DomainResource):
     """
@@ -45,7 +46,7 @@ class OrganizationAffiliation(DomainResource):
         description="Business identifiers that are specific to this role",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this organization affiliation record is in active use",
         default=None,
     )

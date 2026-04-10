@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DeviceUsageAdherence(BackboneElement):
     """
     This indicates how or if the device is being used.
@@ -37,6 +38,7 @@ class DeviceUsageAdherence(BackboneElement):
         description="lost | stolen | prescribed | broken | burned | forgot",
         default=None,
     )
+
 
 class DeviceUsage(DomainResource):
     """
@@ -55,7 +57,7 @@ class DeviceUsage(DomainResource):
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | completed | not-done | entered-in-error +",
         default=None,
     )
@@ -83,11 +85,11 @@ class DeviceUsage(DomainResource):
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="How often  the device was used",
         default=None,
     )
-    dateAsserted: Optional[DateTime] = Field(
+    dateAsserted: Optional[fhir.dateTime] = Field(
         description="When the statement was made (and recorded)",
         default=None,
     )
@@ -108,7 +110,7 @@ class DeviceUsage(DomainResource):
         default=None,
     )
     device: Optional[CodeableReference] = Field(
-        description="Code or Reference to device used",
+        description="code or Reference to device used",
         default=None,
     )
     reason: Optional[ListType[CodeableReference]] = Field(
@@ -135,7 +137,7 @@ class DeviceUsage(DomainResource):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Period, DateTime],
+            field_types=[Timing, Period, fhir.dateTime],
             field_name_base="timing",
             required=False,
         )

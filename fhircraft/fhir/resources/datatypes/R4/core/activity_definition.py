@@ -6,7 +6,7 @@ NoneType = type(None)
 
 from typing import Optional, List as ListType, Literal
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .resource import Resource
 from .domain_resource import DomainResource
 
@@ -35,12 +35,13 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ActivityDefinitionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="patient | practitioner | related-person | device",
         default=None,
     )
@@ -49,12 +50,13 @@ class ActivityDefinitionParticipant(BackboneElement):
         default=None,
     )
 
+
 class ActivityDefinitionDynamicValue(BackboneElement):
     """
     Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the request resource that would contain the result.
     """
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="The path to the element to be set dynamically",
         default=None,
     )
@@ -62,6 +64,7 @@ class ActivityDefinitionDynamicValue(BackboneElement):
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
+
 
 class ActivityDefinition(DomainResource):
     """
@@ -84,35 +87,35 @@ class ActivityDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this activity definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this activity definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the activity definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the activity definition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this activity definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this activity definition (human friendly)",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the activity definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
@@ -124,11 +127,11 @@ class ActivityDefinition(DomainResource):
         description="Type of individual the activity definition is intended for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -136,7 +139,7 @@ class ActivityDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the activity definition",
         default=None,
     )
@@ -148,23 +151,23 @@ class ActivityDefinition(DomainResource):
         description="Intended jurisdiction for activity definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this activity definition is defined",
         default=None,
     )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="Describes the clinical usage of the activity definition",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the activity definition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the activity definition was last reviewed",
         default=None,
     )
@@ -196,15 +199,15 @@ class ActivityDefinition(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the activity definition",
         default=None,
     )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="Kind of resource",
         default=None,
     )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="What profile the resource needs to conform to",
         default=None,
     )
@@ -212,15 +215,15 @@ class ActivityDefinition(DomainResource):
         description="Detail type of activity",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if the activity should not be performed",
         default=None,
     )
@@ -228,7 +231,7 @@ class ActivityDefinition(DomainResource):
         description="When activity is to occur",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="When activity is to occur",
         default=None,
     )
@@ -288,7 +291,7 @@ class ActivityDefinition(DomainResource):
         description="What observations must be produced by this action",
         default=None,
     )
-    transform: Optional[Canonical] = Field(
+    transform: Optional[fhir.canonical] = Field(
         description="Transform to apply the template",
         default=None,
     )
@@ -331,7 +334,7 @@ class ActivityDefinition(DomainResource):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, DateTime, Age, Period, Range, Duration],
+            field_types=[Timing, fhir.dateTime, Age, Period, Range, Duration],
             field_name_base="timing",
             required=False,
         )

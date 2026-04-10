@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -18,59 +18,63 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TestReportParticipant(BackboneElement):
     """
     A participant in the test execution, either the execution engine, a client, or a server.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="test-engine | client | server",
         default=None,
     )
-    uri: Optional[Uri] = Field(
+    uri: Optional[fhir.uri] = Field(
         description="The uri of the participant. An absolute URL is preferred",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="The display name of the participant",
         default=None,
     )
+
 
 class TestReportSetupActionOperation(BackboneElement):
     """
     The operation performed.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    detail: Optional[Uri] = Field(
+    detail: Optional[fhir.uri] = Field(
         description="A link to further details on the result",
         default=None,
     )
+
 
 class TestReportSetupActionAssert(BackboneElement):
     """
     The results of the assertion performed on the previous operations.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    detail: Optional[String] = Field(
+    detail: Optional[fhir.string] = Field(
         description="A link to further details on the result",
         default=None,
     )
+
 
 class TestReportSetupAction(BackboneElement):
     """
@@ -87,6 +91,7 @@ class TestReportSetupAction(BackboneElement):
         alias="assert",
     )
 
+
 class TestReportSetup(BackboneElement):
     """
     The results of the series of required setup operations before the tests were executed.
@@ -97,41 +102,44 @@ class TestReportSetup(BackboneElement):
         default=None,
     )
 
+
 class TestReportTestActionOperation(BackboneElement):
     """
     An operation would involve a REST request to a server.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    detail: Optional[Uri] = Field(
+    detail: Optional[fhir.uri] = Field(
         description="A link to further details on the result",
         default=None,
     )
+
 
 class TestReportTestActionAssert(BackboneElement):
     """
     The results of the assertion performed on the previous operations.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    detail: Optional[String] = Field(
+    detail: Optional[fhir.string] = Field(
         description="A link to further details on the result",
         default=None,
     )
+
 
 class TestReportTestAction(BackboneElement):
     """
@@ -148,16 +156,17 @@ class TestReportTestAction(BackboneElement):
         alias="assert",
     )
 
+
 class TestReportTest(BackboneElement):
     """
     A test executed from the test script.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Tracking/logging name of this test",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Tracking/reporting short description of the test",
         default=None,
     )
@@ -165,6 +174,7 @@ class TestReportTest(BackboneElement):
         description="A test operation or assert that was performed",
         default=None,
     )
+
 
 class TestReportTeardownAction(BackboneElement):
     """
@@ -176,6 +186,7 @@ class TestReportTeardownAction(BackboneElement):
         default=None,
     )
 
+
 class TestReportTeardown(BackboneElement):
     """
     The results of the series of operations required to clean up after all the tests were executed (successfully or otherwise).
@@ -185,6 +196,7 @@ class TestReportTeardown(BackboneElement):
         description="One or more teardown operations performed",
         default=None,
     )
+
 
 class TestReport(DomainResource):
     """
@@ -211,11 +223,11 @@ class TestReport(DomainResource):
         description="External identifier",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Informal name of the executed TestScript",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="completed | in-progress | waiting | stopped | entered-in-error",
         default=None,
     )
@@ -223,19 +235,19 @@ class TestReport(DomainResource):
         description="Reference to the  version-specific TestScript that was executed to produce this TestReport",
         default=None,
     )
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | fail | pending",
         default=None,
     )
-    score: Optional[Decimal] = Field(
+    score: Optional[fhir.decimal] = Field(
         description="The final score (percentage of tests passed) resulting from the execution of the TestScript",
         default=None,
     )
-    tester: Optional[String] = Field(
+    tester: Optional[fhir.string] = Field(
         description="Name of the tester producing this report (Organization or individual)",
         default=None,
     )
-    issued: Optional[DateTime] = Field(
+    issued: Optional[fhir.dateTime] = Field(
         description="When the TestScript was executed and this TestReport was generated",
         default=None,
     )

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,12 +22,13 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MessageHeaderDestination(BackboneElement):
     """
     The destination application which the message is intended for.
     """
 
-    endpointUrl: Optional[Url] = Field(
+    endpointUrl: Optional[fhir.url] = Field(
         description="Actual destination address or Endpoint resource",
         default=None,
     )
@@ -35,7 +36,7 @@ class MessageHeaderDestination(BackboneElement):
         description="Actual destination address or Endpoint resource",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
     )
@@ -59,17 +60,18 @@ class MessageHeaderDestination(BackboneElement):
     def endpoint_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Url, Reference],
+            field_types=[fhir.url, Reference],
             field_name_base="endpoint",
             required=False,
         )
+
 
 class MessageHeaderSource(BackboneElement):
     """
     The source application from which this message originated.
     """
 
-    endpointUrl: Optional[Url] = Field(
+    endpointUrl: Optional[fhir.url] = Field(
         description="Actual source address or Endpoint resource",
         default=None,
     )
@@ -77,15 +79,15 @@ class MessageHeaderSource(BackboneElement):
         description="Actual source address or Endpoint resource",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
     )
-    software: Optional[String] = Field(
+    software: Optional[fhir.string] = Field(
         description="Name of software running the system",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version of software running",
         default=None,
     )
@@ -105,10 +107,11 @@ class MessageHeaderSource(BackboneElement):
     def endpoint_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Url, Reference],
+            field_types=[fhir.url, Reference],
             field_name_base="endpoint",
             required=False,
         )
+
 
 class MessageHeaderResponse(BackboneElement):
     """
@@ -119,7 +122,7 @@ class MessageHeaderResponse(BackboneElement):
         description="Bundle.identifier of original message",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="ok | transient-error | fatal-error",
         default=None,
     )
@@ -127,6 +130,7 @@ class MessageHeaderResponse(BackboneElement):
         description="Specific list of hints/warnings/errors",
         default=None,
     )
+
 
 class MessageHeader(DomainResource):
     """
@@ -141,7 +145,7 @@ class MessageHeader(DomainResource):
         description="Event code or link to EventDefinition",
         default=None,
     )
-    eventCanonical: Optional[Canonical] = Field(
+    eventCanonical: Optional[fhir.canonical] = Field(
         description="Event code or link to EventDefinition",
         default=None,
     )
@@ -177,7 +181,7 @@ class MessageHeader(DomainResource):
         description="The actual content of the message",
         default=None,
     )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Link to the definition for this message",
         default=None,
     )
@@ -193,7 +197,7 @@ class MessageHeader(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, Canonical],
+            field_types=[Coding, fhir.canonical],
             field_name_base="event",
             required=True,
         )

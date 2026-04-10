@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,55 +23,59 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ImplementationGuideDependsOn(BackboneElement):
     """
     Another implementation guide that this implementation depends on. Typically, an implementation guide uses value sets, profiles etc.defined in other implementation guides.
     """
 
-    uri: Optional[Canonical] = Field(
+    uri: Optional[fhir.canonical] = Field(
         description="Identity of the IG that this depends on",
         default=None,
     )
-    packageId: Optional[Id] = Field(
+    packageId: Optional[fhir.id_] = Field(
         description="NPM Package name for IG this depends on",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version of the IG",
         default=None,
     )
-    reason: Optional[Markdown] = Field(
+    reason: Optional[fhir.markdown] = Field(
         description="Why dependency exists",
         default=None,
     )
+
 
 class ImplementationGuideGlobal(BackboneElement):
     """
     A set of profiles that all resources covered by this implementation guide must conform to.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="Type this profile applies to",
         default=None,
     )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Profile that all resources must conform to",
         default=None,
     )
+
 
 class ImplementationGuideDefinitionGrouping(BackboneElement):
     """
     A logical group of resources. Logical groups can be used when building pages.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Descriptive name for the package",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human readable text describing the package",
         default=None,
     )
+
 
 class ImplementationGuideDefinitionResource(BackboneElement):
     """
@@ -82,57 +86,58 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         description="Location of the resource",
         default=None,
     )
-    fhirVersion: Optional[ListType[Code]] = Field(
+    fhirVersion: Optional[ListType[fhir.code]] = Field(
         description="Versions this applies to (if different to IG)",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human readable name for the resource",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Reason why included in guide",
         default=None,
     )
-    isExample: Optional[Boolean] = Field(
+    isExample: Optional[fhir.boolean] = Field(
         description="Is this an example",
         default=None,
     )
-    profile: Optional[ListType[Canonical]] = Field(
+    profile: Optional[ListType[fhir.canonical]] = Field(
         description="Profile(s) this is an example of",
         default=None,
     )
-    groupingId: Optional[Id] = Field(
+    groupingId: Optional[fhir.id_] = Field(
         description="Grouping this is part of",
         default=None,
     )
+
 
 class ImplementationGuideDefinitionPage(BackboneElement):
     """
     A page / section in the implementation guide. The root page is the implementation guide home page.
     """
 
-    sourceUrl: Optional[Url] = Field(
+    sourceUrl: Optional[fhir.url] = Field(
         description="Source for page",
         default=None,
     )
-    sourceString: Optional[String] = Field(
+    sourceString: Optional[fhir.string] = Field(
         description="Source for page",
         default=None,
     )
-    sourceMarkdown: Optional[Markdown] = Field(
+    sourceMarkdown: Optional[fhir.markdown] = Field(
         description="Source for page",
         default=None,
     )
-    name: Optional[Url] = Field(
+    name: Optional[fhir.url] = Field(
         description="Name of the page when published",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Short title shown for navigational assistance",
         default=None,
     )
-    generation: Optional[Code] = Field(
+    generation: Optional[fhir.code] = Field(
         description="html | markdown | xml | generated",
         default=None,
     )
@@ -152,10 +157,11 @@ class ImplementationGuideDefinitionPage(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Url, String, Markdown],
+            field_types=[fhir.url, fhir.string, fhir.markdown],
             field_name_base="source",
             required=False,
         )
+
 
 class ImplementationGuideDefinitionParameter(BackboneElement):
     """
@@ -163,31 +169,33 @@ class ImplementationGuideDefinitionParameter(BackboneElement):
     """
 
     code: Optional[Coding] = Field(
-        description="Code that identifies parameter",
+        description="code that identifies parameter",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="Value for named type",
         default=None,
     )
+
 
 class ImplementationGuideDefinitionTemplate(BackboneElement):
     """
     A template for building resources.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Type of template specified",
         default=None,
     )
-    source: Optional[String] = Field(
+    source: Optional[fhir.string] = Field(
         description="The source location for the template",
         default=None,
     )
-    scope: Optional[String] = Field(
+    scope: Optional[fhir.string] = Field(
         description="The scope in which the template applies",
         default=None,
     )
+
 
 class ImplementationGuideDefinition(BackboneElement):
     """
@@ -215,6 +223,7 @@ class ImplementationGuideDefinition(BackboneElement):
         default=None,
     )
 
+
 class ImplementationGuideManifestResource(BackboneElement):
     """
     A resource that is part of the implementation guide. Conformance resources (value set, structure definition, capability statements etc.) are obvious candidates for inclusion, but any kind of resource can be included as an example resource.
@@ -224,43 +233,45 @@ class ImplementationGuideManifestResource(BackboneElement):
         description="Location of the resource",
         default=None,
     )
-    isExample: Optional[Boolean] = Field(
+    isExample: Optional[fhir.boolean] = Field(
         description="Is this an example",
         default=None,
     )
-    profile: Optional[ListType[Canonical]] = Field(
+    profile: Optional[ListType[fhir.canonical]] = Field(
         description="Profile(s) this is an example of",
         default=None,
     )
-    relativePath: Optional[Url] = Field(
+    relativePath: Optional[fhir.url] = Field(
         description="Relative path for page in IG",
         default=None,
     )
+
 
 class ImplementationGuideManifestPage(BackboneElement):
     """
     Information about a page within the IG.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="HTML page name",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Title of the page, for references",
         default=None,
     )
-    anchor: Optional[ListType[String]] = Field(
+    anchor: Optional[ListType[fhir.string]] = Field(
         description="Anchor available on the page",
         default=None,
     )
+
 
 class ImplementationGuideManifest(BackboneElement):
     """
     Information about an assembled implementation guide, created by the publication tooling.
     """
 
-    rendering: Optional[Url] = Field(
+    rendering: Optional[fhir.url] = Field(
         description="Location of rendered implementation guide",
         default=None,
     )
@@ -272,14 +283,15 @@ class ImplementationGuideManifest(BackboneElement):
         description="HTML page within the parent IG",
         default=None,
     )
-    image: Optional[ListType[String]] = Field(
+    image: Optional[ListType[fhir.string]] = Field(
         description="Image within the IG",
         default=None,
     )
-    other: Optional[ListType[String]] = Field(
+    other: Optional[ListType[fhir.string]] = Field(
         description="Additional linkable file in IG",
         default=None,
     )
+
 
 class ImplementationGuide(DomainResource):
     """
@@ -290,19 +302,19 @@ class ImplementationGuide(DomainResource):
     _type = "ImplementationGuide"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImplementationGuide"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this implementation guide, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this implementation guide, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the implementation guide (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the implementation guide",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -310,27 +322,27 @@ class ImplementationGuide(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this implementation guide (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this implementation guide (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -338,7 +350,7 @@ class ImplementationGuide(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the implementation guide",
         default=None,
     )
@@ -350,27 +362,27 @@ class ImplementationGuide(DomainResource):
         description="Intended jurisdiction for implementation guide (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this implementation guide is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    packageId: Optional[Id] = Field(
+    packageId: Optional[fhir.id_] = Field(
         description="NPM Package name for IG",
         default=None,
     )
-    license: Optional[Code] = Field(
+    license: Optional[fhir.code] = Field(
         description="SPDX license code for this IG (or not-open-source)",
         default=None,
     )
-    fhirVersion: Optional[ListType[Code]] = Field(
+    fhirVersion: Optional[ListType[fhir.code]] = Field(
         description="FHIR Version(s) this Implementation Guide targets",
         default=None,
     )
@@ -403,7 +415,7 @@ class ImplementationGuide(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

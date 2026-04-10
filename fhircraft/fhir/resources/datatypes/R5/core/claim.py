@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -26,6 +26,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ClaimRelated(BackboneElement):
     """
     Other claims which are related to this claim such as prior submissions or claims for related services or for the same event.
@@ -44,6 +45,7 @@ class ClaimRelated(BackboneElement):
         default=None,
     )
 
+
 class ClaimPayee(BackboneElement):
     """
     The party to be reimbursed for cost of the products and services according to the terms of the policy.
@@ -58,6 +60,7 @@ class ClaimPayee(BackboneElement):
         default=None,
     )
 
+
 class ClaimEvent(BackboneElement):
     """
     Information code for an event with a corresponding date or period.
@@ -67,7 +70,7 @@ class ClaimEvent(BackboneElement):
         description="Specific event",
         default=None,
     )
-    whenDateTime: Optional[DateTime] = Field(
+    whenDateTime: Optional[fhir.dateTime] = Field(
         description="Occurance date or period",
         default=None,
     )
@@ -87,17 +90,18 @@ class ClaimEvent(BackboneElement):
     def when_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="when",
             required=True,
         )
+
 
 class ClaimCareTeam(BackboneElement):
     """
     The members of the team who provided the products and services.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Order of care team",
         default=None,
     )
@@ -105,7 +109,7 @@ class ClaimCareTeam(BackboneElement):
         description="Practitioner or organization",
         default=None,
     )
-    responsible: Optional[Boolean] = Field(
+    responsible: Optional[fhir.boolean] = Field(
         description="Indicator of the lead practitioner",
         default=None,
     )
@@ -118,12 +122,13 @@ class ClaimCareTeam(BackboneElement):
         default=None,
     )
 
+
 class ClaimSupportingInfo(BackboneElement):
     """
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Information instance identifier",
         default=None,
     )
@@ -135,7 +140,7 @@ class ClaimSupportingInfo(BackboneElement):
         description="Type of information",
         default=None,
     )
-    timingDate: Optional[Date] = Field(
+    timingDate: Optional[fhir.date_] = Field(
         description="When it occurred",
         default=None,
     )
@@ -143,11 +148,11 @@ class ClaimSupportingInfo(BackboneElement):
         description="When it occurred",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Data to be provided",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Data to be provided",
         default=None,
     )
@@ -190,7 +195,7 @@ class ClaimSupportingInfo(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.date_, Period],
             field_name_base="timing",
             required=False,
         )
@@ -199,17 +204,25 @@ class ClaimSupportingInfo(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, String, Quantity, Attachment, Reference, Identifier],
+            field_types=[
+                fhir.Boolean,
+                fhir.String,
+                Quantity,
+                Attachment,
+                Reference,
+                Identifier,
+            ],
             field_name_base="value",
             required=False,
         )
+
 
 class ClaimDiagnosis(BackboneElement):
     """
     Information about diagnoses relevant to the claim items.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Diagnosis instance identifier",
         default=None,
     )
@@ -246,12 +259,13 @@ class ClaimDiagnosis(BackboneElement):
             required=True,
         )
 
+
 class ClaimProcedure(BackboneElement):
     """
     Procedures performed on the patient relevant to the billing items with the claim.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Procedure instance identifier",
         default=None,
     )
@@ -259,7 +273,7 @@ class ClaimProcedure(BackboneElement):
         description="Category of Procedure",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the procedure was performed",
         default=None,
     )
@@ -292,16 +306,17 @@ class ClaimProcedure(BackboneElement):
             required=True,
         )
 
+
 class ClaimInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Insurance instance identifier",
         default=None,
     )
-    focal: Optional[Boolean] = Field(
+    focal: Optional[fhir.boolean] = Field(
         description="Coverage to be used for adjudication",
         default=None,
     )
@@ -313,11 +328,11 @@ class ClaimInsurance(BackboneElement):
         description="Insurance information",
         default=None,
     )
-    businessArrangement: Optional[String] = Field(
+    businessArrangement: Optional[fhir.string] = Field(
         description="Additional provider contract number",
         default=None,
     )
-    preAuthRef: Optional[ListType[String]] = Field(
+    preAuthRef: Optional[ListType[fhir.string]] = Field(
         description="Prior authorization reference number",
         default=None,
     )
@@ -326,12 +341,13 @@ class ClaimInsurance(BackboneElement):
         default=None,
     )
 
+
 class ClaimAccident(BackboneElement):
     """
     Details of an accident which resulted in injuries which required the products and services listed in the claim.
     """
 
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="When the incident occurred",
         default=None,
     )
@@ -364,6 +380,7 @@ class ClaimAccident(BackboneElement):
             required=False,
         )
 
+
 class ClaimItemBodySite(BackboneElement):
     """
     Physical location where the service is performed or applies.
@@ -378,12 +395,13 @@ class ClaimItemBodySite(BackboneElement):
         default=None,
     )
 
+
 class ClaimItemDetailSubDetail(BackboneElement):
     """
     A claim detail line. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Item instance identifier",
         default=None,
     )
@@ -427,7 +445,7 @@ class ClaimItemDetailSubDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
     )
@@ -444,12 +462,13 @@ class ClaimItemDetailSubDetail(BackboneElement):
         default=None,
     )
 
+
 class ClaimItemDetail(BackboneElement):
     """
     A claim detail line. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Item instance identifier",
         default=None,
     )
@@ -493,7 +512,7 @@ class ClaimItemDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
     )
@@ -514,12 +533,13 @@ class ClaimItemDetail(BackboneElement):
         default=None,
     )
 
+
 class ClaimItem(BackboneElement):
     """
     A claim line. Either a simple  product or service or a 'group' of details which can each be a simple items or groups of sub-details.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Item instance identifier",
         default=None,
     )
@@ -527,19 +547,19 @@ class ClaimItem(BackboneElement):
         description="Number for tracking",
         default=None,
     )
-    careTeamSequence: Optional[ListType[PositiveInt]] = Field(
+    careTeamSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable careTeam members",
         default=None,
     )
-    diagnosisSequence: Optional[ListType[PositiveInt]] = Field(
+    diagnosisSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable diagnoses",
         default=None,
     )
-    procedureSequence: Optional[ListType[PositiveInt]] = Field(
+    procedureSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable procedures",
         default=None,
     )
-    informationSequence: Optional[ListType[PositiveInt]] = Field(
+    informationSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable exception and supporting information",
         default=None,
     )
@@ -571,7 +591,7 @@ class ClaimItem(BackboneElement):
         description="Program the product or service is provided under",
         default=None,
     )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Date or dates of service or product delivery",
         default=None,
     )
@@ -603,7 +623,7 @@ class ClaimItem(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
     )
@@ -650,7 +670,7 @@ class ClaimItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.date_, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -663,6 +683,7 @@ class ClaimItem(BackboneElement):
             field_name_base="location",
             required=False,
         )
+
 
 class Claim(DomainResource):
     """
@@ -681,7 +702,7 @@ class Claim(DomainResource):
         description="Number for tracking",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
@@ -693,7 +714,7 @@ class Claim(DomainResource):
         description="More granular claim type",
         default=None,
     )
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="claim | preauthorization | predetermination",
         default=None,
     )
@@ -705,7 +726,7 @@ class Claim(DomainResource):
         description="Relevant time frame for the claim",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Resource creation date",
         default=None,
     )

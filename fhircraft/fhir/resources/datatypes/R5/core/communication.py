@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -70,11 +70,11 @@ class Communication(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -90,7 +90,7 @@ class Communication(DomainResource):
         description="Reply to",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
@@ -102,7 +102,7 @@ class Communication(DomainResource):
         description="Message category",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
@@ -126,11 +126,11 @@ class Communication(DomainResource):
         description="The Encounter during which this Communication was created",
         default=None,
     )
-    sent: Optional[DateTime] = Field(
+    sent: Optional[fhir.dateTime] = Field(
         description="When sent",
         default=None,
     )
-    received: Optional[DateTime] = Field(
+    received: Optional[fhir.dateTime] = Field(
         description="When received",
         default=None,
     )

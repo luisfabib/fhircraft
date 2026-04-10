@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -32,7 +32,7 @@ class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
         description="Todo",
         default=None,
     )
-    isDefining: Optional[Boolean] = Field(
+    isDefining: Optional[fhir.boolean] = Field(
         description="Todo",
         default=None,
     )
@@ -80,7 +80,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
         description="Todo",
         default=None,
     )
-    representation: Optional[String] = Field(
+    representation: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
     )
@@ -98,7 +98,7 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         description="Todo",
         default=None,
     )
-    repeatUnit: Optional[String] = Field(
+    repeatUnit: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
     )
@@ -124,11 +124,11 @@ class SubstancePolymerRepeat(BackboneElement):
     Todo.
     """
 
-    numberOfUnits: Optional[Integer] = Field(
+    numberOfUnits: Optional[fhir.integer] = Field(
         description="Todo",
         default=None,
     )
-    averageMolecularFormula: Optional[String] = Field(
+    averageMolecularFormula: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
     )
@@ -175,7 +175,7 @@ class SubstancePolymer(DomainResource):
         description="Todo",
         default=None,
     )
-    modification: Optional[ListType[String]] = Field(
+    modification: Optional[ListType[fhir.string]] = Field(
         description="Todo",
         default=None,
     )

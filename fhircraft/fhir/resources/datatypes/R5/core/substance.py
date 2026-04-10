@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class SubstanceIngredient(BackboneElement):
     """
@@ -57,6 +58,7 @@ class SubstanceIngredient(BackboneElement):
             required=True,
         )
 
+
 class Substance(DomainResource):
     """
     A homogeneous material with a definite composition.
@@ -70,11 +72,11 @@ class Substance(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    instance: Optional[Boolean] = Field(
+    instance: Optional[fhir.boolean] = Field(
         description="Is this an instance of a substance or a kind of one",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
     )
@@ -86,11 +88,11 @@ class Substance(DomainResource):
         description="What substance this is",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description of the substance, comments",
         default=None,
     )
-    expiry: Optional[DateTime] = Field(
+    expiry: Optional[fhir.dateTime] = Field(
         description="When no longer valid to use",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -20,24 +20,25 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class NamingSystemUniqueId(BackboneElement):
     """
     Indicates how the system may be identified when referenced in electronic exchange.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="oid | uuid | uri | other",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The unique identifier",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Is this the id that should be used for this type",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Notes about identifier usage",
         default=None,
     )
@@ -45,6 +46,7 @@ class NamingSystemUniqueId(BackboneElement):
         description="When is identifier valid?",
         default=None,
     )
+
 
 class NamingSystem(DomainResource):
     """
@@ -67,23 +69,23 @@ class NamingSystem(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this naming system (computer friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="codesystem | identifier | root",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -91,7 +93,7 @@ class NamingSystem(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    responsible: Optional[String] = Field(
+    responsible: Optional[fhir.string] = Field(
         description="Who maintains system namespace?",
         default=None,
     )
@@ -99,7 +101,7 @@ class NamingSystem(DomainResource):
         description="e.g. driver,  provider,  patient, bank etc.",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the naming system",
         default=None,
     )
@@ -111,7 +113,7 @@ class NamingSystem(DomainResource):
         description="Intended jurisdiction for naming system (if applicable)",
         default=None,
     )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="How/where is it used",
         default=None,
     )

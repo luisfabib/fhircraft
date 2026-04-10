@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -21,41 +21,44 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MessageDefinitionFocus(BackboneElement):
     """
     Identifies the resource (or resources) that are being addressed by the event.  For example, the Encounter for an admit message or two Account records for a merge.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Type of resource",
         default=None,
     )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Profile that must be adhered to by focus",
         default=None,
     )
-    min: Optional[UnsignedInt] = Field(
+    min: Optional[fhir.unsignedInt] = Field(
         description="Minimum number of focuses of this type",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum number of focuses of this type",
         default=None,
     )
+
 
 class MessageDefinitionAllowedResponse(BackboneElement):
     """
     Indicates what types of messages may be sent as an application-level response to this message.
     """
 
-    message: Optional[Canonical] = Field(
+    message: Optional[fhir.canonical] = Field(
         description="Reference to allowed message definition response",
         default=None,
     )
-    situation: Optional[Markdown] = Field(
+    situation: Optional[fhir.markdown] = Field(
         description="When should this response be used",
         default=None,
     )
+
 
 class MessageDefinition(DomainResource):
     """
@@ -78,7 +81,7 @@ class MessageDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Business Identifier for a given MessageDefinition",
         default=None,
     )
@@ -86,35 +89,35 @@ class MessageDefinition(DomainResource):
         description="Primary key for the message definition on a given server",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the message definition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this message definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this message definition (human friendly)",
         default=None,
     )
-    replaces: Optional[ListType[Canonical]] = Field(
+    replaces: Optional[ListType[fhir.canonical]] = Field(
         description="Takes the place of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -122,7 +125,7 @@ class MessageDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the message definition",
         default=None,
     )
@@ -134,19 +137,19 @@ class MessageDefinition(DomainResource):
         description="Intended jurisdiction for message definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this message definition is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    base: Optional[Canonical] = Field(
+    base: Optional[fhir.canonical] = Field(
         description="Definition this one is based on",
         default=None,
     )
-    parent: Optional[ListType[Canonical]] = Field(
+    parent: Optional[ListType[fhir.canonical]] = Field(
         description="Protocol/workflow this is part of",
         default=None,
     )
@@ -154,11 +157,11 @@ class MessageDefinition(DomainResource):
         description="Event code  or link to the EventDefinition",
         default=None,
     )
-    eventUri: Optional[Uri] = Field(
+    eventUri: Optional[fhir.uri] = Field(
         description="Event code  or link to the EventDefinition",
         default=None,
     )
-    category: Optional[Code] = Field(
+    category: Optional[fhir.code] = Field(
         description="consequence | currency | notification",
         default=None,
     )
@@ -166,7 +169,7 @@ class MessageDefinition(DomainResource):
         description="Resource(s) that are the subject of the event",
         default=None,
     )
-    responseRequired: Optional[Code] = Field(
+    responseRequired: Optional[fhir.code] = Field(
         description="always | on-error | never | on-success",
         default=None,
     )
@@ -174,8 +177,8 @@ class MessageDefinition(DomainResource):
         description="Responses to this message",
         default=None,
     )
-    graph: Optional[ListType[Canonical]] = Field(
-        description="Canonical reference to a GraphDefinition",
+    graph: Optional[ListType[fhir.canonical]] = Field(
+        description="canonical reference to a GraphDefinition",
         default=None,
     )
 
@@ -190,7 +193,7 @@ class MessageDefinition(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, Uri],
+            field_types=[Coding, fhir.uri],
             field_name_base="event",
             required=True,
         )

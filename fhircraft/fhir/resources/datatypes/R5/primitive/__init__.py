@@ -1,66 +1,66 @@
-from .string import String, FHIRString
-from .id import Id, FHIRId
-from .boolean import Boolean, FHIRBoolean
-from .canonical import Canonical, FHIRCanonical
-from .code import Code, FHIRCode
-from .date import Date, FHIRDate
-from .date_time import DateTime, FHIRDateTime
-from .decimal import Decimal, FHIRDecimal
-from .instant import Instant, FHIRInstant
-from .integer import Integer, FHIRInteger
-from .integer64 import Integer64, FHIRInteger64
-from .markdown import Markdown, FHIRMarkdown
-from .oid import Oid, FHIROid
-from .positive_int import PositiveInt, FHIRPositiveInt
-from .time import Time, FHIRTime
-from .unsigned_int import UnsignedInt, FHIRUnsignedInt
-from .uri import Uri, FHIRUri
-from .url import Url, FHIRUrl
-from .uuid import Uuid, FHIRUuid
-from .base64_binary import Base64Binary, FHIRBase64Binary
-from .xhtml import Xhtml, FHIRXhtml
+from .string import String, string
+from .id import Id, id_
+from .boolean import Boolean, boolean
+from .canonical import Canonical, canonical
+from .code import Code, code
+from .date import Date, date_
+from .date_time import DateTime, dateTime
+from .decimal import Decimal, decimal
+from .instant import Instant, instant
+from .integer import Integer, integer
+from .integer64 import Integer64, integer64
+from .markdown import Markdown, markdown
+from .oid import Oid, oid
+from .positive_int import PositiveInt, positiveInt
+from .time import Time, time_
+from .unsigned_int import UnsignedInt, unsignedInt
+from .uri import Uri, uri
+from .url import Url, url
+from .uuid import Uuid, uuid
+from .base64_binary import Base64Binary, base64Binary
+from .xhtml import Xhtml, xhtml
 
 __all__ = [
     "String",
-    "FHIRString",
+    "string",
     "Id",
-    "FHIRId",
+    "id_",
     "Boolean",
-    "FHIRBoolean",
+    "boolean",
     "Canonical",
-    "FHIRCanonical",
+    "canonical",
     "Code",
-    "FHIRCode",
+    "code",
     "Date",
-    "FHIRDate",
+    "date_",
     "DateTime",
-    "FHIRDateTime",
+    "dateTime",
     "Decimal",
-    "FHIRDecimal",
+    "decimal",
     "Instant",
-    "FHIRInstant",
+    "instant",
     "Integer",
-    "FHIRInteger",
+    "integer",
     "Integer64",
-    "FHIRInteger64",
+    "integer64",
     "Markdown",
-    "FHIRMarkdown",
+    "markdown",
     "Oid",
-    "FHIROid",
+    "oid",
     "PositiveInt",
-    "FHIRPositiveInt",
+    "positiveInt",
     "Time",
-    "FHIRTime",
+    "time_",
     "UnsignedInt",
-    "FHIRUnsignedInt",
+    "unsignedInt",
     "Uri",
-    "FHIRUri",
+    "uri",
     "Url",
-    "FHIRUrl",
+    "url",
     "Uuid",
-    "FHIRUuid",
+    "uuid",
     "Base64Binary",
-    "FHIRBase64Binary",
+    "base64Binary",
     "Xhtml",
-    "FHIRXhtml",
+    "xhtml",
 ]

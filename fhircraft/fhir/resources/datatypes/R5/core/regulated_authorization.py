@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -43,7 +43,7 @@ class RegulatedAuthorizationCase(BackboneElement):
         description="Relevant date for this case",
         default=None,
     )
-    dateDateTime: Optional[DateTime] = Field(
+    dateDateTime: Optional[fhir.dateTime] = Field(
         description="Relevant date for this case",
         default=None,
     )
@@ -63,7 +63,7 @@ class RegulatedAuthorizationCase(BackboneElement):
     def date_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, DateTime],
+            field_types=[Period, fhir.dateTime],
             field_name_base="date",
             required=False,
         )
@@ -89,7 +89,7 @@ class RegulatedAuthorization(DomainResource):
         description="Overall type of this authorization, for example drug marketing approval, orphan drug designation",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="General textual supporting information",
         default=None,
     )
@@ -101,7 +101,7 @@ class RegulatedAuthorization(DomainResource):
         description="The status that is authorised e.g. approved. Intermediate states can be tracked with cases and applications",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="The date at which the current status was assigned",
         default=None,
     )

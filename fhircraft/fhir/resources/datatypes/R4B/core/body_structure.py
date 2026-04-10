@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -44,7 +44,7 @@ class BodyStructure(DomainResource):
         description="Bodystructure identifier",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this record is in active use",
         default=None,
     )
@@ -60,7 +60,7 @@ class BodyStructure(DomainResource):
         description="Body site modifier",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Text description",
         default=None,
     )

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class InsurancePlanCoverageBenefitLimit(BackboneElement):
     """
     The specific limits on the benefit.
@@ -38,6 +39,7 @@ class InsurancePlanCoverageBenefitLimit(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanCoverageBenefit(BackboneElement):
     """
     Specific benefits under this type of coverage.
@@ -47,7 +49,7 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         description="Type of benefit",
         default=None,
     )
-    requirement: Optional[String] = Field(
+    requirement: Optional[fhir.string] = Field(
         description="Referral requirements",
         default=None,
     )
@@ -55,6 +57,7 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         description="Benefit limits",
         default=None,
     )
+
 
 class InsurancePlanCoverage(BackboneElement):
     """
@@ -74,6 +77,7 @@ class InsurancePlanCoverage(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanPlanGeneralCost(BackboneElement):
     """
     Overall costs associated with the plan.
@@ -83,7 +87,7 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         description="Type of cost",
         default=None,
     )
-    groupSize: Optional[PositiveInt] = Field(
+    groupSize: Optional[fhir.positiveInt] = Field(
         description="Number of enrollees",
         default=None,
     )
@@ -91,10 +95,11 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         description="Cost value",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Additional cost information",
         default=None,
     )
+
 
 class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
     """
@@ -118,6 +123,7 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
     """
     List of the specific benefits under this category of benefit.
@@ -132,6 +138,7 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanPlanSpecificCost(BackboneElement):
     """
     Costs associated with the coverage provided by the product.
@@ -145,6 +152,7 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
         description="Benefits list",
         default=None,
     )
+
 
 class InsurancePlanPlan(BackboneElement):
     """
@@ -176,6 +184,7 @@ class InsurancePlanPlan(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlan(DomainResource):
     """
     Details of a Health Insurance product/plan provided by an organization.
@@ -189,7 +198,7 @@ class InsurancePlan(DomainResource):
         description="Business Identifier for Product",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
@@ -197,11 +206,11 @@ class InsurancePlan(DomainResource):
         description="Kind of product",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Official name",
         default=None,
     )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="Alternate names",
         default=None,
     )

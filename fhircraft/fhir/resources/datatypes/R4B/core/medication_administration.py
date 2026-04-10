@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -42,7 +42,7 @@ class MedicationAdministrationDosage(BackboneElement):
     Describes the medication dosage information details e.g. dose, rate, site, route, etc.
     """
 
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
     )
@@ -112,7 +112,7 @@ class MedicationAdministration(DomainResource):
         description="External identifier",
         default=None,
     )
-    instantiates: Optional[ListType[Uri]] = Field(
+    instantiates: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates protocol or definition",
         default=None,
     )
@@ -120,7 +120,7 @@ class MedicationAdministration(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown",
         default=None,
     )
@@ -152,7 +152,7 @@ class MedicationAdministration(DomainResource):
         description="Additional information to support administration",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="Start and end time of administration",
         default=None,
     )
@@ -231,7 +231,7 @@ class MedicationAdministration(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="effective",
             required=True,
         )

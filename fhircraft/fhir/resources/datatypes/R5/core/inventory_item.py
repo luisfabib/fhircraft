@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class InventoryItemName(BackboneElement):
     """
     The item name(s) - the brand name, or common name, functional name, generic name.
@@ -36,15 +37,16 @@ class InventoryItemName(BackboneElement):
         description="The type of name e.g. \u0027brand-name\u0027, \u0027functional-name\u0027, \u0027common-name\u0027",
         default=None,
     )
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="The language used to express the item name",
         default=None,
     )
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The name or designation of the item",
         default=None,
     )
+
 
 class InventoryItemResponsibleOrganization(BackboneElement):
     """
@@ -60,20 +62,22 @@ class InventoryItemResponsibleOrganization(BackboneElement):
         default=None,
     )
 
+
 class InventoryItemDescription(BackboneElement):
     """
     The descriptive characteristics of the inventory item.
     """
 
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="The language that is used in the item description",
         default=None,
     )
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the item",
         default=None,
     )
+
 
 class InventoryItemAssociation(BackboneElement):
     """
@@ -93,6 +97,7 @@ class InventoryItemAssociation(BackboneElement):
         default=None,
     )
 
+
 class InventoryItemCharacteristic(BackboneElement):
     """
     The descriptive or identifying characteristics of the item.
@@ -102,27 +107,27 @@ class InventoryItemCharacteristic(BackboneElement):
         description="The characteristic that is being defined",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The value of the attribute",
         default=None,
     )
@@ -167,12 +172,12 @@ class InventoryItemCharacteristic(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                String,
-                Integer,
-                Decimal,
-                Boolean,
-                Url,
-                DateTime,
+                fhir.String,
+                fhir.Integer,
+                fhir.Decimal,
+                fhir.Boolean,
+                fhir.Url,
+                fhir.DateTime,
                 Quantity,
                 Range,
                 Ratio,
@@ -185,6 +190,7 @@ class InventoryItemCharacteristic(BackboneElement):
             required=True,
         )
 
+
 class InventoryItemInstance(BackboneElement):
     """
     Instances or occurrences of the product.
@@ -194,11 +200,11 @@ class InventoryItemInstance(BackboneElement):
         description="The identifier for the physical instance, typically a serial number",
         default=None,
     )
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="The lot or batch number of the item",
         default=None,
     )
-    expiry: Optional[DateTime] = Field(
+    expiry: Optional[fhir.dateTime] = Field(
         description="The expiry date or date and time for the product",
         default=None,
     )
@@ -210,6 +216,7 @@ class InventoryItemInstance(BackboneElement):
         description="The location that the item is associated with",
         default=None,
     )
+
 
 class InventoryItem(DomainResource):
     """
@@ -224,7 +231,7 @@ class InventoryItem(DomainResource):
         description="Business identifier for the inventory item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error | unknown",
         default=None,
     )
@@ -233,7 +240,7 @@ class InventoryItem(DomainResource):
         default=None,
     )
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code designating the specific type of item",
+        description="code designating the specific type of item",
         default=None,
     )
     name: Optional[ListType[InventoryItemName]] = Field(

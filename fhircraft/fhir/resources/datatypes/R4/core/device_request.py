@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class DeviceRequestParameter(BackboneElement):
     """
@@ -45,7 +46,7 @@ class DeviceRequestParameter(BackboneElement):
         description="Value of detail",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of detail",
         default=None,
     )
@@ -61,10 +62,11 @@ class DeviceRequestParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Range, Boolean],
+            field_types=[CodeableConcept, Quantity, Range, fhir.boolean],
             field_name_base="value",
             required=False,
         )
+
 
 class DeviceRequest(DomainResource):
     """
@@ -91,11 +93,11 @@ class DeviceRequest(DomainResource):
         description="External Request identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -111,15 +113,15 @@ class DeviceRequest(DomainResource):
         description="Identifier of composite request",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
@@ -143,7 +145,7 @@ class DeviceRequest(DomainResource):
         description="Encounter motivating request",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="Desired time or schedule for use",
         default=None,
     )
@@ -155,7 +157,7 @@ class DeviceRequest(DomainResource):
         description="Desired time or schedule for use",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When recorded",
         default=None,
     )
@@ -223,7 +225,7 @@ class DeviceRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

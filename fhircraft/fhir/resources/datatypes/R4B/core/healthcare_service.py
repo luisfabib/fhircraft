@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class HealthcareServiceEligibility(BackboneElement):
     """
     Does this service have specific eligibility requirements that need to be met in order to use the service?
@@ -31,39 +32,41 @@ class HealthcareServiceEligibility(BackboneElement):
         description="Coded value for the eligibility",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Describes the eligibility conditions for the service",
         default=None,
     )
+
 
 class HealthcareServiceAvailableTime(BackboneElement):
     """
     A collection of times that the Service Site is available.
     """
 
-    daysOfWeek: Optional[ListType[Code]] = Field(
+    daysOfWeek: Optional[ListType[fhir.code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
-    allDay: Optional[Boolean] = Field(
+    allDay: Optional[fhir.boolean] = Field(
         description="Always available? e.g. 24 hour service",
         default=None,
     )
-    availableStartTime: Optional[Time] = Field(
+    availableStartTime: Optional[fhir.time_] = Field(
         description="Opening time of day (ignored if allDay = true)",
         default=None,
     )
-    availableEndTime: Optional[Time] = Field(
+    availableEndTime: Optional[fhir.time_] = Field(
         description="Closing time of day (ignored if allDay = true)",
         default=None,
     )
+
 
 class HealthcareServiceNotAvailable(BackboneElement):
     """
     The HealthcareService is not available during this period of time due to the provided reason.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Reason presented to the user explaining why time not available",
         default=None,
     )
@@ -71,6 +74,7 @@ class HealthcareServiceNotAvailable(BackboneElement):
         description="Service not available from this date",
         default=None,
     )
+
 
 class HealthcareService(DomainResource):
     """
@@ -97,7 +101,7 @@ class HealthcareService(DomainResource):
         description="External identifiers for this item",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this HealthcareService record is in active use",
         default=None,
     )
@@ -121,15 +125,15 @@ class HealthcareService(DomainResource):
         description="Location(s) where service may be provided",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Description of service as presented to a consumer while searching",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Additional description and/or any specific issues not covered elsewhere",
         default=None,
     )
-    extraDetails: Optional[Markdown] = Field(
+    extraDetails: Optional[fhir.markdown] = Field(
         description="Extra details about the service that can\u0027t be placed in the other fields",
         default=None,
     )
@@ -169,7 +173,7 @@ class HealthcareService(DomainResource):
         description="Ways that the service accepts referrals",
         default=None,
     )
-    appointmentRequired: Optional[Boolean] = Field(
+    appointmentRequired: Optional[fhir.boolean] = Field(
         description="If an appointment is required for access to this service",
         default=None,
     )
@@ -181,7 +185,7 @@ class HealthcareService(DomainResource):
         description="Not available during this time due to provided reason",
         default=None,
     )
-    availabilityExceptions: Optional[String] = Field(
+    availabilityExceptions: Optional[fhir.string] = Field(
         description="Description of availability exceptions",
         default=None,
     )

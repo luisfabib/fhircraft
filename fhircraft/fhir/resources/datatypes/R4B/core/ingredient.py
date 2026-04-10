@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,12 +22,13 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class IngredientManufacturer(BackboneElement):
     """
     The organization(s) that manufacture this ingredient. Can be used to indicate:         1) Organizations we are aware of that manufacture this ingredient         2) Specific Manufacturer(s) currently being used         3) Set of organisations allowed to manufacture this ingredient for this product         Users must be clear on the application of context relevant to their use case.
     """
 
-    role: Optional[Code] = Field(
+    role: Optional[fhir.code] = Field(
         description="allowed | possible | actual",
         default=None,
     )
@@ -35,6 +36,7 @@ class IngredientManufacturer(BackboneElement):
         description="An organization that manufactures this ingredient",
         default=None,
     )
+
 
 class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
     """
@@ -53,7 +55,7 @@ class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
         description="Strength expressed in terms of a reference substance",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="When strength is measured at a particular point or distance",
         default=None,
     )
@@ -78,6 +80,7 @@ class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
             required=True,
         )
 
+
 class IngredientSubstanceStrength(BackboneElement):
     """
     The quantity of substance in the unit of presentation, or in the volume (or mass) of the single pharmaceutical product or manufactured item. The allowed repetitions do not represent different strengths, but are different representations - mathematically equivalent - of a single strength.
@@ -91,7 +94,7 @@ class IngredientSubstanceStrength(BackboneElement):
         description="The quantity of substance in the unit of presentation",
         default=None,
     )
-    textPresentation: Optional[String] = Field(
+    textPresentation: Optional[fhir.string] = Field(
         description="Text of either the whole presentation strength or a part of it (rest being in Strength.presentation as a ratio)",
         default=None,
     )
@@ -103,11 +106,11 @@ class IngredientSubstanceStrength(BackboneElement):
         description="The strength per unitary volume (or mass)",
         default=None,
     )
-    textConcentration: Optional[String] = Field(
+    textConcentration: Optional[fhir.string] = Field(
         description="Text of either the whole concentration strength or a part of it (rest being in Strength.concentration as a ratio)",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="When strength is measured at a particular point or distance",
         default=None,
     )
@@ -154,6 +157,7 @@ class IngredientSubstanceStrength(BackboneElement):
             required=False,
         )
 
+
 class IngredientSubstance(BackboneElement):
     """
     The substance that comprises this ingredient.
@@ -167,6 +171,7 @@ class IngredientSubstance(BackboneElement):
         description="The quantity of substance, per presentation, or per volume or mass, and type of quantity",
         default=None,
     )
+
 
 class Ingredient(DomainResource):
     """
@@ -193,7 +198,7 @@ class Ingredient(DomainResource):
         description="An identifier or code by which the ingredient can be referenced",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
@@ -210,7 +215,7 @@ class Ingredient(DomainResource):
         description="Precise action within the drug product, e.g. antioxidant, alkalizing agent",
         default=None,
     )
-    allergenicIndicator: Optional[Boolean] = Field(
+    allergenicIndicator: Optional[fhir.boolean] = Field(
         description="If the ingredient is a known or suspected allergen",
         default=None,
     )

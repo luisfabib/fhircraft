@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -29,11 +29,11 @@ class BodyStructureIncludedStructure(BackboneElement):
     """
 
     structure: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure",
+        description="code that represents the included structure",
         default=None,
     )
     laterality: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure laterality",
+        description="code that represents the included structure laterality",
         default=None,
     )
     bodyLandmarkOrientation: Optional[
@@ -47,7 +47,7 @@ class BodyStructureIncludedStructure(BackboneElement):
         default=None,
     )
     qualifier: Optional[ListType[CodeableConcept]] = Field(
-        description="Code that represents the included structure qualifier",
+        description="code that represents the included structure qualifier",
         default=None,
     )
 
@@ -99,11 +99,11 @@ class BodyStructureExcludedStructure(BackboneElement):
     """
 
     structure: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure",
+        description="code that represents the included structure",
         default=None,
     )
     laterality: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure laterality",
+        description="code that represents the included structure laterality",
         default=None,
     )
     bodyLandmarkOrientation: Optional[
@@ -117,7 +117,7 @@ class BodyStructureExcludedStructure(BackboneElement):
         default=None,
     )
     qualifier: Optional[ListType[CodeableConcept]] = Field(
-        description="Code that represents the included structure qualifier",
+        description="code that represents the included structure qualifier",
         default=None,
     )
 
@@ -134,7 +134,7 @@ class BodyStructure(DomainResource):
         description="Bodystructure identifier",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this record is in active use",
         default=None,
     )
@@ -150,7 +150,7 @@ class BodyStructure(DomainResource):
         description="Excluded anatomic locations(s)",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Text description",
         default=None,
     )

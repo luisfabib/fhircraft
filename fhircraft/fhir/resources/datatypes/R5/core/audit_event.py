@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AuditEventOutcome(BackboneElement):
     """
     Indicates whether the event succeeded or failed. A free text descripiton can be given in outcome.text.
@@ -37,6 +38,7 @@ class AuditEventOutcome(BackboneElement):
         description="Additional outcome detail",
         default=None,
     )
+
 
 class AuditEventAgent(BackboneElement):
     """
@@ -55,7 +57,7 @@ class AuditEventAgent(BackboneElement):
         description="Identifier of who",
         default=None,
     )
-    requestor: Optional[Boolean] = Field(
+    requestor: Optional[fhir.boolean] = Field(
         description="Whether user is initiator",
         default=None,
     )
@@ -63,7 +65,7 @@ class AuditEventAgent(BackboneElement):
         description="The agent location when the event occurred",
         default=None,
     )
-    policy: Optional[ListType[Uri]] = Field(
+    policy: Optional[ListType[fhir.uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
     )
@@ -71,11 +73,11 @@ class AuditEventAgent(BackboneElement):
         description="This agent network location for the activity",
         default=None,
     )
-    networkUri: Optional[Uri] = Field(
+    networkUri: Optional[fhir.uri] = Field(
         description="This agent network location for the activity",
         default=None,
     )
-    networkString: Optional[String] = Field(
+    networkString: Optional[fhir.string] = Field(
         description="This agent network location for the activity",
         default=None,
     )
@@ -95,10 +97,11 @@ class AuditEventAgent(BackboneElement):
     def network_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Uri, String],
+            field_types=[Reference, fhir.uri, fhir.string],
             field_name_base="network",
             required=False,
         )
+
 
 class AuditEventSource(BackboneElement):
     """
@@ -118,6 +121,7 @@ class AuditEventSource(BackboneElement):
         default=None,
     )
 
+
 class AuditEventEntityDetail(BackboneElement):
     """
     Tagged value pairs for conveying additional information about the entity.
@@ -135,15 +139,15 @@ class AuditEventEntityDetail(BackboneElement):
         description="Property value",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Property value",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Property value",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Property value",
         default=None,
     )
@@ -155,11 +159,11 @@ class AuditEventEntityDetail(BackboneElement):
         description="Property value",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Property value",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Property value",
         default=None,
     )
@@ -167,7 +171,7 @@ class AuditEventEntityDetail(BackboneElement):
         description="Property value",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Property value",
         default=None,
     )
@@ -186,19 +190,20 @@ class AuditEventEntityDetail(BackboneElement):
             field_types=[
                 Quantity,
                 CodeableConcept,
-                String,
-                Boolean,
-                Integer,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
                 Range,
                 Ratio,
-                Time,
-                DateTime,
+                fhir.Time,
+                fhir.DateTime,
                 Period,
-                Base64Binary,
+                fhir.Base64Binary,
             ],
             field_name_base="value",
             required=True,
         )
+
 
 class AuditEventEntityAgent(BackboneElement):
     """
@@ -217,7 +222,7 @@ class AuditEventEntityAgent(BackboneElement):
         description="Identifier of who",
         default=None,
     )
-    requestor: Optional[Boolean] = Field(
+    requestor: Optional[fhir.boolean] = Field(
         description="Whether user is initiator",
         default=None,
     )
@@ -225,7 +230,7 @@ class AuditEventEntityAgent(BackboneElement):
         description="The agent location when the event occurred",
         default=None,
     )
-    policy: Optional[ListType[Uri]] = Field(
+    policy: Optional[ListType[fhir.uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
     )
@@ -233,11 +238,11 @@ class AuditEventEntityAgent(BackboneElement):
         description="This agent network location for the activity",
         default=None,
     )
-    networkUri: Optional[Uri] = Field(
+    networkUri: Optional[fhir.uri] = Field(
         description="This agent network location for the activity",
         default=None,
     )
-    networkString: Optional[String] = Field(
+    networkString: Optional[fhir.string] = Field(
         description="This agent network location for the activity",
         default=None,
     )
@@ -257,10 +262,11 @@ class AuditEventEntityAgent(BackboneElement):
     def network_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Uri, String],
+            field_types=[Reference, fhir.uri, fhir.string],
             field_name_base="network",
             required=False,
         )
+
 
 class AuditEventEntity(BackboneElement):
     """
@@ -279,7 +285,7 @@ class AuditEventEntity(BackboneElement):
         description="Security labels on the entity",
         default=None,
     )
-    query: Optional[Base64Binary] = Field(
+    query: Optional[fhir.base64Binary] = Field(
         description="Query parameters",
         default=None,
     )
@@ -291,6 +297,7 @@ class AuditEventEntity(BackboneElement):
         description="Entity is attributed to this agent",
         default=None,
     )
+
 
 class AuditEvent(DomainResource):
     """
@@ -309,11 +316,11 @@ class AuditEvent(DomainResource):
         description="Specific type of event",
         default=None,
     )
-    action: Optional[Code] = Field(
+    action: Optional[fhir.code] = Field(
         description="Type of action performed during the event",
         default=None,
     )
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="emergency | alert | critical | error | warning | notice | informational | debug",
         default=None,
     )
@@ -321,12 +328,12 @@ class AuditEvent(DomainResource):
         description="When the activity occurred",
         default=None,
     )
-    occurredDateTime: Optional[DateTime] = Field(
+    occurredDateTime: Optional[fhir.dateTime] = Field(
         description="When the activity occurred",
         default=None,
     )
-    recorded: Optional[Instant] = Field(
-        description="Time when the event was recorded",
+    recorded: Optional[fhir.instant] = Field(
+        description="time when the event was recorded",
         default=None,
     )
     outcome: Optional[AuditEventOutcome] = Field(
@@ -373,7 +380,7 @@ class AuditEvent(DomainResource):
     def occurred_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, DateTime],
+            field_types=[Period, fhir.dateTime],
             field_name_base="occurred",
             required=False,
         )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class AdministrableProductDefinitionProperty(BackboneElement):
     """
@@ -40,11 +41,11 @@ class AdministrableProductDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
@@ -68,10 +69,17 @@ class AdministrableProductDefinitionProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Date, Boolean, Attachment],
+            field_types=[
+                CodeableConcept,
+                Quantity,
+                fhir.Date,
+                fhir.Boolean,
+                Attachment,
+            ],
             field_name_base="value",
             required=False,
         )
+
 
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod(
     BackboneElement
@@ -88,10 +96,11 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
         description="A value for the time",
         default=None,
     )
-    supportingInformation: Optional[String] = Field(
+    supportingInformation: Optional[fhir.string] = Field(
         description="Extra information about the withdrawal period",
         default=None,
     )
+
 
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneElement):
     """
@@ -110,6 +119,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneE
         description="A species specific time during which consumption of animal product is not appropriate",
         default=None,
     )
+
 
 class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
     """
@@ -147,6 +157,7 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
         default=None,
     )
 
+
 class AdministrableProductDefinition(DomainResource):
     """
     A medicinal product in the final form which is suitable for administering to a patient (after any mixing of multiple components, dissolution etc. has been performed).
@@ -174,7 +185,7 @@ class AdministrableProductDefinition(DomainResource):
         description="An identifier for the administrable product",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )

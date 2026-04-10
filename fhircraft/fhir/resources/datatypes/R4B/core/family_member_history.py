@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class FamilyMemberHistoryCondition(BackboneElement):
     """
     The significant Conditions (or condition) that the family member had. This is a repeating section to allow a system to represent more than one condition per resource, though there is nothing stopping multiple resources - one per condition.
@@ -36,7 +37,7 @@ class FamilyMemberHistoryCondition(BackboneElement):
         description="deceased | permanent disability | etc.",
         default=None,
     )
-    contributedToDeath: Optional[Boolean] = Field(
+    contributedToDeath: Optional[fhir.boolean] = Field(
         description="Whether the condition contributed to the cause of death",
         default=None,
     )
@@ -52,7 +53,7 @@ class FamilyMemberHistoryCondition(BackboneElement):
         description="When condition first manifested",
         default=None,
     )
-    onsetString: Optional[String] = Field(
+    onsetString: Optional[fhir.string] = Field(
         description="When condition first manifested",
         default=None,
     )
@@ -72,10 +73,11 @@ class FamilyMemberHistoryCondition(BackboneElement):
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Age, Range, Period, String],
+            field_types=[Age, Range, Period, fhir.string],
             field_name_base="onset",
             required=False,
         )
+
 
 class FamilyMemberHistory(DomainResource):
     """
@@ -99,18 +101,18 @@ class FamilyMemberHistory(DomainResource):
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
-        description="External Id(s) for this record",
+        description="External id_(s) for this record",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="partial | completed | entered-in-error | health-unknown",
         default=None,
     )
@@ -122,11 +124,11 @@ class FamilyMemberHistory(DomainResource):
         description="Patient history is about",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When history was recorded or last updated",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The family member described",
         default=None,
     )
@@ -142,11 +144,11 @@ class FamilyMemberHistory(DomainResource):
         description="(approximate) date of birth",
         default=None,
     )
-    bornDate: Optional[Date] = Field(
+    bornDate: Optional[fhir.date_] = Field(
         description="(approximate) date of birth",
         default=None,
     )
-    bornString: Optional[String] = Field(
+    bornString: Optional[fhir.string] = Field(
         description="(approximate) date of birth",
         default=None,
     )
@@ -158,15 +160,15 @@ class FamilyMemberHistory(DomainResource):
         description="(approximate) age",
         default=None,
     )
-    ageString: Optional[String] = Field(
+    ageString: Optional[fhir.string] = Field(
         description="(approximate) age",
         default=None,
     )
-    estimatedAge: Optional[Boolean] = Field(
+    estimatedAge: Optional[fhir.boolean] = Field(
         description="Age is estimated?",
         default=None,
     )
-    deceasedBoolean: Optional[Boolean] = Field(
+    deceasedBoolean: Optional[fhir.boolean] = Field(
         description="Dead? How old/when?",
         default=None,
     )
@@ -178,11 +180,11 @@ class FamilyMemberHistory(DomainResource):
         description="Dead? How old/when?",
         default=None,
     )
-    deceasedDate: Optional[Date] = Field(
+    deceasedDate: Optional[fhir.date_] = Field(
         description="Dead? How old/when?",
         default=None,
     )
-    deceasedString: Optional[String] = Field(
+    deceasedString: Optional[fhir.string] = Field(
         description="Dead? How old/when?",
         default=None,
     )
@@ -228,7 +230,7 @@ class FamilyMemberHistory(DomainResource):
     def born_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, Date, String],
+            field_types=[Period, fhir.date_, fhir.string],
             field_name_base="born",
             required=False,
         )
@@ -237,7 +239,7 @@ class FamilyMemberHistory(DomainResource):
     def age_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Age, Range, String],
+            field_types=[Age, Range, fhir.string],
             field_name_base="age",
             required=False,
         )
@@ -246,7 +248,7 @@ class FamilyMemberHistory(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Age, Range, Date, String],
+            field_types=[fhir.boolean, Age, Range, fhir.date_, fhir.string],
             field_name_base="deceased",
             required=False,
         )

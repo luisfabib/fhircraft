@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -30,15 +30,15 @@ class LocationPosition(BackboneElement):
     The absolute geographic location of the Location, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
     """
 
-    longitude: Optional[Decimal] = Field(
+    longitude: Optional[fhir.decimal] = Field(
         description="Longitude with WGS84 datum",
         default=None,
     )
-    latitude: Optional[Decimal] = Field(
+    latitude: Optional[fhir.decimal] = Field(
         description="Latitude with WGS84 datum",
         default=None,
     )
-    altitude: Optional[Decimal] = Field(
+    altitude: Optional[fhir.decimal] = Field(
         description="Altitude with WGS84 datum",
         default=None,
     )
@@ -56,7 +56,7 @@ class Location(DomainResource):
         description="Unique code or number identifying the location to its users",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | suspended | inactive",
         default=None,
     )
@@ -64,19 +64,19 @@ class Location(DomainResource):
         description="The operational status of the location (typically only for a bed/room)",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of the location as used by humans",
         default=None,
     )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="A list of alternate names that the location is known as, or was known as, in the past",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Additional details about the location that could be displayed as further information to identify the location beyond its name",
         default=None,
     )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="instance | kind",
         default=None,
     )

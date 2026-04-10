@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -50,12 +50,13 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TransportRestriction(BackboneElement):
     """
     If the Transport.focus is a request resource and the transport is seeking fulfillment (i.e. is asking for the request to be actioned), this element identifies any limitations on what parts of the referenced request should be actioned.
     """
 
-    repetitions: Optional[PositiveInt] = Field(
+    repetitions: Optional[fhir.positiveInt] = Field(
         description="How many times to repeat",
         default=None,
     )
@@ -68,6 +69,7 @@ class TransportRestriction(BackboneElement):
         default=None,
     )
 
+
 class TransportInput(BackboneElement):
     """
     Additional information that may be needed in the execution of the transport.
@@ -77,83 +79,83 @@ class TransportInput(BackboneElement):
         description="Label for the input",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueCanonical: Optional[Canonical] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueInstant: Optional[Instant] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueInteger64: Optional[Integer64] = Field(
+    valueInteger64: Optional[fhir.integer64] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueOid: Optional[Oid] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valuePositiveInt: Optional[PositiveInt] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueUnsignedInt: Optional[UnsignedInt] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
-    valueUuid: Optional[Uuid] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="Content to use in performing the transport",
         default=None,
     )
@@ -306,26 +308,26 @@ class TransportInput(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Base64Binary,
-                Boolean,
-                Canonical,
-                Code,
-                Date,
-                DateTime,
-                Decimal,
-                Id,
-                Instant,
-                Integer,
-                Integer64,
-                Markdown,
-                Oid,
-                PositiveInt,
-                String,
-                Time,
-                UnsignedInt,
-                Uri,
-                Url,
-                Uuid,
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Integer64,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 Address,
                 Age,
                 Annotation,
@@ -364,6 +366,7 @@ class TransportInput(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class TransportOutput(BackboneElement):
     """
@@ -374,83 +377,83 @@ class TransportOutput(BackboneElement):
         description="Label for output",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Result of output",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Result of output",
         default=None,
     )
-    valueCanonical: Optional[Canonical] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="Result of output",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Result of output",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Result of output",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Result of output",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Result of output",
         default=None,
     )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Result of output",
         default=None,
     )
-    valueInstant: Optional[Instant] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="Result of output",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Result of output",
         default=None,
     )
-    valueInteger64: Optional[Integer64] = Field(
+    valueInteger64: Optional[fhir.integer64] = Field(
         description="Result of output",
         default=None,
     )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="Result of output",
         default=None,
     )
-    valueOid: Optional[Oid] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="Result of output",
         default=None,
     )
-    valuePositiveInt: Optional[PositiveInt] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Result of output",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Result of output",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Result of output",
         default=None,
     )
-    valueUnsignedInt: Optional[UnsignedInt] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Result of output",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Result of output",
         default=None,
     )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="Result of output",
         default=None,
     )
-    valueUuid: Optional[Uuid] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="Result of output",
         default=None,
     )
@@ -603,26 +606,26 @@ class TransportOutput(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Base64Binary,
-                Boolean,
-                Canonical,
-                Code,
-                Date,
-                DateTime,
-                Decimal,
-                Id,
-                Instant,
-                Integer,
-                Integer64,
-                Markdown,
-                Oid,
-                PositiveInt,
-                String,
-                Time,
-                UnsignedInt,
-                Uri,
-                Url,
-                Uuid,
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Integer64,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 Address,
                 Age,
                 Annotation,
@@ -661,6 +664,7 @@ class TransportOutput(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class Transport(DomainResource):
     """
@@ -675,11 +679,11 @@ class Transport(DomainResource):
         description="External identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[Canonical] = Field(
+    instantiatesCanonical: Optional[fhir.canonical] = Field(
         description="Formal definition of transport",
         default=None,
     )
-    instantiatesUri: Optional[Uri] = Field(
+    instantiatesUri: Optional[fhir.uri] = Field(
         description="Formal definition of transport",
         default=None,
     )
@@ -695,7 +699,7 @@ class Transport(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | completed | abandoned | cancelled | planned | entered-in-error",
         default=None,
     )
@@ -703,11 +707,11 @@ class Transport(DomainResource):
         description="Reason for current status",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="unknown | proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
@@ -715,7 +719,7 @@ class Transport(DomainResource):
         description="Transport Type",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Human-readable explanation of transport",
         default=None,
     )
@@ -732,16 +736,16 @@ class Transport(DomainResource):
         description="Healthcare event during which this transport originated",
         default=None,
     )
-    completionTime: Optional[DateTime] = Field(
+    completionTime: Optional[fhir.dateTime] = Field(
         description="Completion time of the event (the occurrence)",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
-        description="Transport Creation Date",
+    authoredOn: Optional[fhir.dateTime] = Field(
+        description="Transport Creation date",
         default=None,
     )
-    lastModified: Optional[DateTime] = Field(
-        description="Transport Last Modified Date",
+    lastModified: Optional[fhir.dateTime] = Field(
+        description="Transport Last Modified date",
         default=None,
     )
     requester: Optional[Reference] = Field(

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class NutritionOrderOralDietNutrient(BackboneElement):
     """
     Class that defines the quantity and type of nutrient modifications (for example carbohydrate, fiber or sodium) required for the oral diet.
@@ -37,19 +38,21 @@ class NutritionOrderOralDietNutrient(BackboneElement):
         default=None,
     )
 
+
 class NutritionOrderOralDietTexture(BackboneElement):
     """
     Class that describes any texture modifications required for the patient to safely consume various types of solid foods.
     """
 
     modifier: Optional[CodeableConcept] = Field(
-        description="Code to indicate how to alter the texture of the foods, e.g. pureed",
+        description="code to indicate how to alter the texture of the foods, e.g. pureed",
         default=None,
     )
     foodType: Optional[CodeableConcept] = Field(
         description="Concepts that are used to identify an entity that is ingested for nutritional purposes",
         default=None,
     )
+
 
 class NutritionOrderOralDiet(BackboneElement):
     """
@@ -76,10 +79,11 @@ class NutritionOrderOralDiet(BackboneElement):
         description="The required consistency of fluids and liquids provided to the patient",
         default=None,
     )
-    instruction: Optional[String] = Field(
+    instruction: Optional[fhir.string] = Field(
         description="Instructions or additional information about the oral diet",
         default=None,
     )
+
 
 class NutritionOrderSupplement(BackboneElement):
     """
@@ -90,7 +94,7 @@ class NutritionOrderSupplement(BackboneElement):
         description="Type of supplement product requested",
         default=None,
     )
-    productName: Optional[String] = Field(
+    productName: Optional[fhir.string] = Field(
         description="Product or brand name of the nutritional supplement",
         default=None,
     )
@@ -102,10 +106,11 @@ class NutritionOrderSupplement(BackboneElement):
         description="Amount of the nutritional supplement",
         default=None,
     )
-    instruction: Optional[String] = Field(
+    instruction: Optional[fhir.string] = Field(
         description="Instructions or additional information about the oral supplement",
         default=None,
     )
+
 
 class NutritionOrderEnteralFormulaAdministration(BackboneElement):
     """
@@ -145,6 +150,7 @@ class NutritionOrderEnteralFormulaAdministration(BackboneElement):
             required=False,
         )
 
+
 class NutritionOrderEnteralFormula(BackboneElement):
     """
     Feeding provided through the gastrointestinal tract via a tube, catheter, or stoma that delivers nutrition distal to the oral cavity.
@@ -154,7 +160,7 @@ class NutritionOrderEnteralFormula(BackboneElement):
         description="Type of enteral or infant formula",
         default=None,
     )
-    baseFormulaProductName: Optional[String] = Field(
+    baseFormulaProductName: Optional[fhir.string] = Field(
         description="Product or brand name of the enteral or infant formula",
         default=None,
     )
@@ -162,7 +168,7 @@ class NutritionOrderEnteralFormula(BackboneElement):
         description="Type of modular component to add to the feeding",
         default=None,
     )
-    additiveProductName: Optional[String] = Field(
+    additiveProductName: Optional[fhir.string] = Field(
         description="Product or brand name of the modular additive",
         default=None,
     )
@@ -184,10 +190,11 @@ class NutritionOrderEnteralFormula(BackboneElement):
         description="Upper limit on formula volume per unit of time",
         default=None,
     )
-    administrationInstruction: Optional[String] = Field(
+    administrationInstruction: Optional[fhir.string] = Field(
         description="Formula feeding instructions expressed as text",
         default=None,
     )
+
 
 class NutritionOrder(DomainResource):
     """
@@ -214,23 +221,23 @@ class NutritionOrder(DomainResource):
         description="Identifiers assigned to this order",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiates: Optional[ListType[Uri]] = Field(
+    instantiates: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates protocol or definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
@@ -242,7 +249,7 @@ class NutritionOrder(DomainResource):
         description="The encounter associated with this nutrition order",
         default=None,
     )
-    dateTime: Optional[DateTime] = Field(
+    dateTime: Optional[fhir.dateTime] = Field(
         description="Date and time the nutrition order was requested",
         default=None,
     )

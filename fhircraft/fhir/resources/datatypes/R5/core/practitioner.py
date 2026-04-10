@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class PractitionerQualification(BackboneElement):
     """
@@ -49,6 +50,7 @@ class PractitionerQualification(BackboneElement):
         default=None,
     )
 
+
 class PractitionerCommunication(BackboneElement):
     """
         A language which may be used to communicate with the practitioner, often for correspondence/administrative purposes.
@@ -60,10 +62,11 @@ class PractitionerCommunication(BackboneElement):
         description="The language code used to communicate with the practitioner",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
         default=None,
     )
+
 
 class Practitioner(DomainResource):
     """
@@ -78,7 +81,7 @@ class Practitioner(DomainResource):
         description="An identifier for the person as this agent",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this practitioner\u0027s record is in active use",
         default=None,
     )
@@ -90,19 +93,19 @@ class Practitioner(DomainResource):
         description="A contact detail for the practitioner (that apply to all roles)",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date  on which the practitioner was born",
         default=None,
     )
-    deceasedBoolean: Optional[Boolean] = Field(
+    deceasedBoolean: Optional[fhir.boolean] = Field(
         description="Indicates if the practitioner is deceased or not",
         default=None,
     )
-    deceasedDateTime: Optional[DateTime] = Field(
+    deceasedDateTime: Optional[fhir.dateTime] = Field(
         description="Indicates if the practitioner is deceased or not",
         default=None,
     )
@@ -134,7 +137,7 @@ class Practitioner(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, DateTime],
+            field_types=[fhir.boolean, fhir.dateTime],
             field_name_base="deceased",
             required=False,
         )

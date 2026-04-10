@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -29,6 +29,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
     """
     Defines the characteristic using both a type and value[x] elements.
@@ -50,7 +51,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
     )
@@ -66,7 +67,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
     )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
     )
@@ -86,21 +87,29 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Boolean, Quantity, Range, Reference, Id],
+            field_types=[
+                CodeableConcept,
+                fhir.Boolean,
+                Quantity,
+                Range,
+                Reference,
+                fhir.Id,
+            ],
             field_name_base="value",
             required=True,
         )
+
 
 class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
     """
     Defines the characteristic as a combination of two or more characteristics.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="all-of | any-of | at-least | at-most | statistical | net-effect | dataset",
         default=None,
     )
-    threshold: Optional[PositiveInt] = Field(
+    threshold: Optional[fhir.positiveInt] = Field(
         description='Provides the value of "n" when "at-least" or "at-most" codes are used',
         default=None,
     )
@@ -109,12 +118,13 @@ class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
         default=None,
     )
 
+
 class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
     """
     Timing in which the characteristic is determined.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human readable description",
         default=None,
     )
@@ -130,11 +140,11 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
         description="The event used as a base point (reference point) in time",
         default=None,
     )
-    eventDateTime: Optional[DateTime] = Field(
+    eventDateTime: Optional[fhir.dateTime] = Field(
         description="The event used as a base point (reference point) in time",
         default=None,
     )
-    eventId: Optional[Id] = Field(
+    eventId: Optional[fhir.id_] = Field(
         description="The event used as a base point (reference point) in time",
         default=None,
     )
@@ -158,21 +168,22 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Reference, DateTime, Id],
+            field_types=[CodeableConcept, Reference, fhir.dateTime, fhir.id_],
             field_name_base="event",
             required=False,
         )
+
 
 class EvidenceVariableCharacteristic(BackboneElement):
     """
     A defining factor of the EvidenceVariable. Multiple characteristics are applied with "and" semantics.
     """
 
-    linkId: Optional[Id] = Field(
+    linkId: Optional[fhir.id_] = Field(
         description="Label for internal linking",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the characteristic",
         default=None,
     )
@@ -180,7 +191,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Used for footnotes or explanatory notes",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Whether the characteristic is an inclusion criterion or exclusion criterion",
         default=None,
     )
@@ -188,8 +199,8 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Defines the characteristic (without using type and value) by a Reference",
         default=None,
     )
-    definitionCanonical: Optional[Canonical] = Field(
-        description="Defines the characteristic (without using type and value) by a Canonical",
+    definitionCanonical: Optional[fhir.canonical] = Field(
+        description="Defines the characteristic (without using type and value) by a canonical",
         default=None,
     )
     definitionCodeableConcept: Optional[CodeableConcept] = Field(
@@ -200,7 +211,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Defines the characteristic (without using type and value) by an expression",
         default=None,
     )
-    definitionId: Optional[Id] = Field(
+    definitionId: Optional[fhir.id_] = Field(
         description="Defines the characteristic (without using type and value) by an id",
         default=None,
     )
@@ -271,12 +282,13 @@ class EvidenceVariableCharacteristic(BackboneElement):
             required=False,
         )
 
+
 class EvidenceVariableCategory(BackboneElement):
     """
     A grouping for ordinal or polychotomous variables.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Description of the grouping",
         default=None,
     )
@@ -309,6 +321,7 @@ class EvidenceVariableCategory(BackboneElement):
             required=False,
         )
 
+
 class EvidenceVariable(DomainResource):
     """
     The EvidenceVariable resource describes an element that knowledge (Evidence) is about.
@@ -318,19 +331,19 @@ class EvidenceVariable(DomainResource):
     _type = "EvidenceVariable"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceVariable"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this evidence variable, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this evidence variable, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the evidence variable",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the evidence variable",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -338,31 +351,31 @@ class EvidenceVariable(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this evidence variable (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this evidence variable (human friendly)",
         default=None,
     )
-    shortTitle: Optional[String] = Field(
+    shortTitle: Optional[fhir.string] = Field(
         description="Title for use in informal contexts",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -370,7 +383,7 @@ class EvidenceVariable(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the evidence variable",
         default=None,
     )
@@ -382,23 +395,23 @@ class EvidenceVariable(DomainResource):
         description="The context that the content is intended to support",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this EvidenceVariable is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the resource was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the resource was last reviewed by the publisher",
         default=None,
     )
@@ -426,7 +439,7 @@ class EvidenceVariable(DomainResource):
         description="Additional documentation, citations, etc",
         default=None,
     )
-    actual: Optional[Boolean] = Field(
+    actual: Optional[fhir.boolean] = Field(
         description="Actual or conceptual",
         default=None,
     )
@@ -434,7 +447,7 @@ class EvidenceVariable(DomainResource):
         description="A defining factor of the EvidenceVariable",
         default=None,
     )
-    handling: Optional[Code] = Field(
+    handling: Optional[fhir.code] = Field(
         description="continuous | dichotomous | ordinal | polychotomous",
         default=None,
     )
@@ -454,7 +467,7 @@ class EvidenceVariable(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

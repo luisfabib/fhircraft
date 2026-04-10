@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class Media(DomainResource):
     """
@@ -54,7 +55,7 @@ class Media(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
@@ -78,7 +79,7 @@ class Media(DomainResource):
         description="Encounter associated with media",
         default=None,
     )
-    createdDateTime: Optional[DateTime] = Field(
+    createdDateTime: Optional[fhir.dateTime] = Field(
         description="When Media was collected",
         default=None,
     )
@@ -86,8 +87,8 @@ class Media(DomainResource):
         description="When Media was collected",
         default=None,
     )
-    issued: Optional[Instant] = Field(
-        description="Date/Time this version was made available",
+    issued: Optional[fhir.instant] = Field(
+        description="Date/time this version was made available",
         default=None,
     )
     operator: Optional[Reference] = Field(
@@ -102,7 +103,7 @@ class Media(DomainResource):
         description="Observed body part",
         default=None,
     )
-    deviceName: Optional[String] = Field(
+    deviceName: Optional[fhir.string] = Field(
         description="Name of the device/manufacturer",
         default=None,
     )
@@ -110,19 +111,19 @@ class Media(DomainResource):
         description="Observing Device",
         default=None,
     )
-    height: Optional[PositiveInt] = Field(
+    height: Optional[fhir.positiveInt] = Field(
         description="Height of the image in pixels (photo/video)",
         default=None,
     )
-    width: Optional[PositiveInt] = Field(
+    width: Optional[fhir.positiveInt] = Field(
         description="Width of the image in pixels (photo/video)",
         default=None,
     )
-    frames: Optional[PositiveInt] = Field(
+    frames: Optional[fhir.positiveInt] = Field(
         description="Number of frames if \u003e 1 (photo)",
         default=None,
     )
-    duration: Optional[Decimal] = Field(
+    duration: Optional[fhir.decimal] = Field(
         description="Length in seconds (audio / video)",
         default=None,
     )
@@ -146,7 +147,7 @@ class Media(DomainResource):
     def created_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="created",
             required=False,
         )

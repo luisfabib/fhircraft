@@ -6,13 +6,13 @@ from fhircraft.fhir.resources.datatypes import (
     MIN_UNSIGNED_32BIT_INT,
     MAX_UNSIGNED_32BIT_INT,
 )
-from fhircraft.fhir.resources.base import FHIRUnsignedInt as FHIRUnsignedIntBase
-from .integer import FHIRInteger
+from fhircraft.fhir.resources.base import UnsignedIntBase
+from .integer import Integer
 
 _UNSIGNED_INT_PATTERN = r"^[0]|([1-9][0-9]*)$"
 
 
-class FHIRUnsignedInt(FHIRInteger, FHIRUnsignedIntBase):
+class UnsignedInt(Integer, UnsignedIntBase):
     """An integer with a value in the range 0..2,147,483,647."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/unsignedInt"
@@ -36,6 +36,4 @@ class FHIRUnsignedInt(FHIRInteger, FHIRUnsignedIntBase):
         return v
 
 
-UnsignedInt = Annotated[
-    int | FHIRUnsignedInt, BeforeValidator(FHIRUnsignedInt.model_validate)
-]
+unsignedInt = Annotated[int | UnsignedInt, BeforeValidator(UnsignedInt.model_validate)]

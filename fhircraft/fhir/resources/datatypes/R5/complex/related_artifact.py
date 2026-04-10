@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     DataType,
     CodeableConcept,
@@ -12,6 +12,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
 )
 
+
 class RelatedArtifact(DataType):
     """
     Related artifacts for a knowledge resource
@@ -19,7 +20,7 @@ class RelatedArtifact(DataType):
 
     _type = "RelatedArtifact"
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as",
         default=None,
     )
@@ -27,15 +28,15 @@ class RelatedArtifact(DataType):
         description="Additional classifiers",
         default=None,
     )
-    label: Optional[String] = Field(
+    label: Optional[fhir.string] = Field(
         description="Short label",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Brief description of the related artifact",
         default=None,
     )
-    citation: Optional[Markdown] = Field(
+    citation: Optional[fhir.markdown] = Field(
         description="Bibliographic citation for the artifact",
         default=None,
     )
@@ -43,7 +44,7 @@ class RelatedArtifact(DataType):
         description="What document is being referenced",
         default=None,
     )
-    resource: Optional[Canonical] = Field(
+    resource: Optional[fhir.canonical] = Field(
         description="What artifact is being referenced",
         default=None,
     )
@@ -51,11 +52,11 @@ class RelatedArtifact(DataType):
         description="What artifact, if not a conformance resource",
         default=None,
     )
-    publicationStatus: Optional[Code] = Field(
+    publicationStatus: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    publicationDate: Optional[Date] = Field(
+    publicationDate: Optional[fhir.date_] = Field(
         description="Date of publication of the artifact being referred to",
         default=None,
     )

@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneType,
     Element,
@@ -12,6 +12,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Range,
     Duration,
 )
+
 
 class TimingRepeat(BackboneType):
     """
@@ -32,59 +33,59 @@ class TimingRepeat(BackboneType):
         description="Length/Range of lengths, or (Start and/or end) limits",
         default=None,
     )
-    count: Optional[PositiveInt] = Field(
+    count: Optional[fhir.positiveInt] = Field(
         description="Number of times to repeat",
         default=None,
     )
-    countMax: Optional[PositiveInt] = Field(
+    countMax: Optional[fhir.positiveInt] = Field(
         description="Maximum number of times to repeat",
         default=None,
     )
-    duration: Optional[Decimal] = Field(
+    duration: Optional[fhir.decimal] = Field(
         description="How long when it happens",
         default=None,
     )
-    durationMax: Optional[Decimal] = Field(
+    durationMax: Optional[fhir.decimal] = Field(
         description="How long when it happens",
         default=None,
     )
-    durationUnit: Optional[Code] = Field(
+    durationUnit: Optional[fhir.code] = Field(
         description="s | min | h | d | wk | mo | a",
         default=None,
     )
-    frequency: Optional[PositiveInt] = Field(
+    frequency: Optional[fhir.positiveInt] = Field(
         description="Event occurs frequency times per period",
         default=None,
     )
-    frequencyMax: Optional[PositiveInt] = Field(
+    frequencyMax: Optional[fhir.positiveInt] = Field(
         description="Event occurs up to frequencyMax times per period",
         default=None,
     )
-    period: Optional[Decimal] = Field(
+    period: Optional[fhir.decimal] = Field(
         description="Event occurs frequency times per period",
         default=None,
     )
-    periodMax: Optional[Decimal] = Field(
+    periodMax: Optional[fhir.decimal] = Field(
         description="Event occurs up to periodMax times per period",
         default=None,
     )
-    periodUnit: Optional[Code] = Field(
+    periodUnit: Optional[fhir.code] = Field(
         description="s | min | h | d | wk | mo | a",
         default=None,
     )
-    dayOfWeek: Optional[List[Code]] = Field(
+    dayOfWeek: Optional[List[fhir.code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
-    timeOfDay: Optional[List[Time]] = Field(
+    timeOfDay: Optional[List[fhir.time_]] = Field(
         description="Specified time of day for action",
         default=None,
     )
-    when: Optional[List[Code]] = Field(
-        description="Code for time period of occurrence",
+    when: Optional[List[fhir.code]] = Field(
+        description="code for time period of occurrence",
         default=None,
     )
-    offset: Optional[UnsignedInt] = Field(
+    offset: Optional[fhir.unsignedInt] = Field(
         description="Minutes from event (before or after)",
         default=None,
     )
@@ -104,6 +105,7 @@ class TimingRepeat(BackboneType):
             base="bounds",
         )
 
+
 class Timing(BackboneType):
     """
     A timing schedule that specifies an event that may occur multiple times
@@ -111,7 +113,7 @@ class Timing(BackboneType):
 
     _type = "Timing"
 
-    event: Optional[List[DateTime]] = Field(
+    event: Optional[List[fhir.dateTime]] = Field(
         description="When the event occurs",
         default=None,
     )

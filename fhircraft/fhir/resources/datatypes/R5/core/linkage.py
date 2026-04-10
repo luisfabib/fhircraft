@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,7 +23,7 @@ class LinkageItem(BackboneElement):
     Identifies which record considered as the reference to the same real-world occurrence as well as how the items should be evaluated within the collection of linked items.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="source | alternate | historical",
         default=None,
     )
@@ -41,7 +41,7 @@ class Linkage(DomainResource):
     _type = "Linkage"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Linkage"
 
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this linkage assertion is active or not",
         default=None,
     )

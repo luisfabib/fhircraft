@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,41 +23,44 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class StructureDefinitionMapping(BackboneElement):
     """
     An external specification that the content is mapped to.
     """
 
-    identity: Optional[Id] = Field(
+    identity: Optional[fhir.id_] = Field(
         description="Internal id when this mapping is used",
         default=None,
     )
-    uri: Optional[Uri] = Field(
+    uri: Optional[fhir.uri] = Field(
         description="Identifies what this mapping refers to",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Names what this mapping refers to",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Versions, Issues, Scope limitations etc",
         default=None,
     )
+
 
 class StructureDefinitionContext(BackboneElement):
     """
     Identifies the types of resource or data type elements to which the extension can be applied. For more guidance on using the 'context' element, see the [defining extensions page](https://hl7.org/fhir/R5/defining-extensions.html#context).
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="fhirpath | element | extension",
         default=None,
     )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="Where the extension can be used in instances",
         default=None,
     )
+
 
 class StructureDefinitionSnapshot(BackboneElement):
     """
@@ -69,6 +72,7 @@ class StructureDefinitionSnapshot(BackboneElement):
         default=None,
     )
 
+
 class StructureDefinitionDifferential(BackboneElement):
     """
     A differential view is expressed relative to the base StructureDefinition - a statement of differences that it applies.
@@ -79,6 +83,7 @@ class StructureDefinitionDifferential(BackboneElement):
         default=None,
     )
 
+
 class StructureDefinition(DomainResource):
     """
     A definition of a FHIR structure. This resource is used to describe the underlying resources, data types defined in FHIR, and also for describing extensions and constraints on resources and data types.
@@ -88,19 +93,19 @@ class StructureDefinition(DomainResource):
     _type = "StructureDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this structure definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this structure definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the structure definition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -108,27 +113,27 @@ class StructureDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this structure definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this structure definition (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -136,7 +141,7 @@ class StructureDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the structure definition",
         default=None,
     )
@@ -148,15 +153,15 @@ class StructureDefinition(DomainResource):
         description="Intended jurisdiction for structure definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this structure definition is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
@@ -164,7 +169,7 @@ class StructureDefinition(DomainResource):
         description="Assist with indexing and finding",
         default=None,
     )
-    fhirVersion: Optional[Code] = Field(
+    fhirVersion: Optional[fhir.code] = Field(
         description="FHIR Version this StructureDefinition targets",
         default=None,
     )
@@ -172,11 +177,11 @@ class StructureDefinition(DomainResource):
         description="External specification that the content is mapped to",
         default=None,
     )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="primitive-type | complex-type | resource | logical",
         default=None,
     )
-    abstract: Optional[Boolean] = Field(
+    abstract: Optional[fhir.boolean] = Field(
         description="Whether the structure is abstract",
         default=None,
     )
@@ -184,19 +189,19 @@ class StructureDefinition(DomainResource):
         description="If an extension, where it can be used in instances",
         default=None,
     )
-    contextInvariant: Optional[ListType[String]] = Field(
+    contextInvariant: Optional[ListType[fhir.string]] = Field(
         description="FHIRPath invariants - when the extension can be used",
         default=None,
     )
-    type: Optional[Uri] = Field(
+    type: Optional[fhir.uri] = Field(
         description="Type defined or constrained by this structure",
         default=None,
     )
-    baseDefinition: Optional[Canonical] = Field(
+    baseDefinition: Optional[fhir.canonical] = Field(
         description="Definition that this type is constrained/specialized from",
         default=None,
     )
-    derivation: Optional[Code] = Field(
+    derivation: Optional[fhir.code] = Field(
         description="specialization | constraint - How relates to base definition",
         default=None,
     )
@@ -220,7 +225,7 @@ class StructureDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

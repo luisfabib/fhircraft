@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -27,39 +27,41 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RequestGroupActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria, or start/stop conditions for the action.
     """
 
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="applicability | start | stop",
         default=None,
     )
     expression: Optional[Expression] = Field(
-        description="Boolean-valued expression",
+        description="boolean-valued expression",
         default=None,
     )
+
 
 class RequestGroupActionRelatedAction(BackboneElement):
     """
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    actionId: Optional[Id] = Field(
+    actionId: Optional[fhir.id_] = Field(
         description="What action this is related to",
         default=None,
     )
-    relationship: Optional[Code] = Field(
+    relationship: Optional[fhir.code] = Field(
         description="before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end",
         default=None,
     )
     offsetDuration: Optional[Duration] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
     offsetRange: Optional[Range] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
 
@@ -79,33 +81,34 @@ class RequestGroupActionRelatedAction(BackboneElement):
             required=False,
         )
 
+
 class RequestGroupAction(BackboneElement):
     """
     The actions, if any, produced by the evaluation of the artifact.
     """
 
-    prefix: Optional[String] = Field(
+    prefix: Optional[fhir.string] = Field(
         description="User-visible prefix for the action (e.g. 1. or A.)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Short description of the action",
         default=None,
     )
-    textEquivalent: Optional[String] = Field(
+    textEquivalent: Optional[fhir.string] = Field(
         description="Static text equivalent of the action, used if the dynamic aspects cannot be interpreted by the receiving system",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code representing the meaning of the action or sub-actions",
+        description="code representing the meaning of the action or sub-actions",
         default=None,
     )
     documentation: Optional[ListType[RelatedArtifact]] = Field(
@@ -120,7 +123,7 @@ class RequestGroupAction(BackboneElement):
         description="Relationship to another action",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="When the action should take place",
         default=None,
     )
@@ -152,23 +155,23 @@ class RequestGroupAction(BackboneElement):
         description="create | update | remove | fire-event",
         default=None,
     )
-    groupingBehavior: Optional[Code] = Field(
+    groupingBehavior: Optional[fhir.code] = Field(
         description="visual-group | logical-group | sentence-group",
         default=None,
     )
-    selectionBehavior: Optional[Code] = Field(
+    selectionBehavior: Optional[fhir.code] = Field(
         description="any | all | all-or-none | exactly-one | at-most-one | one-or-more",
         default=None,
     )
-    requiredBehavior: Optional[Code] = Field(
+    requiredBehavior: Optional[fhir.code] = Field(
         description="must | could | must-unless-documented",
         default=None,
     )
-    precheckBehavior: Optional[Code] = Field(
+    precheckBehavior: Optional[fhir.code] = Field(
         description="yes | no",
         default=None,
     )
-    cardinalityBehavior: Optional[Code] = Field(
+    cardinalityBehavior: Optional[fhir.code] = Field(
         description="single | multiple",
         default=None,
     )
@@ -192,10 +195,11 @@ class RequestGroupAction(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Duration, Range, Timing],
+            field_types=[fhir.dateTime, Age, Period, Duration, Range, Timing],
             field_name_base="timing",
             required=False,
         )
+
 
 class RequestGroup(DomainResource):
     """
@@ -222,11 +226,11 @@ class RequestGroup(DomainResource):
         description="Business identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -242,15 +246,15 @@ class RequestGroup(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
@@ -266,7 +270,7 @@ class RequestGroup(DomainResource):
         description="Created as part of",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When the request group was authored",
         default=None,
     )

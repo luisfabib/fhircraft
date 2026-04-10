@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -42,11 +42,11 @@ class AppointmentParticipant(BackboneElement):
         description="The individual, device, location, or service participating in the appointment",
         default=None,
     )
-    required: Optional[Boolean] = Field(
+    required: Optional[fhir.boolean] = Field(
         description="The participant is required to attend (optional when false)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="accepted | declined | tentative | needs-action",
         default=None,
     )
@@ -56,35 +56,35 @@ class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
     Information about weekly recurring appointments.
     """
 
-    monday: Optional[Boolean] = Field(
+    monday: Optional[fhir.boolean] = Field(
         description="Recurs on Mondays",
         default=None,
     )
-    tuesday: Optional[Boolean] = Field(
+    tuesday: Optional[fhir.boolean] = Field(
         description="Recurs on Tuesday",
         default=None,
     )
-    wednesday: Optional[Boolean] = Field(
+    wednesday: Optional[fhir.boolean] = Field(
         description="Recurs on Wednesday",
         default=None,
     )
-    thursday: Optional[Boolean] = Field(
+    thursday: Optional[fhir.boolean] = Field(
         description="Recurs on Thursday",
         default=None,
     )
-    friday: Optional[Boolean] = Field(
+    friday: Optional[fhir.boolean] = Field(
         description="Recurs on Friday",
         default=None,
     )
-    saturday: Optional[Boolean] = Field(
+    saturday: Optional[fhir.boolean] = Field(
         description="Recurs on Saturday",
         default=None,
     )
-    sunday: Optional[Boolean] = Field(
+    sunday: Optional[fhir.boolean] = Field(
         description="Recurs on Sunday",
         default=None,
     )
-    weekInterval: Optional[PositiveInt] = Field(
+    weekInterval: Optional[fhir.positiveInt] = Field(
         description="Recurs every nth week",
         default=None,
     )
@@ -94,7 +94,7 @@ class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
     Information about monthly recurring appointments.
     """
 
-    dayOfMonth: Optional[PositiveInt] = Field(
+    dayOfMonth: Optional[fhir.positiveInt] = Field(
         description="Recurs on a specific day of the month",
         default=None,
     )
@@ -106,7 +106,7 @@ class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
         description="Indicates which day of the week the appointment should occur",
         default=None,
     )
-    monthInterval: Optional[PositiveInt] = Field(
+    monthInterval: Optional[fhir.positiveInt] = Field(
         description="Recurs every nth month",
         default=None,
     )
@@ -116,7 +116,7 @@ class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
     Information about yearly recurring appointments.
     """
 
-    yearInterval: Optional[PositiveInt] = Field(
+    yearInterval: Optional[fhir.positiveInt] = Field(
         description="Recurs every nth year",
         default=None,
     )
@@ -134,15 +134,15 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="The frequency of the recurrence",
         default=None,
     )
-    lastOccurrenceDate: Optional[Date] = Field(
+    lastOccurrenceDate: Optional[fhir.date_] = Field(
         description="The date when the recurrence should end",
         default=None,
     )
-    occurrenceCount: Optional[PositiveInt] = Field(
+    occurrenceCount: Optional[fhir.positiveInt] = Field(
         description="The number of planned occurrences",
         default=None,
     )
-    occurrenceDate: Optional[ListType[Date]] = Field(
+    occurrenceDate: Optional[ListType[fhir.date_]] = Field(
         description="Specific dates for a recurring set of appointments (no template)",
         default=None,
     )
@@ -158,11 +158,11 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Information about yearly recurring appointments",
         default=None,
     )
-    excludingDate: Optional[ListType[Date]] = Field(
+    excludingDate: Optional[ListType[fhir.date_]] = Field(
         description="Any dates that should be excluded from the series",
         default=None,
     )
-    excludingRecurrenceId: Optional[ListType[PositiveInt]] = Field(
+    excludingRecurrenceId: Optional[ListType[fhir.positiveInt]] = Field(
         description="Any recurrence IDs that should be excluded from the recurrence",
         default=None,
     )
@@ -180,7 +180,7 @@ class Appointment(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist",
         default=None,
     )
@@ -217,7 +217,7 @@ class Appointment(DomainResource):
         description="Used to make informed decisions if needing to re-prioritize",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Shown on a subject line in a meeting request, or appointment list",
         default=None,
     )
@@ -241,15 +241,15 @@ class Appointment(DomainResource):
         description="The originating appointment in a recurring set of appointments",
         default=None,
     )
-    start: Optional[Instant] = Field(
+    start: Optional[fhir.instant] = Field(
         description="When appointment is to take place",
         default=None,
     )
-    end: Optional[Instant] = Field(
+    end: Optional[fhir.instant] = Field(
         description="When appointment is to conclude",
         default=None,
     )
-    minutesDuration: Optional[PositiveInt] = Field(
+    minutesDuration: Optional[fhir.positiveInt] = Field(
         description="Can be less than start/end (e.g. estimate)",
         default=None,
     )
@@ -265,11 +265,11 @@ class Appointment(DomainResource):
         description="The set of accounts that may be used for billing for this Appointment",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="The date that this appointment was initially created",
         default=None,
     )
-    cancellationDate: Optional[DateTime] = Field(
+    cancellationDate: Optional[fhir.dateTime] = Field(
         description="When the appointment was cancelled",
         default=None,
     )
@@ -293,11 +293,11 @@ class Appointment(DomainResource):
         description="Participants involved in appointment",
         default=None,
     )
-    recurrenceId: Optional[PositiveInt] = Field(
+    recurrenceId: Optional[fhir.positiveInt] = Field(
         description="The sequence number in the recurrence",
         default=None,
     )
-    occurrenceChanged: Optional[Boolean] = Field(
+    occurrenceChanged: Optional[fhir.boolean] = Field(
         description="Indicates that this appointment varies from a recurrence pattern",
         default=None,
     )

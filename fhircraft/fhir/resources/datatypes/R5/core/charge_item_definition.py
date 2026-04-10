@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,13 +27,14 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ChargeItemDefinitionApplicability(BackboneElement):
     """
     Expressions that describe applicability criteria for the billing code.
     """
 
     condition: Optional[Expression] = Field(
-        description="Boolean-valued expression",
+        description="boolean-valued expression",
         default=None,
     )
     effectivePeriod: Optional[Period] = Field(
@@ -44,6 +45,7 @@ class ChargeItemDefinitionApplicability(BackboneElement):
         description="Reference to / quotation of the external source of the group of properties",
         default=None,
     )
+
 
 class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
     """
@@ -51,7 +53,7 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
     """
 
     condition: Optional[Expression] = Field(
-        description="Boolean-valued expression",
+        description="boolean-valued expression",
         default=None,
     )
     effectivePeriod: Optional[Period] = Field(
@@ -62,6 +64,7 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
         description="Reference to / quotation of the external source of the group of properties",
         default=None,
     )
+
 
 class ChargeItemDefinitionPropertyGroup(BackboneElement):
     """
@@ -79,6 +82,7 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
         default=None,
     )
 
+
 class ChargeItemDefinition(DomainResource):
     """
     The ChargeItemDefinition resource provides the properties that apply to the (billing) codes necessary to calculate costs and prices. The properties may differ largely depending on type and realm, therefore this resource gives only a rough structure and requires profiling for each type of billing code system.
@@ -88,19 +92,19 @@ class ChargeItemDefinition(DomainResource):
     _type = "ChargeItemDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this charge item definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this charge item definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the charge item definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the charge item definition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -108,39 +112,39 @@ class ChargeItemDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this charge item definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this charge item definition (human friendly)",
         default=None,
     )
-    derivedFromUri: Optional[ListType[Uri]] = Field(
+    derivedFromUri: Optional[ListType[fhir.uri]] = Field(
         description="Underlying externally-defined charge item definition",
         default=None,
     )
-    partOf: Optional[ListType[Canonical]] = Field(
+    partOf: Optional[ListType[fhir.canonical]] = Field(
         description="A larger definition of which this particular definition is a component or step",
         default=None,
     )
-    replaces: Optional[ListType[Canonical]] = Field(
+    replaces: Optional[ListType[fhir.canonical]] = Field(
         description="Completed or terminated request(s) whose function is taken by this new request",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -148,7 +152,7 @@ class ChargeItemDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the charge item definition",
         default=None,
     )
@@ -160,23 +164,23 @@ class ChargeItemDefinition(DomainResource):
         description="Intended jurisdiction for charge item definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this charge item definition is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the charge item definition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the charge item definition was last reviewed by the publisher",
         default=None,
     )
@@ -208,7 +212,7 @@ class ChargeItemDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

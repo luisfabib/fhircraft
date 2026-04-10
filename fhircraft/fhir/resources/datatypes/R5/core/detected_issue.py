@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DetectedIssueEvidence(BackboneElement):
     """
     Supporting evidence or manifestations that provide the basis for identifying the detected issue such as a GuidanceResponse or MeasureReport.
@@ -36,6 +37,7 @@ class DetectedIssueEvidence(BackboneElement):
         default=None,
     )
 
+
 class DetectedIssueMitigation(BackboneElement):
     """
     Indicates an action that has been taken or is committed to reduce or eliminate the likelihood of the risk identified by the detected issue from manifesting.  Can also reflect an observation of known mitigating factors that may reduce/eliminate the need for any action.
@@ -45,7 +47,7 @@ class DetectedIssueMitigation(BackboneElement):
         description="What mitigation?",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date committed",
         default=None,
     )
@@ -57,6 +59,7 @@ class DetectedIssueMitigation(BackboneElement):
         description="Additional notes about the mitigation",
         default=None,
     )
+
 
 class DetectedIssue(DomainResource):
     """
@@ -71,7 +74,7 @@ class DetectedIssue(DomainResource):
         description="Unique id for the detected issue",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preliminary | final | entered-in-error | mitigated",
         default=None,
     )
@@ -83,7 +86,7 @@ class DetectedIssue(DomainResource):
         description="Specific type of detected issue, e.g. drug-drug, duplicate therapy, etc",
         default=None,
     )
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="high | moderate | low",
         default=None,
     )
@@ -95,7 +98,7 @@ class DetectedIssue(DomainResource):
         description="Encounter detected issue is part of",
         default=None,
     )
-    identifiedDateTime: Optional[DateTime] = Field(
+    identifiedDateTime: Optional[fhir.dateTime] = Field(
         description="When identified",
         default=None,
     )
@@ -115,11 +118,11 @@ class DetectedIssue(DomainResource):
         description="Supporting evidence",
         default=None,
     )
-    detail: Optional[Markdown] = Field(
+    detail: Optional[fhir.markdown] = Field(
         description="Description and context",
         default=None,
     )
-    reference: Optional[Uri] = Field(
+    reference: Optional[fhir.uri] = Field(
         description="Authority for issue",
         default=None,
     )
@@ -139,7 +142,7 @@ class DetectedIssue(DomainResource):
     def identified_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="identified",
             required=False,
         )

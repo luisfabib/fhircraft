@@ -3,8 +3,9 @@ from typing import List, Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import Element
+
 
 class Attachment(Element):
     """
@@ -13,35 +14,35 @@ class Attachment(Element):
 
     _type = "Attachment"
 
-    contentType: Optional[Code] = Field(
+    contentType: Optional[fhir.code] = Field(
         description="Mime type of the content, with charset etc.",
         default=None,
     )
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="Human language of the content (BCP-47)",
         default=None,
     )
-    data: Optional[Base64Binary] = Field(
+    data: Optional[fhir.base64Binary] = Field(
         description="Data inline, base64ed",
         default=None,
     )
-    url: Optional[Url] = Field(
-        description="Uri where the data can be found",
+    url: Optional[fhir.url] = Field(
+        description="uri where the data can be found",
         default=None,
     )
-    size: Optional[UnsignedInt] = Field(
+    size: Optional[fhir.unsignedInt] = Field(
         description="Number of bytes of content (if url provided)",
         default=None,
     )
-    hash: Optional[Base64Binary] = Field(
+    hash: Optional[fhir.base64Binary] = Field(
         description="Hash of the data (sha-1, base64ed)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label to display in place of the data",
         default=None,
     )
-    creation: Optional[DateTime] = Field(
+    creation: Optional[fhir.dateTime] = Field(
         description="Date attachment was first created",
         default=None,
     )

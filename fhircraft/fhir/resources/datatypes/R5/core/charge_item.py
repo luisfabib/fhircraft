@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -26,6 +26,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ChargeItemPerformer(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -40,6 +41,7 @@ class ChargeItemPerformer(BackboneElement):
         default=None,
     )
 
+
 class ChargeItem(DomainResource):
     """
     The resource ChargeItem describes the provision of healthcare provider products for a certain patient, therefore referring not only to the product, but containing in addition details of the provision, like date, time, amounts and participating organizations and persons. Main Usage of the ChargeItem is to enable the billing process and internal cost allocation.
@@ -53,15 +55,15 @@ class ChargeItem(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    definitionUri: Optional[ListType[Uri]] = Field(
+    definitionUri: Optional[ListType[fhir.uri]] = Field(
         description="Defining information about the code of this charge item",
         default=None,
     )
-    definitionCanonical: Optional[ListType[Canonical]] = Field(
+    definitionCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | billable | not-billable | aborted | billed | entered-in-error | unknown",
         default=None,
     )
@@ -81,7 +83,7 @@ class ChargeItem(DomainResource):
         description="Encounter associated with this ChargeItem",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the charged service was applied",
         default=None,
     )
@@ -133,7 +135,7 @@ class ChargeItem(DomainResource):
         description="Individual who was entering",
         default=None,
     )
-    enteredDate: Optional[DateTime] = Field(
+    enteredDate: Optional[fhir.dateTime] = Field(
         description="Date the charge item was entered",
         default=None,
     )
@@ -173,7 +175,7 @@ class ChargeItem(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

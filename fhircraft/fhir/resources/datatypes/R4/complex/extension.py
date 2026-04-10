@@ -3,11 +3,11 @@ from typing import Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 
 from fhircraft.fhir.resources.datatypes.R4.complex import Element
 
 if TYPE_CHECKING:
-    from ..primitive import *
     from fhircraft.fhir.resources.datatypes.R4.complex import (
         Age,
         Address,
@@ -54,79 +54,79 @@ class Extension(Element):
         description="identifies the meaning of the extension",
         default=None,
     )
-    valueBase64Binary: Optional["Base64Binary"] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Value of extension",
         default=None,
     )
-    valueBoolean: Optional["Boolean"] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of extension",
         default=None,
     )
-    valueCanonical: Optional["Canonical"] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="Value of extension",
         default=None,
     )
-    valueCode: Optional["Code"] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDate: Optional["Date"] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDateTime: Optional["DateTime"] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDecimal: Optional["Decimal"] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Value of extension",
         default=None,
     )
-    valueId: Optional["Id"] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Value of extension",
         default=None,
     )
-    valueInstant: Optional["Instant"] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="Value of extension",
         default=None,
     )
-    valueInteger: Optional["Integer"] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Value of extension",
         default=None,
     )
-    valueMarkdown: Optional["Markdown"] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="Value of extension",
         default=None,
     )
-    valueOid: Optional["Oid"] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="Value of extension",
         default=None,
     )
-    valuePositiveInt: Optional["PositiveInt"] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Value of extension",
         default=None,
     )
-    valueString: Optional["String"] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Value of extension",
         default=None,
     )
-    valueTime: Optional["Time"] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Value of extension",
         default=None,
     )
-    valueUnsignedInt: Optional["UnsignedInt"] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Value of extension",
         default=None,
     )
-    valueUri: Optional["Uri"] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Value of extension",
         default=None,
     )
-    valueUrl: Optional["Url"] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="Value of extension",
         default=None,
     )
-    valueUuid: Optional["Uuid"] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="Value of extension",
         default=None,
     )

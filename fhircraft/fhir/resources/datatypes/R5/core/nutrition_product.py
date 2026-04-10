@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class NutritionProductNutrient(BackboneElement):
     """
     The product's nutritional information expressed by the nutrients.
@@ -38,6 +39,7 @@ class NutritionProductNutrient(BackboneElement):
         description="The amount of nutrient expressed in one or more units: X per pack / per serving / per dose",
         default=None,
     )
+
 
 class NutritionProductIngredient(BackboneElement):
     """
@@ -53,20 +55,21 @@ class NutritionProductIngredient(BackboneElement):
         default=None,
     )
 
+
 class NutritionProductCharacteristic(BackboneElement):
     """
     Specifies descriptive properties of the nutrition product.
     """
 
     type: Optional[CodeableConcept] = Field(
-        description="Code specifying the type of characteristic",
+        description="code specifying the type of characteristic",
         default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="The value of the characteristic",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The value of the characteristic",
         default=None,
     )
@@ -74,7 +77,7 @@ class NutritionProductCharacteristic(BackboneElement):
         description="The value of the characteristic",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="The value of the characteristic",
         default=None,
     )
@@ -82,7 +85,7 @@ class NutritionProductCharacteristic(BackboneElement):
         description="The value of the characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The value of the characteristic",
         default=None,
     )
@@ -100,15 +103,16 @@ class NutritionProductCharacteristic(BackboneElement):
             self,
             field_types=[
                 CodeableConcept,
-                String,
+                fhir.String,
                 Quantity,
-                Base64Binary,
+                fhir.Base64Binary,
                 Attachment,
-                Boolean,
+                fhir.Boolean,
             ],
             field_name_base="value",
             required=True,
         )
+
 
 class NutritionProductInstance(BackboneElement):
     """
@@ -123,19 +127,19 @@ class NutritionProductInstance(BackboneElement):
         description="The identifier for the physical instance, typically a serial number or manufacturer number",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The name for the specific product",
         default=None,
     )
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="The identification of the batch or lot of the product",
         default=None,
     )
-    expiry: Optional[DateTime] = Field(
+    expiry: Optional[fhir.dateTime] = Field(
         description="The expiry date or date and time for the product",
         default=None,
     )
-    useBy: Optional[DateTime] = Field(
+    useBy: Optional[fhir.dateTime] = Field(
         description="The date until which the product is expected to be good for consumption",
         default=None,
     )
@@ -143,6 +147,7 @@ class NutritionProductInstance(BackboneElement):
         description="An identifier that supports traceability to the event during which material in this product from one or more biological entities was obtained or pooled",
         default=None,
     )
+
 
 class NutritionProduct(DomainResource):
     """
@@ -157,7 +162,7 @@ class NutritionProduct(DomainResource):
         description="A code that can identify the detailed nutrients and ingredients in a specific food product",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
     )

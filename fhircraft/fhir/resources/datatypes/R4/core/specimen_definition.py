@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -69,7 +69,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Color of container cap",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Container description",
         default=None,
     )
@@ -81,7 +81,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Minimum volume",
         default=None,
     )
-    minimumVolumeString: Optional[String] = Field(
+    minimumVolumeString: Optional[fhir.string] = Field(
         description="Minimum volume",
         default=None,
     )
@@ -89,7 +89,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Additive associated with container",
         default=None,
     )
-    preparation: Optional[String] = Field(
+    preparation: Optional[fhir.string] = Field(
         description="Specimen container preparation",
         default=None,
     )
@@ -105,7 +105,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     def minimumVolume_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, String],
+            field_types=[Quantity, fhir.string],
             field_name_base="minimumVolume",
             required=False,
         )
@@ -127,7 +127,7 @@ class SpecimenDefinitionTypeTestedHandling(BackboneElement):
         description="Maximum preservation time",
         default=None,
     )
-    instruction: Optional[String] = Field(
+    instruction: Optional[fhir.string] = Field(
         description="Preservation instruction",
         default=None,
     )
@@ -137,7 +137,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
     Specimen conditioned in a container as expected by the testing laboratory.
     """
 
-    isDerived: Optional[Boolean] = Field(
+    isDerived: Optional[fhir.boolean] = Field(
         description="Primary or secondary specimen",
         default=None,
     )
@@ -145,7 +145,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Type of intended specimen",
         default=None,
     )
-    preference: Optional[Code] = Field(
+    preference: Optional[fhir.code] = Field(
         description="preferred | alternate",
         default=None,
     )
@@ -153,7 +153,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="The specimen\u0027s container",
         default=None,
     )
-    requirement: Optional[String] = Field(
+    requirement: Optional[fhir.string] = Field(
         description="Specimen requirements",
         default=None,
     )
@@ -203,8 +203,8 @@ class SpecimenDefinition(DomainResource):
         description="Patient preparation for collection",
         default=None,
     )
-    timeAspect: Optional[String] = Field(
-        description="Time aspect for collection",
+    timeAspect: Optional[fhir.string] = Field(
+        description="time aspect for collection",
         default=None,
     )
     collection: Optional[ListType[CodeableConcept]] = Field(

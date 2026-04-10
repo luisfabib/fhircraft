@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,7 +27,7 @@ class EpisodeOfCareStatusHistory(BackboneElement):
     The history of statuses that the EpisodeOfCare has been through (without requiring processing the history of the resource).
     """
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
     )
@@ -77,7 +77,7 @@ class EpisodeOfCare(DomainResource):
         description="Business Identifier(s) relevant for this EpisodeOfCare",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
     )

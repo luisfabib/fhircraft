@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -33,7 +33,7 @@ class PaymentNotice(DomainResource):
         description="Business Identifier for the payment notice",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
@@ -45,7 +45,7 @@ class PaymentNotice(DomainResource):
         description="Response reference",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Creation date",
         default=None,
     )
@@ -57,7 +57,7 @@ class PaymentNotice(DomainResource):
         description="Payment reference",
         default=None,
     )
-    paymentDate: Optional[Date] = Field(
+    paymentDate: Optional[fhir.date_] = Field(
         description="Payment or clearing date",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,49 +22,52 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DeviceUdiCarrier(BackboneElement):
     """
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
     """
 
-    deviceIdentifier: Optional[String] = Field(
+    deviceIdentifier: Optional[fhir.string] = Field(
         description="Mandatory fixed portion of UDI",
         default=None,
     )
-    issuer: Optional[Uri] = Field(
+    issuer: Optional[fhir.uri] = Field(
         description="UDI Issuing Organization",
         default=None,
     )
-    jurisdiction: Optional[Uri] = Field(
+    jurisdiction: Optional[fhir.uri] = Field(
         description="Regional UDI authority",
         default=None,
     )
-    carrierAIDC: Optional[Base64Binary] = Field(
-        description="UDI Machine Readable Barcode String",
+    carrierAIDC: Optional[fhir.base64Binary] = Field(
+        description="UDI Machine Readable Barcode string",
         default=None,
     )
-    carrierHRF: Optional[String] = Field(
-        description="UDI Human Readable Barcode String",
+    carrierHRF: Optional[fhir.string] = Field(
+        description="UDI Human Readable Barcode string",
         default=None,
     )
-    entryType: Optional[Code] = Field(
+    entryType: Optional[fhir.code] = Field(
         description="barcode | rfid | manual +",
         default=None,
     )
+
 
 class DeviceDeviceName(BackboneElement):
     """
     This represents the manufacturer's name of the device as provided by the device, from a UDI label, or by a person describing the Device.  This typically would be used when a person provides the name(s) or when the device represents one of the names available from DeviceDefinition.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The name that identifies the device",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="udi-label-name | user-friendly-name | patient-reported-name | manufacturer-name | model-name | other",
         default=None,
     )
+
 
 class DeviceSpecialization(BackboneElement):
     """
@@ -75,10 +78,11 @@ class DeviceSpecialization(BackboneElement):
         description="The standard that is used to operate and communicate",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="The version of the standard that is used to operate and communicate",
         default=None,
     )
+
 
 class DeviceVersion(BackboneElement):
     """
@@ -93,10 +97,11 @@ class DeviceVersion(BackboneElement):
         description="A single component of the device version",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The version text",
         default=None,
     )
+
 
 class DeviceProperty(BackboneElement):
     """
@@ -104,7 +109,7 @@ class DeviceProperty(BackboneElement):
     """
 
     type: Optional[CodeableConcept] = Field(
-        description="Code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
+        description="code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
         default=None,
     )
     valueQuantity: Optional[ListType[Quantity]] = Field(
@@ -115,6 +120,7 @@ class DeviceProperty(BackboneElement):
         description="Property value as a code, e.g., NTP4 (synced to NTP)",
         default=None,
     )
+
 
 class Device(DomainResource):
     """
@@ -149,7 +155,7 @@ class Device(DomainResource):
         description="Unique Device Identifier (UDI) Barcode string",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error | unknown",
         default=None,
     )
@@ -157,27 +163,27 @@ class Device(DomainResource):
         description="online | paused | standby | offline | not-ready | transduc-discon | hw-discon | off",
         default=None,
     )
-    distinctIdentifier: Optional[String] = Field(
+    distinctIdentifier: Optional[fhir.string] = Field(
         description="The distinct identification string",
         default=None,
     )
-    manufacturer: Optional[String] = Field(
+    manufacturer: Optional[fhir.string] = Field(
         description="Name of device manufacturer",
         default=None,
     )
-    manufactureDate: Optional[DateTime] = Field(
+    manufactureDate: Optional[fhir.dateTime] = Field(
         description="Date when the device was made",
         default=None,
     )
-    expirationDate: Optional[DateTime] = Field(
+    expirationDate: Optional[fhir.dateTime] = Field(
         description="Date and time of expiry of this device (if applicable)",
         default=None,
     )
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="Lot number of manufacture",
         default=None,
     )
-    serialNumber: Optional[String] = Field(
+    serialNumber: Optional[fhir.string] = Field(
         description="Serial number assigned by the manufacturer",
         default=None,
     )
@@ -185,11 +191,11 @@ class Device(DomainResource):
         description="The name of the device as given by the manufacturer",
         default=None,
     )
-    modelNumber: Optional[String] = Field(
+    modelNumber: Optional[fhir.string] = Field(
         description="The manufacturer\u0027s model number for the device",
         default=None,
     )
-    partNumber: Optional[String] = Field(
+    partNumber: Optional[fhir.string] = Field(
         description="The part number or catalog number of the device",
         default=None,
     )
@@ -226,7 +232,7 @@ class Device(DomainResource):
         description="Where the device is found",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Network address to contact device",
         default=None,
     )

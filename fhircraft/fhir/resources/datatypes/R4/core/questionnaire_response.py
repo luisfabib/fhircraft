@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -27,35 +27,35 @@ class QuestionnaireResponseItemAnswer(BackboneElement):
     The respondent's answer(s) to the question.
     """
 
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Single-valued answer to the question",
         default=None,
     )
@@ -92,14 +92,14 @@ class QuestionnaireResponseItemAnswer(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
-                Uri,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
+                fhir.Uri,
                 Attachment,
                 Coding,
                 Quantity,
@@ -115,15 +115,15 @@ class QuestionnaireResponseItem(BackboneElement):
     A group or question item from the original questionnaire for which answers are provided.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific item from Questionnaire",
         default=None,
     )
-    definition: Optional[Uri] = Field(
+    definition: Optional[fhir.uri] = Field(
         description="ElementDefinition - details for the item",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Name for group or question text",
         default=None,
     )
@@ -170,11 +170,11 @@ class QuestionnaireResponse(DomainResource):
         description="Part of this action",
         default=None,
     )
-    questionnaire: Optional[Canonical] = Field(
+    questionnaire: Optional[fhir.canonical] = Field(
         description="Form being answered",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | completed | amended | entered-in-error | stopped",
         default=None,
     )
@@ -186,7 +186,7 @@ class QuestionnaireResponse(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    authored: Optional[DateTime] = Field(
+    authored: Optional[fhir.dateTime] = Field(
         description="Date the answers were gathered",
         default=None,
     )

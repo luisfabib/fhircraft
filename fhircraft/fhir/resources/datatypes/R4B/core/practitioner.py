@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class PractitionerQualification(BackboneElement):
     """
@@ -45,6 +46,7 @@ class PractitionerQualification(BackboneElement):
         description="Organization that regulates and issues the qualification",
         default=None,
     )
+
 
 class Practitioner(DomainResource):
     """
@@ -71,7 +73,7 @@ class Practitioner(DomainResource):
         description="An identifier for the person as this agent",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this practitioner\u0027s record is in active use",
         default=None,
     )
@@ -87,11 +89,11 @@ class Practitioner(DomainResource):
         description="Address(es) of the practitioner that are not role specific (typically home address)",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date  on which the practitioner was born",
         default=None,
     )

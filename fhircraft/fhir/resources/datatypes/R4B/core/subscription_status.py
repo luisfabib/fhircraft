@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -23,11 +23,11 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
     Detailed information about events relevant to this subscription notification.
     """
 
-    eventNumber: Optional[String] = Field(
+    eventNumber: Optional[fhir.string] = Field(
         description="Event number",
         default=None,
     )
-    timestamp: Optional[Instant] = Field(
+    timestamp: Optional[fhir.instant] = Field(
         description="The instant this event occurred",
         default=None,
     )
@@ -61,15 +61,15 @@ class SubscriptionStatus(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="requested | active | error | off | entered-in-error",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="handshake | heartbeat | event-notification | query-status | query-event",
         default=None,
     )
-    eventsSinceSubscriptionStart: Optional[String] = Field(
+    eventsSinceSubscriptionStart: Optional[fhir.string] = Field(
         description="Events since the Subscription was created",
         default=None,
     )
@@ -81,7 +81,7 @@ class SubscriptionStatus(DomainResource):
         description="Reference to the Subscription responsible for this notification",
         default=None,
     )
-    topic: Optional[Canonical] = Field(
+    topic: Optional[fhir.canonical] = Field(
         description="Reference to the SubscriptionTopic this notification relates to",
         default=None,
     )

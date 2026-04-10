@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicationIngredient(BackboneElement):
     """
     Identifies a particular constituent of interest in the product.
@@ -32,7 +33,7 @@ class MedicationIngredient(BackboneElement):
         description="The ingredient (substance or medication) that the ingredient.strength relates to",
         default=None,
     )
-    isActive: Optional[Boolean] = Field(
+    isActive: Optional[fhir.boolean] = Field(
         description="Active ingredient indicator",
         default=None,
     )
@@ -65,19 +66,21 @@ class MedicationIngredient(BackboneElement):
             required=False,
         )
 
+
 class MedicationBatch(BackboneElement):
     """
     Information that only applies to packages (not products).
     """
 
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="Identifier assigned to batch",
         default=None,
     )
-    expirationDate: Optional[DateTime] = Field(
+    expirationDate: Optional[fhir.dateTime] = Field(
         description="When batch will expire",
         default=None,
     )
+
 
 class Medication(DomainResource):
     """
@@ -96,7 +99,7 @@ class Medication(DomainResource):
         description="Codes that identify this medication",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ClaimResponseItemAdjudication(BackboneElement):
     """
     If this item is a group then the values here are a summary of the adjudication of the detail items. If this item is a simple product or service then this is the result of the adjudication of this item.
@@ -41,10 +42,11 @@ class ClaimResponseItemAdjudication(BackboneElement):
         description="Monetary amount",
         default=None,
     )
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Non-monetary value",
         default=None,
     )
+
 
 class ClaimResponseItemDetailAdjudication(BackboneElement):
     """
@@ -63,21 +65,22 @@ class ClaimResponseItemDetailAdjudication(BackboneElement):
         description="Monetary amount",
         default=None,
     )
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Non-monetary value",
         default=None,
     )
+
 
 class ClaimResponseItemDetailSubDetail(BackboneElement):
     """
     A sub-detail adjudication of a simple product or service.
     """
 
-    subDetailSequence: Optional[PositiveInt] = Field(
+    subDetailSequence: Optional[fhir.positiveInt] = Field(
         description="Claim sub-detail instance identifier",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -86,16 +89,17 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         default=None,
     )
 
+
 class ClaimResponseItemDetail(BackboneElement):
     """
     A claim detail. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
     """
 
-    detailSequence: Optional[PositiveInt] = Field(
+    detailSequence: Optional[fhir.positiveInt] = Field(
         description="Claim detail instance identifier",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -108,16 +112,17 @@ class ClaimResponseItemDetail(BackboneElement):
         default=None,
     )
 
+
 class ClaimResponseItem(BackboneElement):
     """
     A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
     """
 
-    itemSequence: Optional[PositiveInt] = Field(
+    itemSequence: Optional[fhir.positiveInt] = Field(
         description="Claim item instance identifier",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -129,6 +134,7 @@ class ClaimResponseItem(BackboneElement):
         description="Adjudication for claim details",
         default=None,
     )
+
 
 class ClaimResponseAddItemDetailSubDetail(BackboneElement):
     """
@@ -151,7 +157,7 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
     )
@@ -159,7 +165,7 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -167,6 +173,7 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Added items detail adjudication",
         default=None,
     )
+
 
 class ClaimResponseAddItemDetail(BackboneElement):
     """
@@ -189,7 +196,7 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
     )
@@ -197,7 +204,7 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -210,20 +217,21 @@ class ClaimResponseAddItemDetail(BackboneElement):
         default=None,
     )
 
+
 class ClaimResponseAddItem(BackboneElement):
     """
     The first-tier service adjudications for payor added product or service lines.
     """
 
-    itemSequence: Optional[ListType[PositiveInt]] = Field(
+    itemSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Item sequence number",
         default=None,
     )
-    detailSequence: Optional[ListType[PositiveInt]] = Field(
+    detailSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Detail sequence number",
         default=None,
     )
-    subdetailSequence: Optional[ListType[PositiveInt]] = Field(
+    subdetailSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Subdetail sequence number",
         default=None,
     )
@@ -243,7 +251,7 @@ class ClaimResponseAddItem(BackboneElement):
         description="Program the product or service is provided under",
         default=None,
     )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Date or dates of service or product delivery",
         default=None,
     )
@@ -271,7 +279,7 @@ class ClaimResponseAddItem(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
     )
@@ -287,7 +295,7 @@ class ClaimResponseAddItem(BackboneElement):
         description="Anatomical sub-location",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -318,7 +326,7 @@ class ClaimResponseAddItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.date_, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -331,6 +339,7 @@ class ClaimResponseAddItem(BackboneElement):
             field_name_base="location",
             required=False,
         )
+
 
 class ClaimResponseTotal(BackboneElement):
     """
@@ -345,6 +354,7 @@ class ClaimResponseTotal(BackboneElement):
         description="Financial total for the category",
         default=None,
     )
+
 
 class ClaimResponsePayment(BackboneElement):
     """
@@ -363,7 +373,7 @@ class ClaimResponsePayment(BackboneElement):
         description="Explanation for the adjustment",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Expected date of payment",
         default=None,
     )
@@ -376,20 +386,21 @@ class ClaimResponsePayment(BackboneElement):
         default=None,
     )
 
+
 class ClaimResponseProcessNote(BackboneElement):
     """
     A note that describes or explains adjudication results in a human readable form.
     """
 
-    number: Optional[PositiveInt] = Field(
+    number: Optional[fhir.positiveInt] = Field(
         description="Note instance identifier",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="display | print | printoper",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Note explanatory text",
         default=None,
     )
@@ -398,16 +409,17 @@ class ClaimResponseProcessNote(BackboneElement):
         default=None,
     )
 
+
 class ClaimResponseInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Insurance instance identifier",
         default=None,
     )
-    focal: Optional[Boolean] = Field(
+    focal: Optional[fhir.boolean] = Field(
         description="Coverage to be used for adjudication",
         default=None,
     )
@@ -415,7 +427,7 @@ class ClaimResponseInsurance(BackboneElement):
         description="Insurance information",
         default=None,
     )
-    businessArrangement: Optional[String] = Field(
+    businessArrangement: Optional[fhir.string] = Field(
         description="Additional provider contract number",
         default=None,
     )
@@ -424,20 +436,21 @@ class ClaimResponseInsurance(BackboneElement):
         default=None,
     )
 
+
 class ClaimResponseError(BackboneElement):
     """
     Errors encountered during the processing of the adjudication.
     """
 
-    itemSequence: Optional[PositiveInt] = Field(
+    itemSequence: Optional[fhir.positiveInt] = Field(
         description="Item sequence number",
         default=None,
     )
-    detailSequence: Optional[PositiveInt] = Field(
+    detailSequence: Optional[fhir.positiveInt] = Field(
         description="Detail sequence number",
         default=None,
     )
-    subDetailSequence: Optional[PositiveInt] = Field(
+    subDetailSequence: Optional[fhir.positiveInt] = Field(
         description="Subdetail sequence number",
         default=None,
     )
@@ -445,6 +458,7 @@ class ClaimResponseError(BackboneElement):
         description="Error code detailing processing issues",
         default=None,
     )
+
 
 class ClaimResponse(DomainResource):
     """
@@ -471,7 +485,7 @@ class ClaimResponse(DomainResource):
         description="Business Identifier for a claim response",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
@@ -483,7 +497,7 @@ class ClaimResponse(DomainResource):
         description="More granular claim type",
         default=None,
     )
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="claim | preauthorization | predetermination",
         default=None,
     )
@@ -491,7 +505,7 @@ class ClaimResponse(DomainResource):
         description="The recipient of the products and services",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Response creation date",
         default=None,
     )
@@ -504,18 +518,18 @@ class ClaimResponse(DomainResource):
         default=None,
     )
     request: Optional[Reference] = Field(
-        description="Id of resource triggering adjudication",
+        description="id_ of resource triggering adjudication",
         default=None,
     )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="queued | complete | error | partial",
         default=None,
     )
-    disposition: Optional[String] = Field(
+    disposition: Optional[fhir.string] = Field(
         description="Disposition Message",
         default=None,
     )
-    preAuthRef: Optional[String] = Field(
+    preAuthRef: Optional[fhir.string] = Field(
         description="Preauthorization reference",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -21,12 +21,13 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicinalProductNameNamePart(BackboneElement):
     """
     Coding words or phrases of the name.
     """
 
-    part: Optional[String] = Field(
+    part: Optional[fhir.string] = Field(
         description="A fragment of a product name",
         default=None,
     )
@@ -34,6 +35,7 @@ class MedicinalProductNameNamePart(BackboneElement):
         description="Idenifying type for this part of the name (e.g. strength part)",
         default=None,
     )
+
 
 class MedicinalProductNameCountryLanguage(BackboneElement):
     """
@@ -53,12 +55,13 @@ class MedicinalProductNameCountryLanguage(BackboneElement):
         default=None,
     )
 
+
 class MedicinalProductName(BackboneElement):
     """
     The product's name, including full name and possibly coded parts.
     """
 
-    productName: Optional[String] = Field(
+    productName: Optional[fhir.string] = Field(
         description="The full product name",
         default=None,
     )
@@ -70,6 +73,7 @@ class MedicinalProductName(BackboneElement):
         description="Country where the name applies",
         default=None,
     )
+
 
 class MedicinalProductManufacturingBusinessOperation(BackboneElement):
     """
@@ -84,7 +88,7 @@ class MedicinalProductManufacturingBusinessOperation(BackboneElement):
         description="Regulatory authorization reference number",
         default=None,
     )
-    effectiveDate: Optional[DateTime] = Field(
+    effectiveDate: Optional[fhir.dateTime] = Field(
         description="Regulatory authorization date",
         default=None,
     )
@@ -100,6 +104,7 @@ class MedicinalProductManufacturingBusinessOperation(BackboneElement):
         description="A regulator which oversees the operation",
         default=None,
     )
+
 
 class MedicinalProductSpecialDesignation(BackboneElement):
     """
@@ -130,7 +135,7 @@ class MedicinalProductSpecialDesignation(BackboneElement):
         description="For example granted, pending, expired or withdrawn",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date when the designation was granted",
         default=None,
     )
@@ -154,6 +159,7 @@ class MedicinalProductSpecialDesignation(BackboneElement):
             field_name_base="indication",
             required=False,
         )
+
 
 class MedicinalProduct(DomainResource):
     """
@@ -200,7 +206,7 @@ class MedicinalProduct(DomainResource):
         description="Whether the Medicinal Product is subject to additional monitoring for regulatory reasons",
         default=None,
     )
-    specialMeasures: Optional[ListType[String]] = Field(
+    specialMeasures: Optional[ListType[fhir.string]] = Field(
         description="Whether the Medicinal Product is subject to special measures for regulatory reasons",
         default=None,
     )

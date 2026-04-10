@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,12 +27,13 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceVariableDefinition(BackboneElement):
     """
     Evidence variable such as population, exposure, or outcome.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A text description or summary of the variable",
         default=None,
     )
@@ -57,12 +58,13 @@ class EvidenceVariableDefinition(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatisticSampleSize(BackboneElement):
     """
     Number of samples in the statistic.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description of sample size for statistic",
         default=None,
     )
@@ -70,25 +72,26 @@ class EvidenceStatisticSampleSize(BackboneElement):
         description="Footnote or explanatory note about the sample size",
         default=None,
     )
-    numberOfStudies: Optional[UnsignedInt] = Field(
+    numberOfStudies: Optional[fhir.unsignedInt] = Field(
         description="Number of contributing studies",
         default=None,
     )
-    numberOfParticipants: Optional[UnsignedInt] = Field(
+    numberOfParticipants: Optional[fhir.unsignedInt] = Field(
         description="Cumulative number of participants",
         default=None,
     )
-    knownDataCount: Optional[UnsignedInt] = Field(
+    knownDataCount: Optional[fhir.unsignedInt] = Field(
         description="Number of participants with known results for measured variables",
         default=None,
     )
+
 
 class EvidenceStatisticAttributeEstimate(BackboneElement):
     """
     A statistical attribute of the statistic such as a measure of heterogeneity.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description of the attribute estimate",
         default=None,
     )
@@ -104,7 +107,7 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         description="The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure",
         default=None,
     )
-    level: Optional[Decimal] = Field(
+    level: Optional[fhir.decimal] = Field(
         description="Level of confidence interval, e.g., 0.95 for 95% confidence interval",
         default=None,
     )
@@ -117,6 +120,7 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
     """
     A variable adjusted for in the adjusted analysis.
@@ -126,7 +130,7 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
         description="Description of the variable",
         default=None,
     )
-    handling: Optional[Code] = Field(
+    handling: Optional[fhir.code] = Field(
         description="continuous | dichotomous | ordinal | polychotomous",
         default=None,
     )
@@ -143,12 +147,13 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
     """
     An attribute of the statistic used as a model characteristic.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description of the attribute estimate",
         default=None,
     )
@@ -164,7 +169,7 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         description="The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure",
         default=None,
     )
-    level: Optional[Decimal] = Field(
+    level: Optional[fhir.decimal] = Field(
         description="Level of confidence interval, e.g., 0.95 for 95% confidence interval",
         default=None,
     )
@@ -176,6 +181,7 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         description="A nested attribute estimate; which is the attribute estimate of an attribute estimate",
         default=None,
     )
+
 
 class EvidenceStatisticModelCharacteristic(BackboneElement):
     """
@@ -201,12 +207,13 @@ class EvidenceStatisticModelCharacteristic(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatistic(BackboneElement):
     """
     Values and parameters for a single statistic.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of content",
         default=None,
     )
@@ -226,11 +233,11 @@ class EvidenceStatistic(BackboneElement):
         description="Statistic value",
         default=None,
     )
-    numberOfEvents: Optional[UnsignedInt] = Field(
+    numberOfEvents: Optional[fhir.unsignedInt] = Field(
         description="The number of events associated with the statistic",
         default=None,
     )
-    numberAffected: Optional[UnsignedInt] = Field(
+    numberAffected: Optional[fhir.unsignedInt] = Field(
         description="The number of participants affected",
         default=None,
     )
@@ -249,12 +256,13 @@ class EvidenceStatistic(BackboneElement):
         )
     )
 
+
 class EvidenceCertainty(BackboneElement):
     """
     Assessment of certainty, confidence in the estimates, or quality of the evidence.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description of certainty",
         default=None,
     )
@@ -270,7 +278,7 @@ class EvidenceCertainty(BackboneElement):
         description="Assessment or judgement of the aspect",
         default=None,
     )
-    rater: Optional[String] = Field(
+    rater: Optional[fhir.string] = Field(
         description="Individual or group who did the rating",
         default=None,
     )
@@ -278,6 +286,7 @@ class EvidenceCertainty(BackboneElement):
         description="A domain or subdomain of certainty",
         default=None,
     )
+
 
 class Evidence(DomainResource):
     """
@@ -288,19 +297,19 @@ class Evidence(DomainResource):
     _type = "Evidence"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Evidence"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this evidence, represented as a globally unique URI",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this evidence, represented as a globally unique URI",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the summary",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of this summary",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -308,11 +317,11 @@ class Evidence(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this summary (machine friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this summary (human friendly)",
         default=None,
     )
@@ -320,31 +329,31 @@ class Evidence(DomainResource):
         description="Citation for this evidence",
         default=None,
     )
-    citeAsMarkdown: Optional[Markdown] = Field(
+    citeAsMarkdown: Optional[fhir.markdown] = Field(
         description="Citation for this evidence",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the summary was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the summary was last reviewed by the publisher",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -372,15 +381,15 @@ class Evidence(DomainResource):
         description="The context that the content is intended to support",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this Evidence is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
@@ -388,11 +397,11 @@ class Evidence(DomainResource):
         description="Link or citation to artifact associated with the summary",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the particular summary",
         default=None,
     )
-    assertion: Optional[Markdown] = Field(
+    assertion: Optional[fhir.markdown] = Field(
         description="Declarative description of the Evidence",
         default=None,
     )
@@ -439,7 +448,7 @@ class Evidence(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )
@@ -448,7 +457,7 @@ class Evidence(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Markdown],
+            field_types=[Reference, fhir.markdown],
             field_name_base="citeAs",
             required=False,
         )

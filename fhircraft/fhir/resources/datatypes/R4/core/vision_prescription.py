@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -26,11 +26,11 @@ class VisionPrescriptionLensSpecificationPrism(BackboneElement):
     Allows for adjustment on two axis.
     """
 
-    amount: Optional[Decimal] = Field(
+    amount: Optional[fhir.decimal] = Field(
         description="Amount of adjustment",
         default=None,
     )
-    base: Optional[Code] = Field(
+    base: Optional[fhir.code] = Field(
         description="up | down | in | out",
         default=None,
     )
@@ -44,19 +44,19 @@ class VisionPrescriptionLensSpecification(BackboneElement):
         description="Product to be supplied",
         default=None,
     )
-    eye: Optional[Code] = Field(
+    eye: Optional[fhir.code] = Field(
         description="right | left",
         default=None,
     )
-    sphere: Optional[Decimal] = Field(
+    sphere: Optional[fhir.decimal] = Field(
         description="Power of the lens",
         default=None,
     )
-    cylinder: Optional[Decimal] = Field(
+    cylinder: Optional[fhir.decimal] = Field(
         description="Lens power for astigmatism",
         default=None,
     )
-    axis: Optional[Integer] = Field(
+    axis: Optional[fhir.integer] = Field(
         description="Lens meridian which contain no power for astigmatism",
         default=None,
     )
@@ -64,19 +64,19 @@ class VisionPrescriptionLensSpecification(BackboneElement):
         description="Eye alignment compensation",
         default=None,
     )
-    add: Optional[Decimal] = Field(
+    add: Optional[fhir.decimal] = Field(
         description="Added power for multifocal levels",
         default=None,
     )
-    power: Optional[Decimal] = Field(
+    power: Optional[fhir.decimal] = Field(
         description="Contact lens power",
         default=None,
     )
-    backCurve: Optional[Decimal] = Field(
+    backCurve: Optional[fhir.decimal] = Field(
         description="Contact lens back curvature",
         default=None,
     )
-    diameter: Optional[Decimal] = Field(
+    diameter: Optional[fhir.decimal] = Field(
         description="Contact lens diameter",
         default=None,
     )
@@ -84,11 +84,11 @@ class VisionPrescriptionLensSpecification(BackboneElement):
         description="Lens wear duration",
         default=None,
     )
-    color: Optional[String] = Field(
+    color: Optional[fhir.string] = Field(
         description="Color required",
         default=None,
     )
-    brand: Optional[String] = Field(
+    brand: Optional[fhir.string] = Field(
         description="Brand required",
         default=None,
     )
@@ -122,11 +122,11 @@ class VisionPrescription(DomainResource):
         description="Business Identifier for vision prescription",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Response creation date",
         default=None,
     )
@@ -138,7 +138,7 @@ class VisionPrescription(DomainResource):
         description="Created during encounter / admission / stay",
         default=None,
     )
-    dateWritten: Optional[DateTime] = Field(
+    dateWritten: Optional[fhir.dateTime] = Field(
         description="When prescription was authorized",
         default=None,
     )

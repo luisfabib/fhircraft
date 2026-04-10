@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,26 +22,28 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ConsentPolicy(BackboneElement):
     """
     The references to the policies that are included in this consent scope. Policies may be organizational, but are often defined jurisdictionally, or in law.
     """
 
-    authority: Optional[Uri] = Field(
+    authority: Optional[fhir.uri] = Field(
         description="Enforcement source for policy",
         default=None,
     )
-    uri: Optional[Uri] = Field(
+    uri: Optional[fhir.uri] = Field(
         description="Specific policy covered by this consent",
         default=None,
     )
+
 
 class ConsentVerification(BackboneElement):
     """
     Whether a treatment instruction (e.g. artificial respiration yes or no) was verified with the patient, his/her family or another authorized person.
     """
 
-    verified: Optional[Boolean] = Field(
+    verified: Optional[fhir.boolean] = Field(
         description="Has been verified",
         default=None,
     )
@@ -49,10 +51,11 @@ class ConsentVerification(BackboneElement):
         description="Person who verified",
         default=None,
     )
-    verificationDate: Optional[DateTime] = Field(
+    verificationDate: Optional[fhir.dateTime] = Field(
         description="When consent verified",
         default=None,
     )
+
 
 class ConsentProvisionActor(BackboneElement):
     """
@@ -68,12 +71,13 @@ class ConsentProvisionActor(BackboneElement):
         default=None,
     )
 
+
 class ConsentProvisionData(BackboneElement):
     """
     The resources controlled by this rule if specific resources are referenced.
     """
 
-    meaning: Optional[Code] = Field(
+    meaning: Optional[fhir.code] = Field(
         description="instance | related | dependents | authoredby",
         default=None,
     )
@@ -82,12 +86,13 @@ class ConsentProvisionData(BackboneElement):
         default=None,
     )
 
+
 class ConsentProvision(BackboneElement):
     """
     An exception to the base policy of this consent. An exception can be an addition or removal of access permissions.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="deny | permit",
         default=None,
     )
@@ -133,6 +138,7 @@ class ConsentProvision(BackboneElement):
         default=None,
     )
 
+
 class Consent(DomainResource):
     """
     A record of a healthcare consumer's  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
@@ -158,7 +164,7 @@ class Consent(DomainResource):
         description="Identifier for this record (external references)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | proposed | active | rejected | inactive | entered-in-error",
         default=None,
     )
@@ -174,7 +180,7 @@ class Consent(DomainResource):
         description="Who the consent applies to",
         default=None,
     )
-    dateTime: Optional[DateTime] = Field(
+    dateTime: Optional[fhir.dateTime] = Field(
         description="When this Consent was created or indexed",
         default=None,
     )

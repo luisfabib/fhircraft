@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class InvoiceParticipant(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -35,20 +36,21 @@ class InvoiceParticipant(BackboneElement):
         default=None,
     )
 
+
 class InvoiceLineItemPriceComponent(BackboneElement):
     """
     The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice as to how the prices have been calculated.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code identifying the specific component",
+        description="code identifying the specific component",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Factor used for calculating this component",
         default=None,
     )
@@ -57,12 +59,13 @@ class InvoiceLineItemPriceComponent(BackboneElement):
         default=None,
     )
 
+
 class InvoiceLineItem(BackboneElement):
     """
     Each line item represents one charge for goods and services rendered. Details such as date, code and amount are found in the referenced ChargeItem resource.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Sequence number of line item",
         default=None,
     )
@@ -95,20 +98,21 @@ class InvoiceLineItem(BackboneElement):
             required=True,
         )
 
+
 class InvoiceTotalPriceComponent(BackboneElement):
     """
     The total amount for the Invoice may be calculated as the sum of the line items with surcharges/deductions that apply in certain conditions.  The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the total price was calculated.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code identifying the specific component",
+        description="code identifying the specific component",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Factor used for calculating this component",
         default=None,
     )
@@ -116,6 +120,7 @@ class InvoiceTotalPriceComponent(BackboneElement):
         description="Monetary amount associated with this component",
         default=None,
     )
+
 
 class Invoice(DomainResource):
     """
@@ -142,11 +147,11 @@ class Invoice(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | issued | balanced | cancelled | entered-in-error",
         default=None,
     )
-    cancelledReason: Optional[String] = Field(
+    cancelledReason: Optional[fhir.string] = Field(
         description="Reason for cancellation of this Invoice",
         default=None,
     )
@@ -162,7 +167,7 @@ class Invoice(DomainResource):
         description="Recipient of this invoice",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Invoice date / posting date",
         default=None,
     )
@@ -194,7 +199,7 @@ class Invoice(DomainResource):
         description="Gross total of this Invoice",
         default=None,
     )
-    paymentTerms: Optional[Markdown] = Field(
+    paymentTerms: Optional[fhir.markdown] = Field(
         description="Payment details",
         default=None,
     )

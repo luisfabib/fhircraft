@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -34,7 +34,7 @@ class Schedule(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this schedule is in active use",
         default=None,
     )
@@ -50,7 +50,7 @@ class Schedule(DomainResource):
         description="Type of specialty needed",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human-readable label",
         default=None,
     )
@@ -62,7 +62,7 @@ class Schedule(DomainResource):
         description="Period of time covered by schedule",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Comments on availability",
         default=None,
     )

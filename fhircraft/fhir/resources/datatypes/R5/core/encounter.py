@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -111,7 +111,7 @@ class EncounterLocation(BackboneElement):
         description="Location the encounter takes place",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | active | reserved | completed",
         default=None,
     )
@@ -120,7 +120,7 @@ class EncounterLocation(BackboneElement):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period during which the patient was present at the location",
+        description="time period during which the patient was present at the location",
         default=None,
     )
 
@@ -137,7 +137,7 @@ class Encounter(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | in-progress | on-hold | discharged | completed | cancelled | discontinued | entered-in-error | unknown",
         default=None,
     )
@@ -202,11 +202,11 @@ class Encounter(DomainResource):
         description="The actual start and end time of the encounter",
         default=None,
     )
-    plannedStartDate: Optional[DateTime] = Field(
+    plannedStartDate: Optional[fhir.dateTime] = Field(
         description="The planned start date/time (or admission date) of the encounter",
         default=None,
     )
-    plannedEndDate: Optional[DateTime] = Field(
+    plannedEndDate: Optional[fhir.dateTime] = Field(
         description="The planned end date/time (or discharge date) of the encounter",
         default=None,
     )

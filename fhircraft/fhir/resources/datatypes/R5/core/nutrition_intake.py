@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class NutritionIntakeConsumedItem(BackboneElement):
     """
     What food or fluid product or item was consumed.
@@ -35,7 +36,7 @@ class NutritionIntakeConsumedItem(BackboneElement):
         default=None,
     )
     nutritionProduct: Optional[CodeableReference] = Field(
-        description="Code that identifies the food or fluid product that was consumed",
+        description="code that identifies the food or fluid product that was consumed",
         default=None,
     )
     schedule: Optional[Timing] = Field(
@@ -50,7 +51,7 @@ class NutritionIntakeConsumedItem(BackboneElement):
         description="Rate at which enteral feeding was administered",
         default=None,
     )
-    notConsumed: Optional[Boolean] = Field(
+    notConsumed: Optional[fhir.boolean] = Field(
         description="Flag to indicate if the food or fluid item was refused or otherwise not consumed",
         default=None,
     )
@@ -58,6 +59,7 @@ class NutritionIntakeConsumedItem(BackboneElement):
         description="Reason food or fluid was not consumed",
         default=None,
     )
+
 
 class NutritionIntakeIngredientLabel(BackboneElement):
     """
@@ -73,6 +75,7 @@ class NutritionIntakeIngredientLabel(BackboneElement):
         default=None,
     )
 
+
 class NutritionIntakePerformer(BackboneElement):
     """
     Who performed the intake and how they were involved.
@@ -87,6 +90,7 @@ class NutritionIntakePerformer(BackboneElement):
         default=None,
     )
 
+
 class NutritionIntake(DomainResource):
     """
     A record of food or fluid that is being consumed by a patient.  A NutritionIntake may indicate that the patient may be consuming the food or fluid now or has consumed the food or fluid in the past.  The source of this information can be the patient, significant other (such as a family member or spouse), or a clinician.  A common scenario where this information is captured is during the history taking process during a patient visit or stay or through an app that tracks food or fluids consumed.   The consumption information may come from sources such as the patient's memory, from a nutrition label,  or from a clinician documenting observed intake.
@@ -100,11 +104,11 @@ class NutritionIntake(DomainResource):
         description="External identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -116,7 +120,7 @@ class NutritionIntake(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
@@ -125,7 +129,7 @@ class NutritionIntake(DomainResource):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code representing an overall type of nutrition intake",
+        description="code representing an overall type of nutrition intake",
         default=None,
     )
     subject: Optional[Reference] = Field(
@@ -136,7 +140,7 @@ class NutritionIntake(DomainResource):
         description="Encounter associated with NutritionIntake",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="The date/time or interval when the food or fluid is/was consumed",
         default=None,
     )
@@ -144,11 +148,11 @@ class NutritionIntake(DomainResource):
         description="The date/time or interval when the food or fluid is/was consumed",
         default=None,
     )
-    recorded: Optional[DateTime] = Field(
+    recorded: Optional[fhir.dateTime] = Field(
         description="When the intake was recorded",
         default=None,
     )
-    reportedBoolean: Optional[Boolean] = Field(
+    reportedBoolean: Optional[fhir.boolean] = Field(
         description="Person or organization that provided the information about the consumption of this food or fluid",
         default=None,
     )
@@ -203,7 +207,7 @@ class NutritionIntake(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="occurrence",
             required=False,
         )
@@ -212,7 +216,7 @@ class NutritionIntake(DomainResource):
     def reported_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Reference],
+            field_types=[fhir.boolean, Reference],
             field_name_base="reported",
             required=False,
         )

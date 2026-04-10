@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -21,12 +21,13 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DiagnosticReportMedia(BackboneElement):
     """
     A list of key images associated with this report. The images are generally created during the diagnostic process, and may be directly of the patient, or of treated specimens (i.e. slides of interest).
     """
 
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Comment about the image (e.g. explanation)",
         default=None,
     )
@@ -34,6 +35,7 @@ class DiagnosticReportMedia(BackboneElement):
         description="Reference to the image source",
         default=None,
     )
+
 
 class DiagnosticReport(DomainResource):
     """
@@ -64,7 +66,7 @@ class DiagnosticReport(DomainResource):
         description="What was requested",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | final +",
         default=None,
     )
@@ -73,7 +75,7 @@ class DiagnosticReport(DomainResource):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Name/Code for this diagnostic report",
+        description="Name/code for this diagnostic report",
         default=None,
     )
     subject: Optional[Reference] = Field(
@@ -84,7 +86,7 @@ class DiagnosticReport(DomainResource):
         description="Health care event when test ordered",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="Clinically relevant time/time-period for report",
         default=None,
     )
@@ -92,7 +94,7 @@ class DiagnosticReport(DomainResource):
         description="Clinically relevant time/time-period for report",
         default=None,
     )
-    issued: Optional[Instant] = Field(
+    issued: Optional[fhir.instant] = Field(
         description="DateTime this version was made",
         default=None,
     )
@@ -120,7 +122,7 @@ class DiagnosticReport(DomainResource):
         description="Key images associated with this report",
         default=None,
     )
-    conclusion: Optional[String] = Field(
+    conclusion: Optional[fhir.string] = Field(
         description="Clinical conclusion (interpretation) of test results",
         default=None,
     )
@@ -144,7 +146,7 @@ class DiagnosticReport(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="effective",
             required=False,
         )

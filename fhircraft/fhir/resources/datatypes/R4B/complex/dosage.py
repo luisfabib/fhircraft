@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     CodeableConcept,
@@ -83,11 +83,11 @@ class Dosage(BackboneElement):
 
     _type = "BackboneElement"
 
-    sequence: Optional[Integer] = Field(
+    sequence: Optional[fhir.integer] = Field(
         description="The order of the dosage instructions",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
     )
@@ -95,7 +95,7 @@ class Dosage(BackboneElement):
         description='Supplemental instruction or warnings to the patient - e.g. "with meals", "may cause drowsiness"',
         default=None,
     )
-    patientInstruction: Optional[String] = Field(
+    patientInstruction: Optional[fhir.string] = Field(
         description="Patient or consumer oriented instructions",
         default=None,
     )
@@ -103,7 +103,7 @@ class Dosage(BackboneElement):
         description="When medication should be administered",
         default=None,
     )
-    asNeededBoolean: Optional[Boolean] = Field(
+    asNeededBoolean: Optional[fhir.boolean] = Field(
         description='Take "as needed" (for x)',
         default=None,
     )
@@ -144,7 +144,7 @@ class Dosage(BackboneElement):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, "CodeableConcept"],
+            field_types=[fhir.boolean, "CodeableConcept"],
             field_name_base="asNeeded",
         )
 

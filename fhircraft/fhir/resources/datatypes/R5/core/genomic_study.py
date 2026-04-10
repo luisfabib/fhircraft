@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -123,15 +123,15 @@ class GenomicStudyAnalysis(BackboneElement):
         description="Genome build that is used in this analysis",
         default=None,
     )
-    instantiatesCanonical: Optional[Canonical] = Field(
+    instantiatesCanonical: Optional[fhir.canonical] = Field(
         description="The defined protocol that describes the analysis",
         default=None,
     )
-    instantiatesUri: Optional[Uri] = Field(
+    instantiatesUri: Optional[fhir.uri] = Field(
         description="The URL pointing to an externally maintained protocol that describes the analysis",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name of the analysis event (human friendly)",
         default=None,
     )
@@ -143,7 +143,7 @@ class GenomicStudyAnalysis(BackboneElement):
         description="The specimen used in the analysis event",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="The date of the analysis event",
         default=None,
     )
@@ -193,7 +193,7 @@ class GenomicStudy(DomainResource):
         description="Identifiers for this genomic study",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | available | cancelled | entered-in-error | unknown",
         default=None,
     )
@@ -209,7 +209,7 @@ class GenomicStudy(DomainResource):
         description="The healthcare event with which this genomics study is associated",
         default=None,
     )
-    startDate: Optional[DateTime] = Field(
+    startDate: Optional[fhir.dateTime] = Field(
         description="When the genomic study was started",
         default=None,
     )
@@ -229,11 +229,11 @@ class GenomicStudy(DomainResource):
         description="Why the genomic study was performed",
         default=None,
     )
-    instantiatesCanonical: Optional[Canonical] = Field(
+    instantiatesCanonical: Optional[fhir.canonical] = Field(
         description="The defined protocol that describes the study",
         default=None,
     )
-    instantiatesUri: Optional[Uri] = Field(
+    instantiatesUri: Optional[fhir.uri] = Field(
         description="The URL pointing to an externally maintained protocol that describes the study",
         default=None,
     )
@@ -241,7 +241,7 @@ class GenomicStudy(DomainResource):
         description="Comments related to the genomic study",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the genomic study",
         default=None,
     )

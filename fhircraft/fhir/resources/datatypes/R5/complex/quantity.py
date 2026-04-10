@@ -3,8 +3,9 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import DataType, Element
+
 
 class Quantity(DataType):
     """
@@ -13,23 +14,23 @@ class Quantity(DataType):
 
     _type = "Quantity"
 
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Numerical value (with implicit precision)",
         default=None,
     )
-    comparator: Optional[Code] = Field(
+    comparator: Optional[fhir.code] = Field(
         description="\u003c | \u003c= | \u003e= | \u003e | ad - how to understand the value",
         default=None,
     )
-    unit: Optional[String] = Field(
+    unit: Optional[fhir.string] = Field(
         description="Unit representation",
         default=None,
     )
-    system: Optional[Uri] = Field(
+    system: Optional[fhir.uri] = Field(
         description="System that defines coded unit form",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Coded form of the unit",
         default=None,
     )

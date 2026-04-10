@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -28,7 +28,7 @@ class ResearchStudyArm(BackboneElement):
     Describes an expected sequence of events for one of the participants of a study.  E.g. Exposure to drug A, wash-out, exposure to drug B, wash-out, follow-up.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for study arm",
         default=None,
     )
@@ -36,7 +36,7 @@ class ResearchStudyArm(BackboneElement):
         description="Categorization of study arm",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Short explanation of study path",
         default=None,
     )
@@ -46,7 +46,7 @@ class ResearchStudyObjective(BackboneElement):
     A goal that the study is aiming to achieve in terms of a scientific question to be answered by the analysis of data collected during the study.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for the objective",
         default=None,
     )
@@ -80,7 +80,7 @@ class ResearchStudy(DomainResource):
         description="Business Identifier for study",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this study",
         default=None,
     )
@@ -92,7 +92,7 @@ class ResearchStudy(DomainResource):
         description="Part of larger study",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | administratively-completed | approved | closed-to-accrual | closed-to-accrual-and-intervention | completed | disapproved | in-review | temporarily-closed-to-accrual | temporarily-closed-to-accrual-and-intervention | withdrawn",
         default=None,
     )
@@ -132,7 +132,7 @@ class ResearchStudy(DomainResource):
         description="Geographic region(s) for study",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="What this is study doing",
         default=None,
     )

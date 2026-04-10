@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class GroupCharacteristic(BackboneElement):
     """
     Identifies traits whose presence r absence is shared by members of the group.
@@ -35,7 +36,7 @@ class GroupCharacteristic(BackboneElement):
         description="Value held by characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value held by characteristic",
         default=None,
     )
@@ -51,7 +52,7 @@ class GroupCharacteristic(BackboneElement):
         description="Value held by characteristic",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Group includes or excludes",
         default=None,
     )
@@ -71,10 +72,11 @@ class GroupCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Boolean, Quantity, Range, Reference],
+            field_types=[CodeableConcept, fhir.boolean, Quantity, Range, Reference],
             field_name_base="value",
             required=True,
         )
+
 
 class GroupMember(BackboneElement):
     """
@@ -89,10 +91,11 @@ class GroupMember(BackboneElement):
         description="Period member belonged to the group",
         default=None,
     )
-    inactive: Optional[Boolean] = Field(
+    inactive: Optional[fhir.boolean] = Field(
         description="If member is no longer in group",
         default=None,
     )
+
 
 class Group(DomainResource):
     """
@@ -119,15 +122,15 @@ class Group(DomainResource):
         description="Unique id",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this group\u0027s record is in active use",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="person | animal | practitioner | device | medication | substance",
         default=None,
     )
-    actual: Optional[Boolean] = Field(
+    actual: Optional[fhir.boolean] = Field(
         description="Descriptive or actual",
         default=None,
     )
@@ -135,11 +138,11 @@ class Group(DomainResource):
         description="Kind of Group members",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for Group",
         default=None,
     )
-    quantity: Optional[UnsignedInt] = Field(
+    quantity: Optional[fhir.unsignedInt] = Field(
         description="Number of members",
         default=None,
     )

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CompositionAttester(BackboneElement):
     """
     A participant who has attested to the accuracy of the composition/document.
@@ -34,7 +35,7 @@ class CompositionAttester(BackboneElement):
         description="personal | professional | legal | official",
         default=None,
     )
-    time: Optional[DateTime] = Field(
+    time: Optional[fhir.dateTime] = Field(
         description="When the composition was attested",
         default=None,
     )
@@ -42,6 +43,7 @@ class CompositionAttester(BackboneElement):
         description="Who attested the composition",
         default=None,
     )
+
 
 class CompositionEvent(BackboneElement):
     """
@@ -57,12 +59,13 @@ class CompositionEvent(BackboneElement):
         default=None,
     )
 
+
 class CompositionSection(BackboneElement):
     """
     The root of the sections that make up the composition.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
     )
@@ -99,6 +102,7 @@ class CompositionSection(BackboneElement):
         default=None,
     )
 
+
 class Composition(DomainResource):
     """
     A set of healthcare-related information that is assembled together into a single logical package that provides a single coherent statement of meaning, establishes its own context and that has clinical attestation with regard to who is making the statement. A Composition defines the structure and narrative content necessary for a document. However, a Composition alone does not constitute a document. Rather, the Composition must be the first entry in a Bundle where Bundle.type=document, and any other resources referenced from Composition must be included as subsequent entries in the Bundle (for example Patient, Practitioner, Encounter, etc.).
@@ -108,19 +112,19 @@ class Composition(DomainResource):
     _type = "Composition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Composition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this Composition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this Composition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Version-independent identifier for the Composition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="An explicitly assigned identifer of a variation of the content in the Composition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
         default=None,
     )
@@ -140,7 +144,7 @@ class Composition(DomainResource):
         description="Context of the Composition",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Composition editing time",
         default=None,
     )
@@ -152,11 +156,11 @@ class Composition(DomainResource):
         description="Who and/or what authored the composition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this Composition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human Readable name/title",
         default=None,
     )

@@ -3,8 +3,9 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import Element
+
 
 class Attachment(Element):
     """
@@ -13,55 +14,55 @@ class Attachment(Element):
 
     _type = "Attachment"
 
-    contentType: Optional[Code] = Field(
+    contentType: Optional[fhir.code] = Field(
         description="Mime type of the content, with charset etc.",
         default=None,
     )
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="Human language of the content (BCP-47)",
         default=None,
     )
-    data: Optional[Base64Binary] = Field(
+    data: Optional[fhir.base64Binary] = Field(
         description="Data inline, base64ed",
         default=None,
     )
-    url: Optional[Url] = Field(
-        description="Uri where the data can be found",
+    url: Optional[fhir.url] = Field(
+        description="uri where the data can be found",
         default=None,
     )
-    size: Optional[Integer64] = Field(
+    size: Optional[fhir.integer64] = Field(
         description="Number of bytes of content (if url provided)",
         default=None,
     )
-    hash: Optional[Base64Binary] = Field(
+    hash: Optional[fhir.base64Binary] = Field(
         description="Hash of the data (sha-1, base64ed)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label to display in place of the data",
         default=None,
     )
-    creation: Optional[DateTime] = Field(
+    creation: Optional[fhir.dateTime] = Field(
         description="Date attachment was first created",
         default=None,
     )
-    height: Optional[PositiveInt] = Field(
+    height: Optional[fhir.positiveInt] = Field(
         description="Height of the image in pixels (photo/video)",
         default=None,
     )
-    width: Optional[PositiveInt] = Field(
+    width: Optional[fhir.positiveInt] = Field(
         description="Width of the image in pixels (photo/video)",
         default=None,
     )
-    frames: Optional[PositiveInt] = Field(
+    frames: Optional[fhir.positiveInt] = Field(
         description="Number of frames if \u003e 1 (photo)",
         default=None,
     )
-    duration: Optional[Decimal] = Field(
+    duration: Optional[fhir.decimal] = Field(
         description="Length in seconds (audio / video)",
         default=None,
     )
-    pages: Optional[PositiveInt] = Field(
+    pages: Optional[fhir.positiveInt] = Field(
         description="Number of printed pages",
         default=None,
     )

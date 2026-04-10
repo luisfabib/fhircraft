@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SubstanceInstance(BackboneElement):
     """
     Substance may be used to describe a kind of substance, or a specific package/container of the substance: an instance.
@@ -30,7 +31,7 @@ class SubstanceInstance(BackboneElement):
         description="Identifier of the package/container",
         default=None,
     )
-    expiry: Optional[DateTime] = Field(
+    expiry: Optional[fhir.dateTime] = Field(
         description="When no longer valid to use",
         default=None,
     )
@@ -38,6 +39,7 @@ class SubstanceInstance(BackboneElement):
         description="Amount of substance in the package",
         default=None,
     )
+
 
 class SubstanceIngredient(BackboneElement):
     """
@@ -73,6 +75,7 @@ class SubstanceIngredient(BackboneElement):
             required=True,
         )
 
+
 class Substance(DomainResource):
     """
     A homogeneous material with a definite composition.
@@ -98,7 +101,7 @@ class Substance(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
     )
@@ -110,7 +113,7 @@ class Substance(DomainResource):
         description="What substance this is",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the substance, comments",
         default=None,
     )

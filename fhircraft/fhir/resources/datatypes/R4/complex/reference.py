@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .element import Element
 
 if TYPE_CHECKING:
@@ -17,11 +17,11 @@ class Reference(Element):
 
     _type = "Reference"
 
-    reference: Optional[String] = Field(
+    reference: Optional[fhir.string] = Field(
         description="Literal reference, Relative, internal or absolute URL",
         default=None,
     )
-    type: Optional[Uri] = Field(
+    type: Optional[fhir.uri] = Field(
         description='Type the reference refers to (e.g. "Patient")',
         default=None,
     )
@@ -29,7 +29,7 @@ class Reference(Element):
         description="Logical reference, when literal reference is not known",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Text alternative for the resource",
         default=None,
     )

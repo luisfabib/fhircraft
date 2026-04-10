@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ObservationDefinitionQualifiedValue(BackboneElement):
     """
     A set of qualified values associated with a context and a set of conditions -  provides a range for quantitative and ordinal observations and a collection of value sets for qualitative observations.
@@ -38,7 +39,7 @@ class ObservationDefinitionQualifiedValue(BackboneElement):
         description="Targetted population for the set of qualified values",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
@@ -50,11 +51,11 @@ class ObservationDefinitionQualifiedValue(BackboneElement):
         description="Applicable gestational age range for the set of qualified values",
         default=None,
     )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="Condition associated with the set of qualified values",
         default=None,
     )
-    rangeCategory: Optional[Code] = Field(
+    rangeCategory: Optional[fhir.code] = Field(
         description="reference | critical | absolute",
         default=None,
     )
@@ -62,22 +63,23 @@ class ObservationDefinitionQualifiedValue(BackboneElement):
         description="The range for continuous or ordinal observations",
         default=None,
     )
-    validCodedValueSet: Optional[Canonical] = Field(
+    validCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of valid coded values as part of this set of qualified values",
         default=None,
     )
-    normalCodedValueSet: Optional[Canonical] = Field(
+    normalCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of normal coded values as part of this set of qualified values",
         default=None,
     )
-    abnormalCodedValueSet: Optional[Canonical] = Field(
+    abnormalCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of abnormal coded values as part of this set of qualified values",
         default=None,
     )
-    criticalCodedValueSet: Optional[Canonical] = Field(
+    criticalCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of critical coded values as part of this set of qualified values",
         default=None,
     )
+
 
 class ObservationDefinitionComponentQualifiedValue(BackboneElement):
     """
@@ -92,7 +94,7 @@ class ObservationDefinitionComponentQualifiedValue(BackboneElement):
         description="Targetted population for the set of qualified values",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
@@ -104,11 +106,11 @@ class ObservationDefinitionComponentQualifiedValue(BackboneElement):
         description="Applicable gestational age range for the set of qualified values",
         default=None,
     )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="Condition associated with the set of qualified values",
         default=None,
     )
-    rangeCategory: Optional[Code] = Field(
+    rangeCategory: Optional[fhir.code] = Field(
         description="reference | critical | absolute",
         default=None,
     )
@@ -116,22 +118,23 @@ class ObservationDefinitionComponentQualifiedValue(BackboneElement):
         description="The range for continuous or ordinal observations",
         default=None,
     )
-    validCodedValueSet: Optional[Canonical] = Field(
+    validCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of valid coded values as part of this set of qualified values",
         default=None,
     )
-    normalCodedValueSet: Optional[Canonical] = Field(
+    normalCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of normal coded values as part of this set of qualified values",
         default=None,
     )
-    abnormalCodedValueSet: Optional[Canonical] = Field(
+    abnormalCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of abnormal coded values as part of this set of qualified values",
         default=None,
     )
-    criticalCodedValueSet: Optional[Canonical] = Field(
+    criticalCodedValueSet: Optional[fhir.canonical] = Field(
         description="Value set of critical coded values as part of this set of qualified values",
         default=None,
     )
+
 
 class ObservationDefinitionComponent(BackboneElement):
     """
@@ -142,7 +145,7 @@ class ObservationDefinitionComponent(BackboneElement):
         description="Type of observation",
         default=None,
     )
-    permittedDataType: Optional[ListType[Code]] = Field(
+    permittedDataType: Optional[ListType[fhir.code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
@@ -157,6 +160,7 @@ class ObservationDefinitionComponent(BackboneElement):
         )
     )
 
+
 class ObservationDefinition(DomainResource):
     """
     Set of definitional characteristics for a kind of observation or measurement produced or consumed by an orderable health care service.
@@ -166,7 +170,7 @@ class ObservationDefinition(DomainResource):
     _type = "ObservationDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ObservationDefinition"
 
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Logical canonical URL to reference this ObservationDefinition (globally unique)",
         default=None,
     )
@@ -174,11 +178,11 @@ class ObservationDefinition(DomainResource):
         description="Business identifier of the ObservationDefinition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the ObservationDefinition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -186,27 +190,27 @@ class ObservationDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this ObservationDefinition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this ObservationDefinition (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="If for testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="The name of the individual or organization that published the ObservationDefinition",
         default=None,
     )
@@ -214,7 +218,7 @@ class ObservationDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the ObservationDefinition",
         default=None,
     )
@@ -226,23 +230,23 @@ class ObservationDefinition(DomainResource):
         description="Intended jurisdiction for this ObservationDefinition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this ObservationDefinition is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When ObservationDefinition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="Date on which the asset content was last reviewed by the publisher",
         default=None,
     )
@@ -250,11 +254,11 @@ class ObservationDefinition(DomainResource):
         description="The effective date range for the ObservationDefinition",
         default=None,
     )
-    derivedFromCanonical: Optional[ListType[Canonical]] = Field(
+    derivedFromCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Based on FHIR definition of another observation",
         default=None,
     )
-    derivedFromUri: Optional[ListType[Uri]] = Field(
+    derivedFromUri: Optional[ListType[fhir.uri]] = Field(
         description="Based on external definition",
         default=None,
     )
@@ -274,11 +278,11 @@ class ObservationDefinition(DomainResource):
         description="Type of observation",
         default=None,
     )
-    permittedDataType: Optional[ListType[Code]] = Field(
+    permittedDataType: Optional[ListType[fhir.code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
-    multipleResultsAllowed: Optional[Boolean] = Field(
+    multipleResultsAllowed: Optional[fhir.boolean] = Field(
         description="Multiple results allowed for conforming observations",
         default=None,
     )
@@ -298,7 +302,7 @@ class ObservationDefinition(DomainResource):
         description="Measurement device or model of device",
         default=None,
     )
-    preferredReportName: Optional[String] = Field(
+    preferredReportName: Optional[fhir.string] = Field(
         description="The preferred name to be used when reporting the observation results",
         default=None,
     )
@@ -330,7 +334,7 @@ class ObservationDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

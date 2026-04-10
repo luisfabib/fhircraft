@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,12 +24,13 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MeasureReportGroupPopulation(BackboneElement):
     """
     The populations that make up the population group, one for each type of population appropriate for the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific population from Measure",
         default=None,
     )
@@ -37,7 +38,7 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
     )
@@ -54,12 +55,13 @@ class MeasureReportGroupPopulation(BackboneElement):
         default=None,
     )
 
+
 class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     """
     A stratifier component value.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific stratifier component from Measure",
         default=None,
     )
@@ -71,7 +73,7 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
         description="The stratum component value, e.g. male",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The stratum component value, e.g. male",
         default=None,
     )
@@ -99,17 +101,18 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Boolean, Quantity, Range, Reference],
+            field_types=[CodeableConcept, fhir.boolean, Quantity, Range, Reference],
             field_name_base="value",
             required=True,
         )
+
 
 class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
     """
     The populations that make up the stratum, one for each type of population appropriate to the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific population from Measure",
         default=None,
     )
@@ -117,7 +120,7 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
     )
@@ -134,6 +137,7 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         default=None,
     )
 
+
 class MeasureReportGroupStratifierStratum(BackboneElement):
     """
     This element contains the results for a single stratum within the stratifier. For example, when stratifying on administrative gender, there will be four strata, one for each possible gender value.
@@ -143,7 +147,7 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="The stratum value, e.g. male",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The stratum value, e.g. male",
         default=None,
     )
@@ -173,7 +177,7 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="What score this stratum achieved",
         default=None,
     )
-    measureScoreDateTime: Optional[DateTime] = Field(
+    measureScoreDateTime: Optional[fhir.dateTime] = Field(
         description="What score this stratum achieved",
         default=None,
     )
@@ -212,7 +216,7 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Boolean, Quantity, Range, Reference],
+            field_types=[CodeableConcept, fhir.boolean, Quantity, Range, Reference],
             field_name_base="value",
             required=False,
         )
@@ -221,17 +225,25 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
     def measureScore_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, DateTime, CodeableConcept, Period, Range, Duration],
+            field_types=[
+                Quantity,
+                fhir.DateTime,
+                CodeableConcept,
+                Period,
+                Range,
+                Duration,
+            ],
             field_name_base="measureScore",
             required=False,
         )
+
 
 class MeasureReportGroupStratifier(BackboneElement):
     """
     When a measure includes multiple stratifiers, there will be a stratifier group for each stratifier defined by the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific stratifier from Measure",
         default=None,
     )
@@ -244,12 +256,13 @@ class MeasureReportGroupStratifier(BackboneElement):
         default=None,
     )
 
+
 class MeasureReportGroup(BackboneElement):
     """
     The results of the calculation, one for each population group in the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific group from Measure",
         default=None,
     )
@@ -269,7 +282,7 @@ class MeasureReportGroup(BackboneElement):
         description="What score this group achieved",
         default=None,
     )
-    measureScoreDateTime: Optional[DateTime] = Field(
+    measureScoreDateTime: Optional[fhir.dateTime] = Field(
         description="What score this group achieved",
         default=None,
     )
@@ -305,10 +318,18 @@ class MeasureReportGroup(BackboneElement):
     def measureScore_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, DateTime, CodeableConcept, Period, Range, Duration],
+            field_types=[
+                Quantity,
+                fhir.DateTime,
+                CodeableConcept,
+                Period,
+                Range,
+                Duration,
+            ],
             field_name_base="measureScore",
             required=False,
         )
+
 
 class MeasureReport(DomainResource):
     """
@@ -323,19 +344,19 @@ class MeasureReport(DomainResource):
         description="Additional identifier for the MeasureReport",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="complete | pending | error",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="individual | subject-list | summary | data-exchange",
         default=None,
     )
-    dataUpdateType: Optional[Code] = Field(
+    dataUpdateType: Optional[fhir.code] = Field(
         description="incremental | snapshot",
         default=None,
     )
-    measure: Optional[Canonical] = Field(
+    measure: Optional[fhir.canonical] = Field(
         description="What measure was calculated",
         default=None,
     )
@@ -343,7 +364,7 @@ class MeasureReport(DomainResource):
         description="What individual(s) the report is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the measure was calculated",
         default=None,
     )

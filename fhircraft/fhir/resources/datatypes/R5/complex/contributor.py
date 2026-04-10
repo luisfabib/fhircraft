@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import Element, ContactDetail
 
 class Contributor(Element):
@@ -13,11 +13,11 @@ class Contributor(Element):
 
     _type = "Contributor"
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="author | editor | reviewer | endorser",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Who contributed the content",
         default=None,
     )

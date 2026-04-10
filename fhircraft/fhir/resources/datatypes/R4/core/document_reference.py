@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -22,12 +22,13 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DocumentReferenceRelatesTo(BackboneElement):
     """
     Relationships that this document has with other document references that already exist.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="replaces | transforms | signs | appends",
         default=None,
     )
@@ -35,6 +36,7 @@ class DocumentReferenceRelatesTo(BackboneElement):
         description="Target of the relationship",
         default=None,
     )
+
 
 class DocumentReferenceContent(BackboneElement):
     """
@@ -50,6 +52,7 @@ class DocumentReferenceContent(BackboneElement):
         default=None,
     )
 
+
 class DocumentReferenceContext(BackboneElement):
     """
     The clinical context in which the document was prepared.
@@ -64,7 +67,7 @@ class DocumentReferenceContext(BackboneElement):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time of service that is being documented",
+        description="time of service that is being documented",
         default=None,
     )
     facilityType: Optional[CodeableConcept] = Field(
@@ -83,6 +86,7 @@ class DocumentReferenceContext(BackboneElement):
         description="Related identifiers or resources",
         default=None,
     )
+
 
 class DocumentReference(DomainResource):
     """
@@ -113,11 +117,11 @@ class DocumentReference(DomainResource):
         description="Other identifiers for the document",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | superseded | entered-in-error",
         default=None,
     )
-    docStatus: Optional[Code] = Field(
+    docStatus: Optional[fhir.code] = Field(
         description="preliminary | final | amended | entered-in-error",
         default=None,
     )
@@ -133,7 +137,7 @@ class DocumentReference(DomainResource):
         description="Who/what is the subject of the document",
         default=None,
     )
-    date: Optional[Instant] = Field(
+    date: Optional[fhir.instant] = Field(
         description="When this document reference was created",
         default=None,
     )
@@ -153,7 +157,7 @@ class DocumentReference(DomainResource):
         description="Relationships to other documents",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Human-readable description",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -21,34 +21,36 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PractitionerRoleAvailableTime(BackboneElement):
     """
     A collection of times the practitioner is available or performing this role at the location and/or healthcareservice.
     """
 
-    daysOfWeek: Optional[ListType[Code]] = Field(
+    daysOfWeek: Optional[ListType[fhir.code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
-    allDay: Optional[Boolean] = Field(
+    allDay: Optional[fhir.boolean] = Field(
         description="Always available? e.g. 24 hour service",
         default=None,
     )
-    availableStartTime: Optional[Time] = Field(
+    availableStartTime: Optional[fhir.time_] = Field(
         description="Opening time of day (ignored if allDay = true)",
         default=None,
     )
-    availableEndTime: Optional[Time] = Field(
+    availableEndTime: Optional[fhir.time_] = Field(
         description="Closing time of day (ignored if allDay = true)",
         default=None,
     )
+
 
 class PractitionerRoleNotAvailable(BackboneElement):
     """
     The practitioner is not available or performing this role during this period of time due to the provided reason.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Reason presented to the user explaining why time not available",
         default=None,
     )
@@ -56,6 +58,7 @@ class PractitionerRoleNotAvailable(BackboneElement):
         description="Service not available from this date",
         default=None,
     )
+
 
 class PractitionerRole(DomainResource):
     """
@@ -82,7 +85,7 @@ class PractitionerRole(DomainResource):
         description="Business Identifiers that are specific to a role/location",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this practitioner role record is in active use",
         default=None,
     )
@@ -126,7 +129,7 @@ class PractitionerRole(DomainResource):
         description="Not available during this time due to provided reason",
         default=None,
     )
-    availabilityExceptions: Optional[String] = Field(
+    availabilityExceptions: Optional[fhir.string] = Field(
         description="Description of availability exceptions",
         default=None,
     )

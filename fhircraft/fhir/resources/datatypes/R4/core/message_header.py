@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -20,12 +20,13 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MessageHeaderDestination(BackboneElement):
     """
     The destination application which the message is intended for.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
     )
@@ -33,7 +34,7 @@ class MessageHeaderDestination(BackboneElement):
         description="Particular delivery destination within the destination",
         default=None,
     )
-    endpoint: Optional[Url] = Field(
+    endpoint: Optional[fhir.url] = Field(
         description="Actual destination address or id",
         default=None,
     )
@@ -42,20 +43,21 @@ class MessageHeaderDestination(BackboneElement):
         default=None,
     )
 
+
 class MessageHeaderSource(BackboneElement):
     """
     The source application from which this message originated.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
     )
-    software: Optional[String] = Field(
+    software: Optional[fhir.string] = Field(
         description="Name of software running the system",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version of software running",
         default=None,
     )
@@ -63,21 +65,22 @@ class MessageHeaderSource(BackboneElement):
         description="Human contact for problems",
         default=None,
     )
-    endpoint: Optional[Url] = Field(
+    endpoint: Optional[fhir.url] = Field(
         description="Actual message source address or id",
         default=None,
     )
+
 
 class MessageHeaderResponse(BackboneElement):
     """
     Information about the message that this message is a response to.  Only present if this message is a response.
     """
 
-    identifier: Optional[Id] = Field(
-        description="Id of original message",
+    identifier: Optional[fhir.id_] = Field(
+        description="id_ of original message",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="ok | transient-error | fatal-error",
         default=None,
     )
@@ -85,6 +88,7 @@ class MessageHeaderResponse(BackboneElement):
         description="Specific list of hints/warnings/errors",
         default=None,
     )
+
 
 class MessageHeader(DomainResource):
     """
@@ -108,11 +112,11 @@ class MessageHeader(DomainResource):
         default=None,
     )
     eventCoding: Optional[Coding] = Field(
-        description="Code for the event this message represents or link to event definition",
+        description="code for the event this message represents or link to event definition",
         default=None,
     )
-    eventUri: Optional[Uri] = Field(
-        description="Code for the event this message represents or link to event definition",
+    eventUri: Optional[fhir.uri] = Field(
+        description="code for the event this message represents or link to event definition",
         default=None,
     )
     destination: Optional[ListType[MessageHeaderDestination]] = Field(
@@ -151,7 +155,7 @@ class MessageHeader(DomainResource):
         description="The actual content of the message",
         default=None,
     )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Link to the definition for this message",
         default=None,
     )
@@ -167,7 +171,7 @@ class MessageHeader(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, Uri],
+            field_types=[Coding, fhir.uri],
             field_name_base="event",
             required=True,
         )

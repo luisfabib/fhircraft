@@ -4,7 +4,7 @@ from typing import List as ListType, Optional
 NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Element,
@@ -14,96 +14,101 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 
+
 class BundleLink(BackboneElement):
     """
     A series of links that provide context to this bundle.
     """
 
-    relation: Optional[Code] = Field(
+    relation: Optional[fhir.code] = Field(
         description="See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Reference details for the link",
         default=None,
     )
+
 
 class BundleEntryLink(BackboneElement):
     """
     A series of links that provide context to this entry.
     """
 
-    relation: Optional[Code] = Field(
+    relation: Optional[fhir.code] = Field(
         description="See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Reference details for the link",
         default=None,
     )
+
 
 class BundleEntrySearch(BackboneElement):
     """
     Information about the search process that lead to the creation of this entry.
     """
 
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="match | include - why this is in the result set",
         default=None,
     )
-    score: Optional[Decimal] = Field(
+    score: Optional[fhir.decimal] = Field(
         description="Search ranking (between 0 and 1)",
         default=None,
     )
+
 
 class BundleEntryRequest(BackboneElement):
     """
     Additional information about how this entry should be processed as part of a transaction or batch.  For history, it shows how the entry was processed to create the version contained in the entry.
     """
 
-    method: Optional[Code] = Field(
+    method: Optional[fhir.code] = Field(
         description="GET | HEAD | POST | PUT | DELETE | PATCH",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="URL for HTTP equivalent of this entry",
         default=None,
     )
-    ifNoneMatch: Optional[String] = Field(
+    ifNoneMatch: Optional[fhir.string] = Field(
         description="For managing cache validation",
         default=None,
     )
-    ifModifiedSince: Optional[Instant] = Field(
+    ifModifiedSince: Optional[fhir.instant] = Field(
         description="For managing cache currency",
         default=None,
     )
-    ifMatch: Optional[String] = Field(
+    ifMatch: Optional[fhir.string] = Field(
         description="For managing update contention",
         default=None,
     )
-    ifNoneExist: Optional[String] = Field(
+    ifNoneExist: Optional[fhir.string] = Field(
         description="For conditional creates",
         default=None,
     )
+
 
 class BundleEntryResponse(BackboneElement):
     """
     Indicates the results of processing the corresponding 'request' entry in the batch or transaction being responded to or what the results of an operation where when returning history.
     """
 
-    status: Optional[String] = Field(
+    status: Optional[fhir.string] = Field(
         description="Status response code (text optional)",
         default=None,
     )
-    location: Optional[Uri] = Field(
+    location: Optional[fhir.uri] = Field(
         description="The location (if the operation returns a location)",
         default=None,
     )
-    etag: Optional[String] = Field(
+    etag: Optional[fhir.string] = Field(
         description="The Etag for the resource (if relevant)",
         default=None,
     )
-    lastModified: Optional[Instant] = Field(
+    lastModified: Optional[fhir.instant] = Field(
         description="Server\u0027s date time modified",
         default=None,
     )
@@ -111,6 +116,7 @@ class BundleEntryResponse(BackboneElement):
         description="OperationOutcome with hints and warnings (for batch/transaction)",
         default=None,
     )
+
 
 class BundleEntry(BackboneElement):
     """
@@ -121,7 +127,7 @@ class BundleEntry(BackboneElement):
         description="Links related to this entry",
         default=None,
     )
-    fullUrl: Optional[Uri] = Field(
+    fullUrl: Optional[fhir.uri] = Field(
         description="URI for resource (e.g. the absolute URL server address, URI for UUID/OID, etc.)",
         default=None,
     )
@@ -142,6 +148,7 @@ class BundleEntry(BackboneElement):
         default=None,
     )
 
+
 class Bundle(Resource):
     """
     A container for a collection of resources.
@@ -155,15 +162,15 @@ class Bundle(Resource):
         description="Persistent identifier for the bundle",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="document | message | transaction | transaction-response | batch | batch-response | history | searchset | collection | subscription-notification",
         default=None,
     )
-    timestamp: Optional[Instant] = Field(
+    timestamp: Optional[fhir.instant] = Field(
         description="When the bundle was assembled",
         default=None,
     )
-    total: Optional[UnsignedInt] = Field(
+    total: Optional[fhir.unsignedInt] = Field(
         description="If search, the total number of matches",
         default=None,
     )

@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex.element import Element
 
 if TYPE_CHECKING:

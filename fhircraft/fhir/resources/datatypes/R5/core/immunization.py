@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -56,7 +56,7 @@ class ImmunizationReaction(BackboneElement):
     Categorical data indicating that an adverse event is associated in time to an immunization.
     """
 
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When reaction started",
         default=None,
     )
@@ -64,7 +64,7 @@ class ImmunizationReaction(BackboneElement):
         description="Additional information on reaction",
         default=None,
     )
-    reported: Optional[Boolean] = Field(
+    reported: Optional[fhir.boolean] = Field(
         description="Indicates self-reported reaction",
         default=None,
     )
@@ -74,7 +74,7 @@ class ImmunizationProtocolApplied(BackboneElement):
     The protocol (set of recommendations) being followed by the provider who administered the dose.
     """
 
-    series: Optional[String] = Field(
+    series: Optional[fhir.string] = Field(
         description="Name of vaccine series",
         default=None,
     )
@@ -86,11 +86,11 @@ class ImmunizationProtocolApplied(BackboneElement):
         description="Vaccine preventatable disease being targeted",
         default=None,
     )
-    doseNumber: Optional[String] = Field(
+    doseNumber: Optional[fhir.string] = Field(
         description="Dose number within series",
         default=None,
     )
-    seriesDoses: Optional[String] = Field(
+    seriesDoses: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
@@ -112,7 +112,7 @@ class Immunization(DomainResource):
         description="Authority that the immunization event is based on",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="completed | entered-in-error | not-done",
         default=None,
     )
@@ -132,11 +132,11 @@ class Immunization(DomainResource):
         description="Vaccine manufacturer",
         default=None,
     )
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="Vaccine lot number",
         default=None,
     )
-    expirationDate: Optional[Date] = Field(
+    expirationDate: Optional[fhir.date_] = Field(
         description="Vaccine expiration date",
         default=None,
     )
@@ -152,15 +152,15 @@ class Immunization(DomainResource):
         description="Additional information in support of the immunization",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="Vaccine administration date",
         default=None,
     )
-    occurrenceString: Optional[String] = Field(
+    occurrenceString: Optional[fhir.string] = Field(
         description="Vaccine administration date",
         default=None,
     )
-    primarySource: Optional[Boolean] = Field(
+    primarySource: Optional[fhir.boolean] = Field(
         description="Indicates context the data was captured in",
         default=None,
     )
@@ -196,7 +196,7 @@ class Immunization(DomainResource):
         description="Why immunization occurred",
         default=None,
     )
-    isSubpotent: Optional[Boolean] = Field(
+    isSubpotent: Optional[fhir.boolean] = Field(
         description="Dose potency",
         default=None,
     )
@@ -232,7 +232,7 @@ class Immunization(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, String],
+            field_types=[fhir.dateTime, fhir.string],
             field_name_base="occurrence",
             required=True,
         )

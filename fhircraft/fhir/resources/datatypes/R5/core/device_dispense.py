@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -58,7 +58,7 @@ class DeviceDispense(DomainResource):
         description="The bigger event that this dispense is a part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
         default=None,
     )
@@ -106,11 +106,11 @@ class DeviceDispense(DomainResource):
         description="Amount dispensed",
         default=None,
     )
-    preparedDate: Optional[DateTime] = Field(
+    preparedDate: Optional[fhir.dateTime] = Field(
         description="When product was packaged and reviewed",
         default=None,
     )
-    whenHandedOver: Optional[DateTime] = Field(
+    whenHandedOver: Optional[fhir.dateTime] = Field(
         description="When product was given out",
         default=None,
     )
@@ -122,7 +122,7 @@ class DeviceDispense(DomainResource):
         description="Information about the dispense",
         default=None,
     )
-    usageInstruction: Optional[Markdown] = Field(
+    usageInstruction: Optional[fhir.markdown] = Field(
         description="Full representation of the usage instructions",
         default=None,
     )

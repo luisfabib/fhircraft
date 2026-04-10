@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -41,12 +41,12 @@ class MedicationDispenseSubstitution(BackboneElement):
     Indicates whether or not substitution was made as part of the dispense.  In some cases, substitution will be expected but does not happen, in other cases substitution is not expected but does happen.  This block explains what substitution did or did not happen and why.  If nothing is specified, substitution was not done.
     """
 
-    wasSubstituted: Optional[Boolean] = Field(
+    wasSubstituted: Optional[fhir.boolean] = Field(
         description="Whether a substitution was or was not performed on the dispense",
         default=None,
     )
     type: Optional[CodeableConcept] = Field(
-        description="Code signifying whether a different drug was dispensed from what was prescribed",
+        description="code signifying whether a different drug was dispensed from what was prescribed",
         default=None,
     )
     reason: Optional[ListType[CodeableConcept]] = Field(
@@ -87,7 +87,7 @@ class MedicationDispense(DomainResource):
         description="Event that dispense is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
         default=None,
     )
@@ -147,11 +147,11 @@ class MedicationDispense(DomainResource):
         description="Amount of medication expressed as a timing amount",
         default=None,
     )
-    whenPrepared: Optional[DateTime] = Field(
+    whenPrepared: Optional[fhir.dateTime] = Field(
         description="When product was packaged and reviewed",
         default=None,
     )
-    whenHandedOver: Optional[DateTime] = Field(
+    whenHandedOver: Optional[fhir.dateTime] = Field(
         description="When product was given out",
         default=None,
     )

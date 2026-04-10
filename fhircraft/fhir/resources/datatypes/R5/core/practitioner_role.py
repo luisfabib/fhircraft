@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PractitionerRole(DomainResource):
     """
     A specific set of Roles/Locations/specialties/services that a practitioner may perform, or has performed at an organization during a period of time.
@@ -35,7 +36,7 @@ class PractitionerRole(DomainResource):
         description="Identifiers for a role/location",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this practitioner role record is in active use",
         default=None,
     )

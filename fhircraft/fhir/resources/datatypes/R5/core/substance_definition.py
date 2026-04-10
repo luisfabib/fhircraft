@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SubstanceDefinitionMoiety(BackboneElement):
     """
     Moiety, for structural modifications.
@@ -37,7 +38,7 @@ class SubstanceDefinitionMoiety(BackboneElement):
         description="Identifier by which this moiety substance is known",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Textual name for this moiety substance",
         default=None,
     )
@@ -49,7 +50,7 @@ class SubstanceDefinitionMoiety(BackboneElement):
         description="Optical activity type",
         default=None,
     )
-    molecularFormula: Optional[String] = Field(
+    molecularFormula: Optional[fhir.string] = Field(
         description="Molecular formula for this moiety (e.g. with the Hill system)",
         default=None,
     )
@@ -57,7 +58,7 @@ class SubstanceDefinitionMoiety(BackboneElement):
         description="Quantitative value for this moiety",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="Quantitative value for this moiety",
         default=None,
     )
@@ -77,10 +78,11 @@ class SubstanceDefinitionMoiety(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, String],
+            field_types=[Quantity, fhir.string],
             field_name_base="amount",
             required=False,
         )
+
 
 class SubstanceDefinitionCharacterization(BackboneElement):
     """
@@ -95,7 +97,7 @@ class SubstanceDefinitionCharacterization(BackboneElement):
         description="Describes the nature of the chemical entity and explains, for instance, whether this is a base or a salt form",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The description or justification in support of the interpretation of the data file",
         default=None,
     )
@@ -103,6 +105,7 @@ class SubstanceDefinitionCharacterization(BackboneElement):
         description="The data produced by the analytical instrument or a pictorial representation of that data. Examples: a JCAMP, JDX, or ADX file, or a chromatogram or spectrum analysis",
         default=None,
     )
+
 
 class SubstanceDefinitionProperty(BackboneElement):
     """
@@ -121,11 +124,11 @@ class SubstanceDefinitionProperty(BackboneElement):
         description="A value for the property",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the property",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the property",
         default=None,
     )
@@ -145,10 +148,17 @@ class SubstanceDefinitionProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Date, Boolean, Attachment],
+            field_types=[
+                CodeableConcept,
+                Quantity,
+                fhir.Date,
+                fhir.Boolean,
+                Attachment,
+            ],
             field_name_base="value",
             required=False,
         )
+
 
 class SubstanceDefinitionMolecularWeight(BackboneElement):
     """
@@ -168,6 +178,7 @@ class SubstanceDefinitionMolecularWeight(BackboneElement):
         default=None,
     )
 
+
 class SubstanceDefinitionStructureMolecularWeight(BackboneElement):
     """
     The molecular weight or weight range (for proteins, polymers or nucleic acids).
@@ -186,6 +197,7 @@ class SubstanceDefinitionStructureMolecularWeight(BackboneElement):
         default=None,
     )
 
+
 class SubstanceDefinitionStructureRepresentation(BackboneElement):
     """
     A depiction of the structure of the substance.
@@ -195,7 +207,7 @@ class SubstanceDefinitionStructureRepresentation(BackboneElement):
         description="The kind of structural representation (e.g. full, partial)",
         default=None,
     )
-    representation: Optional[String] = Field(
+    representation: Optional[fhir.string] = Field(
         description="The structural representation as a text string in a standard format",
         default=None,
     )
@@ -207,6 +219,7 @@ class SubstanceDefinitionStructureRepresentation(BackboneElement):
         description="An attachment with the structural representation e.g. a structure graphic or AnIML file",
         default=None,
     )
+
 
 class SubstanceDefinitionStructure(BackboneElement):
     """
@@ -221,11 +234,11 @@ class SubstanceDefinitionStructure(BackboneElement):
         description="Optical activity type",
         default=None,
     )
-    molecularFormula: Optional[String] = Field(
+    molecularFormula: Optional[fhir.string] = Field(
         description="An expression which states the number and type of atoms present in a molecule of a substance",
         default=None,
     )
-    molecularFormulaByMoiety: Optional[String] = Field(
+    molecularFormulaByMoiety: Optional[fhir.string] = Field(
         description="Specified per moiety according to the Hill system",
         default=None,
     )
@@ -248,6 +261,7 @@ class SubstanceDefinitionStructure(BackboneElement):
         )
     )
 
+
 class SubstanceDefinitionCode(BackboneElement):
     """
     Codes associated with the substance.
@@ -261,7 +275,7 @@ class SubstanceDefinitionCode(BackboneElement):
         description="Status of the code assignment, for example \u0027provisional\u0027, \u0027approved\u0027",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="The date at which the code status was changed",
         default=None,
     )
@@ -273,6 +287,7 @@ class SubstanceDefinitionCode(BackboneElement):
         description="Supporting literature",
         default=None,
     )
+
 
 class SubstanceDefinitionNameOfficial(BackboneElement):
     """
@@ -287,17 +302,18 @@ class SubstanceDefinitionNameOfficial(BackboneElement):
         description="The status of the official name, for example \u0027draft\u0027, \u0027active\u0027",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date of official name change",
         default=None,
     )
+
 
 class SubstanceDefinitionName(BackboneElement):
     """
     Names applicable to this substance.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The actual name",
         default=None,
     )
@@ -309,7 +325,7 @@ class SubstanceDefinitionName(BackboneElement):
         description="The status of the name e.g. \u0027current\u0027, \u0027proposed\u0027",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="If this is the preferred name for this substance",
         default=None,
     )
@@ -342,6 +358,7 @@ class SubstanceDefinitionName(BackboneElement):
         default=None,
     )
 
+
 class SubstanceDefinitionRelationship(BackboneElement):
     """
     A link between this substance and another, with details of the relationship.
@@ -359,7 +376,7 @@ class SubstanceDefinitionRelationship(BackboneElement):
         description='For example "salt to parent", "active moiety"',
         default=None,
     )
-    isDefining: Optional[Boolean] = Field(
+    isDefining: Optional[fhir.boolean] = Field(
         description="For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible relationships",
         default=None,
     )
@@ -371,7 +388,7 @@ class SubstanceDefinitionRelationship(BackboneElement):
         description="A numeric factor for the relationship, e.g. that a substance salt has some percentage of active substance in relation to some other",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="A numeric factor for the relationship, e.g. that a substance salt has some percentage of active substance in relation to some other",
         default=None,
     )
@@ -415,10 +432,11 @@ class SubstanceDefinitionRelationship(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, Ratio, String],
+            field_types=[Quantity, Ratio, fhir.string],
             field_name_base="amount",
             required=False,
         )
+
 
 class SubstanceDefinitionSourceMaterial(BackboneElement):
     """
@@ -446,6 +464,7 @@ class SubstanceDefinitionSourceMaterial(BackboneElement):
         default=None,
     )
 
+
 class SubstanceDefinition(DomainResource):
     """
     The detailed description of a substance, typically at a level beyond what is used for prescribing.
@@ -459,7 +478,7 @@ class SubstanceDefinition(DomainResource):
         description="Identifier by which this substance is known",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="A business level version identifier of the substance",
         default=None,
     )
@@ -479,7 +498,7 @@ class SubstanceDefinition(DomainResource):
         description="The quality standard, established benchmark, to which substance complies (e.g. USP/NF, BP)",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description of the substance",
         default=None,
     )

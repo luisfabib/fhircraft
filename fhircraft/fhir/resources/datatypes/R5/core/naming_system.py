@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,24 +24,25 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class NamingSystemUniqueId(BackboneElement):
     """
     Indicates how the system may be identified when referenced in electronic exchange.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="oid | uuid | uri | iri-stem | v2csmnemonic | other",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The unique identifier",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Is this the id that should be used for this type",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Notes about identifier usage",
         default=None,
     )
@@ -49,10 +50,11 @@ class NamingSystemUniqueId(BackboneElement):
         description="When is identifier valid?",
         default=None,
     )
-    authoritative: Optional[Boolean] = Field(
+    authoritative: Optional[fhir.boolean] = Field(
         description="Whether the identifier is authoritative",
         default=None,
     )
+
 
 class NamingSystem(DomainResource):
     """
@@ -63,19 +65,19 @@ class NamingSystem(DomainResource):
     _type = "NamingSystem"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/NamingSystem"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this naming system, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this naming system, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the naming system (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the naming system",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -83,31 +85,31 @@ class NamingSystem(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this naming system (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Title for this naming system (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="codesystem | identifier | root",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -115,7 +117,7 @@ class NamingSystem(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    responsible: Optional[String] = Field(
+    responsible: Optional[fhir.string] = Field(
         description="Who maintains system namespace?",
         default=None,
     )
@@ -123,7 +125,7 @@ class NamingSystem(DomainResource):
         description="e.g. driver,  provider,  patient, bank etc",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the naming system",
         default=None,
     )
@@ -135,23 +137,23 @@ class NamingSystem(DomainResource):
         description="Intended jurisdiction for naming system (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this naming system is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the NamingSystem was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the NamingSystem was last reviewed by the publisher",
         default=None,
     )
@@ -183,7 +185,7 @@ class NamingSystem(DomainResource):
         description="Additional documentation, citations, etc",
         default=None,
     )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="How/where is it used",
         default=None,
     )
@@ -203,7 +205,7 @@ class NamingSystem(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

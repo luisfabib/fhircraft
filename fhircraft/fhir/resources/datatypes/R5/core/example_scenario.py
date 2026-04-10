@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,42 +23,44 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ExampleScenarioActor(BackboneElement):
     """
     A system or person who shares or receives an instance within the scenario.
     """
 
-    key: Optional[String] = Field(
+    key: Optional[fhir.string] = Field(
         description="ID or acronym of the actor",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="person | system",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for actor when rendering",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Details about actor",
         default=None,
     )
+
 
 class ExampleScenarioInstanceVersion(BackboneElement):
     """
     Represents the instance as it was at a specific time-point.
     """
 
-    key: Optional[String] = Field(
+    key: Optional[fhir.string] = Field(
         description="ID or acronym of the version",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for instance version",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Details about version",
         default=None,
     )
@@ -67,26 +69,28 @@ class ExampleScenarioInstanceVersion(BackboneElement):
         default=None,
     )
 
+
 class ExampleScenarioInstanceContainedInstance(BackboneElement):
     """
     References to other instances that can be found within this instance (e.g. the observations contained in a bundle).
     """
 
-    instanceReference: Optional[String] = Field(
+    instanceReference: Optional[fhir.string] = Field(
         description="Key of contained instance",
         default=None,
     )
-    versionReference: Optional[String] = Field(
+    versionReference: Optional[fhir.string] = Field(
         description="Key of contained instance version",
         default=None,
     )
+
 
 class ExampleScenarioInstance(BackboneElement):
     """
     A single data collection that is shared as part of the scenario.
     """
 
-    key: Optional[String] = Field(
+    key: Optional[fhir.string] = Field(
         description="ID or acronym of the instance",
         default=None,
     )
@@ -94,23 +98,23 @@ class ExampleScenarioInstance(BackboneElement):
         description="Data structure for example",
         default=None,
     )
-    structureVersion: Optional[String] = Field(
+    structureVersion: Optional[fhir.string] = Field(
         description="E.g. 4.0.1",
         default=None,
     )
-    structureProfileCanonical: Optional[Canonical] = Field(
+    structureProfileCanonical: Optional[fhir.canonical] = Field(
         description="Rules instance adheres to",
         default=None,
     )
-    structureProfileUri: Optional[Uri] = Field(
+    structureProfileUri: Optional[fhir.uri] = Field(
         description="Rules instance adheres to",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for instance",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the instance",
         default=None,
     )
@@ -140,24 +144,26 @@ class ExampleScenarioInstance(BackboneElement):
     def structureProfile_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Uri],
+            field_types=[fhir.canonical, fhir.uri],
             field_name_base="structureProfile",
             required=False,
         )
+
 
 class ExampleScenarioProcessStepOperationRequest(BackboneElement):
     """
     A reference to the instance that is transmitted from requester to receiver as part of the invocation of the operation.
     """
 
-    instanceReference: Optional[String] = Field(
+    instanceReference: Optional[fhir.string] = Field(
         description="Key of contained instance",
         default=None,
     )
-    versionReference: Optional[String] = Field(
+    versionReference: Optional[fhir.string] = Field(
         description="Key of contained instance version",
         default=None,
     )
+
 
 class ExampleScenarioProcessStepOperation(BackboneElement):
     """
@@ -168,27 +174,27 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         description="Kind of action",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for step",
         default=None,
     )
-    initiator: Optional[String] = Field(
+    initiator: Optional[fhir.string] = Field(
         description="Who starts the operation",
         default=None,
     )
-    receiver: Optional[String] = Field(
+    receiver: Optional[fhir.string] = Field(
         description="Who receives the operation",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the operation",
         default=None,
     )
-    initiatorActive: Optional[Boolean] = Field(
+    initiatorActive: Optional[fhir.boolean] = Field(
         description="Initiator stays active?",
         default=None,
     )
-    receiverActive: Optional[Boolean] = Field(
+    receiverActive: Optional[fhir.boolean] = Field(
         description="Receiver stays active?",
         default=None,
     )
@@ -201,16 +207,17 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         default=None,
     )
 
+
 class ExampleScenarioProcessStepAlternative(BackboneElement):
     """
     Indicates an alternative step that can be taken instead of the sub-process, scenario or operation.  E.g. to represent non-happy-path/exceptional/atypical circumstances.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for alternative",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-readable description of option",
         default=None,
     )
@@ -219,12 +226,13 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
         default=None,
     )
 
+
 class ExampleScenarioProcessStep(BackboneElement):
     """
     A significant action that occurs as part of the process.
     """
 
-    number: Optional[String] = Field(
+    number: Optional[fhir.string] = Field(
         description="Sequential number of the step",
         default=None,
     )
@@ -232,7 +240,7 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Step is nested process",
         default=None,
     )
-    workflow: Optional[Canonical] = Field(
+    workflow: Optional[fhir.canonical] = Field(
         description="Step is nested workflow",
         default=None,
     )
@@ -244,29 +252,30 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Alternate non-typical step action",
         default=None,
     )
-    pause: Optional[Boolean] = Field(
+    pause: Optional[fhir.boolean] = Field(
         description="Pause in the flow?",
         default=None,
     )
+
 
 class ExampleScenarioProcess(BackboneElement):
     """
     A group of operations that represents a significant step within a scenario.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for procss",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the process",
         default=None,
     )
-    preConditions: Optional[Markdown] = Field(
+    preConditions: Optional[fhir.markdown] = Field(
         description="Status before process starts",
         default=None,
     )
-    postConditions: Optional[Markdown] = Field(
+    postConditions: Optional[fhir.markdown] = Field(
         description="Status after successful completion",
         default=None,
     )
@@ -274,6 +283,7 @@ class ExampleScenarioProcess(BackboneElement):
         description="Event within of the process",
         default=None,
     )
+
 
 class ExampleScenario(DomainResource):
     """
@@ -284,19 +294,19 @@ class ExampleScenario(DomainResource):
     _type = "ExampleScenario"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExampleScenario"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this example scenario, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this example scenario, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the example scenario",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the example scenario",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -304,27 +314,27 @@ class ExampleScenario(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="To be removed?",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this example scenario (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -332,7 +342,7 @@ class ExampleScenario(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the ExampleScenario",
         default=None,
     )
@@ -344,15 +354,15 @@ class ExampleScenario(DomainResource):
         description="Intended jurisdiction for example scenario (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="The purpose of the example, e.g. to illustrate a scenario",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
@@ -380,7 +390,7 @@ class ExampleScenario(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

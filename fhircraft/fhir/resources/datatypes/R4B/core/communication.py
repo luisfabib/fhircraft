@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -26,7 +26,7 @@ class CommunicationPayload(BackboneElement):
     Text, attachment(s), or resource(s) that was communicated to the recipient.
     """
 
-    contentString: Optional[String] = Field(
+    contentString: Optional[fhir.string] = Field(
         description="Message part content",
         default=None,
     )
@@ -50,7 +50,7 @@ class CommunicationPayload(BackboneElement):
     def content_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Attachment, Reference],
+            field_types=[fhir.string, Attachment, Reference],
             field_name_base="content",
             required=True,
         )
@@ -80,11 +80,11 @@ class Communication(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -100,7 +100,7 @@ class Communication(DomainResource):
         description="Reply to",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
@@ -112,7 +112,7 @@ class Communication(DomainResource):
         description="Message category",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
@@ -136,11 +136,11 @@ class Communication(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    sent: Optional[DateTime] = Field(
+    sent: Optional[fhir.dateTime] = Field(
         description="When sent",
         default=None,
     )
-    received: Optional[DateTime] = Field(
+    received: Optional[fhir.dateTime] = Field(
         description="When received",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     """
     Associated or related knowledge about a medication.
@@ -36,6 +37,7 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         description="Associated documentation about the associated medication knowledge",
         default=None,
     )
+
 
 class MedicationKnowledgeMonograph(BackboneElement):
     """
@@ -51,6 +53,7 @@ class MedicationKnowledgeMonograph(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeIngredient(BackboneElement):
     """
     Identifies a particular constituent of interest in the product.
@@ -64,7 +67,7 @@ class MedicationKnowledgeIngredient(BackboneElement):
         description="Medication(s) or substance(s) contained in the medication",
         default=None,
     )
-    isActive: Optional[Boolean] = Field(
+    isActive: Optional[fhir.boolean] = Field(
         description="Active ingredient indicator",
         default=None,
     )
@@ -89,6 +92,7 @@ class MedicationKnowledgeIngredient(BackboneElement):
             required=True,
         )
 
+
 class MedicationKnowledgeCost(BackboneElement):
     """
     The price of the medication.
@@ -98,7 +102,7 @@ class MedicationKnowledgeCost(BackboneElement):
         description="The category of the cost information",
         default=None,
     )
-    source: Optional[String] = Field(
+    source: Optional[fhir.string] = Field(
         description="The source or owner for the price information",
         default=None,
     )
@@ -106,6 +110,7 @@ class MedicationKnowledgeCost(BackboneElement):
         description="The price of the medication",
         default=None,
     )
+
 
 class MedicationKnowledgeMonitoringProgram(BackboneElement):
     """
@@ -116,10 +121,11 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         description="Type of program under which the medication is monitored",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of the reviewing program",
         default=None,
     )
+
 
 class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
     """
@@ -134,6 +140,7 @@ class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
         description="Dosage for the medication for the specific guidelines",
         default=None,
     )
+
 
 class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
     BackboneElement
@@ -150,7 +157,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
         description="Specific characteristic that is relevant to the administration guideline",
         default=None,
     )
-    value: Optional[ListType[String]] = Field(
+    value: Optional[ListType[fhir.string]] = Field(
         description="The specific characteristic",
         default=None,
     )
@@ -170,6 +177,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
             field_name_base="characteristic",
             required=True,
         )
+
 
 class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
     """
@@ -213,6 +221,7 @@ class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
             required=False,
         )
 
+
 class MedicationKnowledgeMedicineClassification(BackboneElement):
     """
     Categorization of the medication within a formulary or classification system.
@@ -226,6 +235,7 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         description="Specific category assigned to the medication",
         default=None,
     )
+
 
 class MedicationKnowledgePackaging(BackboneElement):
     """
@@ -241,20 +251,21 @@ class MedicationKnowledgePackaging(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     """
     Specifies descriptive properties of the medicine, such as color, shape, imprints, etc.
     """
 
     type: Optional[CodeableConcept] = Field(
-        description="Code specifying the type of characteristic of medication",
+        description="code specifying the type of characteristic of medication",
         default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Description of the characteristic",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Description of the characteristic",
         default=None,
     )
@@ -262,7 +273,7 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
         description="Description of the characteristic",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Description of the characteristic",
         default=None,
     )
@@ -278,10 +289,11 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, String, Quantity, Base64Binary],
+            field_types=[CodeableConcept, fhir.string, Quantity, fhir.base64Binary],
             field_name_base="value",
             required=False,
         )
+
 
 class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     """
@@ -292,10 +304,11 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         description="Specifies the type of substitution allowed",
         default=None,
     )
-    allowed: Optional[Boolean] = Field(
+    allowed: Optional[fhir.boolean] = Field(
         description="Specifies if regulation allows for changes in the medication when dispensing",
         default=None,
     )
+
 
 class MedicationKnowledgeRegulatorySchedule(BackboneElement):
     """
@@ -306,6 +319,7 @@ class MedicationKnowledgeRegulatorySchedule(BackboneElement):
         description="Specifies the specific drug schedule",
         default=None,
     )
+
 
 class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     """
@@ -320,6 +334,7 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
         description="The period that applies to the maximum number of units",
         default=None,
     )
+
 
 class MedicationKnowledgeRegulatory(BackboneElement):
     """
@@ -343,6 +358,7 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeKinetics(BackboneElement):
     """
     The time course of drug absorption, distribution, metabolism and excretion of a medication from the body.
@@ -357,9 +373,10 @@ class MedicationKnowledgeKinetics(BackboneElement):
         default=None,
     )
     halfLifePeriod: Optional[Duration] = Field(
-        description="Time required for concentration in the body to decrease by half",
+        description="time required for concentration in the body to decrease by half",
         default=None,
     )
+
 
 class MedicationKnowledge(DomainResource):
     """
@@ -383,10 +400,10 @@ class MedicationKnowledge(DomainResource):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code that identifies this medication",
+        description="code that identifies this medication",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
     )
@@ -402,7 +419,7 @@ class MedicationKnowledge(DomainResource):
         description="Amount of drug in package",
         default=None,
     )
-    synonym: Optional[ListType[String]] = Field(
+    synonym: Optional[ListType[fhir.string]] = Field(
         description="Additional names for a medication",
         default=None,
     )
@@ -428,7 +445,7 @@ class MedicationKnowledge(DomainResource):
         description="Active or inactive ingredient",
         default=None,
     )
-    preparationInstruction: Optional[Markdown] = Field(
+    preparationInstruction: Optional[fhir.markdown] = Field(
         description="The instructions for preparing the medication",
         default=None,
     )

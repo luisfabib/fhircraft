@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -47,12 +47,12 @@ class AppointmentResponse(DomainResource):
         description="Appointment this response relates to",
         default=None,
     )
-    start: Optional[Instant] = Field(
-        description="Time from appointment, or requested new start time",
+    start: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new start time",
         default=None,
     )
-    end: Optional[Instant] = Field(
-        description="Time from appointment, or requested new end time",
+    end: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new end time",
         default=None,
     )
     participantType: Optional[ListType[CodeableConcept]] = Field(
@@ -63,11 +63,11 @@ class AppointmentResponse(DomainResource):
         description="Person, Location, HealthcareService, or Device",
         default=None,
     )
-    participantStatus: Optional[Code] = Field(
+    participantStatus: Optional[fhir.code] = Field(
         description="accepted | declined | tentative | needs-action",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Additional comments",
         default=None,
     )

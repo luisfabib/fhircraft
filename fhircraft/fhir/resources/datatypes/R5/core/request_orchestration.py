@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -30,26 +30,28 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RequestOrchestrationActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria, or start/stop conditions for the action.
     """
 
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="applicability | start | stop",
         default=None,
     )
     expression: Optional[Expression] = Field(
-        description="Boolean-valued expression",
+        description="boolean-valued expression",
         default=None,
     )
+
 
 class RequestOrchestrationActionInput(BackboneElement):
     """
     Defines input data requirements for the action.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
     )
@@ -57,17 +59,18 @@ class RequestOrchestrationActionInput(BackboneElement):
         description="What data is provided",
         default=None,
     )
-    relatedData: Optional[Id] = Field(
+    relatedData: Optional[fhir.id_] = Field(
         description="What data is provided",
         default=None,
     )
+
 
 class RequestOrchestrationActionOutput(BackboneElement):
     """
     Defines the outputs of the action, if any.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
     )
@@ -75,34 +78,35 @@ class RequestOrchestrationActionOutput(BackboneElement):
         description="What data is provided",
         default=None,
     )
-    relatedData: Optional[String] = Field(
+    relatedData: Optional[fhir.string] = Field(
         description="What data is provided",
         default=None,
     )
+
 
 class RequestOrchestrationActionRelatedAction(BackboneElement):
     """
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    targetId: Optional[Id] = Field(
+    targetId: Optional[fhir.id_] = Field(
         description="What action this is related to",
         default=None,
     )
-    relationship: Optional[Code] = Field(
+    relationship: Optional[fhir.code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
     )
-    endRelationship: Optional[Code] = Field(
+    endRelationship: Optional[fhir.code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
     )
     offsetDuration: Optional[Duration] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
     offsetRange: Optional[Range] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
 
@@ -122,16 +126,17 @@ class RequestOrchestrationActionRelatedAction(BackboneElement):
             required=False,
         )
 
+
 class RequestOrchestrationActionParticipant(BackboneElement):
     """
     The participant that should perform or be responsible for this action.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="careteam | device | group | healthcareservice | location | organization | patient | practitioner | practitionerrole | relatedperson",
         default=None,
     )
-    typeCanonical: Optional[Canonical] = Field(
+    typeCanonical: Optional[fhir.canonical] = Field(
         description="Who or what can participate",
         default=None,
     )
@@ -147,7 +152,7 @@ class RequestOrchestrationActionParticipant(BackboneElement):
         description="E.g. Author, Reviewer, Witness, etc",
         default=None,
     )
-    actorCanonical: Optional[Canonical] = Field(
+    actorCanonical: Optional[fhir.canonical] = Field(
         description="Who/what is participating?",
         default=None,
     )
@@ -167,17 +172,18 @@ class RequestOrchestrationActionParticipant(BackboneElement):
     def actor_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Reference],
+            field_types=[fhir.canonical, Reference],
             field_name_base="actor",
             required=False,
         )
+
 
 class RequestOrchestrationActionDynamicValue(BackboneElement):
     """
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
     """
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="The path to the element to be set dynamically",
         default=None,
     )
@@ -186,37 +192,38 @@ class RequestOrchestrationActionDynamicValue(BackboneElement):
         default=None,
     )
 
+
 class RequestOrchestrationAction(BackboneElement):
     """
     The actions, if any, produced by the evaluation of the artifact.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific item from the PlanDefinition",
         default=None,
     )
-    prefix: Optional[String] = Field(
+    prefix: Optional[fhir.string] = Field(
         description="User-visible prefix for the action (e.g. 1. or A.)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Short description of the action",
         default=None,
     )
-    textEquivalent: Optional[Markdown] = Field(
+    textEquivalent: Optional[fhir.markdown] = Field(
         description="Static text equivalent of the action, used if the dynamic aspects cannot be interpreted by the receiving system",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code representing the meaning of the action or sub-actions",
+        description="code representing the meaning of the action or sub-actions",
         default=None,
     )
     documentation: Optional[ListType[RelatedArtifact]] = Field(
@@ -243,7 +250,7 @@ class RequestOrchestrationAction(BackboneElement):
         description="Relationship to another action",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="When the action should take place",
         default=None,
     )
@@ -279,23 +286,23 @@ class RequestOrchestrationAction(BackboneElement):
         description="create | update | remove | fire-event",
         default=None,
     )
-    groupingBehavior: Optional[Code] = Field(
+    groupingBehavior: Optional[fhir.code] = Field(
         description="visual-group | logical-group | sentence-group",
         default=None,
     )
-    selectionBehavior: Optional[Code] = Field(
+    selectionBehavior: Optional[fhir.code] = Field(
         description="any | all | all-or-none | exactly-one | at-most-one | one-or-more",
         default=None,
     )
-    requiredBehavior: Optional[Code] = Field(
+    requiredBehavior: Optional[fhir.code] = Field(
         description="must | could | must-unless-documented",
         default=None,
     )
-    precheckBehavior: Optional[Code] = Field(
+    precheckBehavior: Optional[fhir.code] = Field(
         description="yes | no",
         default=None,
     )
-    cardinalityBehavior: Optional[Code] = Field(
+    cardinalityBehavior: Optional[fhir.code] = Field(
         description="single | multiple",
         default=None,
     )
@@ -303,15 +310,15 @@ class RequestOrchestrationAction(BackboneElement):
         description="The target of the action",
         default=None,
     )
-    definitionCanonical: Optional[Canonical] = Field(
+    definitionCanonical: Optional[fhir.canonical] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionUri: Optional[Uri] = Field(
+    definitionUri: Optional[fhir.uri] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    transform: Optional[Canonical] = Field(
+    transform: Optional[fhir.canonical] = Field(
         description="Transform to apply the template",
         default=None,
     )
@@ -342,7 +349,7 @@ class RequestOrchestrationAction(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Duration, Range, Timing],
+            field_types=[fhir.dateTime, Age, Period, Duration, Range, Timing],
             field_name_base="timing",
             required=False,
         )
@@ -351,10 +358,11 @@ class RequestOrchestrationAction(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Uri],
+            field_types=[fhir.canonical, fhir.uri],
             field_name_base="definition",
             required=False,
         )
+
 
 class RequestOrchestration(DomainResource):
     """
@@ -369,11 +377,11 @@ class RequestOrchestration(DomainResource):
         description="Business identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -389,15 +397,15 @@ class RequestOrchestration(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
@@ -413,7 +421,7 @@ class RequestOrchestration(DomainResource):
         description="Created as part of",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When the request orchestration was authored",
         default=None,
     )

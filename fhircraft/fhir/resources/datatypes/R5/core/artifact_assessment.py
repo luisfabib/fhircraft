@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,16 +22,17 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ArtifactAssessmentContent(BackboneElement):
     """
     A component comment, classifier, or rating of the artifact.
     """
 
-    informationType: Optional[Code] = Field(
+    informationType: Optional[fhir.code] = Field(
         description="comment | classifier | rating | container | response | change-request",
         default=None,
     )
-    summary: Optional[Markdown] = Field(
+    summary: Optional[fhir.markdown] = Field(
         description="Brief summary of the content",
         default=None,
     )
@@ -51,7 +52,7 @@ class ArtifactAssessmentContent(BackboneElement):
         description="Who authored the content",
         default=None,
     )
-    path: Optional[ListType[Uri]] = Field(
+    path: Optional[ListType[fhir.uri]] = Field(
         description="What the comment is directed to",
         default=None,
     )
@@ -59,7 +60,7 @@ class ArtifactAssessmentContent(BackboneElement):
         description="Additional information",
         default=None,
     )
-    freeToShare: Optional[Boolean] = Field(
+    freeToShare: Optional[fhir.boolean] = Field(
         description="Acceptable to publicly share the resource content",
         default=None,
     )
@@ -67,6 +68,7 @@ class ArtifactAssessmentContent(BackboneElement):
         description="Contained content",
         default=None,
     )
+
 
 class ArtifactAssessment(DomainResource):
     """
@@ -81,7 +83,7 @@ class ArtifactAssessment(DomainResource):
         description="Additional identifier for the artifact assessment",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="A short title for the assessment for use in displaying and selecting",
         default=None,
     )
@@ -89,23 +91,23 @@ class ArtifactAssessment(DomainResource):
         description="How to cite the comment or rating",
         default=None,
     )
-    citeAsMarkdown: Optional[Markdown] = Field(
+    citeAsMarkdown: Optional[fhir.markdown] = Field(
         description="How to cite the comment or rating",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the artifact assessment was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the artifact assessment was last reviewed by the publisher",
         default=None,
     )
@@ -113,11 +115,11 @@ class ArtifactAssessment(DomainResource):
         description="The artifact assessed, commented upon or rated",
         default=None,
     )
-    artifactCanonical: Optional[Canonical] = Field(
+    artifactCanonical: Optional[fhir.canonical] = Field(
         description="The artifact assessed, commented upon or rated",
         default=None,
     )
-    artifactUri: Optional[Uri] = Field(
+    artifactUri: Optional[fhir.uri] = Field(
         description="The artifact assessed, commented upon or rated",
         default=None,
     )
@@ -125,11 +127,11 @@ class ArtifactAssessment(DomainResource):
         description="Comment, classifier, or rating content",
         default=None,
     )
-    workflowStatus: Optional[Code] = Field(
+    workflowStatus: Optional[fhir.code] = Field(
         description="submitted | triaged | waiting-for-input | resolved-no-change | resolved-change-required | deferred | duplicate | applied | published | entered-in-error",
         default=None,
     )
-    disposition: Optional[Code] = Field(
+    disposition: Optional[fhir.code] = Field(
         description="unresolved | not-persuasive | persuasive | persuasive-with-modification | not-persuasive-with-modification",
         default=None,
     )
@@ -152,7 +154,7 @@ class ArtifactAssessment(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Markdown],
+            field_types=[Reference, fhir.markdown],
             field_name_base="citeAs",
             required=False,
         )
@@ -161,7 +163,7 @@ class ArtifactAssessment(DomainResource):
     def artifact_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Canonical, Uri],
+            field_types=[Reference, fhir.canonical, fhir.uri],
             field_name_base="artifact",
             required=True,
         )

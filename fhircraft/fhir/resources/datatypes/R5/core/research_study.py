@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ResearchStudyLabel(BackboneElement):
     """
     Additional names for the study.
@@ -33,17 +34,18 @@ class ResearchStudyLabel(BackboneElement):
         description="primary | official | scientific | plain-language | subtitle | short-title | acronym | earlier-title | language | auto-translated | human-use | machine-use | duplicate-uid",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The name",
         default=None,
     )
+
 
 class ResearchStudyAssociatedParty(BackboneElement):
     """
     Sponsors, collaborators, and other parties.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of associated party",
         default=None,
     )
@@ -64,6 +66,7 @@ class ResearchStudyAssociatedParty(BackboneElement):
         default=None,
     )
 
+
 class ResearchStudyProgressStatus(BackboneElement):
     """
     Status of study with time for that status.
@@ -73,7 +76,7 @@ class ResearchStudyProgressStatus(BackboneElement):
         description="Label for status or state (e.g. recruitment status)",
         default=None,
     )
-    actual: Optional[Boolean] = Field(
+    actual: Optional[fhir.boolean] = Field(
         description="Actual if true else anticipated",
         default=None,
     )
@@ -82,16 +85,17 @@ class ResearchStudyProgressStatus(BackboneElement):
         default=None,
     )
 
+
 class ResearchStudyRecruitment(BackboneElement):
     """
     Target or actual group of participants enrolled in study.
     """
 
-    targetNumber: Optional[UnsignedInt] = Field(
+    targetNumber: Optional[fhir.unsignedInt] = Field(
         description="Estimated total number of participants to be enrolled",
         default=None,
     )
-    actualNumber: Optional[UnsignedInt] = Field(
+    actualNumber: Optional[fhir.unsignedInt] = Field(
         description="Actual total number of participants enrolled in study",
         default=None,
     )
@@ -104,16 +108,17 @@ class ResearchStudyRecruitment(BackboneElement):
         default=None,
     )
 
+
 class ResearchStudyComparisonGroup(BackboneElement):
     """
     Describes an expected event or sequence of events for one of the subjects of a study. E.g. for a living subject: exposure to drug A, wash-out, exposure to drug B, wash-out, follow-up. E.g. for a stability study: {store sample from lot A at 25 degrees for 1 month}, {store sample from lot A at 40 degrees for 1 month}.
     """
 
-    linkId: Optional[Id] = Field(
+    linkId: Optional[fhir.id_] = Field(
         description="Allows the comparisonGroup for the study and the comparisonGroup for the subject to be linked easily",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for study comparisonGroup",
         default=None,
     )
@@ -121,7 +126,7 @@ class ResearchStudyComparisonGroup(BackboneElement):
         description="Categorization of study comparisonGroup",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Short explanation of study path",
         default=None,
     )
@@ -134,12 +139,13 @@ class ResearchStudyComparisonGroup(BackboneElement):
         default=None,
     )
 
+
 class ResearchStudyObjective(BackboneElement):
     """
     A goal that the study is aiming to achieve in terms of a scientific question to be answered by the analysis of data collected during the study.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for the objective",
         default=None,
     )
@@ -147,17 +153,18 @@ class ResearchStudyObjective(BackboneElement):
         description="primary | secondary | exploratory",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the objective",
         default=None,
     )
+
 
 class ResearchStudyOutcomeMeasure(BackboneElement):
     """
     An "outcome measure", "endpoint", "effect measure" or "measure of effect" is a specific measurement or observation used to quantify the effect of experimental variables on the participants in a study, or for observational studies, to describe patterns of diseases or traits or associations with exposures, risk factors or treatment.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for the outcome",
         default=None,
     )
@@ -165,7 +172,7 @@ class ResearchStudyOutcomeMeasure(BackboneElement):
         description="primary | secondary | exploratory",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the outcome",
         default=None,
     )
@@ -173,6 +180,7 @@ class ResearchStudyOutcomeMeasure(BackboneElement):
         description="Structured outcome definition",
         default=None,
     )
+
 
 class ResearchStudy(DomainResource):
     """
@@ -183,23 +191,23 @@ class ResearchStudy(DomainResource):
     _type = "ResearchStudy"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchStudy"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this study resource",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this study resource",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for study",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="The business version for the study record",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this study (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human readable name of the study",
         default=None,
     )
@@ -219,11 +227,11 @@ class ResearchStudy(DomainResource):
         description="References, URLs, and attachments",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date the resource last changed",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
@@ -255,11 +263,11 @@ class ResearchStudy(DomainResource):
         description="Geographic area for the study",
         default=None,
     )
-    descriptionSummary: Optional[Markdown] = Field(
+    descriptionSummary: Optional[fhir.markdown] = Field(
         description="Brief text explaining the study",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Detailed narrative of the study",
         default=None,
     )

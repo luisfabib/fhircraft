@@ -3,7 +3,7 @@ from pydantic import Field, model_validator
 from typing import List as ListType, Optional
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Address,
     Age,
@@ -50,87 +50,87 @@ class ParametersParameter(BackboneElement):
     A parameter passed to or received from the operation.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name from the definition",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueCanonical: Optional[Canonical] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueInstant: Optional[Instant] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueInteger64: Optional[Integer64] = Field(
+    valueInteger64: Optional[fhir.integer64] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueOid: Optional[Oid] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valuePositiveInt: Optional[PositiveInt] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUnsignedInt: Optional[UnsignedInt] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUuid: Optional[Uuid] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="If parameter is a data type",
         default=None,
     )
@@ -291,26 +291,26 @@ class ParametersParameter(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Base64Binary,
-                Boolean,
-                Canonical,
-                Code,
-                Date,
-                DateTime,
-                Decimal,
-                Id,
-                Instant,
-                Integer,
-                Integer64,
-                Markdown,
-                Oid,
-                PositiveInt,
-                String,
-                Time,
-                UnsignedInt,
-                Uri,
-                Url,
-                Uuid,
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Integer64,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 Address,
                 Age,
                 Annotation,

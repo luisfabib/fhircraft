@@ -5,7 +5,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,7 +22,7 @@ class Binary(Resource):
     _type = "Binary"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Binary"
 
-    contentType: Optional[Code] = Field(
+    contentType: Optional[fhir.code] = Field(
         description="MimeType of the binary content",
         default=None,
     )
@@ -30,7 +30,7 @@ class Binary(Resource):
         description="Identifies another resource to use as proxy when enforcing access control",
         default=None,
     )
-    data: Optional[Base64Binary] = Field(
+    data: Optional[fhir.base64Binary] = Field(
         description="The actual content",
         default=None,
     )

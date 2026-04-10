@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -49,11 +49,11 @@ class GuidanceResponse(DomainResource):
         description="Business identifier",
         default=None,
     )
-    moduleUri: Optional[Uri] = Field(
+    moduleUri: Optional[fhir.uri] = Field(
         description="What guidance was requested",
         default=None,
     )
-    moduleCanonical: Optional[Canonical] = Field(
+    moduleCanonical: Optional[fhir.canonical] = Field(
         description="What guidance was requested",
         default=None,
     )
@@ -61,7 +61,7 @@ class GuidanceResponse(DomainResource):
         description="What guidance was requested",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="success | data-requested | data-required | in-progress | failure | entered-in-error",
         default=None,
     )
@@ -73,7 +73,7 @@ class GuidanceResponse(DomainResource):
         description="Encounter during which the response was returned",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the guidance response was processed",
         default=None,
     )
@@ -121,7 +121,7 @@ class GuidanceResponse(DomainResource):
     def module_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Uri, Canonical, CodeableConcept],
+            field_types=[fhir.uri, fhir.canonical, CodeableConcept],
             field_name_base="module",
             required=True,
         )

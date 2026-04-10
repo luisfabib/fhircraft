@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class OrganizationQualification(BackboneElement):
     """
@@ -46,6 +47,7 @@ class OrganizationQualification(BackboneElement):
         default=None,
     )
 
+
 class Organization(DomainResource):
     """
     A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.
@@ -59,7 +61,7 @@ class Organization(DomainResource):
         description="Identifies this organization  across multiple systems",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether the organization\u0027s record is still in active use",
         default=None,
     )
@@ -67,15 +69,15 @@ class Organization(DomainResource):
         description="Kind of organization",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name used for the organization",
         default=None,
     )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Additional details about the Organization that could be displayed as further information to identify the Organization beyond its name",
         default=None,
     )

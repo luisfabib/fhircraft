@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -26,6 +26,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MeasureTerm(BackboneElement):
     """
     Provides a description of an individual term used within the measure.
@@ -35,17 +36,18 @@ class MeasureTerm(BackboneElement):
         description="What term?",
         default=None,
     )
-    definition: Optional[Markdown] = Field(
+    definition: Optional[fhir.markdown] = Field(
         description="Meaning of the term",
         default=None,
     )
+
 
 class MeasureGroupPopulation(BackboneElement):
     """
     A population criteria for the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for population in measure",
         default=None,
     )
@@ -53,7 +55,7 @@ class MeasureGroupPopulation(BackboneElement):
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this population criteria",
         default=None,
     )
@@ -65,7 +67,7 @@ class MeasureGroupPopulation(BackboneElement):
         description="A group resource that defines this population",
         default=None,
     )
-    inputPopulationId: Optional[String] = Field(
+    inputPopulationId: Optional[fhir.string] = Field(
         description="Which population",
         default=None,
     )
@@ -74,12 +76,13 @@ class MeasureGroupPopulation(BackboneElement):
         default=None,
     )
 
+
 class MeasureGroupStratifierComponent(BackboneElement):
     """
     A component of the stratifier criteria for the measure report, specified as either the name of a valid CQL expression defined within a referenced library or a valid FHIR Resource Path.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for stratifier component in measure",
         default=None,
     )
@@ -87,7 +90,7 @@ class MeasureGroupStratifierComponent(BackboneElement):
         description="Meaning of the stratifier component",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this stratifier component",
         default=None,
     )
@@ -100,12 +103,13 @@ class MeasureGroupStratifierComponent(BackboneElement):
         default=None,
     )
 
+
 class MeasureGroupStratifier(BackboneElement):
     """
     The stratifier criteria for the measure report, specified as either the name of a valid CQL expression defined within a referenced library or a valid FHIR Resource Path.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for stratifier in measure",
         default=None,
     )
@@ -113,7 +117,7 @@ class MeasureGroupStratifier(BackboneElement):
         description="Meaning of the stratifier",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this stratifier",
         default=None,
     )
@@ -130,12 +134,13 @@ class MeasureGroupStratifier(BackboneElement):
         default=None,
     )
 
+
 class MeasureGroup(BackboneElement):
     """
     A group of population criteria for the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for group in measure",
         default=None,
     )
@@ -143,7 +148,7 @@ class MeasureGroup(BackboneElement):
         description="Meaning of the group",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Summary description",
         default=None,
     )
@@ -159,7 +164,7 @@ class MeasureGroup(BackboneElement):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    basis: Optional[Code] = Field(
+    basis: Optional[fhir.code] = Field(
         description="Population basis",
         default=None,
     )
@@ -171,7 +176,7 @@ class MeasureGroup(BackboneElement):
         description="What units?",
         default=None,
     )
-    rateAggregation: Optional[Markdown] = Field(
+    rateAggregation: Optional[fhir.markdown] = Field(
         description="How is rate aggregation performed for this measure",
         default=None,
     )
@@ -179,7 +184,7 @@ class MeasureGroup(BackboneElement):
         description="increase | decrease",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the measure group",
         default=None,
     )
@@ -208,12 +213,13 @@ class MeasureGroup(BackboneElement):
             required=False,
         )
 
+
 class MeasureSupplementalData(BackboneElement):
     """
     The supplemental data criteria for the measure report, specified as either the name of a valid CQL expression within a referenced library, or a valid FHIR Resource Path.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for supplementalData in measure",
         default=None,
     )
@@ -225,7 +231,7 @@ class MeasureSupplementalData(BackboneElement):
         description="supplemental-data | risk-adjustment-factor",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this supplemental data",
         default=None,
     )
@@ -233,6 +239,7 @@ class MeasureSupplementalData(BackboneElement):
         description="Expression describing additional data to be reported",
         default=None,
     )
+
 
 class Measure(DomainResource):
     """
@@ -243,19 +250,19 @@ class Measure(DomainResource):
     _type = "Measure"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Measure"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this measure, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this measure, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the measure",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the measure",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -263,23 +270,23 @@ class Measure(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this measure (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this measure (human friendly)",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the measure",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
@@ -291,15 +298,15 @@ class Measure(DomainResource):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    basis: Optional[Code] = Field(
+    basis: Optional[fhir.code] = Field(
         description="Population basis",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -307,7 +314,7 @@ class Measure(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the measure",
         default=None,
     )
@@ -319,27 +326,27 @@ class Measure(DomainResource):
         description="Intended jurisdiction for measure (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this measure is defined",
         default=None,
     )
-    usage: Optional[Markdown] = Field(
+    usage: Optional[fhir.markdown] = Field(
         description="Describes the clinical usage of the measure",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the measure was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the measure was last reviewed by the publisher",
         default=None,
     )
@@ -371,11 +378,11 @@ class Measure(DomainResource):
         description="Additional documentation, citations, etc",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the measure",
         default=None,
     )
-    disclaimer: Optional[Markdown] = Field(
+    disclaimer: Optional[fhir.markdown] = Field(
         description="Disclaimer for use of the measure or its referenced content",
         default=None,
     )
@@ -395,19 +402,19 @@ class Measure(DomainResource):
         description="process | outcome | structure | patient-reported-outcome | composite",
         default=None,
     )
-    riskAdjustment: Optional[Markdown] = Field(
+    riskAdjustment: Optional[fhir.markdown] = Field(
         description="How risk adjustment is applied for this measure",
         default=None,
     )
-    rateAggregation: Optional[Markdown] = Field(
+    rateAggregation: Optional[fhir.markdown] = Field(
         description="How is rate aggregation performed for this measure",
         default=None,
     )
-    rationale: Optional[Markdown] = Field(
+    rationale: Optional[fhir.markdown] = Field(
         description="Detailed description of why the measure exists",
         default=None,
     )
-    clinicalRecommendationStatement: Optional[Markdown] = Field(
+    clinicalRecommendationStatement: Optional[fhir.markdown] = Field(
         description="Summary of clinical guidelines",
         default=None,
     )
@@ -419,7 +426,7 @@ class Measure(DomainResource):
         description="Defined terms used in the measure documentation",
         default=None,
     )
-    guidance: Optional[Markdown] = Field(
+    guidance: Optional[fhir.markdown] = Field(
         description="Additional guidance for implementers (deprecated)",
         default=None,
     )
@@ -450,7 +457,7 @@ class Measure(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

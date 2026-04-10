@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,12 +24,13 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TestPlanDependency(BackboneElement):
     """
     The required criteria to execute the test plan - e.g. preconditions, previous tests...
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the dependency criterium",
         default=None,
     )
@@ -38,12 +39,13 @@ class TestPlanDependency(BackboneElement):
         default=None,
     )
 
+
 class TestPlanTestCaseDependency(BackboneElement):
     """
     The required criteria to execute the test case - e.g. preconditions, previous tests.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the criteria",
         default=None,
     )
@@ -51,6 +53,7 @@ class TestPlanTestCaseDependency(BackboneElement):
         description="Link to predecessor test plans",
         default=None,
     )
+
 
 class TestPlanTestCaseTestRunScript(BackboneElement):
     """
@@ -61,7 +64,7 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
         description="The language for the test cases e.g. \u0027gherkin\u0027, \u0027testscript\u0027",
         default=None,
     )
-    sourceString: Optional[String] = Field(
+    sourceString: Optional[fhir.string] = Field(
         description="The actual content of the cases - references to TestScripts or externally defined content",
         default=None,
     )
@@ -81,17 +84,18 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Reference],
+            field_types=[fhir.string, Reference],
             field_name_base="source",
             required=False,
         )
+
 
 class TestPlanTestCaseTestRun(BackboneElement):
     """
     The actual test to be executed.
     """
 
-    narrative: Optional[Markdown] = Field(
+    narrative: Optional[fhir.markdown] = Field(
         description="The narrative description of the tests",
         default=None,
     )
@@ -99,6 +103,7 @@ class TestPlanTestCaseTestRun(BackboneElement):
         description="The test cases in a structured language e.g. gherkin, Postman, or FHIR TestScript",
         default=None,
     )
+
 
 class TestPlanTestCaseTestData(BackboneElement):
     """
@@ -113,7 +118,7 @@ class TestPlanTestCaseTestData(BackboneElement):
         description="The actual test resources when they exist",
         default=None,
     )
-    sourceString: Optional[String] = Field(
+    sourceString: Optional[fhir.string] = Field(
         description="Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc",
         default=None,
     )
@@ -133,10 +138,11 @@ class TestPlanTestCaseTestData(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Reference],
+            field_types=[fhir.string, Reference],
             field_name_base="source",
             required=False,
         )
+
 
 class TestPlanTestCaseAssertion(BackboneElement):
     """
@@ -156,12 +162,13 @@ class TestPlanTestCaseAssertion(BackboneElement):
         default=None,
     )
 
+
 class TestPlanTestCase(BackboneElement):
     """
     The individual test cases that are part of this plan, when they they are made explicit.
     """
 
-    sequence: Optional[Integer] = Field(
+    sequence: Optional[fhir.integer] = Field(
         description="Sequence of test case in the test plan",
         default=None,
     )
@@ -186,6 +193,7 @@ class TestPlanTestCase(BackboneElement):
         default=None,
     )
 
+
 class TestPlan(DomainResource):
     """
     A plan for executing testing on an artifact or specifications
@@ -195,19 +203,19 @@ class TestPlan(DomainResource):
     _type = "TestPlan"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestPlan"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this test plan, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this test plan, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier identifier for the test plan",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the test plan",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -215,27 +223,27 @@ class TestPlan(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this test plan (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this test plan (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -243,7 +251,7 @@ class TestPlan(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the test plan",
         default=None,
     )
@@ -255,15 +263,15 @@ class TestPlan(DomainResource):
         description="Intended jurisdiction where the test plan applies (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this test plan is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
@@ -275,7 +283,7 @@ class TestPlan(DomainResource):
         description="What is being tested with this Test Plan - a conformance resource, or narrative criteria, or an external reference",
         default=None,
     )
-    testTools: Optional[Markdown] = Field(
+    testTools: Optional[fhir.markdown] = Field(
         description="A description of test tools to be used in the test plan - narrative for now",
         default=None,
     )
@@ -283,7 +291,7 @@ class TestPlan(DomainResource):
         description="The required criteria to execute the test plan - e.g. preconditions, previous tests",
         default=None,
     )
-    exitCriteria: Optional[Markdown] = Field(
+    exitCriteria: Optional[fhir.markdown] = Field(
         description="The threshold or criteria for the test plan to be considered successfully executed - narrative",
         default=None,
     )
@@ -303,7 +311,7 @@ class TestPlan(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneType,
     Duration,
@@ -25,7 +25,7 @@ class ProductShelfLife(BackboneType):
         description="The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    periodString: Optional[String] = Field(
+    periodString: Optional[fhir.string] = Field(
         description="The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
@@ -38,7 +38,7 @@ class ProductShelfLife(BackboneType):
     def period_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Duration, String],
+            field_types=[Duration, fhir.string],
             field_name_base="period",
         )
 

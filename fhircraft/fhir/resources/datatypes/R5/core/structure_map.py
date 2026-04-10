@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,148 +22,153 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class StructureMapStructure(BackboneElement):
     """
     A structure definition used by this map. The structure definition may describe instances that are converted, or the instances that are produced.
     """
 
-    url: Optional[Canonical] = Field(
-        description="Canonical reference to structure definition",
+    url: Optional[fhir.canonical] = Field(
+        description="canonical reference to structure definition",
         default=None,
     )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="source | queried | target | produced",
         default=None,
     )
-    alias: Optional[String] = Field(
+    alias: Optional[fhir.string] = Field(
         description="Name for type in this map",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Documentation on use of structure",
         default=None,
     )
+
 
 class StructureMapConst(BackboneElement):
     """
     Definition of a constant value used in the map rules.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Constant name",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="FHIRPath exression - value of the constant",
         default=None,
     )
+
 
 class StructureMapGroupInput(BackboneElement):
     """
     A name assigned to an instance of data. The instance must be provided when the mapping is invoked.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Name for this instance of data",
         default=None,
     )
-    type: Optional[String] = Field(
+    type: Optional[fhir.string] = Field(
         description="Type for this instance of data",
         default=None,
     )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="source | target",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Documentation for this instance of data",
         default=None,
     )
+
 
 class StructureMapGroupRuleSource(BackboneElement):
     """
     Source inputs to the mapping.
     """
 
-    context: Optional[Id] = Field(
+    context: Optional[fhir.id_] = Field(
         description="Type or variable this rule applies to",
         default=None,
     )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Specified minimum cardinality",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Specified maximum cardinality (number or *)",
         default=None,
     )
-    type: Optional[String] = Field(
+    type: Optional[fhir.string] = Field(
         description="Rule only applies if source has this type",
         default=None,
     )
-    defaultValue: Optional[String] = Field(
+    defaultValue: Optional[fhir.string] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    element: Optional[String] = Field(
+    element: Optional[fhir.string] = Field(
         description="Optional field for this source",
         default=None,
     )
-    listMode: Optional[Code] = Field(
+    listMode: Optional[fhir.code] = Field(
         description="first | not_first | last | not_last | only_one",
         default=None,
     )
-    variable: Optional[Id] = Field(
+    variable: Optional[fhir.id_] = Field(
         description="Named context for field, if a field is specified",
         default=None,
     )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="FHIRPath expression  - must be true or the rule does not apply",
         default=None,
     )
-    check: Optional[String] = Field(
+    check: Optional[fhir.string] = Field(
         description="FHIRPath expression  - must be true or the mapping engine throws an error instead of completing",
         default=None,
     )
-    logMessage: Optional[String] = Field(
+    logMessage: Optional[fhir.string] = Field(
         description="Message to put in log if source exists (FHIRPath)",
         default=None,
     )
+
 
 class StructureMapGroupRuleTargetParameter(BackboneElement):
     """
     Parameters to the transform.
     """
 
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
@@ -179,37 +184,47 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Id, String, Boolean, Integer, Decimal, Date, Time, DateTime],
+            field_types=[
+                fhir.Id,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
+                fhir.Decimal,
+                fhir.Date,
+                fhir.Time,
+                fhir.DateTime,
+            ],
             field_name_base="value",
             required=True,
         )
+
 
 class StructureMapGroupRuleTarget(BackboneElement):
     """
     Content to create because of this mapping rule.
     """
 
-    context: Optional[String] = Field(
+    context: Optional[fhir.string] = Field(
         description="Variable this rule applies to",
         default=None,
     )
-    element: Optional[String] = Field(
+    element: Optional[fhir.string] = Field(
         description="Field to create in the context",
         default=None,
     )
-    variable: Optional[Id] = Field(
+    variable: Optional[fhir.id_] = Field(
         description="Named context for field, if desired, and a field is specified",
         default=None,
     )
-    listMode: Optional[ListType[Code]] = Field(
+    listMode: Optional[ListType[fhir.code]] = Field(
         description="first | share | last | single",
         default=None,
     )
-    listRuleId: Optional[Id] = Field(
+    listRuleId: Optional[fhir.id_] = Field(
         description="Internal rule reference for shared list items",
         default=None,
     )
-    transform: Optional[Code] = Field(
+    transform: Optional[fhir.code] = Field(
         description="create | copy +",
         default=None,
     )
@@ -218,40 +233,41 @@ class StructureMapGroupRuleTarget(BackboneElement):
         default=None,
     )
 
+
 class StructureMapGroupRuleDependentParameter(BackboneElement):
     """
     Parameter to pass to the rule or group.
     """
 
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
@@ -267,17 +283,27 @@ class StructureMapGroupRuleDependentParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Id, String, Boolean, Integer, Decimal, Date, Time, DateTime],
+            field_types=[
+                fhir.Id,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
+                fhir.Decimal,
+                fhir.Date,
+                fhir.Time,
+                fhir.DateTime,
+            ],
             field_name_base="value",
             required=True,
         )
+
 
 class StructureMapGroupRuleDependent(BackboneElement):
     """
     Which other rules to apply in the context of this rule.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Name of a rule or group to apply",
         default=None,
     )
@@ -286,12 +312,13 @@ class StructureMapGroupRuleDependent(BackboneElement):
         default=None,
     )
 
+
 class StructureMapGroupRule(BackboneElement):
     """
     Transform Rule from source to target.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Name of the rule for internal references",
         default=None,
     )
@@ -311,29 +338,30 @@ class StructureMapGroupRule(BackboneElement):
         description="Which other rules to apply in the context of this rule",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Documentation for this instance of data",
         default=None,
     )
+
 
 class StructureMapGroup(BackboneElement):
     """
     Organizes the mapping into managable chunks for human review/ease of maintenance.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Human-readable label",
         default=None,
     )
-    extends: Optional[Id] = Field(
+    extends: Optional[fhir.id_] = Field(
         description="Another group that this group adds rules to",
         default=None,
     )
-    typeMode: Optional[Code] = Field(
+    typeMode: Optional[fhir.code] = Field(
         description="types | type-and-types",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Additional description/explanation for group",
         default=None,
     )
@@ -346,6 +374,7 @@ class StructureMapGroup(BackboneElement):
         default=None,
     )
 
+
 class StructureMap(DomainResource):
     """
     A Map of relationships between 2 structures that can be used to transform data.
@@ -355,19 +384,19 @@ class StructureMap(DomainResource):
     _type = "StructureMap"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureMap"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this structure map, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this structure map, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure map",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the structure map",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -375,27 +404,27 @@ class StructureMap(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this structure map (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this structure map (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -403,7 +432,7 @@ class StructureMap(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the structure map",
         default=None,
     )
@@ -415,15 +444,15 @@ class StructureMap(DomainResource):
         description="Intended jurisdiction for structure map (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this structure map is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
@@ -431,7 +460,7 @@ class StructureMap(DomainResource):
         description="Structure Definition used by this map",
         default=None,
     )
-    import_: Optional[ListType[Canonical]] = Field(
+    import_: Optional[ListType[fhir.canonical]] = Field(
         description="Other maps used by this map (canonical URLs)",
         default=None,
         alias="import",
@@ -456,7 +485,7 @@ class StructureMap(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

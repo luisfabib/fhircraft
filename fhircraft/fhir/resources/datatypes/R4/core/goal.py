@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -45,15 +45,15 @@ class GoalTarget(BackboneElement):
         description="The target value to be achieved",
         default=None,
     )
-    detailString: Optional[String] = Field(
+    detailString: Optional[fhir.string] = Field(
         description="The target value to be achieved",
         default=None,
     )
-    detailBoolean: Optional[Boolean] = Field(
+    detailBoolean: Optional[fhir.boolean] = Field(
         description="The target value to be achieved",
         default=None,
     )
-    detailInteger: Optional[Integer] = Field(
+    detailInteger: Optional[fhir.integer] = Field(
         description="The target value to be achieved",
         default=None,
     )
@@ -61,7 +61,7 @@ class GoalTarget(BackboneElement):
         description="The target value to be achieved",
         default=None,
     )
-    dueDate: Optional[Date] = Field(
+    dueDate: Optional[fhir.date_] = Field(
         description="Reach goal on or before",
         default=None,
     )
@@ -92,9 +92,9 @@ class GoalTarget(BackboneElement):
                 Quantity,
                 Range,
                 CodeableConcept,
-                String,
-                Boolean,
-                Integer,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
                 Ratio,
             ],
             field_name_base="detail",
@@ -105,7 +105,7 @@ class GoalTarget(BackboneElement):
     def due_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Duration],
+            field_types=[fhir.date_, Duration],
             field_name_base="due",
             required=False,
         )
@@ -135,7 +135,7 @@ class Goal(DomainResource):
         description="External Ids for this goal",
         default=None,
     )
-    lifecycleStatus: Optional[Code] = Field(
+    lifecycleStatus: Optional[fhir.code] = Field(
         description="proposed | planned | accepted | active | on-hold | completed | cancelled | entered-in-error | rejected",
         default=None,
     )
@@ -152,14 +152,14 @@ class Goal(DomainResource):
         default=None,
     )
     description: Optional[CodeableConcept] = Field(
-        description="Code or text describing goal",
+        description="code or text describing goal",
         default=None,
     )
     subject: Optional[Reference] = Field(
         description="Who this goal is intended for",
         default=None,
     )
-    startDate: Optional[Date] = Field(
+    startDate: Optional[fhir.date_] = Field(
         description="When goal pursuit begins",
         default=None,
     )
@@ -171,11 +171,11 @@ class Goal(DomainResource):
         description="Target outcome for the goal",
         default=None,
     )
-    statusDate: Optional[Date] = Field(
+    statusDate: Optional[fhir.date_] = Field(
         description="When goal status took effect",
         default=None,
     )
-    statusReason: Optional[String] = Field(
+    statusReason: Optional[fhir.string] = Field(
         description="Reason for current status",
         default=None,
     )
@@ -222,7 +222,7 @@ class Goal(DomainResource):
     def start_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, CodeableConcept],
+            field_types=[fhir.date_, CodeableConcept],
             field_name_base="start",
             required=False,
         )

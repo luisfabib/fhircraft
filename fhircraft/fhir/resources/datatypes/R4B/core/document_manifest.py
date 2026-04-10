@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -62,7 +62,7 @@ class DocumentManifest(DomainResource):
         description="Other identifiers for the manifest",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | superseded | entered-in-error",
         default=None,
     )
@@ -74,7 +74,7 @@ class DocumentManifest(DomainResource):
         description="The subject of the set of documents",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="When this document manifest created",
         default=None,
     )
@@ -86,11 +86,11 @@ class DocumentManifest(DomainResource):
         description="Intended to get notified about this set of documents",
         default=None,
     )
-    source: Optional[Uri] = Field(
+    source: Optional[fhir.uri] = Field(
         description="The source system/application/software",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Human-readable description (title)",
         default=None,
     )

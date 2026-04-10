@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import DataType, Element, Quantity
 
 class SampledData(DataType):
@@ -17,40 +17,40 @@ class SampledData(DataType):
         description="Zero value and units",
         default=None,
     )
-    interval: Optional[Decimal] = Field(
+    interval: Optional[fhir.decimal] = Field(
         description="Number of intervalUnits between samples",
         default=None,
     )
-    intervalUnit: Optional[Code] = Field(
+    intervalUnit: Optional[fhir.code] = Field(
         description="The measurement unit of the interval between samples",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Multiply data by this before adding to origin",
         default=None,
     )
-    lowerLimit: Optional[Decimal] = Field(
+    lowerLimit: Optional[fhir.decimal] = Field(
         description="Lower limit of detection",
         default=None,
     )
-    upperLimit: Optional[Decimal] = Field(
+    upperLimit: Optional[fhir.decimal] = Field(
         description="Upper limit of detection",
         default=None,
     )
-    dimensions: Optional[PositiveInt] = Field(
+    dimensions: Optional[fhir.positiveInt] = Field(
         description="Number of sample points at each time point",
         default=None,
     )
-    codeMap: Optional[Canonical] = Field(
+    codeMap: Optional[fhir.canonical] = Field(
         description="Defines the codes used in the data",
         default=None,
     )
-    offsets: Optional[String] = Field(
+    offsets: Optional[fhir.string] = Field(
         description="Offsets, typically in time, at which data values were taken",
         default=None,
     )
-    data: Optional[String] = Field(
-        description='Decimal values with spaces, or "E" | "U" | "L", or another code',
+    data: Optional[fhir.string] = Field(
+        description='decimal values with spaces, or "E" | "U" | "L", or another code',
         default=None,
     )
 

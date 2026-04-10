@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ContractContentDefinition(BackboneElement):
     """
     Precusory content developed with a focus and intent of supporting the formation a Contract instance, which may be associated with and transformable into a Contract.
@@ -44,25 +45,26 @@ class ContractContentDefinition(BackboneElement):
         description="Publisher Entity",
         default=None,
     )
-    publicationDate: Optional[DateTime] = Field(
+    publicationDate: Optional[fhir.dateTime] = Field(
         description="When published",
         default=None,
     )
-    publicationStatus: Optional[Code] = Field(
+    publicationStatus: Optional[fhir.code] = Field(
         description="amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Publication Ownership",
         default=None,
     )
+
 
 class ContractTermSecurityLabel(BackboneElement):
     """
     Security labels that protect the handling of information about the term and its elements, which may be specifically identified..
     """
 
-    number: Optional[ListType[UnsignedInt]] = Field(
+    number: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Link to Security Labels",
         default=None,
     )
@@ -79,6 +81,7 @@ class ContractTermSecurityLabel(BackboneElement):
         default=None,
     )
 
+
 class ContractTermOfferParty(BackboneElement):
     """
     Offer Recipient.
@@ -93,40 +96,41 @@ class ContractTermOfferParty(BackboneElement):
         default=None,
     )
 
+
 class ContractTermOfferAnswer(BackboneElement):
     """
     Response to offer text.
     """
 
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="The actual answer response",
         default=None,
     )
@@ -159,14 +163,14 @@ class ContractTermOfferAnswer(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
-                Uri,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
+                fhir.Uri,
                 Attachment,
                 Coding,
                 Quantity,
@@ -175,6 +179,7 @@ class ContractTermOfferAnswer(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class ContractTermOffer(BackboneElement):
     """
@@ -209,18 +214,19 @@ class ContractTermOffer(BackboneElement):
         description="Response to offer text",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Human readable offer text",
         default=None,
     )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to text",
         default=None,
     )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Offer restriction numbers",
         default=None,
     )
+
 
 class ContractTermAssetContext(BackboneElement):
     """
@@ -235,45 +241,46 @@ class ContractTermAssetContext(BackboneElement):
         description="Codeable asset context",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Context description",
         default=None,
     )
+
 
 class ContractTermAssetAnswer(BackboneElement):
     """
     Response to assets.
     """
 
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="The actual answer response",
         default=None,
     )
@@ -306,14 +313,14 @@ class ContractTermAssetAnswer(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
-                Uri,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
+                fhir.Uri,
                 Attachment,
                 Coding,
                 Quantity,
@@ -322,6 +329,7 @@ class ContractTermAssetAnswer(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class ContractTermAssetValuedItem(BackboneElement):
     """
@@ -340,7 +348,7 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Contract Valued Item Number",
         default=None,
     )
-    effectiveTime: Optional[DateTime] = Field(
+    effectiveTime: Optional[fhir.dateTime] = Field(
         description="Contract Valued Item Effective Tiem",
         default=None,
     )
@@ -352,11 +360,11 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Contract Valued Item fee, charge, or cost",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Contract Valued Item Price Scaling Factor",
         default=None,
     )
-    points: Optional[Decimal] = Field(
+    points: Optional[fhir.decimal] = Field(
         description="Contract Valued Item Difficulty Scaling Factor",
         default=None,
     )
@@ -364,11 +372,11 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Total Contract Valued Item Value",
         default=None,
     )
-    payment: Optional[String] = Field(
+    payment: Optional[fhir.string] = Field(
         description="Terms of valuation",
         default=None,
     )
-    paymentDate: Optional[DateTime] = Field(
+    paymentDate: Optional[fhir.dateTime] = Field(
         description="When payment is due",
         default=None,
     )
@@ -380,11 +388,11 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Who will receive payment",
         default=None,
     )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Security Labels that define affected terms",
         default=None,
     )
@@ -404,6 +412,7 @@ class ContractTermAssetValuedItem(BackboneElement):
             field_name_base="entity",
             required=False,
         )
+
 
 class ContractTermAsset(BackboneElement):
     """
@@ -434,7 +443,7 @@ class ContractTermAsset(BackboneElement):
         description="Circumstance of the asset",
         default=None,
     )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="Quality desctiption of asset",
         default=None,
     )
@@ -443,18 +452,18 @@ class ContractTermAsset(BackboneElement):
         default=None,
     )
     period: Optional[ListType[Period]] = Field(
-        description="Time period of the asset",
+        description="time period of the asset",
         default=None,
     )
     usePeriod: Optional[ListType[Period]] = Field(
-        description="Time period",
+        description="time period",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Asset clause or question text",
         default=None,
     )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to asset text",
         default=None,
     )
@@ -462,7 +471,7 @@ class ContractTermAsset(BackboneElement):
         description="Response to assets",
         default=None,
     )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Asset restriction numbers",
         default=None,
     )
@@ -470,6 +479,7 @@ class ContractTermAsset(BackboneElement):
         description="Contract Valued Item List",
         default=None,
     )
+
 
 class ContractTermActionSubject(BackboneElement):
     """
@@ -485,12 +495,13 @@ class ContractTermActionSubject(BackboneElement):
         default=None,
     )
 
+
 class ContractTermAction(BackboneElement):
     """
     An actor taking a role in an activity for which it can be assigned some degree of responsibility for the activity taking place.
     """
 
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if the term prohibits the  action",
         default=None,
     )
@@ -506,7 +517,7 @@ class ContractTermAction(BackboneElement):
         description="Purpose for the Contract Term Action",
         default=None,
     )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -518,11 +529,11 @@ class ContractTermAction(BackboneElement):
         description="Episode associated with action",
         default=None,
     )
-    contextLinkId: Optional[ListType[String]] = Field(
+    contextLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When action happens",
         default=None,
     )
@@ -538,7 +549,7 @@ class ContractTermAction(BackboneElement):
         description="Who asked for action",
         default=None,
     )
-    requesterLinkId: Optional[ListType[String]] = Field(
+    requesterLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -554,7 +565,7 @@ class ContractTermAction(BackboneElement):
         description="Actor that wil execute (or not) the action",
         default=None,
     )
-    performerLinkId: Optional[ListType[String]] = Field(
+    performerLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -566,11 +577,11 @@ class ContractTermAction(BackboneElement):
         description="Why is action (not) needed?",
         default=None,
     )
-    reason: Optional[ListType[String]] = Field(
+    reason: Optional[ListType[fhir.string]] = Field(
         description="Why action is to be performed",
         default=None,
     )
-    reasonLinkId: Optional[ListType[String]] = Field(
+    reasonLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -578,7 +589,7 @@ class ContractTermAction(BackboneElement):
         description="Comments about the action",
         default=None,
     )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Action restriction numbers",
         default=None,
     )
@@ -594,10 +605,11 @@ class ContractTermAction(BackboneElement):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )
+
 
 class ContractTerm(BackboneElement):
     """
@@ -608,12 +620,12 @@ class ContractTerm(BackboneElement):
         description="Contract Term Number",
         default=None,
     )
-    issued: Optional[DateTime] = Field(
-        description="Contract Term Issue Date Time",
+    issued: Optional[fhir.dateTime] = Field(
+        description="Contract Term Issue date time",
         default=None,
     )
     applies: Optional[Period] = Field(
-        description="Contract Term Effective Time",
+        description="Contract Term Effective time",
         default=None,
     )
     topicCodeableConcept: Optional[CodeableConcept] = Field(
@@ -632,7 +644,7 @@ class ContractTerm(BackboneElement):
         description="Contract Term Type specific classification",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Term Statement",
         default=None,
     )
@@ -673,6 +685,7 @@ class ContractTerm(BackboneElement):
             required=False,
         )
 
+
 class ContractSigner(BackboneElement):
     """
     Parties with legal standing in the Contract, including the principal parties, the grantor(s) and grantee(s), which are any person or organization bound by the contract, and any ancillary parties, which facilitate the execution of the contract such as a notary or witness.
@@ -690,6 +703,7 @@ class ContractSigner(BackboneElement):
         description="Contract Documentation Signature",
         default=None,
     )
+
 
 class ContractFriendly(BackboneElement):
     """
@@ -721,6 +735,7 @@ class ContractFriendly(BackboneElement):
             required=True,
         )
 
+
 class ContractLegal(BackboneElement):
     """
     List of Legal expressions or representations of this Contract.
@@ -750,6 +765,7 @@ class ContractLegal(BackboneElement):
             field_name_base="content",
             required=True,
         )
+
 
 class ContractRule(BackboneElement):
     """
@@ -781,6 +797,7 @@ class ContractRule(BackboneElement):
             required=True,
         )
 
+
 class Contract(DomainResource):
     """
     Legally enforceable, formally recorded unilateral or bilateral directive i.e., a policy or agreement.
@@ -806,15 +823,15 @@ class Contract(DomainResource):
         description="Contract number",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Basal definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business edition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated",
         default=None,
     )
@@ -826,7 +843,7 @@ class Contract(DomainResource):
         description="Source Contract Definition",
         default=None,
     )
-    instantiatesUri: Optional[Uri] = Field(
+    instantiatesUri: Optional[fhir.uri] = Field(
         description="External Contract Definition",
         default=None,
     )
@@ -834,7 +851,7 @@ class Contract(DomainResource):
         description="Content derived from the basal information",
         default=None,
     )
-    issued: Optional[DateTime] = Field(
+    issued: Optional[fhir.dateTime] = Field(
         description="When this Contract was issued",
         default=None,
     )
@@ -862,19 +879,19 @@ class Contract(DomainResource):
         description="Specific Location",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Computer friendly designation",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human Friendly name",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate Friendly name",
         default=None,
     )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="Acronym or short name",
         default=None,
     )

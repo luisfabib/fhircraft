@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -19,66 +19,70 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TerminologyCapabilitiesSoftware(BackboneElement):
     """
     Software that is covered by this terminology capability statement.  It is used when the statement describes the capabilities of a particular software version, independent of an installation.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A name the software is known by",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version covered by this statement",
         default=None,
     )
+
 
 class TerminologyCapabilitiesImplementation(BackboneElement):
     """
     Identifies a specific implementation instance that is described by the terminology capability statement - i.e. a particular installation, rather than the capabilities of a software program.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Describes this specific instance",
         default=None,
     )
-    url: Optional[Url] = Field(
+    url: Optional[fhir.url] = Field(
         description="Base URL for the implementation",
         default=None,
     )
+
 
 class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     """
     Filter Properties supported.
     """
 
-    code: Optional[Code] = Field(
-        description="Code of the property supported",
+    code: Optional[fhir.code] = Field(
+        description="code of the property supported",
         default=None,
     )
-    op: Optional[ListType[Code]] = Field(
+    op: Optional[ListType[fhir.code]] = Field(
         description="Operations supported for the property",
         default=None,
     )
+
 
 class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
     """
     For the code system, a list of versions that are supported by the server.
     """
 
-    code: Optional[String] = Field(
+    code: Optional[fhir.string] = Field(
         description="Version identifier for this version",
         default=None,
     )
-    isDefault: Optional[Boolean] = Field(
+    isDefault: Optional[fhir.boolean] = Field(
         description="If this is the default version for this code system",
         default=None,
     )
-    compositional: Optional[Boolean] = Field(
+    compositional: Optional[fhir.boolean] = Field(
         description="If compositional grammar is supported",
         default=None,
     )
-    language: Optional[ListType[Code]] = Field(
+    language: Optional[ListType[fhir.code]] = Field(
         description="Language Displays supported",
         default=None,
     )
@@ -87,58 +91,61 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         description="Filter Properties supported",
         default=None,
     )
-    property_: Optional[ListType[Code]] = Field(
+    property_: Optional[ListType[fhir.code]] = Field(
         description="Properties supported for $lookup",
         default=None,
         alias="property",
     )
+
 
 class TerminologyCapabilitiesCodeSystem(BackboneElement):
     """
     Identifies a code system that is supported by the server. If there is a no code system URL, then this declares the general assumptions a client can make about support for any CodeSystem resource.
     """
 
-    uri: Optional[Canonical] = Field(
-        description="URI for the Code System",
+    uri: Optional[fhir.canonical] = Field(
+        description="URI for the code System",
         default=None,
     )
     version: Optional[ListType[TerminologyCapabilitiesCodeSystemVersion]] = Field(
-        description="Version of Code System supported",
+        description="Version of code System supported",
         default=None,
     )
-    subsumption: Optional[Boolean] = Field(
+    subsumption: Optional[fhir.boolean] = Field(
         description="Whether subsumption is supported",
         default=None,
     )
+
 
 class TerminologyCapabilitiesExpansionParameter(BackboneElement):
     """
     Supported expansion parameter.
     """
 
-    name: Optional[Code] = Field(
+    name: Optional[fhir.code] = Field(
         description="Expansion Parameter name",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Description of support for parameter",
         default=None,
     )
+
 
 class TerminologyCapabilitiesExpansion(BackboneElement):
     """
     Information about the [ValueSet/$expand](https://www.hl7.org/fhir/R4B/valueset-operation-expand.html) operation.
     """
 
-    hierarchical: Optional[Boolean] = Field(
+    hierarchical: Optional[fhir.boolean] = Field(
         description="Whether the server can return nested value sets",
         default=None,
     )
-    paging: Optional[Boolean] = Field(
+    paging: Optional[fhir.boolean] = Field(
         description="Whether the server supports paging on expansion",
         default=None,
     )
-    incomplete: Optional[Boolean] = Field(
+    incomplete: Optional[fhir.boolean] = Field(
         description="Allow request for incomplete expansions?",
         default=None,
     )
@@ -146,40 +153,44 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         description="Supported expansion parameter",
         default=None,
     )
-    textFilter: Optional[Markdown] = Field(
+    textFilter: Optional[fhir.markdown] = Field(
         description="Documentation about text searching works",
         default=None,
     )
+
 
 class TerminologyCapabilitiesValidateCode(BackboneElement):
     """
     Information about the [ValueSet/$validate-code](https://hl7.org/fhir/R4B/valueset-operation-validate-code.html) operation.
     """
 
-    translations: Optional[Boolean] = Field(
+    translations: Optional[fhir.boolean] = Field(
         description="Whether translations are validated",
         default=None,
     )
+
 
 class TerminologyCapabilitiesTranslation(BackboneElement):
     """
     Information about the [ConceptMap/$translate](https://hl7.org/fhir/R4B/conceptmap-operation-translate.html) operation.
     """
 
-    needsMap: Optional[Boolean] = Field(
+    needsMap: Optional[fhir.boolean] = Field(
         description="Whether the client must identify the map",
         default=None,
     )
+
 
 class TerminologyCapabilitiesClosure(BackboneElement):
     """
     Whether the $closure operation is supported.
     """
 
-    translation: Optional[Boolean] = Field(
+    translation: Optional[fhir.boolean] = Field(
         description="If cross-system closure is supported",
         default=None,
     )
+
 
 class TerminologyCapabilities(DomainResource):
     """
@@ -202,35 +213,35 @@ class TerminologyCapabilities(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this terminology capabilities, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this terminology capabilities, represented as a URI (globally unique)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the terminology capabilities",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this terminology capabilities (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this terminology capabilities (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -238,7 +249,7 @@ class TerminologyCapabilities(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the terminology capabilities",
         default=None,
     )
@@ -250,15 +261,15 @@ class TerminologyCapabilities(DomainResource):
         description="Intended jurisdiction for terminology capabilities (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this terminology capabilities is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="instance | capability | requirements",
         default=None,
     )
@@ -270,7 +281,7 @@ class TerminologyCapabilities(DomainResource):
         description="If this describes a specific instance",
         default=None,
     )
-    lockedDate: Optional[Boolean] = Field(
+    lockedDate: Optional[fhir.boolean] = Field(
         description="Whether lockedDate is supported",
         default=None,
     )
@@ -282,7 +293,7 @@ class TerminologyCapabilities(DomainResource):
         description="Information about the [ValueSet/$expand](https://www.hl7.org/fhir/R4B/valueset-operation-expand.html) operation",
         default=None,
     )
-    codeSearch: Optional[Code] = Field(
+    codeSearch: Optional[fhir.code] = Field(
         description="explicit | all",
         default=None,
     )

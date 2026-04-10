@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -33,12 +33,12 @@ class BiologicallyDerivedProductCollection(BackboneElement):
         description="Who is product from",
         default=None,
     )
-    collectedDateTime: Optional[DateTime] = Field(
-        description="Time of product collection",
+    collectedDateTime: Optional[fhir.dateTime] = Field(
+        description="time of product collection",
         default=None,
     )
     collectedPeriod: Optional[Period] = Field(
-        description="Time of product collection",
+        description="time of product collection",
         default=None,
     )
 
@@ -53,7 +53,7 @@ class BiologicallyDerivedProductCollection(BackboneElement):
     def collected_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="collected",
             required=False,
         )
@@ -63,7 +63,7 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
     Any processing of the product during collection that does not change the fundamental nature of the product. For example adding anti-coagulants during the collection of Peripheral Blood Stem Cells.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of of processing",
         default=None,
     )
@@ -75,12 +75,12 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
         description="Substance added during processing",
         default=None,
     )
-    timeDateTime: Optional[DateTime] = Field(
-        description="Time of processing",
+    timeDateTime: Optional[fhir.dateTime] = Field(
+        description="time of processing",
         default=None,
     )
     timePeriod: Optional[Period] = Field(
-        description="Time of processing",
+        description="time of processing",
         default=None,
     )
 
@@ -95,7 +95,7 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
     def time_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="time",
             required=False,
         )
@@ -105,16 +105,16 @@ class BiologicallyDerivedProductManipulation(BackboneElement):
     Any manipulation of product post-collection that is intended to alter the product.  For example a buffy-coat enrichment or CD8 reduction of Peripheral Blood Stem Cells to make it more suitable for infusion.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of manipulation",
         default=None,
     )
-    timeDateTime: Optional[DateTime] = Field(
-        description="Time of manipulation",
+    timeDateTime: Optional[fhir.dateTime] = Field(
+        description="time of manipulation",
         default=None,
     )
     timePeriod: Optional[Period] = Field(
-        description="Time of manipulation",
+        description="time of manipulation",
         default=None,
     )
 
@@ -129,7 +129,7 @@ class BiologicallyDerivedProductManipulation(BackboneElement):
     def time_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="time",
             required=False,
         )
@@ -139,15 +139,15 @@ class BiologicallyDerivedProductStorage(BackboneElement):
     Product storage.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of storage",
         default=None,
     )
-    temperature: Optional[Decimal] = Field(
+    temperature: Optional[fhir.decimal] = Field(
         description="Storage temperature",
         default=None,
     )
-    scale: Optional[Code] = Field(
+    scale: Optional[fhir.code] = Field(
         description="farenheit | celsius | kelvin",
         default=None,
     )
@@ -184,7 +184,7 @@ class BiologicallyDerivedProduct(DomainResource):
         description="External ids for this item",
         default=None,
     )
-    productCategory: Optional[Code] = Field(
+    productCategory: Optional[fhir.code] = Field(
         description="organ | tissue | fluid | cells | biologicalAgent",
         default=None,
     )
@@ -192,7 +192,7 @@ class BiologicallyDerivedProduct(DomainResource):
         description="What this biologically derived product is",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="available | unavailable",
         default=None,
     )
@@ -200,7 +200,7 @@ class BiologicallyDerivedProduct(DomainResource):
         description="Procedure request",
         default=None,
     )
-    quantity: Optional[Integer] = Field(
+    quantity: Optional[fhir.integer] = Field(
         description="The amount of this biologically derived product",
         default=None,
     )

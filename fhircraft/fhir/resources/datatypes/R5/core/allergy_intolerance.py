@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AllergyIntoleranceParticipant(BackboneElement):
     """
     Indicates who or what participated in the activities related to the allergy or intolerance and how they were involved.
@@ -39,6 +40,7 @@ class AllergyIntoleranceParticipant(BackboneElement):
         default=None,
     )
 
+
 class AllergyIntoleranceReaction(BackboneElement):
     """
     Details about each adverse reaction event linked to exposure to the identified substance.
@@ -52,15 +54,15 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Clinical symptoms/signs associated with the Event",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of the event as a whole",
         default=None,
     )
-    onset: Optional[DateTime] = Field(
+    onset: Optional[fhir.dateTime] = Field(
         description="Date(/time) when manifestations showed",
         default=None,
     )
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="mild | moderate | severe (of event as a whole)",
         default=None,
     )
@@ -72,6 +74,7 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Text about event not captured in other fields",
         default=None,
     )
+
 
 class AllergyIntolerance(DomainResource):
     """
@@ -98,16 +101,16 @@ class AllergyIntolerance(DomainResource):
         description="allergy | intolerance - Underlying mechanism (if known)",
         default=None,
     )
-    category: Optional[ListType[Code]] = Field(
+    category: Optional[ListType[fhir.code]] = Field(
         description="food | medication | environment | biologic",
         default=None,
     )
-    criticality: Optional[Code] = Field(
+    criticality: Optional[fhir.code] = Field(
         description="low | high | unable-to-assess",
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code that identifies the allergy or intolerance",
+        description="code that identifies the allergy or intolerance",
         default=None,
     )
     patient: Optional[Reference] = Field(
@@ -118,7 +121,7 @@ class AllergyIntolerance(DomainResource):
         description="Encounter when the allergy or intolerance was asserted",
         default=None,
     )
-    onsetDateTime: Optional[DateTime] = Field(
+    onsetDateTime: Optional[fhir.dateTime] = Field(
         description="When allergy or intolerance was identified",
         default=None,
     )
@@ -134,11 +137,11 @@ class AllergyIntolerance(DomainResource):
         description="When allergy or intolerance was identified",
         default=None,
     )
-    onsetString: Optional[String] = Field(
+    onsetString: Optional[fhir.string] = Field(
         description="When allergy or intolerance was identified",
         default=None,
     )
-    recordedDate: Optional[DateTime] = Field(
+    recordedDate: Optional[fhir.dateTime] = Field(
         description="Date allergy or intolerance was first recorded",
         default=None,
     )
@@ -146,7 +149,7 @@ class AllergyIntolerance(DomainResource):
         description="Who or what participated in the activities related to the allergy or intolerance and how they were involved",
         default=None,
     )
-    lastOccurrence: Optional[DateTime] = Field(
+    lastOccurrence: Optional[fhir.dateTime] = Field(
         description="Date(/time) of last known occurrence of a reaction",
         default=None,
     )
@@ -170,7 +173,7 @@ class AllergyIntolerance(DomainResource):
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Range, String],
+            field_types=[fhir.dateTime, Age, Period, Range, fhir.string],
             field_name_base="onset",
             required=False,
         )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -69,7 +69,7 @@ class Organization(DomainResource):
         description="Identifies this organization  across multiple systems",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether the organization\u0027s record is still in active use",
         default=None,
     )
@@ -77,11 +77,11 @@ class Organization(DomainResource):
         description="Kind of organization",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name used for the organization",
         default=None,
     )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
     )

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -59,7 +59,7 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Short description",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | allocated | issued | unfulfilled | returned | entered-in-error | unknown",
         default=None,
     )
@@ -91,11 +91,11 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Amount dispensed",
         default=None,
     )
-    preparedDate: Optional[DateTime] = Field(
+    preparedDate: Optional[fhir.dateTime] = Field(
         description="When product was selected/matched",
         default=None,
     )
-    whenHandedOver: Optional[DateTime] = Field(
+    whenHandedOver: Optional[fhir.dateTime] = Field(
         description="When the product was dispatched",
         default=None,
     )
@@ -107,7 +107,7 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Additional notes",
         default=None,
     )
-    usageInstruction: Optional[String] = Field(
+    usageInstruction: Optional[fhir.string] = Field(
         description="Specific instructions for use",
         default=None,
     )

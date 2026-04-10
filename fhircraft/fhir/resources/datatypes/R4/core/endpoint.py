@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -46,7 +46,7 @@ class Endpoint(DomainResource):
         description="Identifies this endpoint across multiple systems",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | suspended | error | off | entered-in-error | test",
         default=None,
     )
@@ -54,7 +54,7 @@ class Endpoint(DomainResource):
         description="Protocol/Profile/Standard to be used with this endpoint connection",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A name that this endpoint can be identified by",
         default=None,
     )
@@ -74,15 +74,15 @@ class Endpoint(DomainResource):
         description="The type of content that may be used at this endpoint (e.g. XDS Discharge summaries)",
         default=None,
     )
-    payloadMimeType: Optional[ListType[Code]] = Field(
+    payloadMimeType: Optional[ListType[fhir.code]] = Field(
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    address: Optional[Url] = Field(
+    address: Optional[fhir.url] = Field(
         description="The technical base address for connecting to this endpoint",
         default=None,
     )
-    header: Optional[ListType[String]] = Field(
+    header: Optional[ListType[fhir.string]] = Field(
         description="Usage depends on the channel type",
         default=None,
     )

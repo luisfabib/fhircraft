@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -25,44 +25,45 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class QuestionnaireItemEnableWhen(BackboneElement):
     """
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
     """
 
-    question: Optional[String] = Field(
+    question: Optional[fhir.string] = Field(
         description="Question that determines whether item is enabled",
         default=None,
     )
-    operator: Optional[Code] = Field(
+    operator: Optional[fhir.code] = Field(
         description="exists | = | != | \u003e | \u003c | \u003e= | \u003c=",
         default=None,
     )
-    answerBoolean: Optional[Boolean] = Field(
+    answerBoolean: Optional[fhir.boolean] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerDecimal: Optional[Decimal] = Field(
+    answerDecimal: Optional[fhir.decimal] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerInteger: Optional[Integer] = Field(
+    answerInteger: Optional[fhir.integer] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerDate: Optional[Date] = Field(
+    answerDate: Optional[fhir.date_] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerDateTime: Optional[DateTime] = Field(
+    answerDateTime: Optional[fhir.dateTime] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerTime: Optional[Time] = Field(
+    answerTime: Optional[fhir.time_] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerString: Optional[String] = Field(
+    answerString: Optional[fhir.string] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
@@ -91,13 +92,13 @@ class QuestionnaireItemEnableWhen(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
                 Coding,
                 Quantity,
                 Reference,
@@ -106,24 +107,25 @@ class QuestionnaireItemEnableWhen(BackboneElement):
             required=True,
         )
 
+
 class QuestionnaireItemAnswerOption(BackboneElement):
     """
     One of the permitted answers for a "choice" or "open-choice" question.
     """
 
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Answer value",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Answer value",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Answer value",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Answer value",
         default=None,
     )
@@ -135,7 +137,7 @@ class QuestionnaireItemAnswerOption(BackboneElement):
         description="Answer value",
         default=None,
     )
-    initialSelected: Optional[Boolean] = Field(
+    initialSelected: Optional[fhir.boolean] = Field(
         description="Whether option is selected by default",
         default=None,
     )
@@ -151,45 +153,53 @@ class QuestionnaireItemAnswerOption(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Integer, Date, Time, String, Coding, Reference],
+            field_types=[
+                fhir.Integer,
+                fhir.Date,
+                fhir.Time,
+                fhir.String,
+                Coding,
+                Reference,
+            ],
             field_name_base="value",
             required=True,
         )
+
 
 class QuestionnaireItemInitial(BackboneElement):
     """
     One or more values that should be pre-populated in the answer when initially rendering the questionnaire for user input.
     """
 
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
@@ -222,14 +232,14 @@ class QuestionnaireItemInitial(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
-                Uri,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
+                fhir.Uri,
                 Attachment,
                 Coding,
                 Quantity,
@@ -239,16 +249,17 @@ class QuestionnaireItemInitial(BackboneElement):
             required=True,
         )
 
+
 class QuestionnaireItem(BackboneElement):
     """
     A particular question, question grouping or display text that is part of the questionnaire.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for item in questionnaire",
         default=None,
     )
-    definition: Optional[Uri] = Field(
+    definition: Optional[fhir.uri] = Field(
         description="ElementDefinition - details for the item",
         default=None,
     )
@@ -256,15 +267,15 @@ class QuestionnaireItem(BackboneElement):
         description="Corresponding concept for this item in a terminology",
         default=None,
     )
-    prefix: Optional[String] = Field(
+    prefix: Optional[fhir.string] = Field(
         description='E.g. "1(a)", "2.5.3"',
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Primary text for the item",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="group | display | boolean | decimal | integer | date | dateTime +",
         default=None,
     )
@@ -272,27 +283,27 @@ class QuestionnaireItem(BackboneElement):
         description="Only allow data when",
         default=None,
     )
-    enableBehavior: Optional[Code] = Field(
+    enableBehavior: Optional[fhir.code] = Field(
         description="all | any",
         default=None,
     )
-    required: Optional[Boolean] = Field(
+    required: Optional[fhir.boolean] = Field(
         description="Whether the item must be included in data results",
         default=None,
     )
-    repeats: Optional[Boolean] = Field(
+    repeats: Optional[fhir.boolean] = Field(
         description="Whether the item may repeat",
         default=None,
     )
-    readOnly: Optional[Boolean] = Field(
+    readOnly: Optional[fhir.boolean] = Field(
         description="Don\u0027t allow human editing",
         default=None,
     )
-    maxLength: Optional[Integer] = Field(
+    maxLength: Optional[fhir.integer] = Field(
         description="No more than this many characters",
         default=None,
     )
-    answerValueSet: Optional[Canonical] = Field(
+    answerValueSet: Optional[fhir.canonical] = Field(
         description="Valueset containing permitted answers",
         default=None,
     )
@@ -308,6 +319,7 @@ class QuestionnaireItem(BackboneElement):
         description="Nested questionnaire items",
         default=None,
     )
+
 
 class Questionnaire(DomainResource):
     """
@@ -330,47 +342,47 @@ class Questionnaire(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this questionnaire, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this questionnaire, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the questionnaire",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the questionnaire",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this questionnaire (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this questionnaire (human friendly)",
         default=None,
     )
-    derivedFrom: Optional[ListType[Canonical]] = Field(
+    derivedFrom: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates protocol or definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    subjectType: Optional[ListType[Code]] = Field(
+    subjectType: Optional[ListType[fhir.code]] = Field(
         description="Resource that can be subject of QuestionnaireResponse",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -378,7 +390,7 @@ class Questionnaire(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the questionnaire",
         default=None,
     )
@@ -390,19 +402,19 @@ class Questionnaire(DomainResource):
         description="Intended jurisdiction for questionnaire (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this questionnaire is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the questionnaire was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the questionnaire was last reviewed",
         default=None,
     )
@@ -499,7 +511,7 @@ class Questionnaire(DomainResource):
         return fhir_validators.validate_element_constraint(
             self,
             elements=("item.enableWhen",),
-            expression="operator = 'exists' implies (answer is Boolean)",
+            expression="operator = 'exists' implies (answer is boolean)",
             human="If the operator is 'exists', the value must be a boolean",
             key="que-7",
             severity="error",

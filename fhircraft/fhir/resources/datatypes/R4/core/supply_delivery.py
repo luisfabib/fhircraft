@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -89,7 +89,7 @@ class SupplyDelivery(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | completed | abandoned | entered-in-error",
         default=None,
     )
@@ -105,7 +105,7 @@ class SupplyDelivery(DomainResource):
         description="The item that is delivered or supplied",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When event occurred",
         default=None,
     )
@@ -141,7 +141,7 @@ class SupplyDelivery(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

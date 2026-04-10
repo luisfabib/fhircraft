@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneType,
     Element,
@@ -83,11 +83,11 @@ class Dosage(BackboneType):
 
     _type = "Dosage"
 
-    sequence: Optional[Integer] = Field(
+    sequence: Optional[fhir.integer] = Field(
         description="The order of the dosage instructions",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
     )
@@ -95,7 +95,7 @@ class Dosage(BackboneType):
         description='Supplemental instruction or warnings to the patient - e.g. "with meals", "may cause drowsiness"',
         default=None,
     )
-    patientInstruction: Optional[String] = Field(
+    patientInstruction: Optional[fhir.string] = Field(
         description="Patient or consumer oriented instructions",
         default=None,
     )
@@ -103,7 +103,7 @@ class Dosage(BackboneType):
         description="When medication should be administered",
         default=None,
     )
-    asNeeded: Optional[Boolean] = Field(
+    asNeeded: Optional[fhir.boolean] = Field(
         description='Take "as needed"',
         default=None,
     )

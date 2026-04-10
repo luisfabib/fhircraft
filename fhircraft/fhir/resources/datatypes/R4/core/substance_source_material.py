@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,7 +23,7 @@ class SubstanceSourceMaterialFractionDescription(BackboneElement):
     Many complex materials are fractions of parts of plants, animals, or minerals. Fraction elements are often necessary to define both Substances and Specified Group 1 Substances. For substances derived from Plants, fraction information will be captured at the Substance information level ( . Oils, Juices and Exudates). Additional information for Extracts, such as extraction solvent composition, will be captured at the Specified Substance Group 1 information level. For plasma-derived products fraction information will be captured at the Substance and the Specified Substance Group 1 levels.
     """
 
-    fraction: Optional[String] = Field(
+    fraction: Optional[fhir.string] = Field(
         description="This element is capturing information about the fraction of a plant part, or human plasma for fractionation",
         default=None,
     )
@@ -41,7 +41,7 @@ class SubstanceSourceMaterialOrganismAuthor(BackboneElement):
         description="The type of author of an organism species shall be specified. The parenthetical author of an organism species refers to the first author who published the plant/animal name (of any rank). The primary author of an organism species refers to the first author(s), who validly published the plant/animal name",
         default=None,
     )
-    authorDescription: Optional[String] = Field(
+    authorDescription: Optional[fhir.string] = Field(
         description="The author of an organism species shall be specified. The author year of an organism shall also be specified when applicable; refers to the year in which the first author(s) published the infraspecific plant/animal name (of any rank)",
         default=None,
     )
@@ -51,19 +51,19 @@ class SubstanceSourceMaterialOrganismHybrid(BackboneElement):
     4.9.13.8.1 Hybrid species maternal organism ID (Optional).
     """
 
-    maternalOrganismId: Optional[String] = Field(
+    maternalOrganismId: Optional[fhir.string] = Field(
         description="The identifier of the maternal species constituting the hybrid organism shall be specified based on a controlled vocabulary. For plants, the parents aren\u2019t always known, and it is unlikely that it will be known which is maternal and which is paternal",
         default=None,
     )
-    maternalOrganismName: Optional[String] = Field(
+    maternalOrganismName: Optional[fhir.string] = Field(
         description="The name of the maternal species constituting the hybrid organism shall be specified. For plants, the parents aren\u2019t always known, and it is unlikely that it will be known which is maternal and which is paternal",
         default=None,
     )
-    paternalOrganismId: Optional[String] = Field(
+    paternalOrganismId: Optional[fhir.string] = Field(
         description="The identifier of the paternal species constituting the hybrid organism shall be specified based on a controlled vocabulary",
         default=None,
     )
-    paternalOrganismName: Optional[String] = Field(
+    paternalOrganismName: Optional[fhir.string] = Field(
         description="The name of the paternal species constituting the hybrid organism shall be specified",
         default=None,
     )
@@ -116,7 +116,7 @@ class SubstanceSourceMaterialOrganism(BackboneElement):
         description="The Intraspecific type of an organism shall be specified",
         default=None,
     )
-    intraspecificDescription: Optional[String] = Field(
+    intraspecificDescription: Optional[fhir.string] = Field(
         description="The intraspecific description of an organism shall be specified based on a controlled vocabulary. For Influenza Vaccine, the intraspecific description shall contain the syntax of the antigen in line with the WHO convention",
         default=None,
     )
@@ -184,7 +184,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="The unique identifier associated with the source material parent organism shall be specified",
         default=None,
     )
-    organismName: Optional[String] = Field(
+    organismName: Optional[fhir.string] = Field(
         description="The organism accepted Scientific name shall be provided based on the organism taxonomy",
         default=None,
     )
@@ -192,7 +192,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="The parent of the herbal drug Ginkgo biloba, Leaf is the substance ID of the substance (fresh) of Ginkgo biloba L. or Ginkgo biloba L. (Whole plant)",
         default=None,
     )
-    parentSubstanceName: Optional[ListType[String]] = Field(
+    parentSubstanceName: Optional[ListType[fhir.string]] = Field(
         description="The parent substance of the Herbal Drug, or Herbal preparation",
         default=None,
     )
@@ -200,7 +200,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="The country where the plant material is harvested or the countries where the plasma is sourced from as laid down in accordance with the Plasma Master File. For \u201cPlasma-derived substances\u201d the attribute country of origin provides information about the countries used for the manufacturing of the Cryopoor plama or Crioprecipitate",
         default=None,
     )
-    geographicalLocation: Optional[ListType[String]] = Field(
+    geographicalLocation: Optional[ListType[fhir.string]] = Field(
         description="The place/region where the plant is harvested or the places/regions where the animal source material has its habitat",
         default=None,
     )

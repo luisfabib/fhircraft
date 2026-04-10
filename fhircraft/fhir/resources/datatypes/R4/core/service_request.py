@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class ServiceRequest(DomainResource):
     """
@@ -49,11 +50,11 @@ class ServiceRequest(DomainResource):
         description="Identifiers assigned to this order",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -69,11 +70,11 @@ class ServiceRequest(DomainResource):
         description="Composite Request ID",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
@@ -81,11 +82,11 @@ class ServiceRequest(DomainResource):
         description="Classification of service",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if service/procedure should not be performed",
         default=None,
     )
@@ -117,7 +118,7 @@ class ServiceRequest(DomainResource):
         description="Encounter in which the request was created",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When service should occur",
         default=None,
     )
@@ -129,7 +130,7 @@ class ServiceRequest(DomainResource):
         description="When service should occur",
         default=None,
     )
-    asNeededBoolean: Optional[Boolean] = Field(
+    asNeededBoolean: Optional[fhir.boolean] = Field(
         description="Preconditions for service",
         default=None,
     )
@@ -137,7 +138,7 @@ class ServiceRequest(DomainResource):
         description="Preconditions for service",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="Date request signed",
         default=None,
     )
@@ -189,7 +190,7 @@ class ServiceRequest(DomainResource):
         description="Comments",
         default=None,
     )
-    patientInstruction: Optional[String] = Field(
+    patientInstruction: Optional[fhir.string] = Field(
         description="Patient or consumer-oriented instructions",
         default=None,
     )
@@ -232,7 +233,7 @@ class ServiceRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )
@@ -241,7 +242,7 @@ class ServiceRequest(DomainResource):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, CodeableConcept],
+            field_types=[fhir.boolean, CodeableConcept],
             field_name_base="asNeeded",
             required=False,
         )

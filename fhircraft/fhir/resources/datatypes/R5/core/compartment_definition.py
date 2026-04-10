@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -20,31 +20,33 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CompartmentDefinitionResource(BackboneElement):
     """
     Information about how a resource is related to the compartment.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Name of resource type",
         default=None,
     )
-    param: Optional[ListType[String]] = Field(
+    param: Optional[ListType[fhir.string]] = Field(
         description="Search Parameter Name, or chained parameters",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Additional documentation about the resource and compartment",
         default=None,
     )
-    startParam: Optional[Uri] = Field(
+    startParam: Optional[fhir.uri] = Field(
         description="Search Param for interpreting $everything.start",
         default=None,
     )
-    endParam: Optional[Uri] = Field(
+    endParam: Optional[fhir.uri] = Field(
         description="Search Param for interpreting $everything.end",
         default=None,
     )
+
 
 class CompartmentDefinition(DomainResource):
     """
@@ -55,15 +57,15 @@ class CompartmentDefinition(DomainResource):
     _type = "CompartmentDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CompartmentDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this compartment definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this compartment definition, represented as a URI (globally unique)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the compartment definition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -71,27 +73,27 @@ class CompartmentDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this compartment definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this compartment definition (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -99,7 +101,7 @@ class CompartmentDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the compartment definition",
         default=None,
     )
@@ -107,15 +109,15 @@ class CompartmentDefinition(DomainResource):
         description="The context that the content is intended to support",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this compartment definition is defined",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Patient | Encounter | RelatedPerson | Practitioner | Device | EpisodeOfCare",
         default=None,
     )
-    search: Optional[Boolean] = Field(
+    search: Optional[fhir.boolean] = Field(
         description="Whether the search syntax is supported",
         default=None,
     )
@@ -135,7 +137,7 @@ class CompartmentDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

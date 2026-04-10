@@ -5,7 +5,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,58 +23,61 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ChargeItemDefinitionApplicability(BackboneElement):
     """
     Expressions that describe applicability criteria for the billing code.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Natural language description of the condition",
         default=None,
     )
-    language: Optional[String] = Field(
+    language: Optional[fhir.string] = Field(
         description="Language of the expression",
         default=None,
     )
 
-    expression: Optional[String] = Field(
-        description="Boolean-valued expression",
+    expression: Optional[fhir.string] = Field(
+        description="boolean-valued expression",
         default=None,
     )
+
 
 class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
     """
     Expressions that describe applicability criteria for the priceComponent.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Natural language description of the condition",
         default=None,
     )
-    language: Optional[String] = Field(
+    language: Optional[fhir.string] = Field(
         description="Language of the expression",
         default=None,
     )
 
-    expression: Optional[String] = Field(
-        description="Boolean-valued expression",
+    expression: Optional[fhir.string] = Field(
+        description="boolean-valued expression",
         default=None,
     )
+
 
 class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
     """
     The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the prices have been calculated.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code identifying the specific component",
+        description="code identifying the specific component",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Factor used for calculating this component",
         default=None,
     )
@@ -82,6 +85,7 @@ class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
         description="Monetary amount associated with this component",
         default=None,
     )
+
 
 class ChargeItemDefinitionPropertyGroup(BackboneElement):
     """
@@ -100,6 +104,7 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
         description="Components of total line item price",
         default=None,
     )
+
 
 class ChargeItemDefinition(DomainResource):
     """
@@ -122,47 +127,47 @@ class ChargeItemDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this charge item definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this charge item definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the charge item definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the charge item definition",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this charge item definition (human friendly)",
         default=None,
     )
-    derivedFromUri: Optional[ListType[Uri]] = Field(
+    derivedFromUri: Optional[ListType[fhir.uri]] = Field(
         description="Underlying externally-defined charge item definition",
         default=None,
     )
-    partOf: Optional[ListType[Canonical]] = Field(
+    partOf: Optional[ListType[fhir.canonical]] = Field(
         description="A larger definition of which this particular definition is a component or step",
         default=None,
     )
-    replaces: Optional[ListType[Canonical]] = Field(
+    replaces: Optional[ListType[fhir.canonical]] = Field(
         description="Completed or terminated request(s) whose function is taken by this new request",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -170,7 +175,7 @@ class ChargeItemDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the charge item definition",
         default=None,
     )
@@ -182,15 +187,15 @@ class ChargeItemDefinition(DomainResource):
         description="Intended jurisdiction for charge item definition (if applicable)",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the charge item definition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the charge item definition was last reviewed",
         default=None,
     )

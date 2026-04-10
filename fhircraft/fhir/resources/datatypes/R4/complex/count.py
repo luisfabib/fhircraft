@@ -2,7 +2,7 @@ from pydantic import model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .quantity import Quantity
 
 class Count(Quantity):

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -43,12 +43,12 @@ class MedicationDispenseSubstitution(BackboneElement):
     Indicates whether or not substitution was made as part of the dispense.  In some cases, substitution will be expected but does not happen, in other cases substitution is not expected but does happen.  This block explains what substitution did or did not happen and why.  If nothing is specified, substitution was not done.
     """
 
-    wasSubstituted: Optional[Boolean] = Field(
+    wasSubstituted: Optional[fhir.boolean] = Field(
         description="Whether a substitution was or was not performed on the dispense",
         default=None,
     )
     type: Optional[CodeableConcept] = Field(
-        description="Code signifying whether a different drug was dispensed from what was prescribed",
+        description="code signifying whether a different drug was dispensed from what was prescribed",
         default=None,
     )
     reason: Optional[ListType[CodeableConcept]] = Field(
@@ -81,7 +81,7 @@ class MedicationDispense(DomainResource):
         description="Event that dispense is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
         default=None,
     )
@@ -89,7 +89,7 @@ class MedicationDispense(DomainResource):
         description="Why a dispense was not performed",
         default=None,
     )
-    statusChanged: Optional[DateTime] = Field(
+    statusChanged: Optional[fhir.dateTime] = Field(
         description="When the status changed",
         default=None,
     )
@@ -137,15 +137,15 @@ class MedicationDispense(DomainResource):
         description="Amount of medication expressed as a timing amount",
         default=None,
     )
-    recorded: Optional[DateTime] = Field(
+    recorded: Optional[fhir.dateTime] = Field(
         description="When the recording of the dispense started",
         default=None,
     )
-    whenPrepared: Optional[DateTime] = Field(
+    whenPrepared: Optional[fhir.dateTime] = Field(
         description="When product was packaged and reviewed",
         default=None,
     )
-    whenHandedOver: Optional[DateTime] = Field(
+    whenHandedOver: Optional[fhir.dateTime] = Field(
         description="When product was given out",
         default=None,
     )
@@ -161,7 +161,7 @@ class MedicationDispense(DomainResource):
         description="Information about the dispense",
         default=None,
     )
-    renderedDosageInstruction: Optional[Markdown] = Field(
+    renderedDosageInstruction: Optional[fhir.markdown] = Field(
         description="Full representation of the dosage instructions",
         default=None,
     )

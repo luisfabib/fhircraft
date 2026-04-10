@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RiskAssessmentPrediction(BackboneElement):
     """
     Describes the expected outcome for the subject.
@@ -33,7 +34,7 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Possible outcome for the subject",
         default=None,
     )
-    probabilityDecimal: Optional[Decimal] = Field(
+    probabilityDecimal: Optional[fhir.decimal] = Field(
         description="Likelihood of specified outcome",
         default=None,
     )
@@ -45,7 +46,7 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Likelihood of specified outcome as a qualitative value",
         default=None,
     )
-    relativeRisk: Optional[Decimal] = Field(
+    relativeRisk: Optional[fhir.decimal] = Field(
         description="Relative likelihood",
         default=None,
     )
@@ -57,7 +58,7 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Timeframe or age range",
         default=None,
     )
-    rationale: Optional[String] = Field(
+    rationale: Optional[fhir.string] = Field(
         description="Explanation of prediction",
         default=None,
     )
@@ -80,7 +81,7 @@ class RiskAssessmentPrediction(BackboneElement):
     def probability_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Decimal, Range],
+            field_types=[fhir.decimal, Range],
             field_name_base="probability",
             required=False,
         )
@@ -93,6 +94,7 @@ class RiskAssessmentPrediction(BackboneElement):
             field_name_base="when",
             required=False,
         )
+
 
 class RiskAssessment(DomainResource):
     """
@@ -115,7 +117,7 @@ class RiskAssessment(DomainResource):
         description="Part of this occurrence",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | preliminary | final | amended +",
         default=None,
     )
@@ -135,7 +137,7 @@ class RiskAssessment(DomainResource):
         description="Where was assessment performed?",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When was assessment made?",
         default=None,
     )
@@ -163,7 +165,7 @@ class RiskAssessment(DomainResource):
         description="Outcome predicted",
         default=None,
     )
-    mitigation: Optional[String] = Field(
+    mitigation: Optional[fhir.string] = Field(
         description="How to reduce risk",
         default=None,
     )
@@ -183,7 +185,7 @@ class RiskAssessment(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="occurrence",
             required=False,
         )

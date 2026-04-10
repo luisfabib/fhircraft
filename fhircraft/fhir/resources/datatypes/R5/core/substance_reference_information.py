@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -91,7 +91,7 @@ class SubstanceReferenceInformationTarget(BackboneElement):
         description="Todo",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
     )
@@ -115,7 +115,7 @@ class SubstanceReferenceInformationTarget(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, Range, String],
+            field_types=[Quantity, Range, fhir.string],
             field_name_base="amount",
             required=False,
         )
@@ -136,7 +136,7 @@ class SubstanceReferenceInformation(DomainResource):
         default=None,
     )
 
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
     )

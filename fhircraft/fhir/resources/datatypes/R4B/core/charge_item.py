@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ChargeItemPerformer(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -37,6 +38,7 @@ class ChargeItemPerformer(BackboneElement):
         description="Individual who was performing",
         default=None,
     )
+
 
 class ChargeItem(DomainResource):
     """
@@ -63,15 +65,15 @@ class ChargeItem(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    definitionUri: Optional[ListType[Uri]] = Field(
+    definitionUri: Optional[ListType[fhir.uri]] = Field(
         description="Defining information about the code of this charge item",
         default=None,
     )
-    definitionCanonical: Optional[ListType[Canonical]] = Field(
+    definitionCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | billable | not-billable | aborted | billed | entered-in-error | unknown",
         default=None,
     )
@@ -91,7 +93,7 @@ class ChargeItem(DomainResource):
         description="Encounter / Episode associated with event",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the charged service was applied",
         default=None,
     )
@@ -127,7 +129,7 @@ class ChargeItem(DomainResource):
         description="Anatomical location, if relevant",
         default=None,
     )
-    factorOverride: Optional[Decimal] = Field(
+    factorOverride: Optional[fhir.decimal] = Field(
         description="Factor overriding the associated rules",
         default=None,
     )
@@ -135,7 +137,7 @@ class ChargeItem(DomainResource):
         description="Price overriding the associated rules",
         default=None,
     )
-    overrideReason: Optional[String] = Field(
+    overrideReason: Optional[fhir.string] = Field(
         description="Reason for overriding the list price/factor",
         default=None,
     )
@@ -143,7 +145,7 @@ class ChargeItem(DomainResource):
         description="Individual who was entering",
         default=None,
     )
-    enteredDate: Optional[DateTime] = Field(
+    enteredDate: Optional[fhir.dateTime] = Field(
         description="Date the charge item was entered",
         default=None,
     )
@@ -194,7 +196,7 @@ class ChargeItem(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

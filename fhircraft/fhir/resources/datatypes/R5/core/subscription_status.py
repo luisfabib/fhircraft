@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,11 +24,11 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
     Detailed information about events relevant to this subscription notification.
     """
 
-    eventNumber: Optional[Integer64] = Field(
+    eventNumber: Optional[fhir.integer64] = Field(
         description="Sequencing index of this event",
         default=None,
     )
-    timestamp: Optional[Instant] = Field(
+    timestamp: Optional[fhir.instant] = Field(
         description="The instant this event occurred",
         default=None,
     )
@@ -50,15 +50,15 @@ class SubscriptionStatus(DomainResource):
     _type = "SubscriptionStatus"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubscriptionStatus"
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="requested | active | error | off | entered-in-error",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="handshake | heartbeat | event-notification | query-status | query-event",
         default=None,
     )
-    eventsSinceSubscriptionStart: Optional[Integer64] = Field(
+    eventsSinceSubscriptionStart: Optional[fhir.integer64] = Field(
         description="Events since the Subscription was created",
         default=None,
     )
@@ -70,7 +70,7 @@ class SubscriptionStatus(DomainResource):
         description="Reference to the Subscription responsible for this notification",
         default=None,
     )
-    topic: Optional[Canonical] = Field(
+    topic: Optional[fhir.canonical] = Field(
         description="Reference to the SubscriptionTopic this notification relates to",
         default=None,
     )

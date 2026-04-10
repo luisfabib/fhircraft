@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class CarePlanActivity(BackboneElement):
     """
@@ -41,6 +42,7 @@ class CarePlanActivity(BackboneElement):
         default=None,
     )
 
+
 class CarePlan(DomainResource):
     """
     Describes the intention of how one or more practitioners intend to deliver care for a particular patient, group or community for a period of time, possibly limited to care for a specific condition or set of conditions.
@@ -54,11 +56,11 @@ class CarePlan(DomainResource):
         description="External Ids for this plan",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -74,11 +76,11 @@ class CarePlan(DomainResource):
         description="Part of referenced CarePlan",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | order | option | directive",
         default=None,
     )
@@ -86,11 +88,11 @@ class CarePlan(DomainResource):
         description="Type of plan",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human-friendly name for the care plan",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Summary of nature of plan",
         default=None,
     )
@@ -103,10 +105,10 @@ class CarePlan(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period plan covers",
+        description="time period plan covers",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Date record was first recorded",
         default=None,
     )

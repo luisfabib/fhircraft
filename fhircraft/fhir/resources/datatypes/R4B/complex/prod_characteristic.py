@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Attachment,
@@ -43,15 +43,15 @@ class ProdCharacteristic(BackboneElement):
         description="Where applicable, the external diameter can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    shape: Optional[String] = Field(
+    shape: Optional[fhir.string] = Field(
         description="Where applicable, the shape can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used",
         default=None,
     )
-    color: Optional[List[String]] = Field(
+    color: Optional[List[fhir.string]] = Field(
         description="Where applicable, the color can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used",
         default=None,
     )
-    imprint: Optional[List[String]] = Field(
+    imprint: Optional[List[fhir.string]] = Field(
         description="Where applicable, the imprint can be specified as text",
         default=None,
     )

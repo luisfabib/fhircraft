@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -24,51 +24,55 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
     """
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
     """
 
-    deviceIdentifier: Optional[String] = Field(
+    deviceIdentifier: Optional[fhir.string] = Field(
         description="The identifier that is to be associated with every Device that references this DeviceDefintiion for the issuer and jurisdication porvided in the DeviceDefinition.udiDeviceIdentifier",
         default=None,
     )
-    issuer: Optional[Uri] = Field(
+    issuer: Optional[fhir.uri] = Field(
         description="The organization that assigns the identifier algorithm",
         default=None,
     )
-    jurisdiction: Optional[Uri] = Field(
+    jurisdiction: Optional[fhir.uri] = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
         default=None,
     )
+
 
 class DeviceDefinitionDeviceName(BackboneElement):
     """
     A name given to the device to identify it.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The name of the device",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="udi-label-name | user-friendly-name | patient-reported-name | manufacturer-name | model-name | other",
         default=None,
     )
+
 
 class DeviceDefinitionSpecialization(BackboneElement):
     """
     The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication.
     """
 
-    systemType: Optional[String] = Field(
+    systemType: Optional[fhir.string] = Field(
         description="The standard that is used to operate and communicate",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="The version of the standard that is used to operate and communicate",
         default=None,
     )
+
 
 class DeviceDefinitionCapability(BackboneElement):
     """
@@ -84,13 +88,14 @@ class DeviceDefinitionCapability(BackboneElement):
         default=None,
     )
 
+
 class DeviceDefinitionProperty(BackboneElement):
     """
     The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties.
     """
 
     type: Optional[CodeableConcept] = Field(
-        description="Code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
+        description="code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
         default=None,
     )
     valueQuantity: Optional[ListType[Quantity]] = Field(
@@ -102,6 +107,7 @@ class DeviceDefinitionProperty(BackboneElement):
         default=None,
     )
 
+
 class DeviceDefinitionMaterial(BackboneElement):
     """
     A substance used to create the material(s) of which the device is made.
@@ -111,14 +117,15 @@ class DeviceDefinitionMaterial(BackboneElement):
         description="The substance",
         default=None,
     )
-    alternate: Optional[Boolean] = Field(
+    alternate: Optional[fhir.boolean] = Field(
         description="Indicates an alternative material of the device",
         default=None,
     )
-    allergenicIndicator: Optional[Boolean] = Field(
+    allergenicIndicator: Optional[fhir.boolean] = Field(
         description="Whether the substance is a known or suspected allergen",
         default=None,
     )
+
 
 class DeviceDefinition(DomainResource):
     """
@@ -151,7 +158,7 @@ class DeviceDefinition(DomainResource):
             default=None,
         )
     )
-    manufacturerString: Optional[String] = Field(
+    manufacturerString: Optional[fhir.string] = Field(
         description="Name of device manufacturer",
         default=None,
     )
@@ -163,7 +170,7 @@ class DeviceDefinition(DomainResource):
         description="A name given to the device to identify it",
         default=None,
     )
-    modelNumber: Optional[String] = Field(
+    modelNumber: Optional[fhir.string] = Field(
         description="The model number for the device",
         default=None,
     )
@@ -175,7 +182,7 @@ class DeviceDefinition(DomainResource):
         description="The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication",
         default=None,
     )
-    version: Optional[ListType[String]] = Field(
+    version: Optional[ListType[fhir.string]] = Field(
         description="Available versions",
         default=None,
     )
@@ -212,11 +219,11 @@ class DeviceDefinition(DomainResource):
         description="Details for human/organization for support",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Network address to contact device",
         default=None,
     )
-    onlineInformation: Optional[Uri] = Field(
+    onlineInformation: Optional[fhir.uri] = Field(
         description="Access to on-line information",
         default=None,
     )
@@ -248,7 +255,7 @@ class DeviceDefinition(DomainResource):
     def manufacturer_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Reference],
+            field_types=[fhir.string, Reference],
             field_name_base="manufacturer",
             required=False,
         )

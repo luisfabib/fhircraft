@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -25,7 +25,7 @@ class EpisodeOfCareStatusHistory(BackboneElement):
     The history of statuses that the EpisodeOfCare has been through (without requiring processing the history of the resource).
     """
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
     )
@@ -47,7 +47,7 @@ class EpisodeOfCareDiagnosis(BackboneElement):
         description="Role that this diagnosis has within the episode of care (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-    rank: Optional[PositiveInt] = Field(
+    rank: Optional[fhir.positiveInt] = Field(
         description="Ranking of the diagnosis (for each role type)",
         default=None,
     )
@@ -77,7 +77,7 @@ class EpisodeOfCare(DomainResource):
         description="Business Identifier(s) relevant for this EpisodeOfCare",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
     )

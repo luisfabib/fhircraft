@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,12 +24,13 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ValueSetComposeIncludeConceptDesignation(BackboneElement):
     """
     Additional representations for this concept when used in this value set - other languages, aliases, specialized purposes, used for particular purposes, etc.
     """
 
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="Human language of the designation",
         default=None,
     )
@@ -42,21 +43,22 @@ class ValueSetComposeIncludeConceptDesignation(BackboneElement):
         description="Additional ways how this designation would be used",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The text value for this designation",
         default=None,
     )
+
 
 class ValueSetComposeIncludeConcept(BackboneElement):
     """
     Specifies a concept to be included or excluded.
     """
 
-    code: Optional[Code] = Field(
-        description="Code or expression from system",
+    code: Optional[fhir.code] = Field(
+        description="code or expression from system",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Text to display for this code for this value set in this valueset",
         default=None,
     )
@@ -65,35 +67,37 @@ class ValueSetComposeIncludeConcept(BackboneElement):
         default=None,
     )
 
+
 class ValueSetComposeIncludeFilter(BackboneElement):
     """
     Select concepts by specifying a matching criterion based on the properties (including relationships) defined by the system, or on filters defined by the system. If multiple filters are specified within the include, they SHALL all be true.
     """
 
-    property_: Optional[Code] = Field(
+    property_: Optional[fhir.code] = Field(
         description="A property/filter defined by the code system",
         default=None,
         alias="property",
     )
-    op: Optional[Code] = Field(
+    op: Optional[fhir.code] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists",
         default=None,
     )
-    value: Optional[String] = Field(
-        description="Code from the system, or regex criteria, or boolean value for exists",
+    value: Optional[fhir.string] = Field(
+        description="code from the system, or regex criteria, or boolean value for exists",
         default=None,
     )
+
 
 class ValueSetComposeInclude(BackboneElement):
     """
     Include one or more codes from a code system or other value set(s).
     """
 
-    system: Optional[Uri] = Field(
+    system: Optional[fhir.uri] = Field(
         description="The system the codes come from",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Specific version of the code system referred to",
         default=None,
     )
@@ -105,25 +109,26 @@ class ValueSetComposeInclude(BackboneElement):
         description="Select codes/concepts by their properties (including relationships)",
         default=None,
     )
-    valueSet: Optional[ListType[Canonical]] = Field(
+    valueSet: Optional[ListType[fhir.canonical]] = Field(
         description="Select the contents included in this value set",
         default=None,
     )
-    copyright: Optional[String] = Field(
+    copyright: Optional[fhir.string] = Field(
         description="A copyright statement for the specific code system included in the value set",
         default=None,
     )
+
 
 class ValueSetComposeExclude(BackboneElement):
     """
     Exclude one or more codes from the value set based on code system filters and/or other value sets.
     """
 
-    system: Optional[Uri] = Field(
+    system: Optional[fhir.uri] = Field(
         description="The system the codes come from",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Specific version of the code system referred to",
         default=None,
     )
@@ -135,25 +140,26 @@ class ValueSetComposeExclude(BackboneElement):
         description="Select codes/concepts by their properties (including relationships)",
         default=None,
     )
-    valueSet: Optional[ListType[Canonical]] = Field(
+    valueSet: Optional[ListType[fhir.canonical]] = Field(
         description="Select the contents included in this value set",
         default=None,
     )
-    copyright: Optional[String] = Field(
+    copyright: Optional[fhir.string] = Field(
         description="A copyright statement for the specific code system included in the value set",
         default=None,
     )
+
 
 class ValueSetCompose(BackboneElement):
     """
     A set of criteria that define the contents of the value set by including or excluding codes selected from the specified code system(s) that the value set draws from. This is also known as the Content Logical Definition (CLD).
     """
 
-    lockedDate: Optional[Date] = Field(
+    lockedDate: Optional[fhir.date_] = Field(
         description="Fixed date for references with no specified version (transitive)",
         default=None,
     )
-    inactive: Optional[Boolean] = Field(
+    inactive: Optional[fhir.boolean] = Field(
         description="Whether inactive codes are in the value set",
         default=None,
     )
@@ -165,46 +171,47 @@ class ValueSetCompose(BackboneElement):
         description="Explicitly exclude codes from a code system or other value sets",
         default=None,
     )
-    property_: Optional[ListType[String]] = Field(
+    property_: Optional[ListType[fhir.string]] = Field(
         description="Property to return if client doesn\u0027t override",
         default=None,
         alias="property",
     )
+
 
 class ValueSetExpansionParameter(BackboneElement):
     """
     A parameter that controlled the expansion process. These parameters may be used by users of expanded value sets to check whether the expansion is suitable for a particular purpose, or to pick the correct expansion.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name as assigned by the client or server",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Value of the named parameter",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Value of the named parameter",
         default=None,
     )
@@ -220,31 +227,41 @@ class ValueSetExpansionParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Boolean, Integer, Decimal, Uri, Code, DateTime],
+            field_types=[
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
+                fhir.Decimal,
+                fhir.Uri,
+                fhir.Code,
+                fhir.DateTime,
+            ],
             field_name_base="value",
             required=False,
         )
+
 
 class ValueSetExpansionProperty(BackboneElement):
     """
     A property defines an additional slot through which additional information can be provided about a concept.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Identifies the property on the concepts, and when referred to in operations",
         default=None,
     )
-    uri: Optional[Uri] = Field(
+    uri: Optional[fhir.uri] = Field(
         description="Formal identifier for the property",
         default=None,
     )
+
 
 class ValueSetExpansionContainsDesignation(BackboneElement):
     """
     Additional representations for this item - other languages, aliases, specialized purposes, used for particular purposes, etc. These are relevant when the conditions of the expansion do not fix to a single correct representation.
     """
 
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="Human language of the designation",
         default=None,
     )
@@ -257,21 +274,22 @@ class ValueSetExpansionContainsDesignation(BackboneElement):
         description="Additional ways how this designation would be used",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The text value for this designation",
         default=None,
     )
+
 
 class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
     """
     A subproperty value for this concept.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Reference to ValueSet.expansion.property.code",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
@@ -279,23 +297,23 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
@@ -311,21 +329,30 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Code, Coding, String, Integer, Boolean, DateTime, Decimal],
+            field_types=[
+                fhir.Code,
+                Coding,
+                fhir.String,
+                fhir.Integer,
+                fhir.Boolean,
+                fhir.DateTime,
+                fhir.Decimal,
+            ],
             field_name_base="value",
             required=True,
         )
+
 
 class ValueSetExpansionContainsProperty(BackboneElement):
     """
     A property value for this concept.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Reference to ValueSet.expansion.property.code",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Value of the property for this concept",
         default=None,
     )
@@ -333,23 +360,23 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Value of the property for this concept",
         default=None,
     )
@@ -371,37 +398,46 @@ class ValueSetExpansionContainsProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Code, Coding, String, Integer, Boolean, DateTime, Decimal],
+            field_types=[
+                fhir.Code,
+                Coding,
+                fhir.String,
+                fhir.Integer,
+                fhir.Boolean,
+                fhir.DateTime,
+                fhir.Decimal,
+            ],
             field_name_base="value",
             required=True,
         )
+
 
 class ValueSetExpansionContains(BackboneElement):
     """
     The codes that are contained in the value set expansion.
     """
 
-    system: Optional[Uri] = Field(
+    system: Optional[fhir.uri] = Field(
         description="System value for the code",
         default=None,
     )
-    abstract: Optional[Boolean] = Field(
+    abstract: Optional[fhir.boolean] = Field(
         description="If user cannot select this entry",
         default=None,
     )
-    inactive: Optional[Boolean] = Field(
+    inactive: Optional[fhir.boolean] = Field(
         description="If concept is inactive in the code system",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version in which this code/display is defined",
         default=None,
     )
-    code: Optional[Code] = Field(
-        description="Code - if blank, this is not a selectable code",
+    code: Optional[fhir.code] = Field(
+        description="code - if blank, this is not a selectable code",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="User display for the concept",
         default=None,
     )
@@ -419,28 +455,29 @@ class ValueSetExpansionContains(BackboneElement):
         default=None,
     )
 
+
 class ValueSetExpansion(BackboneElement):
     """
     A value set can also be "expanded", where the value set is turned into a simple collection of enumerated codes. This element holds the expansion, if it has been performed.
     """
 
-    identifier: Optional[Uri] = Field(
+    identifier: Optional[fhir.uri] = Field(
         description="Identifies the value set expansion (business identifier)",
         default=None,
     )
-    next: Optional[Uri] = Field(
+    next: Optional[fhir.uri] = Field(
         description="Opaque urls for paging through expansion results",
         default=None,
     )
-    timestamp: Optional[DateTime] = Field(
-        description="Time ValueSet expansion happened",
+    timestamp: Optional[fhir.dateTime] = Field(
+        description="time ValueSet expansion happened",
         default=None,
     )
-    total: Optional[Integer] = Field(
+    total: Optional[fhir.integer] = Field(
         description="Total number of codes in the expansion",
         default=None,
     )
-    offset: Optional[Integer] = Field(
+    offset: Optional[fhir.integer] = Field(
         description="Offset at which this resource starts",
         default=None,
     )
@@ -458,19 +495,21 @@ class ValueSetExpansion(BackboneElement):
         default=None,
     )
 
+
 class ValueSetScope(BackboneElement):
     """
     Description of the semantic space the Value Set Expansion is intended to cover and should further clarify the text in ValueSet.description.
     """
 
-    inclusionCriteria: Optional[String] = Field(
+    inclusionCriteria: Optional[fhir.string] = Field(
         description="Criteria describing which concepts or codes should be included and why",
         default=None,
     )
-    exclusionCriteria: Optional[String] = Field(
+    exclusionCriteria: Optional[fhir.string] = Field(
         description="Criteria describing which concepts or codes should be excluded and why",
         default=None,
     )
+
 
 class ValueSet(DomainResource):
     """
@@ -481,19 +520,19 @@ class ValueSet(DomainResource):
     _type = "ValueSet"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ValueSet"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this value set, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this value set, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the value set (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the value set",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -501,27 +540,27 @@ class ValueSet(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this value set (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this value set (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -529,7 +568,7 @@ class ValueSet(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the value set",
         default=None,
     )
@@ -541,27 +580,27 @@ class ValueSet(DomainResource):
         description="Intended jurisdiction for value set (if applicable)",
         default=None,
     )
-    immutable: Optional[Boolean] = Field(
+    immutable: Optional[fhir.boolean] = Field(
         description="Indicates whether or not any change to the content logical definition may occur",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this value set is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the ValueSet was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the ValueSet was last reviewed by the publisher",
         default=None,
     )
@@ -617,7 +656,7 @@ class ValueSet(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -40,7 +40,7 @@ class CareTeamParticipant(BackboneElement):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period of participant",
+        description="time period of participant",
         default=None,
     )
 
@@ -69,7 +69,7 @@ class CareTeam(DomainResource):
         description="External Ids for this team",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="proposed | active | suspended | inactive | entered-in-error",
         default=None,
     )
@@ -77,7 +77,7 @@ class CareTeam(DomainResource):
         description="Type of team",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of the team, such as crisis assessment team",
         default=None,
     )
@@ -90,7 +90,7 @@ class CareTeam(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period team covers",
+        description="time period team covers",
         default=None,
     )
     participant: Optional[ListType[CareTeamParticipant]] = Field(

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -42,11 +42,11 @@ class ResearchSubjectProgress(BackboneElement):
         description="State change reason",
         default=None,
     )
-    startDate: Optional[DateTime] = Field(
+    startDate: Optional[fhir.dateTime] = Field(
         description="State change date",
         default=None,
     )
-    endDate: Optional[DateTime] = Field(
+    endDate: Optional[fhir.dateTime] = Field(
         description="State change date",
         default=None,
     )
@@ -64,7 +64,7 @@ class ResearchSubject(DomainResource):
         description="Business Identifier for research subject in a study",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
@@ -84,11 +84,11 @@ class ResearchSubject(DomainResource):
         description="Who or what is part of study",
         default=None,
     )
-    assignedComparisonGroup: Optional[Id] = Field(
+    assignedComparisonGroup: Optional[fhir.id_] = Field(
         description="What path should be followed",
         default=None,
     )
-    actualComparisonGroup: Optional[Id] = Field(
+    actualComparisonGroup: Optional[fhir.id_] = Field(
         description="What path was followed",
         default=None,
     )

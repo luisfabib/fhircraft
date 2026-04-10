@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
     """
     The legal status of supply of the packaged item as classified by the regulator.
@@ -38,6 +39,7 @@ class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
         description="The place where the legal status of supply applies",
         default=None,
     )
+
 
 class PackagedProductDefinitionPackagingProperty(BackboneElement):
     """
@@ -56,11 +58,11 @@ class PackagedProductDefinitionPackagingProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
@@ -80,10 +82,17 @@ class PackagedProductDefinitionPackagingProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Date, Boolean, Attachment],
+            field_types=[
+                CodeableConcept,
+                Quantity,
+                fhir.Date,
+                fhir.Boolean,
+                Attachment,
+            ],
             field_name_base="value",
             required=False,
         )
+
 
 class PackagedProductDefinitionPackagingContainedItem(BackboneElement):
     """
@@ -99,6 +108,7 @@ class PackagedProductDefinitionPackagingContainedItem(BackboneElement):
         default=None,
     )
 
+
 class PackagedProductDefinitionPackaging(BackboneElement):
     """
     A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap (which is not a device or a medication manufactured item).
@@ -112,11 +122,11 @@ class PackagedProductDefinitionPackaging(BackboneElement):
         description="The physical type of the container of the items",
         default=None,
     )
-    componentPart: Optional[Boolean] = Field(
+    componentPart: Optional[fhir.boolean] = Field(
         description="Is this a part of the packaging (e.g. a cap or bottle stopper), rather than the packaging itself (e.g. a bottle or vial)",
         default=None,
     )
-    quantity: Optional[Integer] = Field(
+    quantity: Optional[fhir.integer] = Field(
         description="The quantity of this level of packaging in the package that contains it (with the outermost level being 1)",
         default=None,
     )
@@ -152,6 +162,7 @@ class PackagedProductDefinitionPackaging(BackboneElement):
         default=None,
     )
 
+
 class PackagedProductDefinitionCharacteristic(BackboneElement):
     """
     Allows the key features to be recorded, such as "hospital pack", "nurse prescribable", "calendar pack".
@@ -169,11 +180,11 @@ class PackagedProductDefinitionCharacteristic(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
@@ -193,10 +204,17 @@ class PackagedProductDefinitionCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Date, Boolean, Attachment],
+            field_types=[
+                CodeableConcept,
+                Quantity,
+                fhir.Date,
+                fhir.Boolean,
+                Attachment,
+            ],
             field_name_base="value",
             required=False,
         )
+
 
 class PackagedProductDefinition(DomainResource):
     """
@@ -211,7 +229,7 @@ class PackagedProductDefinition(DomainResource):
         description="A unique identifier for this package as whole - not for the content of the package",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A name for this package. Typically as listed in a drug formulary, catalogue, inventory etc",
         default=None,
     )
@@ -227,7 +245,7 @@ class PackagedProductDefinition(DomainResource):
         description="The status within the lifecycle of this item. High level - not intended to duplicate details elsewhere e.g. legal status, or authorization/marketing status",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="The date at which the given status became applicable",
         default=None,
     )
@@ -235,7 +253,7 @@ class PackagedProductDefinition(DomainResource):
         description="A total of the complete count of contained items of a particular type/form, independent of sub-packaging or organization. This can be considered as the pack size. See also packaging.containedItem.amount (especially the long definition)",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description. Note that this is not the name of the package or product",
         default=None,
     )
@@ -249,7 +267,7 @@ class PackagedProductDefinition(DomainResource):
         description="Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated",
         default=None,
     )
-    copackagedIndicator: Optional[Boolean] = Field(
+    copackagedIndicator: Optional[fhir.boolean] = Field(
         description="Identifies if the drug product is supplied with another item such as a diluent or adjuvant",
         default=None,
     )

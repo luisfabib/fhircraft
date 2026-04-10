@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -50,7 +50,7 @@ class DeviceUseStatement(DomainResource):
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | completed | entered-in-error +",
         default=None,
     )
@@ -70,11 +70,11 @@ class DeviceUseStatement(DomainResource):
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="How often  the device was used",
         default=None,
     )
-    recordedOn: Optional[DateTime] = Field(
+    recordedOn: Optional[fhir.dateTime] = Field(
         description="When statement was recorded",
         default=None,
     )
@@ -114,7 +114,7 @@ class DeviceUseStatement(DomainResource):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Period, DateTime],
+            field_types=[Timing, Period, fhir.dateTime],
             field_name_base="timing",
             required=False,
         )

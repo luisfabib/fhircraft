@@ -1,11 +1,11 @@
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field
 
-from fhircraft.fhir.resources.base import FHIRUuid as FHIRUuidBase
-from .uri import FHIRUri
+from fhircraft.fhir.resources.base import UuidBase
+from .uri import Uri
 
 
-class FHIRUuid(FHIRUri, FHIRUuidBase):
+class Uuid(Uri, UuidBase):
     """A UUID represented as a URI."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/uuid"
@@ -18,4 +18,4 @@ class FHIRUuid(FHIRUri, FHIRUuidBase):
     )
 
 
-Uuid = Annotated[str | FHIRUuid, BeforeValidator(FHIRUuid.model_validate)]
+uuid = Annotated[str | Uuid, BeforeValidator(Uuid.model_validate)]

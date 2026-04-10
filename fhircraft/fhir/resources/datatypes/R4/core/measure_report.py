@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MeasureReportGroupPopulation(BackboneElement):
     """
     The populations that make up the population group, one for each type of population appropriate for the measure.
@@ -30,7 +31,7 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
     )
@@ -38,6 +39,7 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="For subject-list reports, the subject results in this population",
         default=None,
     )
+
 
 class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     """
@@ -53,6 +55,7 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
         default=None,
     )
 
+
 class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
     """
     The populations that make up the stratum, one for each type of population appropriate to the measure.
@@ -62,7 +65,7 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
     )
@@ -70,6 +73,7 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="For subject-list reports, the subject results in this population",
         default=None,
     )
+
 
 class MeasureReportGroupStratifierStratum(BackboneElement):
     """
@@ -95,6 +99,7 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         default=None,
     )
 
+
 class MeasureReportGroupStratifier(BackboneElement):
     """
     When a measure includes multiple stratifiers, there will be a stratifier group for each stratifier defined by the measure.
@@ -108,6 +113,7 @@ class MeasureReportGroupStratifier(BackboneElement):
         description="Stratum results, one for each unique value, or set of values, in the stratifier, or stratifier components",
         default=None,
     )
+
 
 class MeasureReportGroup(BackboneElement):
     """
@@ -130,6 +136,7 @@ class MeasureReportGroup(BackboneElement):
         description="Stratification results",
         default=None,
     )
+
 
 class MeasureReport(DomainResource):
     """
@@ -156,15 +163,15 @@ class MeasureReport(DomainResource):
         description="Additional identifier for the MeasureReport",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="complete | pending | error",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="individual | subject-list | summary | data-collection",
         default=None,
     )
-    measure: Optional[Canonical] = Field(
+    measure: Optional[fhir.canonical] = Field(
         description="What measure was calculated",
         default=None,
     )
@@ -172,7 +179,7 @@ class MeasureReport(DomainResource):
         description="What individual(s) the report is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the report was generated",
         default=None,
     )

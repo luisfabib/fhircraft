@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Identifier,
@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .domain_resource import DomainResource
 
+
 class ActorDefinition(DomainResource):
     """
     The ActorDefinition resource is used to describe an actor - a human or an application that plays a role in data exchange, and that may have obligations associated with the role the actor plays.
@@ -26,19 +27,19 @@ class ActorDefinition(DomainResource):
     _type = "ActorDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ActorDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this actor definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this actor definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the actor definition (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the actor definition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -46,27 +47,27 @@ class ActorDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this actor definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this actor definition (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -74,7 +75,7 @@ class ActorDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the actor",
         default=None,
     )
@@ -86,35 +87,35 @@ class ActorDefinition(DomainResource):
         description="Intended jurisdiction for actor definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this actor definition is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="person | system",
         default=None,
     )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Functionality associated with the actor",
         default=None,
     )
-    reference: Optional[ListType[Url]] = Field(
+    reference: Optional[ListType[fhir.url]] = Field(
         description="Reference to more information about the actor",
         default=None,
     )
-    capabilities: Optional[Canonical] = Field(
+    capabilities: Optional[fhir.canonical] = Field(
         description="CapabilityStatement for the actor (if applicable)",
         default=None,
     )
-    derivedFrom: Optional[ListType[Canonical]] = Field(
+    derivedFrom: Optional[ListType[fhir.canonical]] = Field(
         description="Definition of this actor in another context / IG",
         default=None,
     )
@@ -130,7 +131,7 @@ class ActorDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

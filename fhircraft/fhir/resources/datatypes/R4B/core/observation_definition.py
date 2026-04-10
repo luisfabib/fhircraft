@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ObservationDefinitionQuantitativeDetails(BackboneElement):
     """
     Characteristics for quantitative results of this observation.
@@ -33,21 +34,22 @@ class ObservationDefinitionQuantitativeDetails(BackboneElement):
         description="SI unit for quantitative results",
         default=None,
     )
-    conversionFactor: Optional[Decimal] = Field(
+    conversionFactor: Optional[fhir.decimal] = Field(
         description="SI to Customary unit conversion factor",
         default=None,
     )
-    decimalPrecision: Optional[Integer] = Field(
-        description="Decimal precision of observation quantitative results",
+    decimalPrecision: Optional[fhir.integer] = Field(
+        description="decimal precision of observation quantitative results",
         default=None,
     )
+
 
 class ObservationDefinitionQualifiedInterval(BackboneElement):
     """
     Multiple  ranges of results qualified by different contexts for ordinal or continuous observations conforming to this ObservationDefinition.
     """
 
-    category: Optional[Code] = Field(
+    category: Optional[fhir.code] = Field(
         description="reference | critical | absolute",
         default=None,
     )
@@ -63,7 +65,7 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         description="Targetted population of the range",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
@@ -75,10 +77,11 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         description="Applicable gestational age range, if relevant",
         default=None,
     )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="Condition associated with the reference range",
         default=None,
     )
+
 
 class ObservationDefinition(DomainResource):
     """
@@ -113,11 +116,11 @@ class ObservationDefinition(DomainResource):
         description="Business identifier for this ObservationDefinition instance",
         default=None,
     )
-    permittedDataType: Optional[ListType[Code]] = Field(
+    permittedDataType: Optional[ListType[fhir.code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
-    multipleResultsAllowed: Optional[Boolean] = Field(
+    multipleResultsAllowed: Optional[fhir.boolean] = Field(
         description="Multiple results allowed",
         default=None,
     )
@@ -125,7 +128,7 @@ class ObservationDefinition(DomainResource):
         description="Method used to produce the observation",
         default=None,
     )
-    preferredReportName: Optional[String] = Field(
+    preferredReportName: Optional[fhir.string] = Field(
         description="Preferred report name",
         default=None,
     )

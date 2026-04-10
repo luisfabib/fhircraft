@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -45,7 +45,7 @@ class MedicationAdministrationDosage(BackboneElement):
     Describes the medication dosage information details e.g. dose, rate, site, route, etc.
     """
 
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
     )
@@ -111,7 +111,7 @@ class MedicationAdministration(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown",
         default=None,
     )
@@ -139,7 +139,7 @@ class MedicationAdministration(DomainResource):
         description="Additional information to support administration",
         default=None,
     )
-    occurenceDateTime: Optional[DateTime] = Field(
+    occurenceDateTime: Optional[fhir.dateTime] = Field(
         description="Specific date/time or interval of time during which the administration took place (or did not take place)",
         default=None,
     )
@@ -151,11 +151,11 @@ class MedicationAdministration(DomainResource):
         description="Specific date/time or interval of time during which the administration took place (or did not take place)",
         default=None,
     )
-    recorded: Optional[DateTime] = Field(
+    recorded: Optional[fhir.dateTime] = Field(
         description="When the MedicationAdministration was first captured in the subject\u0027s record",
         default=None,
     )
-    isSubPotent: Optional[Boolean] = Field(
+    isSubPotent: Optional[fhir.boolean] = Field(
         description="Full dose was not administered",
         default=None,
     )
@@ -203,7 +203,7 @@ class MedicationAdministration(DomainResource):
     def occurence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurence",
             required=True,
         )

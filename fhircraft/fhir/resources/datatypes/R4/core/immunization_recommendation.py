@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
     """
     Vaccine date recommendations.  For example, earliest date to administer, latest date to administer, etc.
@@ -28,10 +29,11 @@ class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
         description="Type of date",
         default=None,
     )
-    value: Optional[DateTime] = Field(
+    value: Optional[fhir.dateTime] = Field(
         description="Recommended date",
         default=None,
     )
+
 
 class ImmunizationRecommendationRecommendation(BackboneElement):
     """
@@ -64,27 +66,27 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Dates governing proposed immunization",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Protocol details",
         default=None,
     )
-    series: Optional[String] = Field(
+    series: Optional[fhir.string] = Field(
         description="Name of vaccination series",
         default=None,
     )
-    doseNumberPositiveInt: Optional[PositiveInt] = Field(
+    doseNumberPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Recommended dose number within series",
         default=None,
     )
-    doseNumberString: Optional[String] = Field(
+    doseNumberString: Optional[fhir.string] = Field(
         description="Recommended dose number within series",
         default=None,
     )
-    seriesDosesPositiveInt: Optional[PositiveInt] = Field(
+    seriesDosesPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
-    seriesDosesString: Optional[String] = Field(
+    seriesDosesString: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
@@ -115,7 +117,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
     def doseNumber_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[PositiveInt, String],
+            field_types=[fhir.positiveInt, fhir.string],
             field_name_base="doseNumber",
             required=False,
         )
@@ -124,10 +126,11 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
     def seriesDoses_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[PositiveInt, String],
+            field_types=[fhir.positiveInt, fhir.string],
             field_name_base="seriesDoses",
             required=False,
         )
+
 
 class ImmunizationRecommendation(DomainResource):
     """
@@ -160,7 +163,7 @@ class ImmunizationRecommendation(DomainResource):
         description="Who this profile is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date recommendation(s) created",
         default=None,
     )

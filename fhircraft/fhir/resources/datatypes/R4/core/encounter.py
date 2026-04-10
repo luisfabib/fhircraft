@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -27,7 +27,7 @@ class EncounterStatusHistory(BackboneElement):
     The status history permits the encounter resource to contain the status history without needing to read through the historical versions of the resource, or even have the server store them.
     """
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | arrived | triaged | in-progress | onleave | finished | cancelled +",
         default=None,
     )
@@ -82,7 +82,7 @@ class EncounterDiagnosis(BackboneElement):
         description="Role that this diagnosis has within the encounter (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-    rank: Optional[PositiveInt] = Field(
+    rank: Optional[fhir.positiveInt] = Field(
         description="Ranking of the diagnosis (for each role type)",
         default=None,
     )
@@ -138,7 +138,7 @@ class EncounterLocation(BackboneElement):
         description="Location the encounter takes place",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | active | reserved | completed",
         default=None,
     )
@@ -147,7 +147,7 @@ class EncounterLocation(BackboneElement):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period during which the patient was present at the location",
+        description="time period during which the patient was present at the location",
         default=None,
     )
 
@@ -176,7 +176,7 @@ class Encounter(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | arrived | triaged | in-progress | onleave | finished | cancelled +",
         default=None,
     )

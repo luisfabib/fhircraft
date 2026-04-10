@@ -9,7 +9,7 @@ NoneType = type(None)
 # Dynamic modules
 from typing import Optional, List as ListType
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .resource import Resource
 from .domain_resource import DomainResource
 
@@ -35,7 +35,7 @@ class AccountCoverage(BackboneElement):
         description="The party(s), such as insurances, that may contribute to the payment of this account",
         default=None,
     )
-    priority: Optional[PositiveInt] = Field(
+    priority: Optional[fhir.positiveInt] = Field(
         description="The priority of the coverage in the context of this account",
         default=None,
     )
@@ -49,7 +49,7 @@ class AccountGuarantor(BackboneElement):
         description="Responsible entity",
         default=None,
     )
-    onHold: Optional[Boolean] = Field(
+    onHold: Optional[fhir.boolean] = Field(
         description="Credit or other hold applied",
         default=None,
     )
@@ -83,7 +83,7 @@ class Account(DomainResource):
         description="Account number",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error | on-hold | unknown",
         default=None,
     )
@@ -91,7 +91,7 @@ class Account(DomainResource):
         description="E.g. patient, expense, depreciation",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human-readable label",
         default=None,
     )
@@ -111,7 +111,7 @@ class Account(DomainResource):
         description="Entity managing the Account",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Explanation of purpose/use",
         default=None,
     )

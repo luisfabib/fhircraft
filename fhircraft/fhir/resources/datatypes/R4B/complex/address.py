@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.R4B.complex.element import Element
 from typing import TYPE_CHECKING
@@ -17,43 +17,43 @@ class Address(Element):
 
     _type = "Address"
 
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="home | work | temp | old | billing - purpose of this address",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="postal | physical | both",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Text representation of the address",
         default=None,
     )
-    line: Optional[List[String]] = Field(
+    line: Optional[List[fhir.string]] = Field(
         description="Street name, number, direction \u0026 P.O. Box etc.",
         default=None,
     )
-    city: Optional[String] = Field(
+    city: Optional[fhir.string] = Field(
         description="Name of city, town etc.",
         default=None,
     )
-    district: Optional[String] = Field(
+    district: Optional[fhir.string] = Field(
         description="District name (aka county)",
         default=None,
     )
-    state: Optional[String] = Field(
+    state: Optional[fhir.string] = Field(
         description="Sub-unit of country (abbreviations ok)",
         default=None,
     )
-    postalCode: Optional[String] = Field(
+    postalCode: Optional[fhir.string] = Field(
         description="Postal code for area",
         default=None,
     )
-    country: Optional[String] = Field(
+    country: Optional[fhir.string] = Field(
         description="Country (e.g. can be ISO 3166 2 or 3 letter code)",
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period when address was/is in use",
+        description="time period when address was/is in use",
         default=None,
     )

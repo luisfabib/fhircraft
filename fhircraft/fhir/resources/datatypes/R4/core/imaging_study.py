@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -40,7 +40,7 @@ class ImagingStudySeriesInstance(BackboneElement):
     A single SOP instance within the series, e.g. an image, or presentation state.
     """
 
-    uid: Optional[Id] = Field(
+    uid: Optional[fhir.id_] = Field(
         description="DICOM SOP Instance UID",
         default=None,
     )
@@ -48,11 +48,11 @@ class ImagingStudySeriesInstance(BackboneElement):
         description="DICOM class type",
         default=None,
     )
-    number: Optional[UnsignedInt] = Field(
+    number: Optional[fhir.unsignedInt] = Field(
         description="The number of this instance in the series",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Description of instance",
         default=None,
     )
@@ -62,11 +62,11 @@ class ImagingStudySeries(BackboneElement):
     Each study has one or more series of images or other content.
     """
 
-    uid: Optional[Id] = Field(
+    uid: Optional[fhir.id_] = Field(
         description="DICOM Series Instance UID for the series",
         default=None,
     )
-    number: Optional[UnsignedInt] = Field(
+    number: Optional[fhir.unsignedInt] = Field(
         description="Numeric identifier of this series",
         default=None,
     )
@@ -74,11 +74,11 @@ class ImagingStudySeries(BackboneElement):
         description="The modality of the instances in the series",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="A short human readable summary of the series",
         default=None,
     )
-    numberOfInstances: Optional[UnsignedInt] = Field(
+    numberOfInstances: Optional[fhir.unsignedInt] = Field(
         description="Number of Series Related Instances",
         default=None,
     )
@@ -98,7 +98,7 @@ class ImagingStudySeries(BackboneElement):
         description="Specimen imaged",
         default=None,
     )
-    started: Optional[DateTime] = Field(
+    started: Optional[fhir.dateTime] = Field(
         description="When the series started",
         default=None,
     )
@@ -136,7 +136,7 @@ class ImagingStudy(DomainResource):
         description="Identifiers for the whole study",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | available | cancelled | entered-in-error | unknown",
         default=None,
     )
@@ -152,7 +152,7 @@ class ImagingStudy(DomainResource):
         description="Encounter with which this imaging study is associated",
         default=None,
     )
-    started: Optional[DateTime] = Field(
+    started: Optional[fhir.dateTime] = Field(
         description="When the study was started",
         default=None,
     )
@@ -172,11 +172,11 @@ class ImagingStudy(DomainResource):
         description="Study access endpoint",
         default=None,
     )
-    numberOfSeries: Optional[UnsignedInt] = Field(
+    numberOfSeries: Optional[fhir.unsignedInt] = Field(
         description="Number of Study Related Series",
         default=None,
     )
-    numberOfInstances: Optional[UnsignedInt] = Field(
+    numberOfInstances: Optional[fhir.unsignedInt] = Field(
         description="Number of Study Related Instances",
         default=None,
     )
@@ -204,7 +204,7 @@ class ImagingStudy(DomainResource):
         description="User-defined comments",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Institution-generated description",
         default=None,
     )

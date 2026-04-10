@@ -2,7 +2,7 @@ import re
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field, field_validator
 
-from fhircraft.fhir.resources.base import FHIRInteger as FHIRIntegerBase
+from fhircraft.fhir.resources.base import IntegerBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 from fhircraft.fhir.resources.datatypes import (
     MIN_SIGNED_32BIT_INT,
@@ -12,7 +12,7 @@ from fhircraft.fhir.resources.datatypes import (
 _INTEGER_PATTERN = r"^[0]|[-+]?[1-9][0-9]*$"
 
 
-class FHIRInteger(PrimitiveType, FHIRIntegerBase):
+class Integer(PrimitiveType, IntegerBase):
     """A signed integer in the range -2,147,483,648..2,147,483,647."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/integer"
@@ -37,4 +37,4 @@ class FHIRInteger(PrimitiveType, FHIRIntegerBase):
         return v
 
 
-Integer = Annotated[int | FHIRInteger, BeforeValidator(FHIRInteger.model_validate)]
+integer = Annotated[int | Integer, BeforeValidator(Integer.model_validate)]

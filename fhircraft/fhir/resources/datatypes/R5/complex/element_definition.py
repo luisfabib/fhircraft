@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from pydantic import Field, model_validator
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.validators import (
     get_type_choice_value_by_base,
     validate_element_constraint,
@@ -48,6 +48,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Availability,
 )
 
+
 class ElementDefinitionSlicingDiscriminator(Element):
     """
     Designates which child elements are used to discriminate between the slices when processing an instance. If one or more discriminators are provided, the value of the child elements in the instance data SHALL completely distinguish which slice the element in the resource matches based on the allowed values for those elements in each of the slices.
@@ -55,14 +56,15 @@ class ElementDefinitionSlicingDiscriminator(Element):
 
     _type = "ElementDefinitionSlicingDiscriminator"
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="value | exists | type | profile | position",
         default=None,
     )
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="Path to element value",
         default=None,
     )
+
 
 class ElementDefinitionSlicing(Element):
     """
@@ -75,18 +77,19 @@ class ElementDefinitionSlicing(Element):
         description="Element values that are used to distinguish the slices",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Text description of how slicing works (or not)",
         default=None,
     )
-    ordered: Optional[Boolean] = Field(
+    ordered: Optional[fhir.boolean] = Field(
         description="If elements must be in same order as slices",
         default=None,
     )
-    rules: Optional[Code] = Field(
+    rules: Optional[fhir.code] = Field(
         description="closed | open | openAtEnd",
         default=None,
     )
+
 
 class ElementDefinitionBase(Element):
     """
@@ -95,18 +98,19 @@ class ElementDefinitionBase(Element):
 
     _type = "ElementDefinitionBase"
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="Path that identifies the base element",
         default=None,
     )
-    min: Optional[UnsignedInt] = Field(
+    min: Optional[fhir.unsignedInt] = Field(
         description="Min cardinality of the base element",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Max cardinality of the base element",
         default=None,
     )
+
 
 class ElementDefinitionType(Element):
     """
@@ -115,26 +119,27 @@ class ElementDefinitionType(Element):
 
     _type = "ElementDefinitionType"
 
-    code: Optional[Uri] = Field(
+    code: Optional[fhir.uri] = Field(
         description="Data type or Resource (reference to definition)",
         default=None,
     )
-    profile: Optional[List[Canonical]] = Field(
+    profile: Optional[List[fhir.canonical]] = Field(
         description="Profiles (StructureDefinition or IG) - one must apply",
         default=None,
     )
-    targetProfile: Optional[List[Canonical]] = Field(
+    targetProfile: Optional[List[fhir.canonical]] = Field(
         description="Profile (StructureDefinition or IG) on the Reference/canonical target - one must apply",
         default=None,
     )
-    aggregation: Optional[List[Code]] = Field(
+    aggregation: Optional[List[fhir.code]] = Field(
         description="contained | referenced | bundled - how aggregated",
         default=None,
     )
-    versioning: Optional[Code] = Field(
+    versioning: Optional[fhir.code] = Field(
         description="either | independent | specific",
         default=None,
     )
+
 
 class ElementDefinitionExample(Element):
     """
@@ -143,87 +148,87 @@ class ElementDefinitionExample(Element):
 
     _type = "ElementDefinitionExample"
 
-    label: Optional[String] = Field(
+    label: Optional[fhir.string] = Field(
         description="Describes the purpose of this example",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueCanonical: Optional[Canonical] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueInstant: Optional[Instant] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueInteger64: Optional[Integer64] = Field(
+    valueInteger64: Optional[fhir.integer64] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueOid: Optional[Oid] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valuePositiveInt: Optional[PositiveInt] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueUnsignedInt: Optional[UnsignedInt] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
-    valueUuid: Optional[Uuid] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="Value of Example (one of allowed types)",
         default=None,
     )
@@ -376,26 +381,26 @@ class ElementDefinitionExample(Element):
         return validate_type_choice_element(
             self,
             field_types=[
-                "Base64Binary",
-                "Boolean",
-                "Canonical",
-                "Code",
-                "Date",
-                "DateTime",
-                "Decimal",
-                "Id",
-                "Instant",
-                "Integer",
-                "Integer64",
-                "Markdown",
-                "Oid",
-                "PositiveInt",
-                "String",
-                "Time",
-                "UnsignedInt",
-                "Uri",
-                "Url",
-                "Uuid",
+                "base64Binary",
+                "boolean",
+                "canonical",
+                "code",
+                "date",
+                "dateTime",
+                "decimal",
+                "id_",
+                "instant",
+                "integer",
+                "integer64",
+                "markdown",
+                "oid",
+                "positiveInt",
+                "string",
+                "time",
+                "unsignedInt",
+                "uri",
+                "url",
+                "uuid",
                 "Address",
                 "Age",
                 "Annotation",
@@ -436,6 +441,7 @@ class ElementDefinitionExample(Element):
             non_allowed_types=[],
         )
 
+
 class ElementDefinitionConstraint(Element):
     """
     Formal constraints such as co-occurrence and other constraints that can be computationally evaluated within the context of the instance.
@@ -443,34 +449,35 @@ class ElementDefinitionConstraint(Element):
 
     _type = "ElementDefinitionConstraint"
 
-    key: Optional[Id] = Field(
+    key: Optional[fhir.id_] = Field(
         description="Target of \u0027condition\u0027 reference above",
         default=None,
     )
-    requirements: Optional[Markdown] = Field(
+    requirements: Optional[fhir.markdown] = Field(
         description="Why this constraint is necessary or appropriate",
         default=None,
     )
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="error | warning",
         default=None,
     )
-    suppress: Optional[Boolean] = Field(
+    suppress: Optional[fhir.boolean] = Field(
         description="Suppress warning or hint in profile",
         default=None,
     )
-    human: Optional[String] = Field(
+    human: Optional[fhir.string] = Field(
         description="Human description of constraint",
         default=None,
     )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="FHIRPath expression of constraint",
         default=None,
     )
-    source: Optional[Canonical] = Field(
+    source: Optional[fhir.canonical] = Field(
         description="Reference to original source of constraint",
         default=None,
     )
+
 
 class ElementDefinitionBindingAdditional(Element):
     """
@@ -479,19 +486,19 @@ class ElementDefinitionBindingAdditional(Element):
 
     _type = "ElementDefinitionBindingAdditional"
 
-    purpose: Optional[Code] = Field(
+    purpose: Optional[fhir.code] = Field(
         description="maximum | minimum | required | extensible | candidate | current | preferred | ui | starter | component",
         default=None,
     )
-    valueSet: Optional[Canonical] = Field(
+    valueSet: Optional[fhir.canonical] = Field(
         description="The value set for the additional binding",
         default=None,
     )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Documentation of the purpose of use of the binding",
         default=None,
     )
-    shortDoco: Optional[String] = Field(
+    shortDoco: Optional[fhir.string] = Field(
         description="Concise documentation - for summary tables",
         default=None,
     )
@@ -499,10 +506,11 @@ class ElementDefinitionBindingAdditional(Element):
         description="Qualifies the usage - jurisdiction, gender, workflow status etc.",
         default=None,
     )
-    any: Optional[Boolean] = Field(
+    any: Optional[fhir.boolean] = Field(
         description="Whether binding can applies to all repeats, or just one",
         default=None,
     )
+
 
 class ElementDefinitionBinding(Element):
     """
@@ -511,15 +519,15 @@ class ElementDefinitionBinding(Element):
 
     _type = "ElementDefinitionBinding"
 
-    strength: Optional[Code] = Field(
+    strength: Optional[fhir.code] = Field(
         description="required | extensible | preferred | example",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Intended use of codes in the bound value set",
         default=None,
     )
-    valueSet: Optional[Canonical] = Field(
+    valueSet: Optional[fhir.canonical] = Field(
         description="Source of value set",
         default=None,
     )
@@ -528,6 +536,7 @@ class ElementDefinitionBinding(Element):
         default=None,
     )
 
+
 class ElementDefinitionMapping(Element):
     """
     Identifies a concept from an external specification that roughly corresponds to this element.
@@ -535,22 +544,23 @@ class ElementDefinitionMapping(Element):
 
     _type = "ElementDefinitionMapping"
 
-    identity: Optional[Id] = Field(
+    identity: Optional[fhir.id_] = Field(
         description="Reference to mapping declaration",
         default=None,
     )
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="Computable language of mapping",
         default=None,
     )
-    map: Optional[String] = Field(
+    map: Optional[fhir.string] = Field(
         description="Details of the mapping",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Comments about the mapping or its use",
         default=None,
     )
+
 
 class ElementDefinition(BackboneType):
     """
@@ -559,27 +569,27 @@ class ElementDefinition(BackboneType):
 
     _type = "ElementDefinition"
 
-    id: Optional[String] = Field(
+    id: Optional[fhir.string] = Field(
         description="Unique id for the element within a resource (for internal references)",
         default=None,
     )
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="Path of the element in the hierarchy of elements",
         default=None,
     )
-    representation: Optional[List[Code]] = Field(
+    representation: Optional[List[fhir.code]] = Field(
         description="xmlAttr | xmlText | typeAttr | cdaText | xhtml",
         default=None,
     )
-    sliceName: Optional[String] = Field(
+    sliceName: Optional[fhir.string] = Field(
         description="Name for this particular element (in a set of slices)",
         default=None,
     )
-    sliceIsConstraining: Optional[Boolean] = Field(
+    sliceIsConstraining: Optional[fhir.boolean] = Field(
         description="If this slice definition constrains an inherited slice definition (or not)",
         default=None,
     )
-    label: Optional[String] = Field(
+    label: Optional[fhir.string] = Field(
         description="Name for element to display with or prompt for element",
         default=None,
     )
@@ -591,31 +601,31 @@ class ElementDefinition(BackboneType):
         description="This element is sliced - slices follow",
         default=None,
     )
-    short: Optional[String] = Field(
+    short: Optional[fhir.string] = Field(
         description="Concise definition for space-constrained presentation",
         default=None,
     )
-    definition: Optional[Markdown] = Field(
+    definition: Optional[fhir.markdown] = Field(
         description="Full formal definition as narrative text",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Comments about the use of this element",
         default=None,
     )
-    requirements: Optional[Markdown] = Field(
+    requirements: Optional[fhir.markdown] = Field(
         description="Why this resource has been created",
         default=None,
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[List[fhir.string]] = Field(
         description="Other names",
         default=None,
     )
-    min: Optional[UnsignedInt] = Field(
+    min: Optional[fhir.unsignedInt] = Field(
         description="Minimum Cardinality",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum Cardinality (a number or *)",
         default=None,
     )
@@ -623,7 +633,7 @@ class ElementDefinition(BackboneType):
         description="Base definition information for tools",
         default=None,
     )
-    contentReference: Optional[Uri] = Field(
+    contentReference: Optional[fhir.uri] = Field(
         description="Reference to definition of content for the element",
         default=None,
     )
@@ -631,83 +641,83 @@ class ElementDefinition(BackboneType):
         description="Data type and Profile for this element",
         default=None,
     )
-    defaultValueBase64Binary: Optional[Base64Binary] = Field(
+    defaultValueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueBoolean: Optional[Boolean] = Field(
+    defaultValueBoolean: Optional[fhir.boolean] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueCanonical: Optional[Canonical] = Field(
+    defaultValueCanonical: Optional[fhir.canonical] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueCode: Optional[Code] = Field(
+    defaultValueCode: Optional[fhir.code] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDate: Optional[Date] = Field(
+    defaultValueDate: Optional[fhir.date_] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDateTime: Optional[DateTime] = Field(
+    defaultValueDateTime: Optional[fhir.dateTime] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDecimal: Optional[Decimal] = Field(
+    defaultValueDecimal: Optional[fhir.decimal] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueId: Optional[Id] = Field(
+    defaultValueId: Optional[fhir.id_] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueInstant: Optional[Instant] = Field(
+    defaultValueInstant: Optional[fhir.instant] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueInteger: Optional[Integer] = Field(
+    defaultValueInteger: Optional[fhir.integer] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueInteger64: Optional[Integer64] = Field(
+    defaultValueInteger64: Optional[fhir.integer64] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueMarkdown: Optional[Markdown] = Field(
+    defaultValueMarkdown: Optional[fhir.markdown] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueOid: Optional[Oid] = Field(
+    defaultValueOid: Optional[fhir.oid] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValuePositiveInt: Optional[PositiveInt] = Field(
+    defaultValuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueString: Optional[String] = Field(
+    defaultValueString: Optional[fhir.string] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueTime: Optional[Time] = Field(
+    defaultValueTime: Optional[fhir.time_] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueUnsignedInt: Optional[UnsignedInt] = Field(
+    defaultValueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueUri: Optional[Uri] = Field(
+    defaultValueUri: Optional[fhir.uri] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueUrl: Optional[Url] = Field(
+    defaultValueUrl: Optional[fhir.url] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueUuid: Optional[Uuid] = Field(
+    defaultValueUuid: Optional[fhir.uuid] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
@@ -847,91 +857,91 @@ class ElementDefinition(BackboneType):
         description="Specified value if missing from instance",
         default=None,
     )
-    meaningWhenMissing: Optional[Markdown] = Field(
+    meaningWhenMissing: Optional[fhir.markdown] = Field(
         description="Implicit meaning when this element is missing",
         default=None,
     )
-    orderMeaning: Optional[String] = Field(
+    orderMeaning: Optional[fhir.string] = Field(
         description="What the order of the elements means",
         default=None,
     )
-    fixedBase64Binary: Optional[Base64Binary] = Field(
+    fixedBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedBoolean: Optional[Boolean] = Field(
+    fixedBoolean: Optional[fhir.boolean] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedCanonical: Optional[Canonical] = Field(
+    fixedCanonical: Optional[fhir.canonical] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedCode: Optional[Code] = Field(
+    fixedCode: Optional[fhir.code] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDate: Optional[Date] = Field(
+    fixedDate: Optional[fhir.date_] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDateTime: Optional[DateTime] = Field(
+    fixedDateTime: Optional[fhir.dateTime] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDecimal: Optional[Decimal] = Field(
+    fixedDecimal: Optional[fhir.decimal] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedId: Optional[Id] = Field(
+    fixedId: Optional[fhir.id_] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedInstant: Optional[Instant] = Field(
+    fixedInstant: Optional[fhir.instant] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedInteger: Optional[Integer] = Field(
+    fixedInteger: Optional[fhir.integer] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedInteger64: Optional[Integer64] = Field(
+    fixedInteger64: Optional[fhir.integer64] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedMarkdown: Optional[Markdown] = Field(
+    fixedMarkdown: Optional[fhir.markdown] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedOid: Optional[Oid] = Field(
+    fixedOid: Optional[fhir.oid] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedPositiveInt: Optional[PositiveInt] = Field(
+    fixedPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedString: Optional[String] = Field(
+    fixedString: Optional[fhir.string] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedTime: Optional[Time] = Field(
+    fixedTime: Optional[fhir.time_] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedUnsignedInt: Optional[UnsignedInt] = Field(
+    fixedUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedUri: Optional[Uri] = Field(
+    fixedUri: Optional[fhir.uri] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedUrl: Optional[Url] = Field(
+    fixedUrl: Optional[fhir.url] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedUuid: Optional[Uuid] = Field(
+    fixedUuid: Optional[fhir.uuid] = Field(
         description="Value must be exactly this",
         default=None,
     )
@@ -1071,83 +1081,83 @@ class ElementDefinition(BackboneType):
         description="Value must be exactly this",
         default=None,
     )
-    patternBase64Binary: Optional[Base64Binary] = Field(
+    patternBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternBoolean: Optional[Boolean] = Field(
+    patternBoolean: Optional[fhir.boolean] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternCanonical: Optional[Canonical] = Field(
+    patternCanonical: Optional[fhir.canonical] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternCode: Optional[Code] = Field(
+    patternCode: Optional[fhir.code] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDate: Optional[Date] = Field(
+    patternDate: Optional[fhir.date_] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDateTime: Optional[DateTime] = Field(
+    patternDateTime: Optional[fhir.dateTime] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDecimal: Optional[Decimal] = Field(
+    patternDecimal: Optional[fhir.decimal] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternId: Optional[Id] = Field(
+    patternId: Optional[fhir.id_] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternInstant: Optional[Instant] = Field(
+    patternInstant: Optional[fhir.instant] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternInteger: Optional[Integer] = Field(
+    patternInteger: Optional[fhir.integer] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternInteger64: Optional[Integer64] = Field(
+    patternInteger64: Optional[fhir.integer64] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternMarkdown: Optional[Markdown] = Field(
+    patternMarkdown: Optional[fhir.markdown] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternOid: Optional[Oid] = Field(
+    patternOid: Optional[fhir.oid] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternPositiveInt: Optional[PositiveInt] = Field(
+    patternPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternString: Optional[String] = Field(
+    patternString: Optional[fhir.string] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternTime: Optional[Time] = Field(
+    patternTime: Optional[fhir.time_] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternUnsignedInt: Optional[UnsignedInt] = Field(
+    patternUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternUri: Optional[Uri] = Field(
+    patternUri: Optional[fhir.uri] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternUrl: Optional[Url] = Field(
+    patternUrl: Optional[fhir.url] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternUuid: Optional[Uuid] = Field(
+    patternUuid: Optional[fhir.uuid] = Field(
         description="Value must have at least these property values",
         default=None,
     )
@@ -1291,39 +1301,39 @@ class ElementDefinition(BackboneType):
         description="Example value (as defined for type)",
         default=None,
     )
-    minValueDate: Optional[Date] = Field(
+    minValueDate: Optional[fhir.date_] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueDateTime: Optional[DateTime] = Field(
+    minValueDateTime: Optional[fhir.dateTime] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueInstant: Optional[Instant] = Field(
+    minValueInstant: Optional[fhir.instant] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueTime: Optional[Time] = Field(
+    minValueTime: Optional[fhir.time_] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueDecimal: Optional[Decimal] = Field(
+    minValueDecimal: Optional[fhir.decimal] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueInteger: Optional[Integer] = Field(
+    minValueInteger: Optional[fhir.integer] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueInteger64: Optional[Integer64] = Field(
+    minValueInteger64: Optional[fhir.integer64] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValuePositiveInt: Optional[PositiveInt] = Field(
+    minValuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueUnsignedInt: Optional[UnsignedInt] = Field(
+    minValueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
@@ -1331,39 +1341,39 @@ class ElementDefinition(BackboneType):
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    maxValueDate: Optional[Date] = Field(
+    maxValueDate: Optional[fhir.date_] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueDateTime: Optional[DateTime] = Field(
+    maxValueDateTime: Optional[fhir.dateTime] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueInstant: Optional[Instant] = Field(
+    maxValueInstant: Optional[fhir.instant] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueTime: Optional[Time] = Field(
+    maxValueTime: Optional[fhir.time_] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueDecimal: Optional[Decimal] = Field(
+    maxValueDecimal: Optional[fhir.decimal] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueInteger: Optional[Integer] = Field(
+    maxValueInteger: Optional[fhir.integer] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueInteger64: Optional[Integer64] = Field(
+    maxValueInteger64: Optional[fhir.integer64] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValuePositiveInt: Optional[PositiveInt] = Field(
+    maxValuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueUnsignedInt: Optional[UnsignedInt] = Field(
+    maxValueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
@@ -1371,11 +1381,11 @@ class ElementDefinition(BackboneType):
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxLength: Optional[Integer] = Field(
+    maxLength: Optional[fhir.integer] = Field(
         description="Max length for string type data",
         default=None,
     )
-    condition: Optional[List[Id]] = Field(
+    condition: Optional[List[fhir.id_]] = Field(
         description="Reference to invariant about presence",
         default=None,
     )
@@ -1383,27 +1393,27 @@ class ElementDefinition(BackboneType):
         description="Condition that must evaluate to True",
         default=None,
     )
-    mustHaveValue: Optional[Boolean] = Field(
+    mustHaveValue: Optional[fhir.boolean] = Field(
         description="For primitives, that a value must be present - not replaced by an extension",
         default=None,
     )
-    valueAlternatives: Optional[List[Canonical]] = Field(
+    valueAlternatives: Optional[List[fhir.canonical]] = Field(
         description="Extensions that are allowed to replace a primitive value",
         default=None,
     )
-    mustSupport: Optional[Boolean] = Field(
+    mustSupport: Optional[fhir.boolean] = Field(
         description="If the element must be supported (discouraged - see obligations)",
         default=None,
     )
-    isModifier: Optional[Boolean] = Field(
+    isModifier: Optional[fhir.boolean] = Field(
         description="If this modifies the meaning of other elements",
         default=None,
     )
-    isModifierReason: Optional[String] = Field(
+    isModifierReason: Optional[fhir.string] = Field(
         description="Reason that this element is marked as a modifier",
         default=None,
     )
-    isSummary: Optional[Boolean] = Field(
+    isSummary: Optional[fhir.boolean] = Field(
         description="Include when _summary = True?",
         default=None,
     )
@@ -1533,26 +1543,26 @@ class ElementDefinition(BackboneType):
         return validate_type_choice_element(
             self,
             field_types=[
-                "Base64Binary",
-                "Boolean",
-                "Canonical",
-                "Code",
-                "Date",
-                "DateTime",
-                "Decimal",
-                "Id",
-                "Instant",
-                "Integer",
-                "Integer64",
-                "Markdown",
-                "Oid",
-                "PositiveInt",
-                "String",
-                "Time",
-                "UnsignedInt",
-                "Uri",
-                "Url",
-                "Uuid",
+                "base64Binary",
+                "boolean",
+                "canonical",
+                "code",
+                "date",
+                "dateTime",
+                "decimal",
+                "id_",
+                "instant",
+                "integer",
+                "integer64",
+                "markdown",
+                "oid",
+                "positiveInt",
+                "string",
+                "time",
+                "unsignedInt",
+                "uri",
+                "url",
+                "uuid",
                 "Address",
                 "Age",
                 "Annotation",
@@ -1598,26 +1608,26 @@ class ElementDefinition(BackboneType):
         return validate_type_choice_element(
             self,
             field_types=[
-                "Base64Binary",
-                "Boolean",
-                "Canonical",
-                "Code",
-                "Date",
-                "DateTime",
-                "Decimal",
-                "Id",
-                "Instant",
-                "Integer",
-                "Integer64",
-                "Markdown",
-                "Oid",
-                "PositiveInt",
-                "String",
-                "Time",
-                "UnsignedInt",
-                "Uri",
-                "Url",
-                "Uuid",
+                "base64Binary",
+                "boolean",
+                "canonical",
+                "code",
+                "date",
+                "dateTime",
+                "decimal",
+                "id_",
+                "instant",
+                "integer",
+                "integer64",
+                "markdown",
+                "oid",
+                "positiveInt",
+                "string",
+                "time",
+                "unsignedInt",
+                "uri",
+                "url",
+                "uuid",
                 "Address",
                 "Age",
                 "Annotation",
@@ -1663,26 +1673,26 @@ class ElementDefinition(BackboneType):
         return validate_type_choice_element(
             self,
             field_types=[
-                "Base64Binary",
-                "Boolean",
-                "Canonical",
-                "Code",
-                "Date",
-                "DateTime",
-                "Decimal",
-                "Id",
-                "Instant",
-                "Integer",
-                "Integer64",
-                "Markdown",
-                "Oid",
-                "PositiveInt",
-                "String",
-                "Time",
-                "UnsignedInt",
-                "Uri",
-                "Url",
-                "Uuid",
+                "base64Binary",
+                "boolean",
+                "canonical",
+                "code",
+                "date",
+                "dateTime",
+                "decimal",
+                "id_",
+                "instant",
+                "integer",
+                "integer64",
+                "markdown",
+                "oid",
+                "positiveInt",
+                "string",
+                "time",
+                "unsignedInt",
+                "uri",
+                "url",
+                "uuid",
                 "Address",
                 "Age",
                 "Annotation",
@@ -1728,15 +1738,15 @@ class ElementDefinition(BackboneType):
         return validate_type_choice_element(
             self,
             field_types=[
-                "Date",
-                "DateTime",
-                "Instant",
-                "Time",
-                "Decimal",
-                "Integer",
-                "Integer64",
-                "PositiveInt",
-                "UnsignedInt",
+                "date",
+                "dateTime",
+                "instant",
+                "time",
+                "decimal",
+                "integer",
+                "integer64",
+                "positiveInt",
+                "unsignedInt",
                 "Quantity",
             ],
             field_name_base="minValue",
@@ -1749,15 +1759,15 @@ class ElementDefinition(BackboneType):
         return validate_type_choice_element(
             self,
             field_types=[
-                "Date",
-                "DateTime",
-                "Instant",
-                "Time",
-                "Decimal",
-                "Integer",
-                "Integer64",
-                "PositiveInt",
-                "UnsignedInt",
+                "date",
+                "dateTime",
+                "instant",
+                "time",
+                "decimal",
+                "integer",
+                "integer64",
+                "positiveInt",
+                "unsignedInt",
                 "Quantity",
             ],
             field_name_base="maxValue",

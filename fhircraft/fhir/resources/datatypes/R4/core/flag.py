@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -18,6 +18,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class Flag(DomainResource):
     """
@@ -44,7 +45,7 @@ class Flag(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
     )
@@ -61,7 +62,7 @@ class Flag(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period when flag is active",
+        description="time period when flag is active",
         default=None,
     )
     encounter: Optional[Reference] = Field(

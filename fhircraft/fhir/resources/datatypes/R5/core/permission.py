@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -41,7 +41,7 @@ class PermissionRuleDataResource(BackboneElement):
     Explicit FHIR Resource references.
     """
 
-    meaning: Optional[Code] = Field(
+    meaning: Optional[fhir.code] = Field(
         description="instance | related | dependents | authoredby",
         default=None,
     )
@@ -95,7 +95,7 @@ class PermissionRule(BackboneElement):
     A set of rules.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="deny | permit",
         default=None,
     )
@@ -121,7 +121,7 @@ class Permission(DomainResource):
     _type = "Permission"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Permission"
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | entered-in-error | draft | rejected",
         default=None,
     )
@@ -129,7 +129,7 @@ class Permission(DomainResource):
         description="The person or entity that asserts the permission",
         default=None,
     )
-    date: Optional[ListType[DateTime]] = Field(
+    date: Optional[ListType[fhir.dateTime]] = Field(
         description="The date that permission was asserted",
         default=None,
     )
@@ -141,7 +141,7 @@ class Permission(DomainResource):
         description="The asserted justification for using the data",
         default=None,
     )
-    combining: Optional[Code] = Field(
+    combining: Optional[fhir.code] = Field(
         description="deny-overrides | permit-overrides | ordered-deny-overrides | ordered-permit-overrides | deny-unless-permit | permit-unless-deny",
         default=None,
     )

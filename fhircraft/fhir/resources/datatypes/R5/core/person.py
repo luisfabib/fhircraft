@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -33,7 +33,7 @@ class PersonCommunication(BackboneElement):
         description="The language which can be used to communicate with the person about his or her health",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
         default=None,
     )
@@ -47,7 +47,7 @@ class PersonLink(BackboneElement):
         description="The resource to which this actual person is associated",
         default=None,
     )
-    assurance: Optional[Code] = Field(
+    assurance: Optional[fhir.code] = Field(
         description="level1 | level2 | level3 | level4",
         default=None,
     )
@@ -65,7 +65,7 @@ class Person(DomainResource):
         description="A human identifier for this person",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="This person\u0027s record is in active use",
         default=None,
     )
@@ -77,19 +77,19 @@ class Person(DomainResource):
         description="A contact detail for the person",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date on which the person was born",
         default=None,
     )
-    deceasedBoolean: Optional[Boolean] = Field(
+    deceasedBoolean: Optional[fhir.boolean] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
-    deceasedDateTime: Optional[DateTime] = Field(
+    deceasedDateTime: Optional[fhir.dateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
@@ -129,7 +129,7 @@ class Person(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, DateTime],
+            field_types=[fhir.boolean, fhir.dateTime],
             field_name_base="deceased",
             required=False,
         )

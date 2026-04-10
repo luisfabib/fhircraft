@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,56 +24,59 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CodeSystemFilter(BackboneElement):
     """
     A filter that can be used in a value set compose statement when selecting concepts using a filter.
     """
 
-    code: Optional[Code] = Field(
-        description="Code that identifies the filter",
+    code: Optional[fhir.code] = Field(
+        description="code that identifies the filter",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="How or why the filter is used",
         default=None,
     )
-    operator: Optional[ListType[Code]] = Field(
+    operator: Optional[ListType[fhir.code]] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="What to use for the value",
         default=None,
     )
+
 
 class CodeSystemProperty(BackboneElement):
     """
     A property defines an additional slot through which additional information can be provided about a concept.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Identifies the property on the concepts, and when referred to in operations",
         default=None,
     )
-    uri: Optional[Uri] = Field(
+    uri: Optional[fhir.uri] = Field(
         description="Formal identifier for the property",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why the property is defined, and/or what it conveys",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="code | Coding | string | integer | boolean | dateTime | decimal",
         default=None,
     )
+
 
 class CodeSystemConceptDesignation(BackboneElement):
     """
     Additional representations for the concept - other languages, aliases, specialized purposes, used for particular purposes, etc.
     """
 
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="Human language of the designation",
         default=None,
     )
@@ -86,21 +89,22 @@ class CodeSystemConceptDesignation(BackboneElement):
         description="Additional ways how this designation would be used",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The text value for this designation",
         default=None,
     )
+
 
 class CodeSystemConceptProperty(BackboneElement):
     """
     A property value for this concept.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Reference to CodeSystem.property.code",
         default=None,
     )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Value of the property for this concept",
         default=None,
     )
@@ -108,23 +112,23 @@ class CodeSystemConceptProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Value of the property for this concept",
         default=None,
     )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Value of the property for this concept",
         default=None,
     )
@@ -140,25 +144,34 @@ class CodeSystemConceptProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Code, Coding, String, Integer, Boolean, DateTime, Decimal],
+            field_types=[
+                fhir.Code,
+                Coding,
+                fhir.String,
+                fhir.Integer,
+                fhir.Boolean,
+                fhir.DateTime,
+                fhir.Decimal,
+            ],
             field_name_base="value",
             required=True,
         )
+
 
 class CodeSystemConcept(BackboneElement):
     """
     Concepts that are in the code system. The concept definitions are inherently hierarchical, but the definitions must be consulted to determine what the meanings of the hierarchical relationships are.
     """
 
-    code: Optional[Code] = Field(
-        description="Code that identifies concept",
+    code: Optional[fhir.code] = Field(
+        description="code that identifies concept",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Text to display to the user",
         default=None,
     )
-    definition: Optional[String] = Field(
+    definition: Optional[fhir.string] = Field(
         description="Formal definition",
         default=None,
     )
@@ -176,6 +189,7 @@ class CodeSystemConcept(BackboneElement):
         default=None,
     )
 
+
 class CodeSystem(DomainResource):
     """
     The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
@@ -185,19 +199,19 @@ class CodeSystem(DomainResource):
     _type = "CodeSystem"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CodeSystem"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this code system, represented as a URI (globally unique) (Coding.system)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this code system, represented as a URI (globally unique) (Coding.system)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the code system (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the code system (Coding.version)",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -205,27 +219,27 @@ class CodeSystem(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this code system (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this code system (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -233,7 +247,7 @@ class CodeSystem(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the code system",
         default=None,
     )
@@ -245,23 +259,23 @@ class CodeSystem(DomainResource):
         description="Intended jurisdiction for code system (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this code system is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the CodeSystem was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the CodeSystem was last reviewed by the publisher",
         default=None,
     )
@@ -293,35 +307,35 @@ class CodeSystem(DomainResource):
         description="Additional documentation, citations, etc",
         default=None,
     )
-    caseSensitive: Optional[Boolean] = Field(
+    caseSensitive: Optional[fhir.boolean] = Field(
         description="If code comparison is case sensitive",
         default=None,
     )
-    valueSet: Optional[Canonical] = Field(
-        description="Canonical reference to the value set with entire code system",
+    valueSet: Optional[fhir.canonical] = Field(
+        description="canonical reference to the value set with entire code system",
         default=None,
     )
-    hierarchyMeaning: Optional[Code] = Field(
+    hierarchyMeaning: Optional[fhir.code] = Field(
         description="grouped-by | is-a | part-of | classified-with",
         default=None,
     )
-    compositional: Optional[Boolean] = Field(
+    compositional: Optional[fhir.boolean] = Field(
         description="If code system defines a compositional grammar",
         default=None,
     )
-    versionNeeded: Optional[Boolean] = Field(
+    versionNeeded: Optional[fhir.boolean] = Field(
         description="If definitions are not stable",
         default=None,
     )
-    content: Optional[Code] = Field(
+    content: Optional[fhir.code] = Field(
         description="not-present | example | fragment | complete | supplement",
         default=None,
     )
-    supplements: Optional[Canonical] = Field(
-        description="Canonical URL of Code System this adds designations and properties to",
+    supplements: Optional[fhir.canonical] = Field(
+        description="canonical URL of code System this adds designations and properties to",
         default=None,
     )
-    count: Optional[UnsignedInt] = Field(
+    count: Optional[fhir.unsignedInt] = Field(
         description="Total concepts in the code system",
         default=None,
     )
@@ -361,7 +375,7 @@ class CodeSystem(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

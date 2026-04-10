@@ -4,7 +4,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Identifier,
@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .domain_resource import DomainResource
 
+
 class AccountCoverage(BackboneElement):
     """
     The party(s) that are responsible for covering the payment of this account, and what order should they be applied to the account.
@@ -26,10 +27,11 @@ class AccountCoverage(BackboneElement):
         description="The party(s), such as insurances, that may contribute to the payment of this account",
         default=None,
     )
-    priority: Optional[PositiveInt] = Field(
+    priority: Optional[fhir.positiveInt] = Field(
         description="The priority of the coverage in the context of this account",
         default=None,
     )
+
 
 class AccountGuarantor(BackboneElement):
     """
@@ -40,7 +42,7 @@ class AccountGuarantor(BackboneElement):
         description="Responsible entity",
         default=None,
     )
-    onHold: Optional[Boolean] = Field(
+    onHold: Optional[fhir.boolean] = Field(
         description="Credit or other hold applied",
         default=None,
     )
@@ -49,12 +51,13 @@ class AccountGuarantor(BackboneElement):
         default=None,
     )
 
+
 class AccountDiagnosis(BackboneElement):
     """
     When using an account for billing a specific Encounter the set of diagnoses that are relevant for billing are stored here on the account where they are able to be sequenced appropriately prior to processing to produce claim(s).
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Ranking of the diagnosis (for each type)",
         default=None,
     )
@@ -62,7 +65,7 @@ class AccountDiagnosis(BackboneElement):
         description="The diagnosis relevant to the account",
         default=None,
     )
-    dateOfDiagnosis: Optional[DateTime] = Field(
+    dateOfDiagnosis: Optional[fhir.dateTime] = Field(
         description="Date of the diagnosis (when coded diagnosis)",
         default=None,
     )
@@ -70,21 +73,22 @@ class AccountDiagnosis(BackboneElement):
         description="Type that this diagnosis has relevant to the account (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-    onAdmission: Optional[Boolean] = Field(
+    onAdmission: Optional[fhir.boolean] = Field(
         description="Diagnosis present on Admission",
         default=None,
     )
     packageCode: Optional[ListType[CodeableConcept]] = Field(
-        description="Package Code specific for billing",
+        description="Package code specific for billing",
         default=None,
     )
+
 
 class AccountProcedure(BackboneElement):
     """
     When using an account for billing a specific Encounter the set of procedures that are relevant for billing are stored here on the account where they are able to be sequenced appropriately prior to processing to produce claim(s).
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Ranking of the procedure (for each type)",
         default=None,
     )
@@ -92,7 +96,7 @@ class AccountProcedure(BackboneElement):
         description="The procedure relevant to the account",
         default=None,
     )
-    dateOfService: Optional[DateTime] = Field(
+    dateOfService: Optional[fhir.dateTime] = Field(
         description="Date of the procedure (when coded procedure)",
         default=None,
     )
@@ -101,13 +105,14 @@ class AccountProcedure(BackboneElement):
         default=None,
     )
     packageCode: Optional[ListType[CodeableConcept]] = Field(
-        description="Package Code specific for billing",
+        description="Package code specific for billing",
         default=None,
     )
     device: Optional[ListType[Reference]] = Field(
         description="Any devices that were associated with the procedure",
         default=None,
     )
+
 
 class AccountRelatedAccount(BackboneElement):
     """
@@ -122,6 +127,7 @@ class AccountRelatedAccount(BackboneElement):
         description="Reference to an associated Account",
         default=None,
     )
+
 
 class AccountBalance(BackboneElement):
     """
@@ -138,7 +144,7 @@ class AccountBalance(BackboneElement):
         description="current | 30 | 60 | 90 | 120",
         default=None,
     )
-    estimate: Optional[Boolean] = Field(
+    estimate: Optional[fhir.boolean] = Field(
         description="Estimated balance",
         default=None,
     )
@@ -146,6 +152,7 @@ class AccountBalance(BackboneElement):
         description="Calculated amount",
         default=None,
     )
+
 
 class Account(DomainResource):
     """
@@ -160,7 +167,7 @@ class Account(DomainResource):
         description="Account number",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error | on-hold | unknown",
         default=None,
     )
@@ -172,7 +179,7 @@ class Account(DomainResource):
         description="E.g. patient, expense, depreciation",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human-readable label",
         default=None,
     )
@@ -192,7 +199,7 @@ class Account(DomainResource):
         description="Entity managing the Account",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Explanation of purpose/use",
         default=None,
     )
@@ -220,8 +227,8 @@ class Account(DomainResource):
         description="Calculated account balance(s)",
         default=None,
     )
-    calculatedAt: Optional[Instant] = Field(
-        description="Time the balance amount was calculated",
+    calculatedAt: Optional[fhir.instant] = Field(
+        description="time the balance amount was calculated",
         default=None,
     )
 

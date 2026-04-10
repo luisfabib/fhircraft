@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -24,23 +24,25 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RiskEvidenceSynthesisSampleSize(BackboneElement):
     """
     A description of the size of the sample involved in the synthesis.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of sample size",
         default=None,
     )
-    numberOfStudies: Optional[Integer] = Field(
+    numberOfStudies: Optional[fhir.integer] = Field(
         description="How many studies?",
         default=None,
     )
-    numberOfParticipants: Optional[Integer] = Field(
+    numberOfParticipants: Optional[fhir.integer] = Field(
         description="How many participants?",
         default=None,
     )
+
 
 class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate(BackboneElement):
     """
@@ -51,26 +53,27 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate(BackboneElement):
         description="Type of precision estimate",
         default=None,
     )
-    level: Optional[Decimal] = Field(
+    level: Optional[fhir.decimal] = Field(
         description="Level of confidence interval",
         default=None,
     )
-    from_: Optional[Decimal] = Field(
+    from_: Optional[fhir.decimal] = Field(
         description="Lower bound",
         default=None,
         alias="from",
     )
-    to: Optional[Decimal] = Field(
+    to: Optional[fhir.decimal] = Field(
         description="Upper bound",
         default=None,
     )
+
 
 class RiskEvidenceSynthesisRiskEstimate(BackboneElement):
     """
     The estimated risk of the outcome.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of risk estimate",
         default=None,
     )
@@ -78,7 +81,7 @@ class RiskEvidenceSynthesisRiskEstimate(BackboneElement):
         description="Type of risk estimate",
         default=None,
     )
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Point estimate",
         default=None,
     )
@@ -86,11 +89,11 @@ class RiskEvidenceSynthesisRiskEstimate(BackboneElement):
         description="What unit is the outcome described in?",
         default=None,
     )
-    denominatorCount: Optional[Integer] = Field(
+    denominatorCount: Optional[fhir.integer] = Field(
         description="Sample size for group measured",
         default=None,
     )
-    numeratorCount: Optional[Integer] = Field(
+    numeratorCount: Optional[fhir.integer] = Field(
         description="Number with the outcome",
         default=None,
     )
@@ -100,6 +103,7 @@ class RiskEvidenceSynthesisRiskEstimate(BackboneElement):
         description="How precise the estimate is",
         default=None,
     )
+
 
 class RiskEvidenceSynthesisCertaintyCertaintySubcomponent(BackboneElement):
     """
@@ -118,6 +122,7 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent(BackboneElement):
         description="Used for footnotes or explanatory notes",
         default=None,
     )
+
 
 class RiskEvidenceSynthesisCertainty(BackboneElement):
     """
@@ -138,6 +143,7 @@ class RiskEvidenceSynthesisCertainty(BackboneElement):
         description="A component that contributes to the overall certainty",
         default=None,
     )
+
 
 class RiskEvidenceSynthesis(DomainResource):
     """
@@ -160,35 +166,35 @@ class RiskEvidenceSynthesis(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this risk evidence synthesis, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this risk evidence synthesis, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the risk evidence synthesis",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the risk evidence synthesis",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this risk evidence synthesis (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this risk evidence synthesis (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -196,7 +202,7 @@ class RiskEvidenceSynthesis(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the risk evidence synthesis",
         default=None,
     )
@@ -212,15 +218,15 @@ class RiskEvidenceSynthesis(DomainResource):
         description="Intended jurisdiction for risk evidence synthesis (if applicable)",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the risk evidence synthesis was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the risk evidence synthesis was last reviewed",
         default=None,
     )

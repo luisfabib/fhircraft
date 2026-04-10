@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -26,6 +26,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
     """
@@ -57,6 +58,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
             required=True,
         )
 
+
 class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     """
     The specimen's container.
@@ -74,7 +76,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Color of container cap",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The description of the kind of container",
         default=None,
     )
@@ -86,7 +88,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Minimum volume",
         default=None,
     )
-    minimumVolumeString: Optional[String] = Field(
+    minimumVolumeString: Optional[fhir.string] = Field(
         description="Minimum volume",
         default=None,
     )
@@ -94,7 +96,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Additive associated with container",
         default=None,
     )
-    preparation: Optional[Markdown] = Field(
+    preparation: Optional[fhir.markdown] = Field(
         description="Special processing applied to the container for this specimen type",
         default=None,
     )
@@ -110,10 +112,11 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     def minimumVolume_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, String],
+            field_types=[Quantity, fhir.string],
             field_name_base="minimumVolume",
             required=False,
         )
+
 
 class SpecimenDefinitionTypeTestedHandling(BackboneElement):
     """
@@ -132,17 +135,18 @@ class SpecimenDefinitionTypeTestedHandling(BackboneElement):
         description="Maximum preservation time",
         default=None,
     )
-    instruction: Optional[Markdown] = Field(
+    instruction: Optional[fhir.markdown] = Field(
         description="Preservation instruction",
         default=None,
     )
+
 
 class SpecimenDefinitionTypeTested(BackboneElement):
     """
     Specimen conditioned in a container as expected by the testing laboratory.
     """
 
-    isDerived: Optional[Boolean] = Field(
+    isDerived: Optional[fhir.boolean] = Field(
         description="Primary or secondary specimen",
         default=None,
     )
@@ -150,7 +154,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Type of intended specimen",
         default=None,
     )
-    preference: Optional[Code] = Field(
+    preference: Optional[fhir.code] = Field(
         description="preferred | alternate",
         default=None,
     )
@@ -158,7 +162,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="The specimen\u0027s container",
         default=None,
     )
-    requirement: Optional[Markdown] = Field(
+    requirement: Optional[fhir.markdown] = Field(
         description="Requirements for specimen delivery and special handling",
         default=None,
     )
@@ -166,7 +170,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="The usual time for retaining this kind of specimen",
         default=None,
     )
-    singleUse: Optional[Boolean] = Field(
+    singleUse: Optional[fhir.boolean] = Field(
         description="Specimen for single use only",
         default=None,
     )
@@ -183,6 +187,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         default=None,
     )
 
+
 class SpecimenDefinition(DomainResource):
     """
     A kind of specimen with associated set of requirements.
@@ -192,7 +197,7 @@ class SpecimenDefinition(DomainResource):
     _type = "SpecimenDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SpecimenDefinition"
 
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Logical canonical URL to reference this SpecimenDefinition (globally unique)",
         default=None,
     )
@@ -200,11 +205,11 @@ class SpecimenDefinition(DomainResource):
         description="Business identifier",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the SpecimenDefinition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -212,27 +217,27 @@ class SpecimenDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this {{title}} (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this SpecimenDefinition (Human friendly)",
         default=None,
     )
-    derivedFromCanonical: Optional[ListType[Canonical]] = Field(
+    derivedFromCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Based on FHIR definition of another SpecimenDefinition",
         default=None,
     )
-    derivedFromUri: Optional[ListType[Uri]] = Field(
+    derivedFromUri: Optional[ListType[fhir.uri]] = Field(
         description="Based on external definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="If this SpecimenDefinition is not for real usage",
         default=None,
     )
@@ -244,11 +249,11 @@ class SpecimenDefinition(DomainResource):
         description="Type of subject for specimen collection",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date status first applied",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="The name of the individual or organization that published the SpecimenDefinition",
         default=None,
     )
@@ -256,7 +261,7 @@ class SpecimenDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the SpecimenDefinition",
         default=None,
     )
@@ -268,23 +273,23 @@ class SpecimenDefinition(DomainResource):
         description="Intended jurisdiction for this SpecimenDefinition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this SpecimenDefinition is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When SpecimenDefinition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="The date on which the asset content was last reviewed by the publisher",
         default=None,
     )
@@ -300,8 +305,8 @@ class SpecimenDefinition(DomainResource):
         description="Patient preparation for collection",
         default=None,
     )
-    timeAspect: Optional[String] = Field(
-        description="Time aspect for collection",
+    timeAspect: Optional[fhir.string] = Field(
+        description="time aspect for collection",
         default=None,
     )
     collection: Optional[ListType[CodeableConcept]] = Field(
@@ -331,7 +336,7 @@ class SpecimenDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

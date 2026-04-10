@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class HealthcareServiceEligibility(BackboneElement):
     """
     Does this service have specific eligibility requirements that need to be met in order to use the service?
@@ -32,10 +33,11 @@ class HealthcareServiceEligibility(BackboneElement):
         description="Coded value for the eligibility",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Describes the eligibility conditions for the service",
         default=None,
     )
+
 
 class HealthcareService(DomainResource):
     """
@@ -50,7 +52,7 @@ class HealthcareService(DomainResource):
         description="External identifiers for this item",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this HealthcareService record is in active use",
         default=None,
     )
@@ -78,15 +80,15 @@ class HealthcareService(DomainResource):
         description="Location(s) where service may be provided",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Description of service as presented to a consumer while searching",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Additional description and/or any specific issues not covered elsewhere",
         default=None,
     )
-    extraDetails: Optional[Markdown] = Field(
+    extraDetails: Optional[fhir.markdown] = Field(
         description="Extra details about the service that can\u0027t be placed in the other fields",
         default=None,
     )
@@ -126,7 +128,7 @@ class HealthcareService(DomainResource):
         description="Ways that the service accepts referrals",
         default=None,
     )
-    appointmentRequired: Optional[Boolean] = Field(
+    appointmentRequired: Optional[fhir.boolean] = Field(
         description="If an appointment is required for access to this service",
         default=None,
     )

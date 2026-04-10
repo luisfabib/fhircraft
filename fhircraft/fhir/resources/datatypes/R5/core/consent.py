@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ConsentPolicyBasis(BackboneElement):
     """
     A Reference or URL used to uniquely identify the policy the organization will enforce for this Consent. This Reference or URL should be specific to the version of the policy and should be dereferencable to a computable policy of some form.
@@ -33,17 +34,18 @@ class ConsentPolicyBasis(BackboneElement):
         description="Reference backing policy resource",
         default=None,
     )
-    url: Optional[Url] = Field(
+    url: Optional[fhir.url] = Field(
         description="URL to a computable backing policy",
         default=None,
     )
+
 
 class ConsentVerification(BackboneElement):
     """
     Whether a treatment instruction (e.g. artificial respiration: yes or no) was verified with the patient, his/her family or another authorized person.
     """
 
-    verified: Optional[Boolean] = Field(
+    verified: Optional[fhir.boolean] = Field(
         description="Has been verified",
         default=None,
     )
@@ -59,10 +61,11 @@ class ConsentVerification(BackboneElement):
         description="Person who verified",
         default=None,
     )
-    verificationDate: Optional[ListType[DateTime]] = Field(
+    verificationDate: Optional[ListType[fhir.dateTime]] = Field(
         description="When consent verified",
         default=None,
     )
+
 
 class ConsentProvisionActor(BackboneElement):
     """
@@ -78,12 +81,13 @@ class ConsentProvisionActor(BackboneElement):
         default=None,
     )
 
+
 class ConsentProvisionData(BackboneElement):
     """
     The resources controlled by this provision if specific resources are referenced.
     """
 
-    meaning: Optional[Code] = Field(
+    meaning: Optional[fhir.code] = Field(
         description="instance | related | dependents | authoredby",
         default=None,
     )
@@ -91,6 +95,7 @@ class ConsentProvisionData(BackboneElement):
         description="The actual data reference",
         default=None,
     )
+
 
 class ConsentProvision(BackboneElement):
     """
@@ -142,6 +147,7 @@ class ConsentProvision(BackboneElement):
         default=None,
     )
 
+
 class Consent(DomainResource):
     """
     A record of a healthcare consumer’s  choices  or choices made on their behalf by a third party, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
@@ -155,7 +161,7 @@ class Consent(DomainResource):
         description="Identifier for this record (external references)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | inactive | not-done | entered-in-error | unknown",
         default=None,
     )
@@ -167,7 +173,7 @@ class Consent(DomainResource):
         description="Who the consent applies to",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Fully executed date of the consent",
         default=None,
     )
@@ -215,7 +221,7 @@ class Consent(DomainResource):
         description="Consent Verified by patient or family",
         default=None,
     )
-    decision: Optional[Code] = Field(
+    decision: Optional[fhir.code] = Field(
         description="deny | permit",
         default=None,
     )

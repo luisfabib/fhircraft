@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicationStatementAdherence(BackboneElement):
     """
     Indicates whether the medication is or is not being consumed or administered.
@@ -38,6 +39,7 @@ class MedicationStatementAdherence(BackboneElement):
         description="Details of the reason for the current use of the medication",
         default=None,
     )
+
 
 class MedicationStatement(DomainResource):
     """
@@ -58,7 +60,7 @@ class MedicationStatement(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="recorded | entered-in-error | draft",
         default=None,
     )
@@ -78,7 +80,7 @@ class MedicationStatement(DomainResource):
         description="Encounter associated with MedicationStatement",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,
     )
@@ -90,7 +92,7 @@ class MedicationStatement(DomainResource):
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,
     )
-    dateAsserted: Optional[DateTime] = Field(
+    dateAsserted: Optional[fhir.dateTime] = Field(
         description="When the usage was asserted?",
         default=None,
     )
@@ -114,7 +116,7 @@ class MedicationStatement(DomainResource):
         description="Link to information relevant to the usage of a medication",
         default=None,
     )
-    renderedDosageInstruction: Optional[Markdown] = Field(
+    renderedDosageInstruction: Optional[fhir.markdown] = Field(
         description="Full representation of the dosage instructions",
         default=None,
     )
@@ -138,7 +140,7 @@ class MedicationStatement(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="effective",
             required=False,
         )

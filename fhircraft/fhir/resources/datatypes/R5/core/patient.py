@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -46,7 +46,7 @@ class PatientContact(BackboneElement):
         description="Address for the contact person",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
@@ -68,7 +68,7 @@ class PatientCommunication(BackboneElement):
         description="The language which can be used to communicate with the patient about his or her health",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
         default=None,
     )
@@ -82,7 +82,7 @@ class PatientLink(BackboneElement):
         description="The other patient or related person resource that the link refers to",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="replaced-by | replaces | refer | seealso",
         default=None,
     )
@@ -100,7 +100,7 @@ class Patient(DomainResource):
         description="An identifier for this patient",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this patient\u0027s record is in active use",
         default=None,
     )
@@ -112,19 +112,19 @@ class Patient(DomainResource):
         description="A contact detail for the individual",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date of birth for the individual",
         default=None,
     )
-    deceasedBoolean: Optional[Boolean] = Field(
+    deceasedBoolean: Optional[fhir.boolean] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
-    deceasedDateTime: Optional[DateTime] = Field(
+    deceasedDateTime: Optional[fhir.dateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
@@ -136,11 +136,11 @@ class Patient(DomainResource):
         description="Marital (civil) status of a patient",
         default=None,
     )
-    multipleBirthBoolean: Optional[Boolean] = Field(
+    multipleBirthBoolean: Optional[fhir.boolean] = Field(
         description="Whether patient is part of a multiple birth",
         default=None,
     )
-    multipleBirthInteger: Optional[Integer] = Field(
+    multipleBirthInteger: Optional[fhir.integer] = Field(
         description="Whether patient is part of a multiple birth",
         default=None,
     )
@@ -187,7 +187,7 @@ class Patient(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, DateTime],
+            field_types=[fhir.boolean, fhir.dateTime],
             field_name_base="deceased",
             required=False,
         )
@@ -196,7 +196,7 @@ class Patient(DomainResource):
     def multipleBirth_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Integer],
+            field_types=[fhir.boolean, fhir.integer],
             field_name_base="multipleBirth",
             required=False,
         )

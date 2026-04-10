@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class ProcedurePerformer(BackboneElement):
     """
@@ -48,6 +49,7 @@ class ProcedurePerformer(BackboneElement):
         default=None,
     )
 
+
 class ProcedureFocalDevice(BackboneElement):
     """
     A device that is implanted, removed or otherwise manipulated (calibration, battery replacement, fitting a prosthesis, attaching a wound-vac, etc.) as a focal portion of the Procedure.
@@ -62,6 +64,7 @@ class ProcedureFocalDevice(BackboneElement):
         default=None,
     )
 
+
 class Procedure(DomainResource):
     """
     An action that is or was performed on or for a patient, practitioner, device, organization, or location. For example, this can be a physical intervention on a patient like an operation, or less invasive like long term services, counseling, or hypnotherapy.  This can be a quality or safety inspection for a location, organization, or device.  This can be an accreditation procedure on a practitioner for licensing.
@@ -75,11 +78,11 @@ class Procedure(DomainResource):
         description="External Identifiers for this procedure",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -91,7 +94,7 @@ class Procedure(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
@@ -119,7 +122,7 @@ class Procedure(DomainResource):
         description="The Encounter during which this Procedure was created",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the procedure occurred or is occurring",
         default=None,
     )
@@ -127,7 +130,7 @@ class Procedure(DomainResource):
         description="When the procedure occurred or is occurring",
         default=None,
     )
-    occurrenceString: Optional[String] = Field(
+    occurrenceString: Optional[fhir.string] = Field(
         description="When the procedure occurred or is occurring",
         default=None,
     )
@@ -143,7 +146,7 @@ class Procedure(DomainResource):
         description="When the procedure occurred or is occurring",
         default=None,
     )
-    recorded: Optional[DateTime] = Field(
+    recorded: Optional[fhir.dateTime] = Field(
         description="When the procedure was first captured in the subject\u0027s record",
         default=None,
     )
@@ -151,7 +154,7 @@ class Procedure(DomainResource):
         description="Who recorded the procedure",
         default=None,
     )
-    reportedBoolean: Optional[Boolean] = Field(
+    reportedBoolean: Optional[fhir.boolean] = Field(
         description="Reported rather than primary record",
         default=None,
     )
@@ -226,7 +229,7 @@ class Procedure(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, String, Age, Range, Timing],
+            field_types=[fhir.dateTime, Period, fhir.string, Age, Range, Timing],
             field_name_base="occurrence",
             required=False,
         )
@@ -235,7 +238,7 @@ class Procedure(DomainResource):
     def reported_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Reference],
+            field_types=[fhir.boolean, Reference],
             field_name_base="reported",
             required=False,
         )

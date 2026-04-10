@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class SupplyRequestParameter(BackboneElement):
     """
@@ -44,7 +45,7 @@ class SupplyRequestParameter(BackboneElement):
         description="Value of detail",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of detail",
         default=None,
     )
@@ -60,10 +61,11 @@ class SupplyRequestParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Range, Boolean],
+            field_types=[CodeableConcept, Quantity, Range, fhir.boolean],
             field_name_base="value",
             required=False,
         )
+
 
 class SupplyRequest(DomainResource):
     """
@@ -90,7 +92,7 @@ class SupplyRequest(DomainResource):
         description="Business Identifier for SupplyRequest",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | suspended +",
         default=None,
     )
@@ -98,7 +100,7 @@ class SupplyRequest(DomainResource):
         description="The kind of supply (central, non-stock, etc.)",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
@@ -118,7 +120,7 @@ class SupplyRequest(DomainResource):
         description="Ordered item details",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the request should be fulfilled",
         default=None,
     )
@@ -130,7 +132,7 @@ class SupplyRequest(DomainResource):
         description="When the request should be fulfilled",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When the request was made",
         default=None,
     )
@@ -186,7 +188,7 @@ class SupplyRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.dateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

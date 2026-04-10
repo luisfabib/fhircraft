@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -27,7 +27,7 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Information instance identifier",
         default=None,
     )
@@ -35,7 +35,7 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
         description="Data to be provided",
         default=None,
     )
-    appliesToAll: Optional[Boolean] = Field(
+    appliesToAll: Optional[fhir.boolean] = Field(
         description="Applies to all items",
         default=None,
     )
@@ -45,7 +45,7 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
     Financial instruments for reimbursement for the health care products and services.
     """
 
-    focal: Optional[Boolean] = Field(
+    focal: Optional[fhir.boolean] = Field(
         description="Applicable coverage",
         default=None,
     )
@@ -53,7 +53,7 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         description="Insurance information",
         default=None,
     )
-    businessArrangement: Optional[String] = Field(
+    businessArrangement: Optional[fhir.string] = Field(
         description="Additional provider contract number",
         default=None,
     )
@@ -93,7 +93,7 @@ class CoverageEligibilityRequestItem(BackboneElement):
     Service categories or billable services for which benefit details and/or an authorization prior to service delivery may be required by the payor.
     """
 
-    supportingInfoSequence: Optional[ListType[PositiveInt]] = Field(
+    supportingInfoSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable exception or supporting information",
         default=None,
     )
@@ -161,7 +161,7 @@ class CoverageEligibilityRequest(DomainResource):
         description="Business Identifier for coverage eligiblity request",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
@@ -169,7 +169,7 @@ class CoverageEligibilityRequest(DomainResource):
         description="Desired processing priority",
         default=None,
     )
-    purpose: Optional[ListType[Code]] = Field(
+    purpose: Optional[ListType[fhir.code]] = Field(
         description="auth-requirements | benefits | discovery | validation",
         default=None,
     )
@@ -177,7 +177,7 @@ class CoverageEligibilityRequest(DomainResource):
         description="Intended recipient of products and services",
         default=None,
     )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Estimated date or dates of service",
         default=None,
     )
@@ -185,7 +185,7 @@ class CoverageEligibilityRequest(DomainResource):
         description="Estimated date or dates of service",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Creation date",
         default=None,
     )
@@ -231,7 +231,7 @@ class CoverageEligibilityRequest(DomainResource):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.date_, Period],
             field_name_base="serviced",
             required=False,
         )

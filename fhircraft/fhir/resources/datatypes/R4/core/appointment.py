@@ -5,7 +5,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -33,11 +33,11 @@ class AppointmentParticipant(BackboneElement):
         description="Person, Location/HealthcareService or Device",
         default=None,
     )
-    required: Optional[Code] = Field(
+    required: Optional[fhir.code] = Field(
         description="required | optional | information-only",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="accepted | declined | tentative | needs-action",
         default=None,
     )
@@ -71,7 +71,7 @@ class Appointment(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist",
         default=None,
     )
@@ -103,11 +103,11 @@ class Appointment(DomainResource):
         description="Reason the appointment is to take place (resource)",
         default=None,
     )
-    priority: Optional[UnsignedInt] = Field(
+    priority: Optional[fhir.unsignedInt] = Field(
         description="Used to make informed decisions if needing to re-prioritize",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Shown on a subject line in a meeting request, or appointment list",
         default=None,
     )
@@ -115,15 +115,15 @@ class Appointment(DomainResource):
         description="Additional information to support the appointment",
         default=None,
     )
-    start: Optional[Instant] = Field(
+    start: Optional[fhir.instant] = Field(
         description="When appointment is to take place",
         default=None,
     )
-    end: Optional[Instant] = Field(
+    end: Optional[fhir.instant] = Field(
         description="When appointment is to conclude",
         default=None,
     )
-    minutesDuration: Optional[PositiveInt] = Field(
+    minutesDuration: Optional[fhir.positiveInt] = Field(
         description="Can be less than start/end (e.g. estimate)",
         default=None,
     )
@@ -131,15 +131,15 @@ class Appointment(DomainResource):
         description="The slots that this appointment is filling",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="The date that this appointment was initially created",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Additional comments",
         default=None,
     )
-    patientInstruction: Optional[String] = Field(
+    patientInstruction: Optional[fhir.string] = Field(
         description="Detailed information and instructions for the patient",
         default=None,
     )

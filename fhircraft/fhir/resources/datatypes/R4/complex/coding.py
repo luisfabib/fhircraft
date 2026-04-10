@@ -3,8 +3,9 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import Element
+
 
 class Coding(Element):
     """
@@ -13,23 +14,23 @@ class Coding(Element):
 
     _type = "Coding"
 
-    system: Optional[Uri] = Field(
+    system: Optional[fhir.uri] = Field(
         description="Identity of the terminology system",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version of the system - if relevant",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Symbol in syntax defined by the system",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Representation defined by the system",
         default=None,
     )
-    userSelected: Optional[Boolean] = Field(
+    userSelected: Optional[fhir.boolean] = Field(
         description="If this coding was chosen directly by the user",
         default=None,
     )

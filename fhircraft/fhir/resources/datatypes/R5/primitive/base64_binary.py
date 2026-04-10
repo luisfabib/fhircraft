@@ -1,11 +1,11 @@
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field
 
-from fhircraft.fhir.resources.base import FHIRBase64Binary as FHIRBase64BinaryBase
+from fhircraft.fhir.resources.base import Base64BinaryBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 
 
-class FHIRBase64Binary(PrimitiveType, FHIRBase64BinaryBase):
+class Base64Binary(PrimitiveType, Base64BinaryBase):
     """A stream of bytes, base64 encoded."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/base64Binary"
@@ -19,6 +19,6 @@ class FHIRBase64Binary(PrimitiveType, FHIRBase64BinaryBase):
     )
 
 
-Base64Binary = Annotated[
-    str | FHIRBase64Binary, BeforeValidator(FHIRBase64Binary.model_validate)
+base64Binary = Annotated[
+    str | Base64Binary, BeforeValidator(Base64Binary.model_validate)
 ]

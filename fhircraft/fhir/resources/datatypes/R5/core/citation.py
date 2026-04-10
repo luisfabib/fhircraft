@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CitationSummary(BackboneElement):
     """
     A human-readable display of key concepts to represent the citation.
@@ -36,10 +37,11 @@ class CitationSummary(BackboneElement):
         description="Format for display of the citation summary",
         default=None,
     )
-    text: Optional[Markdown] = Field(
+    text: Optional[fhir.markdown] = Field(
         description="The human-readable display of the citation summary",
         default=None,
     )
+
 
 class CitationClassification(BackboneElement):
     """
@@ -55,6 +57,7 @@ class CitationClassification(BackboneElement):
         default=None,
     )
 
+
 class CitationStatusDate(BackboneElement):
     """
     The state or status of the citation record paired with an effective date or period for that state.
@@ -64,7 +67,7 @@ class CitationStatusDate(BackboneElement):
         description="Classification of the status",
         default=None,
     )
-    actual: Optional[Boolean] = Field(
+    actual: Optional[fhir.boolean] = Field(
         description="Either occurred or expected",
         default=None,
     )
@@ -73,12 +76,13 @@ class CitationStatusDate(BackboneElement):
         default=None,
     )
 
+
 class CitationCitedArtifactVersion(BackboneElement):
     """
     The defined version of the cited artifact.
     """
 
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The version number or other version identifier",
         default=None,
     )
@@ -86,6 +90,7 @@ class CitationCitedArtifactVersion(BackboneElement):
         description="Citation for the main version of the cited artifact",
         default=None,
     )
+
 
 class CitationCitedArtifactStatusDate(BackboneElement):
     """
@@ -96,7 +101,7 @@ class CitationCitedArtifactStatusDate(BackboneElement):
         description="Classification of the status",
         default=None,
     )
-    actual: Optional[Boolean] = Field(
+    actual: Optional[fhir.boolean] = Field(
         description="Either occurred or expected",
         default=None,
     )
@@ -104,6 +109,7 @@ class CitationCitedArtifactStatusDate(BackboneElement):
         description="When the status started and/or ended",
         default=None,
     )
+
 
 class CitationCitedArtifactTitle(BackboneElement):
     """
@@ -118,10 +124,11 @@ class CitationCitedArtifactTitle(BackboneElement):
         description="Used to express the specific language",
         default=None,
     )
-    text: Optional[Markdown] = Field(
+    text: Optional[fhir.markdown] = Field(
         description="The title of the article or artifact",
         default=None,
     )
+
 
 class CitationCitedArtifactAbstract(BackboneElement):
     """
@@ -136,14 +143,15 @@ class CitationCitedArtifactAbstract(BackboneElement):
         description="Used to express the specific language",
         default=None,
     )
-    text: Optional[Markdown] = Field(
+    text: Optional[fhir.markdown] = Field(
         description="Abstract content",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Copyright notice for the abstract",
         default=None,
     )
+
 
 class CitationCitedArtifactPart(BackboneElement):
     """
@@ -154,7 +162,7 @@ class CitationCitedArtifactPart(BackboneElement):
         description="The kind of component",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The specification of the component",
         default=None,
     )
@@ -163,12 +171,13 @@ class CitationCitedArtifactPart(BackboneElement):
         default=None,
     )
 
+
 class CitationCitedArtifactRelatesTo(BackboneElement):
     """
     The artifact related to the cited artifact.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as | reprint | reprint-of",
         default=None,
     )
@@ -176,15 +185,15 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="Additional classifiers",
         default=None,
     )
-    label: Optional[String] = Field(
+    label: Optional[fhir.string] = Field(
         description="Short label",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Brief description of the related artifact",
         default=None,
     )
-    citation: Optional[Markdown] = Field(
+    citation: Optional[fhir.markdown] = Field(
         description="Bibliographic citation for the artifact",
         default=None,
     )
@@ -192,7 +201,7 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="What document is being referenced",
         default=None,
     )
-    resource: Optional[Canonical] = Field(
+    resource: Optional[fhir.canonical] = Field(
         description="What artifact is being referenced",
         default=None,
     )
@@ -200,6 +209,7 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="What artifact, if not a conformance resource",
         default=None,
     )
+
 
 class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
     """
@@ -214,7 +224,7 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         description="Journal identifiers include ISSN, ISO Abbreviation and NLMuniqueID; Book identifiers include ISBN",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name of the database or title of the book or journal",
         default=None,
     )
@@ -222,10 +232,11 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         description="Name of or resource describing the publisher",
         default=None,
     )
-    publisherLocation: Optional[String] = Field(
+    publisherLocation: Optional[fhir.string] = Field(
         description="Geographic location of the publisher",
         default=None,
     )
+
 
 class CitationCitedArtifactPublicationForm(BackboneElement):
     """
@@ -240,27 +251,27 @@ class CitationCitedArtifactPublicationForm(BackboneElement):
         description="Internet or Print",
         default=None,
     )
-    volume: Optional[String] = Field(
+    volume: Optional[fhir.string] = Field(
         description="Volume number of journal or other collection in which the article is published",
         default=None,
     )
-    issue: Optional[String] = Field(
+    issue: Optional[fhir.string] = Field(
         description="Issue, part or supplement of journal or other collection in which the article is published",
         default=None,
     )
-    articleDate: Optional[DateTime] = Field(
+    articleDate: Optional[fhir.dateTime] = Field(
         description="The date the article was added to the database, or the date the article was released",
         default=None,
     )
-    publicationDateText: Optional[String] = Field(
+    publicationDateText: Optional[fhir.string] = Field(
         description="Text representation of the date on which the issue of the cited artifact was published",
         default=None,
     )
-    publicationDateSeason: Optional[String] = Field(
+    publicationDateSeason: Optional[fhir.string] = Field(
         description="Season in which the cited artifact was published",
         default=None,
     )
-    lastRevisionDate: Optional[DateTime] = Field(
+    lastRevisionDate: Optional[fhir.dateTime] = Field(
         description="The date the article was last revised or updated in the database",
         default=None,
     )
@@ -268,30 +279,31 @@ class CitationCitedArtifactPublicationForm(BackboneElement):
         description="Language(s) in which this form of the article is published",
         default=None,
     )
-    accessionNumber: Optional[String] = Field(
+    accessionNumber: Optional[fhir.string] = Field(
         description="Entry number or identifier for inclusion in a database",
         default=None,
     )
-    pageString: Optional[String] = Field(
+    pageString: Optional[fhir.string] = Field(
         description="Used for full display of pagination",
         default=None,
     )
-    firstPage: Optional[String] = Field(
+    firstPage: Optional[fhir.string] = Field(
         description="Used for isolated representation of first page",
         default=None,
     )
-    lastPage: Optional[String] = Field(
+    lastPage: Optional[fhir.string] = Field(
         description="Used for isolated representation of last page",
         default=None,
     )
-    pageCount: Optional[String] = Field(
+    pageCount: Optional[fhir.string] = Field(
         description="Number of pages or screens",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Copyright notice for the full article or artifact",
         default=None,
     )
+
 
 class CitationCitedArtifactWebLocation(BackboneElement):
     """
@@ -299,13 +311,14 @@ class CitationCitedArtifactWebLocation(BackboneElement):
     """
 
     classifier: Optional[ListType[CodeableConcept]] = Field(
-        description="Code the reason for different URLs, e.g. abstract and full-text",
+        description="code the reason for different URLs, e.g. abstract and full-text",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="The specific URL",
         default=None,
     )
+
 
 class CitationCitedArtifactClassification(BackboneElement):
     """
@@ -325,6 +338,7 @@ class CitationCitedArtifactClassification(BackboneElement):
         default=None,
     )
 
+
 class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElement):
     """
     Contributions with accounting for time or number.
@@ -334,10 +348,11 @@ class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElem
         description="The specific contribution",
         default=None,
     )
-    time: Optional[DateTime] = Field(
+    time: Optional[fhir.dateTime] = Field(
         description="The time that the contribution was made",
         default=None,
     )
+
 
 class CitationCitedArtifactContributorshipEntry(BackboneElement):
     """
@@ -348,7 +363,7 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
         description="The identity of the individual contributor",
         default=None,
     )
-    forenameInitials: Optional[String] = Field(
+    forenameInitials: Optional[fhir.string] = Field(
         description="For citation styles that use initials",
         default=None,
     )
@@ -370,14 +385,15 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
         description="Contributions with accounting for time or number",
         default=None,
     )
-    correspondingContact: Optional[Boolean] = Field(
+    correspondingContact: Optional[fhir.boolean] = Field(
         description="Whether the contributor is the corresponding contributor for the role",
         default=None,
     )
-    rankingOrder: Optional[PositiveInt] = Field(
+    rankingOrder: Optional[fhir.positiveInt] = Field(
         description="Ranked order of contribution",
         default=None,
     )
+
 
 class CitationCitedArtifactContributorshipSummary(BackboneElement):
     """
@@ -396,17 +412,18 @@ class CitationCitedArtifactContributorshipSummary(BackboneElement):
         description="Used to code the producer or rule for creating the display string",
         default=None,
     )
-    value: Optional[Markdown] = Field(
+    value: Optional[fhir.markdown] = Field(
         description="The display string for the author list, contributor list, or contributorship statement",
         default=None,
     )
+
 
 class CitationCitedArtifactContributorship(BackboneElement):
     """
     This element is used to list authors and other contributors, their contact information, specific contributions, and summary statements.
     """
 
-    complete: Optional[Boolean] = Field(
+    complete: Optional[fhir.boolean] = Field(
         description="Indicates if the list includes all authors and/or contributors",
         default=None,
     )
@@ -418,6 +435,7 @@ class CitationCitedArtifactContributorship(BackboneElement):
         description="Used to record a display of the author/contributor list without separate data element for each list member",
         default=None,
     )
+
 
 class CitationCitedArtifact(BackboneElement):
     """
@@ -432,7 +450,7 @@ class CitationCitedArtifact(BackboneElement):
         description="Identifier not unique to the cited artifact. May include trial registry identifiers",
         default=None,
     )
-    dateAccessed: Optional[DateTime] = Field(
+    dateAccessed: Optional[fhir.dateTime] = Field(
         description="When the cited artifact was accessed",
         default=None,
     )
@@ -485,6 +503,7 @@ class CitationCitedArtifact(BackboneElement):
         default=None,
     )
 
+
 class Citation(DomainResource):
     """
     The Citation Resource enables reference to any knowledge artifact for purposes of identification and attribution. The Citation Resource supports existing reference structures and developing publication practices such as versioning, expressing complex contributorship roles, and referencing computable resources.
@@ -494,19 +513,19 @@ class Citation(DomainResource):
     _type = "Citation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Citation"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this citation record, represented as a globally unique URI",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this citation record, represented as a globally unique URI",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier for the citation record itself",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the citation record",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -514,27 +533,27 @@ class Citation(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this citation record (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this citation record (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="The publisher of the citation record, not the publisher of the article or artifact being cited",
         default=None,
     )
@@ -542,7 +561,7 @@ class Citation(DomainResource):
         description="Contact details for the publisher of the citation record",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the citation",
         default=None,
     )
@@ -554,23 +573,23 @@ class Citation(DomainResource):
         description="Intended jurisdiction for citation record (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this citation is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions for the citation record, not for the cited artifact",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s) for the ciation record, not for the cited artifact",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the citation record was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the citation record was last reviewed by the publisher",
         default=None,
     )
@@ -634,7 +653,7 @@ class Citation(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

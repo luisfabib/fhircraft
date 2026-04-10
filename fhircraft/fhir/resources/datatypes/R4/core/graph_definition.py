@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -25,23 +25,23 @@ class GraphDefinitionLinkTargetCompartment(BackboneElement):
     Compartment Consistency Rules.
     """
 
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="condition | requirement",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Patient | Encounter | RelatedPerson | Practitioner | Device",
         default=None,
     )
-    rule: Optional[Code] = Field(
+    rule: Optional[fhir.code] = Field(
         description="identical | matching | different | custom",
         default=None,
     )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="Custom rule, as a FHIRPath expression",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Documentation for FHIRPath expression",
         default=None,
     )
@@ -52,15 +52,15 @@ class GraphDefinitionLinkTarget(BackboneElement):
     Potential target for the link.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="Type of resource this link refers to",
         default=None,
     )
-    params: Optional[String] = Field(
+    params: Optional[fhir.string] = Field(
         description="Criteria for reverse lookup",
         default=None,
     )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Profile for the target resource",
         default=None,
     )
@@ -79,23 +79,23 @@ class GraphDefinitionLink(BackboneElement):
     Links this graph makes rules about.
     """
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="Path in the resource that contains the link",
         default=None,
     )
-    sliceName: Optional[String] = Field(
+    sliceName: Optional[fhir.string] = Field(
         description="Which slice (if profiled)",
         default=None,
     )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Minimum occurrences for this link",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum occurrences for this link",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why this link is specified",
         default=None,
     )
@@ -126,31 +126,31 @@ class GraphDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this graph definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this graph definition, represented as a URI (globally unique)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the graph definition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this graph definition (computer friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -158,7 +158,7 @@ class GraphDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the graph definition",
         default=None,
     )
@@ -170,15 +170,15 @@ class GraphDefinition(DomainResource):
         description="Intended jurisdiction for graph definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this graph definition is defined",
         default=None,
     )
-    start: Optional[Code] = Field(
+    start: Optional[fhir.code] = Field(
         description="Type of resource at which the graph starts",
         default=None,
     )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Profile on base resource",
         default=None,
     )

@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .element import Element
 
 class ParameterDefinition(Element):
@@ -14,31 +14,31 @@ class ParameterDefinition(Element):
 
     _type = "ParameterDefinition"
 
-    name: Optional[Code] = Field(
+    name: Optional[fhir.code] = Field(
         description="Name used to access the parameter value",
         default=None,
     )
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="in | out",
         default=None,
     )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Minimum cardinality",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum cardinality (a number of *)",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="A brief description of the parameter",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="What type of value",
         default=None,
     )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="What profile the value is expected to be",
         default=None,
     )

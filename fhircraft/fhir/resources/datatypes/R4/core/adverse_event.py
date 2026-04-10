@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -28,7 +28,7 @@ class AdverseEventSuspectEntityCausality(BackboneElement):
         description="Assessment of if the entity caused the event",
         default=None,
     )
-    productRelatedness: Optional[String] = Field(
+    productRelatedness: Optional[fhir.string] = Field(
         description="AdverseEvent.suspectEntity.causalityProductRelatedness",
         default=None,
     )
@@ -80,7 +80,7 @@ class AdverseEvent(DomainResource):
         description="Business identifier for the event",
         default=None,
     )
-    actuality: Optional[Code] = Field(
+    actuality: Optional[fhir.code] = Field(
         description="actual | potential",
         default=None,
     )
@@ -100,15 +100,15 @@ class AdverseEvent(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the event occurred",
         default=None,
     )
-    detected: Optional[DateTime] = Field(
+    detected: Optional[fhir.dateTime] = Field(
         description="When the event was detected",
         default=None,
     )
-    recordedDate: Optional[DateTime] = Field(
+    recordedDate: Optional[fhir.dateTime] = Field(
         description="When the event was recorded",
         default=None,
     )

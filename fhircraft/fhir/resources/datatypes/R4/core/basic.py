@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class Basic(DomainResource):
     """
@@ -51,7 +52,7 @@ class Basic(DomainResource):
         description="Identifies the focus of this resource",
         default=None,
     )
-    created: Optional[Date] = Field(
+    created: Optional[fhir.date_] = Field(
         description="When created",
         default=None,
     )

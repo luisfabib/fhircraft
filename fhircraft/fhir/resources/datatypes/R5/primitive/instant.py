@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field, field_validator, model_serializer
 
-from fhircraft.fhir.resources.base import FHIRInstant as FHIRInstantBase
+from fhircraft.fhir.resources.base import InstantBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 from fhircraft.fhir.resources.datatypes import (
     YEAR_REGEX,
@@ -21,7 +21,7 @@ _INSTANT_PATTERN = (
 )
 
 
-class FHIRInstant(PrimitiveType, FHIRInstantBase):
+class Instant(PrimitiveType, InstantBase):
     """An instant in time in the format YYYY-MM-DDThh:mm:ss.sss+zz:zz."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/instant"
@@ -54,4 +54,4 @@ class FHIRInstant(PrimitiveType, FHIRInstantBase):
         return s
 
 
-Instant = Annotated[datetime | FHIRInstant, BeforeValidator(FHIRInstant.model_validate)]
+instant = Annotated[datetime | Instant, BeforeValidator(Instant.model_validate)]

@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .coding import Coding
 from .element import Element
 
@@ -15,19 +15,19 @@ class Meta(Element):
 
     _type = "Meta"
 
-    versionId: Optional[Id] = Field(
+    versionId: Optional[fhir.id_] = Field(
         description="Version specific identifier",
         default=None,
     )
-    lastUpdated: Optional[Instant] = Field(
+    lastUpdated: Optional[fhir.instant] = Field(
         description="When the resource version last changed",
         default=None,
     )
-    source: Optional[Uri] = Field(
+    source: Optional[fhir.uri] = Field(
         description="Identifies where the resource comes from",
         default=None,
     )
-    profile: Optional[List[Canonical]] = Field(
+    profile: Optional[List[fhir.canonical]] = Field(
         description="Profiles this resource claims to conform to",
         default=None,
     )

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -32,7 +32,7 @@ class ClinicalImpressionFinding(BackboneElement):
         description="What was found",
         default=None,
     )
-    basis: Optional[String] = Field(
+    basis: Optional[fhir.string] = Field(
         description="Which investigations support finding",
         default=None,
     )
@@ -50,7 +50,7 @@ class ClinicalImpression(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
@@ -58,7 +58,7 @@ class ClinicalImpression(DomainResource):
         description="Reason for current status",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why/how the assessment was performed",
         default=None,
     )
@@ -70,15 +70,15 @@ class ClinicalImpression(DomainResource):
         description="The Encounter during which this ClinicalImpression was created",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
-        description="Time of assessment",
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
+        description="time of assessment",
         default=None,
     )
     effectivePeriod: Optional[Period] = Field(
-        description="Time of assessment",
+        description="time of assessment",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the assessment was documented",
         default=None,
     )
@@ -98,11 +98,11 @@ class ClinicalImpression(DomainResource):
         description="Change in the status/pattern of a subject\u0027s condition since previously assessed, such as worsening, improving, or no change",
         default=None,
     )
-    protocol: Optional[ListType[Uri]] = Field(
+    protocol: Optional[ListType[fhir.uri]] = Field(
         description="Clinical Protocol followed",
         default=None,
     )
-    summary: Optional[String] = Field(
+    summary: Optional[fhir.string] = Field(
         description="Summary of the assessment",
         default=None,
     )
@@ -138,7 +138,7 @@ class ClinicalImpression(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="effective",
             required=False,
         )

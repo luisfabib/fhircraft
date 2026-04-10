@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,44 +23,45 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RequirementsStatement(BackboneElement):
     """
     The actual statement of requirement, in markdown format.
     """
 
-    key: Optional[Id] = Field(
+    key: Optional[fhir.id_] = Field(
         description="Key that identifies this statement",
         default=None,
     )
-    label: Optional[String] = Field(
+    label: Optional[fhir.string] = Field(
         description="Short Human label for this statement",
         default=None,
     )
-    conformance: Optional[ListType[Code]] = Field(
+    conformance: Optional[ListType[fhir.code]] = Field(
         description="SHALL | SHOULD | MAY | SHOULD-NOT",
         default=None,
     )
-    conditionality: Optional[Boolean] = Field(
+    conditionality: Optional[fhir.boolean] = Field(
         description="Set to true if requirements statement is conditional",
         default=None,
     )
-    requirement: Optional[Markdown] = Field(
+    requirement: Optional[fhir.markdown] = Field(
         description="The actual requirement",
         default=None,
     )
-    derivedFrom: Optional[String] = Field(
+    derivedFrom: Optional[fhir.string] = Field(
         description="Another statement this clarifies/restricts ([url#]key)",
         default=None,
     )
-    parent: Optional[String] = Field(
+    parent: Optional[fhir.string] = Field(
         description="A larger requirement that this requirement helps to refine and enable",
         default=None,
     )
-    satisfiedBy: Optional[ListType[Url]] = Field(
+    satisfiedBy: Optional[ListType[fhir.url]] = Field(
         description="Design artifact that satisfies this requirement",
         default=None,
     )
-    reference: Optional[ListType[Url]] = Field(
+    reference: Optional[ListType[fhir.url]] = Field(
         description="External artifact (rule/document etc. that) created this requirement",
         default=None,
     )
@@ -68,6 +69,7 @@ class RequirementsStatement(BackboneElement):
         description="Who asked for this statement",
         default=None,
     )
+
 
 class Requirements(DomainResource):
     """
@@ -78,19 +80,19 @@ class Requirements(DomainResource):
     _type = "Requirements"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Requirements"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this Requirements, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this Requirements, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the Requirements (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the Requirements",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -98,27 +100,27 @@ class Requirements(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this Requirements (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this Requirements (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -126,7 +128,7 @@ class Requirements(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the requirements",
         default=None,
     )
@@ -138,27 +140,27 @@ class Requirements(DomainResource):
         description="Intended jurisdiction for Requirements (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this Requirements is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    derivedFrom: Optional[ListType[Canonical]] = Field(
+    derivedFrom: Optional[ListType[fhir.canonical]] = Field(
         description="Other set of Requirements this builds on",
         default=None,
     )
-    reference: Optional[ListType[Url]] = Field(
+    reference: Optional[ListType[fhir.url]] = Field(
         description="External artifact (rule/document etc. that) created this set of requirements",
         default=None,
     )
-    actor: Optional[ListType[Canonical]] = Field(
+    actor: Optional[ListType[fhir.canonical]] = Field(
         description="Actor for these requirements",
         default=None,
     )
@@ -178,7 +180,7 @@ class Requirements(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

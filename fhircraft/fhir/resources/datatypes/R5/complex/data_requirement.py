@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Reference,
@@ -14,6 +14,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Duration,
 )
 
+
 class DataRequirementCodeFilter(BackboneElement):
     """
     What codes are expected
@@ -21,15 +22,15 @@ class DataRequirementCodeFilter(BackboneElement):
 
     _type = "BackboneElement"
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="A code-valued attribute to filter on",
         default=None,
     )
-    searchParam: Optional[String] = Field(
+    searchParam: Optional[fhir.string] = Field(
         description="A search parameter defined on the specified type",
         default=None,
     )
-    valueSet: Optional[Canonical] = Field(
+    valueSet: Optional[fhir.canonical] = Field(
         description="The valueset for the filter",
         default=None,
     )
@@ -38,6 +39,7 @@ class DataRequirementCodeFilter(BackboneElement):
         default=None,
     )
 
+
 class DataRequirementDateFilter(BackboneElement):
     """
     What dates/date ranges are expected
@@ -45,15 +47,15 @@ class DataRequirementDateFilter(BackboneElement):
 
     _type = "BackboneElement"
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="A date-valued attribute to filter on",
         default=None,
     )
-    searchParam: Optional[String] = Field(
+    searchParam: Optional[fhir.string] = Field(
         description="A date-valued parameter to search on",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The value of the filter, as a dateTime",
         default=None,
     )
@@ -70,7 +72,7 @@ class DataRequirementDateFilter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["DateTime", "Period", "Duration"],
+            field_types=["dateTime", "Period", "Duration"],
             field_name_base="value",
         )
 
@@ -80,6 +82,7 @@ class DataRequirementDateFilter(BackboneElement):
             self,
             base="value",
         )
+
 
 class DataRequirementValueFilter(BackboneElement):
     """
@@ -88,15 +91,15 @@ class DataRequirementValueFilter(BackboneElement):
 
     _type = "BackboneElement"
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="An attribute to filter on",
         default=None,
     )
-    searchParam: Optional[String] = Field(
+    searchParam: Optional[fhir.string] = Field(
         description="A parameter to search on",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The value of the filter, as a dateTime",
         default=None,
     )
@@ -113,7 +116,7 @@ class DataRequirementValueFilter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["DateTime", "Period", "Duration"],
+            field_types=["dateTime", "Period", "Duration"],
             field_name_base="value",
         )
 
@@ -124,6 +127,7 @@ class DataRequirementValueFilter(BackboneElement):
             base="value",
         )
 
+
 class DataRequirementSort(BackboneElement):
     """
     Order of the results
@@ -131,14 +135,15 @@ class DataRequirementSort(BackboneElement):
 
     _type = "BackboneElement"
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="The name of the attribute to perform the sort",
         default=None,
     )
-    direction: Optional[Code] = Field(
+    direction: Optional[fhir.code] = Field(
         description="The direction of the sort, ascending or descending",
         default=None,
     )
+
 
 class DataRequirement(Element):
     """
@@ -147,11 +152,11 @@ class DataRequirement(Element):
 
     _type = "DataRequirement"
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="The type of the required data",
         default=None,
     )
-    profile: Optional[List[Canonical]] = Field(
+    profile: Optional[List[fhir.canonical]] = Field(
         description="The profile of the required data",
         default=None,
     )
@@ -163,7 +168,7 @@ class DataRequirement(Element):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    mustSupport: Optional[List[String]] = Field(
+    mustSupport: Optional[List[fhir.string]] = Field(
         description="Indicates specific structure elements that are referenced by the knowledge module",
         default=None,
     )
@@ -179,7 +184,7 @@ class DataRequirement(Element):
         description="What values are expected",
         default=None,
     )
-    limit: Optional[PositiveInt] = Field(
+    limit: Optional[fhir.positiveInt] = Field(
         description="Number of results",
         default=None,
     )

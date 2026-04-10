@@ -2,13 +2,13 @@ import re
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field, field_validator
 
-from fhircraft.fhir.resources.base import FHIRDecimal as FHIRDecimalBase
+from fhircraft.fhir.resources.base import DecimalBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 
 _DECIMAL_PATTERN = r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$"
 
 
-class FHIRDecimal(PrimitiveType, FHIRDecimalBase):
+class Decimal(PrimitiveType, DecimalBase):
     """A rational number."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/decimal"
@@ -30,4 +30,4 @@ class FHIRDecimal(PrimitiveType, FHIRDecimalBase):
         return v
 
 
-Decimal = Annotated[float | FHIRDecimal, BeforeValidator(FHIRDecimal.model_validate)]
+decimal = Annotated[float | Decimal, BeforeValidator(Decimal.model_validate)]

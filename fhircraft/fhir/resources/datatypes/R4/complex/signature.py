@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .coding import Coding
 from .element import Element
 from .reference import Reference
@@ -20,7 +20,7 @@ class Signature(Element):
         description="Indication of the reason the entity signed the object(s)",
         default=None,
     )
-    when: Optional[Instant] = Field(
+    when: Optional[fhir.instant] = Field(
         description="When the signature was created",
         default=None,
     )
@@ -32,15 +32,15 @@ class Signature(Element):
         description="The party represented",
         default=None,
     )
-    targetFormat: Optional[Code] = Field(
+    targetFormat: Optional[fhir.code] = Field(
         description="The technical format of the signed resources",
         default=None,
     )
-    sigFormat: Optional[Code] = Field(
+    sigFormat: Optional[fhir.code] = Field(
         description="The technical format of the signature",
         default=None,
     )
-    data: Optional[Base64Binary] = Field(
+    data: Optional[fhir.base64Binary] = Field(
         description="The actual signature content (XML DigSig. JWS, picture, etc.)",
         default=None,
     )

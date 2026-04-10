@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .element import Element
 from .quantity import Quantity
 
@@ -19,27 +19,27 @@ class SampledData(Element):
         description="Zero value and units",
         default=None,
     )
-    period: Optional[Decimal] = Field(
+    period: Optional[fhir.decimal] = Field(
         description="Number of milliseconds between samples",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Multiply data by this before adding to origin",
         default=None,
     )
-    lowerLimit: Optional[Decimal] = Field(
+    lowerLimit: Optional[fhir.decimal] = Field(
         description="Lower limit of detection",
         default=None,
     )
-    upperLimit: Optional[Decimal] = Field(
+    upperLimit: Optional[fhir.decimal] = Field(
         description="Upper limit of detection",
         default=None,
     )
-    dimensions: Optional[PositiveInt] = Field(
+    dimensions: Optional[fhir.positiveInt] = Field(
         description="Number of sample points at each time point",
         default=None,
     )
-    data: Optional[String] = Field(
-        description='Decimal values with spaces, or "E" | "U" | "L"',
+    data: Optional[fhir.string] = Field(
+        description='decimal values with spaces, or "E" | "U" | "L"',
         default=None,
     )

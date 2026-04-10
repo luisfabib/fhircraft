@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ResearchElementDefinitionCharacteristic(BackboneElement):
     """
     A characteristic that defines the members of the research element. Multiple characteristics are applied with "and" semantics.
@@ -36,7 +37,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="What code or expression defines members?",
         default=None,
     )
-    definitionCanonical: Optional[Canonical] = Field(
+    definitionCanonical: Optional[fhir.canonical] = Field(
         description="What code or expression defines members?",
         default=None,
     )
@@ -52,7 +53,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="What code/value pairs define members?",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Whether the characteristic includes or excludes members",
         default=None,
     )
@@ -60,11 +61,11 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="What unit is the outcome described in?",
         default=None,
     )
-    studyEffectiveDescription: Optional[String] = Field(
+    studyEffectiveDescription: Optional[fhir.string] = Field(
         description="What time period does the study cover",
         default=None,
     )
-    studyEffectiveDateTime: Optional[DateTime] = Field(
+    studyEffectiveDateTime: Optional[fhir.dateTime] = Field(
         description="What time period does the study cover",
         default=None,
     )
@@ -84,15 +85,15 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="Observation time from study start",
         default=None,
     )
-    studyEffectiveGroupMeasure: Optional[Code] = Field(
+    studyEffectiveGroupMeasure: Optional[fhir.code] = Field(
         description="mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median",
         default=None,
     )
-    participantEffectiveDescription: Optional[String] = Field(
+    participantEffectiveDescription: Optional[fhir.string] = Field(
         description="What time period do participants cover",
         default=None,
     )
-    participantEffectiveDateTime: Optional[DateTime] = Field(
+    participantEffectiveDateTime: Optional[fhir.dateTime] = Field(
         description="What time period do participants cover",
         default=None,
     )
@@ -112,7 +113,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="Observation time from study start",
         default=None,
     )
-    participantEffectiveGroupMeasure: Optional[Code] = Field(
+    participantEffectiveGroupMeasure: Optional[fhir.code] = Field(
         description="mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median",
         default=None,
     )
@@ -142,7 +143,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Canonical, Expression, DataRequirement],
+            field_types=[CodeableConcept, fhir.canonical, Expression, DataRequirement],
             field_name_base="definition",
             required=True,
         )
@@ -151,7 +152,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     def studyEffective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Duration, Timing],
+            field_types=[fhir.dateTime, Period, Duration, Timing],
             field_name_base="studyEffective",
             required=False,
         )
@@ -160,10 +161,11 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     def participantEffective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Duration, Timing],
+            field_types=[fhir.dateTime, Period, Duration, Timing],
             field_name_base="participantEffective",
             required=False,
         )
+
 
 class ResearchElementDefinition(DomainResource):
     """
@@ -186,39 +188,39 @@ class ResearchElementDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this research element definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this research element definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the research element definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the research element definition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this research element definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this research element definition (human friendly)",
         default=None,
     )
-    shortTitle: Optional[String] = Field(
+    shortTitle: Optional[fhir.string] = Field(
         description="Title for use in informal contexts",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the ResearchElementDefinition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
@@ -230,11 +232,11 @@ class ResearchElementDefinition(DomainResource):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -242,11 +244,11 @@ class ResearchElementDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the research element definition",
         default=None,
     )
-    comment: Optional[ListType[String]] = Field(
+    comment: Optional[ListType[fhir.string]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
@@ -258,23 +260,23 @@ class ResearchElementDefinition(DomainResource):
         description="Intended jurisdiction for research element definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this research element definition is defined",
         default=None,
     )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="Describes the clinical usage of the ResearchElementDefinition",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the research element definition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the research element definition was last reviewed",
         default=None,
     )
@@ -306,15 +308,15 @@ class ResearchElementDefinition(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the ResearchElementDefinition",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="population | exposure | outcome",
         default=None,
     )
-    variableType: Optional[Code] = Field(
+    variableType: Optional[fhir.code] = Field(
         description="dichotomous | continuous | descriptive",
         default=None,
     )

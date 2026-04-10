@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -26,19 +26,19 @@ class ExampleScenarioActor(BackboneElement):
     Actor participating in the resource.
     """
 
-    actorId: Optional[String] = Field(
+    actorId: Optional[fhir.string] = Field(
         description="ID or acronym of the actor",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="person | entity",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The name of the actor as shown in the page",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The description of the actor",
         default=None,
     )
@@ -49,11 +49,11 @@ class ExampleScenarioInstanceVersion(BackboneElement):
     A specific version of the resource.
     """
 
-    versionId: Optional[String] = Field(
+    versionId: Optional[fhir.string] = Field(
         description="The identifier of a specific version of a resource",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The description of the resource version",
         default=None,
     )
@@ -64,11 +64,11 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
     Resources contained in the instance (e.g. the observations contained in a bundle).
     """
 
-    resourceId: Optional[String] = Field(
+    resourceId: Optional[fhir.string] = Field(
         description="Each resource contained in the instance",
         default=None,
     )
-    versionId: Optional[String] = Field(
+    versionId: Optional[fhir.string] = Field(
         description="A specific version of a resource contained in the instance",
         default=None,
     )
@@ -79,19 +79,19 @@ class ExampleScenarioInstance(BackboneElement):
     Each resource and each version that is present in the workflow.
     """
 
-    resourceId: Optional[String] = Field(
+    resourceId: Optional[fhir.string] = Field(
         description="The id of the resource for referencing",
         default=None,
     )
-    resourceType: Optional[Code] = Field(
+    resourceType: Optional[fhir.code] = Field(
         description="The type of the resource",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A short name for the resource instance",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the resource instance",
         default=None,
     )
@@ -112,11 +112,11 @@ class ExampleScenarioProcessStepOperationRequest(BackboneElement):
     Each resource instance used by the initiator.
     """
 
-    resourceId: Optional[String] = Field(
+    resourceId: Optional[fhir.string] = Field(
         description="Each resource contained in the instance",
         default=None,
     )
-    versionId: Optional[String] = Field(
+    versionId: Optional[fhir.string] = Field(
         description="A specific version of a resource contained in the instance",
         default=None,
     )
@@ -127,35 +127,35 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
     Each interaction or action.
     """
 
-    number: Optional[String] = Field(
+    number: Optional[fhir.string] = Field(
         description="The sequential number of the interaction",
         default=None,
     )
-    type: Optional[String] = Field(
+    type: Optional[fhir.string] = Field(
         description="The type of operation - CRUD",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The human-friendly name of the interaction",
         default=None,
     )
-    initiator: Optional[String] = Field(
+    initiator: Optional[fhir.string] = Field(
         description="Who starts the transaction",
         default=None,
     )
-    receiver: Optional[String] = Field(
+    receiver: Optional[fhir.string] = Field(
         description="Who receives the transaction",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A comment to be inserted in the diagram",
         default=None,
     )
-    initiatorActive: Optional[Boolean] = Field(
+    initiatorActive: Optional[fhir.boolean] = Field(
         description="Whether the initiator is deactivated right after the transaction",
         default=None,
     )
-    receiverActive: Optional[Boolean] = Field(
+    receiverActive: Optional[fhir.boolean] = Field(
         description="Whether the receiver is deactivated right after the transaction",
         default=None,
     )
@@ -174,11 +174,11 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
     Indicates an alternative step that can be taken instead of the operations on the base step in exceptional/atypical circumstances.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for alternative",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A human-readable description of each option",
         default=None,
     )
@@ -197,7 +197,7 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Nested process",
         default=None,
     )
-    pause: Optional[Boolean] = Field(
+    pause: Optional[fhir.boolean] = Field(
         description="If there is a pause in the flow",
         default=None,
     )
@@ -216,19 +216,19 @@ class ExampleScenarioProcess(BackboneElement):
     Each major process - a group of operations.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="The diagram title of the group of operations",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A longer description of the group of operations",
         default=None,
     )
-    preConditions: Optional[Markdown] = Field(
+    preConditions: Optional[fhir.markdown] = Field(
         description="Description of initial status before the process starts",
         default=None,
     )
-    postConditions: Optional[Markdown] = Field(
+    postConditions: Optional[fhir.markdown] = Field(
         description="Description of final status after the process ends",
         default=None,
     )
@@ -259,35 +259,35 @@ class ExampleScenario(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this example scenario, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this example scenario, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the example scenario",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the example scenario",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this example scenario (computer friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -303,11 +303,11 @@ class ExampleScenario(DomainResource):
         description="Intended jurisdiction for example scenario (if applicable)",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="The purpose of the example, e.g. to illustrate a scenario",
         default=None,
     )
@@ -323,7 +323,7 @@ class ExampleScenario(DomainResource):
         description="Each major process - a group of operations",
         default=None,
     )
-    workflow: Optional[ListType[Canonical]] = Field(
+    workflow: Optional[ListType[fhir.canonical]] = Field(
         description="Another nested workflow",
         default=None,
     )

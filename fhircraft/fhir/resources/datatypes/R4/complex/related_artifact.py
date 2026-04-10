@@ -4,9 +4,10 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .attachment import Attachment
 from .element import Element
+
 
 class RelatedArtifact(Element):
     """
@@ -15,23 +16,23 @@ class RelatedArtifact(Element):
 
     _type = "RelatedArtifact"
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of",
         default=None,
     )
-    label: Optional[String] = Field(
+    label: Optional[fhir.string] = Field(
         description="Short label",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Brief description of the related artifact",
         default=None,
     )
-    citation: Optional[Markdown] = Field(
+    citation: Optional[fhir.markdown] = Field(
         description="Bibliographic citation for the artifact",
         default=None,
     )
-    url: Optional[Url] = Field(
+    url: Optional[fhir.url] = Field(
         description="Where the artifact can be accessed",
         default=None,
     )
@@ -39,7 +40,7 @@ class RelatedArtifact(Element):
         description="What document is being referenced",
         default=None,
     )
-    resource: Optional[Canonical] = Field(
+    resource: Optional[fhir.canonical] = Field(
         description="What resource is being referenced",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -19,68 +19,71 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class OperationDefinitionParameterBinding(BackboneElement):
     """
     Binds to a value set if this parameter is coded (code, Coding, CodeableConcept).
     """
 
-    strength: Optional[Code] = Field(
+    strength: Optional[fhir.code] = Field(
         description="required | extensible | preferred | example",
         default=None,
     )
-    valueSet: Optional[Canonical] = Field(
+    valueSet: Optional[fhir.canonical] = Field(
         description="Source of value set",
         default=None,
     )
+
 
 class OperationDefinitionParameterReferencedFrom(BackboneElement):
     """
     Identifies other resource parameters within the operation invocation that are expected to resolve to this resource.
     """
 
-    source: Optional[String] = Field(
+    source: Optional[fhir.string] = Field(
         description="Referencing parameter",
         default=None,
     )
-    sourceId: Optional[String] = Field(
+    sourceId: Optional[fhir.string] = Field(
         description="Element id of reference",
         default=None,
     )
+
 
 class OperationDefinitionParameter(BackboneElement):
     """
     The parameters for the operation/query.
     """
 
-    name: Optional[Code] = Field(
+    name: Optional[fhir.code] = Field(
         description="Name in Parameters.parameter.name or in URL",
         default=None,
     )
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="in | out",
         default=None,
     )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Minimum Cardinality",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum Cardinality (a number or *)",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Description of meaning/use",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="What type this parameter has",
         default=None,
     )
-    targetProfile: Optional[ListType[Canonical]] = Field(
+    targetProfile: Optional[ListType[fhir.canonical]] = Field(
         description="If type is Reference | canonical, allowed targets",
         default=None,
     )
-    searchType: Optional[Code] = Field(
+    searchType: Optional[fhir.code] = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
         default=None,
     )
@@ -99,19 +102,21 @@ class OperationDefinitionParameter(BackboneElement):
         default=None,
     )
 
+
 class OperationDefinitionOverload(BackboneElement):
     """
     Defines an appropriate combination of parameters to use when invoking this operation, to help code generators when generating overloaded parameter sets for this operation.
     """
 
-    parameterName: Optional[ListType[String]] = Field(
+    parameterName: Optional[ListType[fhir.string]] = Field(
         description="Name of parameter to include in overload",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Comments to go on overload",
         default=None,
     )
+
 
 class OperationDefinition(DomainResource):
     """
@@ -134,39 +139,39 @@ class OperationDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this operation definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this operation definition, represented as a URI (globally unique)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the operation definition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this operation definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this operation definition (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="operation | query",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -174,7 +179,7 @@ class OperationDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the operation definition",
         default=None,
     )
@@ -186,47 +191,47 @@ class OperationDefinition(DomainResource):
         description="Intended jurisdiction for operation definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this operation definition is defined",
         default=None,
     )
-    affectsState: Optional[Boolean] = Field(
+    affectsState: Optional[fhir.boolean] = Field(
         description="Whether content is changed by the operation",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Name used to invoke the operation",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Additional information about use",
         default=None,
     )
-    base: Optional[Canonical] = Field(
+    base: Optional[fhir.canonical] = Field(
         description="Marks this as a profile of the base",
         default=None,
     )
-    resource: Optional[ListType[Code]] = Field(
+    resource: Optional[ListType[fhir.code]] = Field(
         description="Types this operation applies to",
         default=None,
     )
-    system: Optional[Boolean] = Field(
+    system: Optional[fhir.boolean] = Field(
         description="Invoke at the system level?",
         default=None,
     )
-    type: Optional[Boolean] = Field(
+    type: Optional[fhir.boolean] = Field(
         description="Invoke at the type level?",
         default=None,
     )
-    instance: Optional[Boolean] = Field(
+    instance: Optional[fhir.boolean] = Field(
         description="Invoke on an instance?",
         default=None,
     )
-    inputProfile: Optional[Canonical] = Field(
+    inputProfile: Optional[fhir.canonical] = Field(
         description="Validation information for in parameters",
         default=None,
     )
-    outputProfile: Optional[Canonical] = Field(
+    outputProfile: Optional[fhir.canonical] = Field(
         description="Validation information for out parameters",
         default=None,
     )
@@ -277,7 +282,7 @@ class OperationDefinition(DomainResource):
             self,
             elements=("parameter",),
             expression="targetProfile.exists() implies (type = 'Reference' or type = 'canonical')",
-            human="A targetProfile can only be specified for parameters of type Reference or Canonical",
+            human="A targetProfile can only be specified for parameters of type Reference or canonical",
             key="opd-3",
             severity="error",
         )

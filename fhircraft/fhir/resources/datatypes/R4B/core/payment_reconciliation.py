@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class PaymentReconciliationDetail(BackboneElement):
     """
@@ -50,7 +51,7 @@ class PaymentReconciliationDetail(BackboneElement):
         description="Response committing to a payment",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Date of commitment to pay",
         default=None,
     )
@@ -67,19 +68,21 @@ class PaymentReconciliationDetail(BackboneElement):
         default=None,
     )
 
+
 class PaymentReconciliationProcessNote(BackboneElement):
     """
     A note that describes or explains the processing in a human readable form.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="display | print | printoper",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Note explanatory text",
         default=None,
     )
+
 
 class PaymentReconciliation(DomainResource):
     """
@@ -106,7 +109,7 @@ class PaymentReconciliation(DomainResource):
         description="Business Identifier for a payment reconciliation",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
@@ -114,7 +117,7 @@ class PaymentReconciliation(DomainResource):
         description="Period covered",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Creation date",
         default=None,
     )
@@ -130,15 +133,15 @@ class PaymentReconciliation(DomainResource):
         description="Responsible practitioner",
         default=None,
     )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="queued | complete | error | partial",
         default=None,
     )
-    disposition: Optional[String] = Field(
+    disposition: Optional[fhir.string] = Field(
         description="Disposition message",
         default=None,
     )
-    paymentDate: Optional[Date] = Field(
+    paymentDate: Optional[fhir.date_] = Field(
         description="When payment issued",
         default=None,
     )

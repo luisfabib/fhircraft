@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SpecimenFeature(BackboneElement):
     """
     A physical feature or landmark on a specimen, highlighted for context by the collector of the specimen (e.g. surgeon), that identifies the type of feature as well as its meaning (e.g. the red ink indicating the resection margin of the right lobe of the excised prostate tissue or wire loop at radiologically suspected tumor location).
@@ -34,10 +35,11 @@ class SpecimenFeature(BackboneElement):
         description="Highlighted feature",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Information about the feature",
         default=None,
     )
+
 
 class SpecimenCollection(BackboneElement):
     """
@@ -48,7 +50,7 @@ class SpecimenCollection(BackboneElement):
         description="Who collected the specimen",
         default=None,
     )
-    collectedDateTime: Optional[DateTime] = Field(
+    collectedDateTime: Optional[fhir.dateTime] = Field(
         description="Collection time",
         default=None,
     )
@@ -107,7 +109,7 @@ class SpecimenCollection(BackboneElement):
     def collected_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="collected",
             required=False,
         )
@@ -121,12 +123,13 @@ class SpecimenCollection(BackboneElement):
             required=False,
         )
 
+
 class SpecimenProcessing(BackboneElement):
     """
     Details concerning processing and processing steps for the specimen.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of procedure",
         default=None,
     )
@@ -138,7 +141,7 @@ class SpecimenProcessing(BackboneElement):
         description="Material used in the processing step",
         default=None,
     )
-    timeDateTime: Optional[DateTime] = Field(
+    timeDateTime: Optional[fhir.dateTime] = Field(
         description="Date and time of specimen processing",
         default=None,
     )
@@ -158,10 +161,11 @@ class SpecimenProcessing(BackboneElement):
     def time_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="time",
             required=False,
         )
+
 
 class SpecimenContainer(BackboneElement):
     """
@@ -181,6 +185,7 @@ class SpecimenContainer(BackboneElement):
         default=None,
     )
 
+
 class Specimen(DomainResource):
     """
     A sample to be used for analysis.
@@ -198,7 +203,7 @@ class Specimen(DomainResource):
         description="Identifier assigned by the lab",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="available | unavailable | unsatisfactory | entered-in-error",
         default=None,
     )
@@ -210,7 +215,7 @@ class Specimen(DomainResource):
         description="Where the specimen came from. This may be from patient(s), from a location (e.g., the source of an environmental sample), or a sampling of a substance, a biologically-derived product, or a device",
         default=None,
     )
-    receivedTime: Optional[DateTime] = Field(
+    receivedTime: Optional[fhir.dateTime] = Field(
         description="The time when specimen is received by the testing laboratory",
         default=None,
     )
@@ -222,7 +227,7 @@ class Specimen(DomainResource):
         description="Why the specimen was collected",
         default=None,
     )
-    combined: Optional[Code] = Field(
+    combined: Optional[fhir.code] = Field(
         description="grouped | pooled",
         default=None,
     )

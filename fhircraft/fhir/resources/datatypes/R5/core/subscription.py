@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -26,23 +26,23 @@ class SubscriptionFilterBy(BackboneElement):
     The filter properties to be applied to narrow the subscription topic stream.  When multiple filters are applied, evaluates to true if all the conditions applicable to that resource are met; otherwise it returns false (i.e., logical AND).
     """
 
-    resourceType: Optional[String] = Field(
+    resourceType: Optional[fhir.string] = Field(
         description="Allowed Resource (reference to definition) for this Subscription filter",
         default=None,
     )
-    filterParameter: Optional[String] = Field(
+    filterParameter: Optional[fhir.string] = Field(
         description="Filter label defined in SubscriptionTopic",
         default=None,
     )
-    comparator: Optional[Code] = Field(
+    comparator: Optional[fhir.code] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    modifier: Optional[Code] = Field(
+    modifier: Optional[fhir.code] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="Literal value or resource path",
         default=None,
     )
@@ -52,11 +52,11 @@ class SubscriptionParameter(BackboneElement):
     Channel-dependent information to send as part of the notification (e.g., HTTP Headers).
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name (key) of the parameter",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="Value of the parameter to use or pass through",
         default=None,
     )
@@ -74,15 +74,15 @@ class Subscription(DomainResource):
         description="Additional identifiers (business identifier)",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human readable name for this subscription",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="requested | active | error | off | entered-in-error",
         default=None,
     )
-    topic: Optional[Canonical] = Field(
+    topic: Optional[fhir.canonical] = Field(
         description="Reference to the subscription topic being subscribed to",
         default=None,
     )
@@ -90,7 +90,7 @@ class Subscription(DomainResource):
         description="Contact details for source (e.g. troubleshooting)",
         default=None,
     )
-    end: Optional[Instant] = Field(
+    end: Optional[fhir.instant] = Field(
         description="When to automatically delete the subscription",
         default=None,
     )
@@ -98,7 +98,7 @@ class Subscription(DomainResource):
         description="Entity responsible for Subscription changes",
         default=None,
     )
-    reason: Optional[String] = Field(
+    reason: Optional[fhir.string] = Field(
         description="Description of why this subscription was created",
         default=None,
     )
@@ -110,7 +110,7 @@ class Subscription(DomainResource):
         description="Channel type for notifications",
         default=None,
     )
-    endpoint: Optional[Url] = Field(
+    endpoint: Optional[fhir.url] = Field(
         description="Where the channel points to",
         default=None,
     )
@@ -118,23 +118,23 @@ class Subscription(DomainResource):
         description="Channel type",
         default=None,
     )
-    heartbeatPeriod: Optional[UnsignedInt] = Field(
+    heartbeatPeriod: Optional[fhir.unsignedInt] = Field(
         description="Interval in seconds to send \u0027heartbeat\u0027 notification",
         default=None,
     )
-    timeout: Optional[UnsignedInt] = Field(
+    timeout: Optional[fhir.unsignedInt] = Field(
         description="Timeout in seconds to attempt notification delivery",
         default=None,
     )
-    contentType: Optional[Code] = Field(
+    contentType: Optional[fhir.code] = Field(
         description="MIME type to send, or omit for no payload",
         default=None,
     )
-    content: Optional[Code] = Field(
+    content: Optional[fhir.code] = Field(
         description="empty | id-only | full-resource",
         default=None,
     )
-    maxCount: Optional[PositiveInt] = Field(
+    maxCount: Optional[fhir.positiveInt] = Field(
         description="Maximum number of events that can be combined in a single notification",
         default=None,
     )

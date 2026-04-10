@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -56,7 +56,7 @@ class MedicationStatement(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | completed | entered-in-error | intended | stopped | on-hold | unknown | not-taken",
         default=None,
     )
@@ -84,7 +84,7 @@ class MedicationStatement(DomainResource):
         description="Encounter / Episode associated with MedicationStatement",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,
     )
@@ -92,7 +92,7 @@ class MedicationStatement(DomainResource):
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,
     )
-    dateAsserted: Optional[DateTime] = Field(
+    dateAsserted: Optional[fhir.dateTime] = Field(
         description="When the statement was asserted?",
         default=None,
     )
@@ -148,7 +148,7 @@ class MedicationStatement(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="effective",
             required=False,
         )

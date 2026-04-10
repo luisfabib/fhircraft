@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import DataType, Element
 
 class Expression(DataType):
@@ -13,23 +13,23 @@ class Expression(DataType):
 
     _type = "Expression"
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Natural language description of the condition",
         default=None,
     )
-    name: Optional[Code] = Field(
+    name: Optional[fhir.code] = Field(
         description="Short name assigned to expression for reuse",
         default=None,
     )
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="text/cql | text/fhirpath | application/x-fhir-query | etc.",
         default=None,
     )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="Expression in specified language",
         default=None,
     )
-    reference: Optional[Uri] = Field(
+    reference: Optional[fhir.uri] = Field(
         description="Where the expression is found",
         default=None,
     )

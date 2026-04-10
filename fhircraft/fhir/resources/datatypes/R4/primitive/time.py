@@ -3,7 +3,7 @@ from datetime import time
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field, field_validator, model_serializer
 
-from fhircraft.fhir.resources.base import FHIRTime as FHIRTimeBase
+from fhircraft.fhir.resources.base import TimeBase
 from fhircraft.fhir.resources.datatypes.R4.complex.element import Element
 from fhircraft.fhir.resources.datatypes import (
     HOUR_REGEX,
@@ -17,7 +17,7 @@ _TIME_PATTERN = (
 )
 
 
-class FHIRTime(Element, FHIRTimeBase):
+class Time(Element, TimeBase):
     """A time during the day."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/time"
@@ -47,4 +47,4 @@ class FHIRTime(Element, FHIRTimeBase):
         return self.value.isoformat()
 
 
-Time = Annotated[time | FHIRTime, BeforeValidator(FHIRTime.model_validate)]
+time_ = Annotated[time | Time, BeforeValidator(Time.model_validate)]

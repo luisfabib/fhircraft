@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DocumentReferenceAttester(BackboneElement):
     """
     A participant who has authenticated the accuracy of the document.
@@ -33,7 +34,7 @@ class DocumentReferenceAttester(BackboneElement):
         description="personal | professional | legal | official",
         default=None,
     )
-    time: Optional[DateTime] = Field(
+    time: Optional[fhir.dateTime] = Field(
         description="When the document was attested",
         default=None,
     )
@@ -41,6 +42,7 @@ class DocumentReferenceAttester(BackboneElement):
         description="Who attested the document",
         default=None,
     )
+
 
 class DocumentReferenceRelatesTo(BackboneElement):
     """
@@ -56,21 +58,22 @@ class DocumentReferenceRelatesTo(BackboneElement):
         default=None,
     )
 
+
 class DocumentReferenceContentProfile(BackboneElement):
     """
     An identifier of the document constraints, encoding, structure, and template that the document conforms to beyond the base format indicated in the mimeType.
     """
 
     valueCoding: Optional[Coding] = Field(
-        description="Code|uri|canonical",
+        description="code|uri|canonical",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
-        description="Code|uri|canonical",
+    valueUri: Optional[fhir.uri] = Field(
+        description="code|uri|canonical",
         default=None,
     )
-    valueCanonical: Optional[Canonical] = Field(
-        description="Code|uri|canonical",
+    valueCanonical: Optional[fhir.canonical] = Field(
+        description="code|uri|canonical",
         default=None,
     )
 
@@ -85,10 +88,11 @@ class DocumentReferenceContentProfile(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, Uri, Canonical],
+            field_types=[Coding, fhir.uri, fhir.canonical],
             field_name_base="value",
             required=True,
         )
+
 
 class DocumentReferenceContent(BackboneElement):
     """
@@ -104,6 +108,7 @@ class DocumentReferenceContent(BackboneElement):
         default=None,
     )
 
+
 class DocumentReference(DomainResource):
     """
     A reference to a document of any kind for any purpose. While the term “document” implies a more narrow focus, for this resource this “document” encompasses *any* serialized object with a mime-type, it includes formal patient-centric documents (CDA), clinical notes, scanned paper, non-patient specific documents like policy text, as well as a photo, video, or audio recording acquired or used in healthcare.  The DocumentReference resource provides metadata about the document so that the document can be discovered and managed.  The actual content may be inline base64 encoded data or provided by direct reference.
@@ -117,7 +122,7 @@ class DocumentReference(DomainResource):
         description="Business identifiers for the document",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="An explicitly assigned identifer of a variation of the content in the DocumentReference",
         default=None,
     )
@@ -125,11 +130,11 @@ class DocumentReference(DomainResource):
         description="Procedure that caused this media to be created",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | superseded | entered-in-error",
         default=None,
     )
-    docStatus: Optional[Code] = Field(
+    docStatus: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
         default=None,
     )
@@ -170,10 +175,10 @@ class DocumentReference(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time of service that is being documented",
+        description="time of service that is being documented",
         default=None,
     )
-    date: Optional[Instant] = Field(
+    date: Optional[fhir.instant] = Field(
         description="When this document reference was created",
         default=None,
     )
@@ -193,7 +198,7 @@ class DocumentReference(DomainResource):
         description="Relationships to other documents",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-readable description",
         default=None,
     )

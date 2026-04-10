@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -55,7 +55,7 @@ class InventoryReportInventoryListing(BackboneElement):
         description="The status of the items that are being reported",
         default=None,
     )
-    countingDateTime: Optional[DateTime] = Field(
+    countingDateTime: Optional[fhir.dateTime] = Field(
         description="The date and time when the items were counted",
         default=None,
     )
@@ -77,11 +77,11 @@ class InventoryReport(DomainResource):
         description="Business identifier for the report",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | requested | active | entered-in-error",
         default=None,
     )
-    countType: Optional[Code] = Field(
+    countType: Optional[fhir.code] = Field(
         description="snapshot | difference",
         default=None,
     )
@@ -93,7 +93,7 @@ class InventoryReport(DomainResource):
         description="The reason for this count - regular count, ad-hoc count, new arrivals, etc",
         default=None,
     )
-    reportedDateTime: Optional[DateTime] = Field(
+    reportedDateTime: Optional[fhir.dateTime] = Field(
         description="When the report has been submitted",
         default=None,
     )

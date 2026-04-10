@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -43,7 +43,7 @@ class ResearchSubject(DomainResource):
         description="Business Identifier for research subject in a study",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn",
         default=None,
     )
@@ -59,11 +59,11 @@ class ResearchSubject(DomainResource):
         description="Who is part of study",
         default=None,
     )
-    assignedArm: Optional[String] = Field(
+    assignedArm: Optional[fhir.string] = Field(
         description="What path should be followed",
         default=None,
     )
-    actualArm: Optional[String] = Field(
+    actualArm: Optional[fhir.string] = Field(
         description="What path was followed",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -33,7 +33,7 @@ class RelatedPersonCommunication(BackboneElement):
         description="The language which can be used to communicate with the patient about his or her health",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
         default=None,
     )
@@ -63,7 +63,7 @@ class RelatedPerson(DomainResource):
         description="A human identifier for this person",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this related person\u0027s record is in active use",
         default=None,
     )
@@ -83,11 +83,11 @@ class RelatedPerson(DomainResource):
         description="A contact detail for the person",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date on which the related person was born",
         default=None,
     )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -69,7 +69,7 @@ class ProvenanceEntity(BackboneElement):
     An entity used in this activity.
     """
 
-    role: Optional[Code] = Field(
+    role: Optional[fhir.code] = Field(
         description="derivation | revision | quotation | source | removal",
         default=None,
     )
@@ -111,15 +111,15 @@ class Provenance(DomainResource):
         description="When the activity occurred",
         default=None,
     )
-    occurredDateTime: Optional[DateTime] = Field(
+    occurredDateTime: Optional[fhir.dateTime] = Field(
         description="When the activity occurred",
         default=None,
     )
-    recorded: Optional[Instant] = Field(
+    recorded: Optional[fhir.instant] = Field(
         description="When the activity was recorded / updated",
         default=None,
     )
-    policy: Optional[ListType[Uri]] = Field(
+    policy: Optional[ListType[fhir.uri]] = Field(
         description="Policy or plan the activity was defined by",
         default=None,
     )
@@ -159,7 +159,7 @@ class Provenance(DomainResource):
     def occurred_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, DateTime],
+            field_types=[Period, fhir.dateTime],
             field_name_base="occurred",
             required=False,
         )

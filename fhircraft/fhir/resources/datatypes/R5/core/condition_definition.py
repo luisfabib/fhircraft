@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ConditionDefinitionObservation(BackboneElement):
     """
     Observations particularly relevant to this condition.
@@ -34,9 +35,10 @@ class ConditionDefinitionObservation(BackboneElement):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code for relevant Observation",
+        description="code for relevant Observation",
         default=None,
     )
+
 
 class ConditionDefinitionMedication(BackboneElement):
     """
@@ -48,21 +50,22 @@ class ConditionDefinitionMedication(BackboneElement):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code for relevant Medication",
+        description="code for relevant Medication",
         default=None,
     )
+
 
 class ConditionDefinitionPrecondition(BackboneElement):
     """
     An observation that suggests that this condition applies.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="sensitive | specific",
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code for relevant Observation",
+        description="code for relevant Observation",
         default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
@@ -90,12 +93,13 @@ class ConditionDefinitionPrecondition(BackboneElement):
             required=False,
         )
 
+
 class ConditionDefinitionQuestionnaire(BackboneElement):
     """
     Questionnaire for this condition.
     """
 
-    purpose: Optional[Code] = Field(
+    purpose: Optional[fhir.code] = Field(
         description="preadmit | diff-diagnosis | outcome",
         default=None,
     )
@@ -103,6 +107,7 @@ class ConditionDefinitionQuestionnaire(BackboneElement):
         description="Specific Questionnaire",
         default=None,
     )
+
 
 class ConditionDefinitionPlan(BackboneElement):
     """
@@ -118,6 +123,7 @@ class ConditionDefinitionPlan(BackboneElement):
         default=None,
     )
 
+
 class ConditionDefinition(DomainResource):
     """
     A definition of a condition and information relevant to managing it.
@@ -127,19 +133,19 @@ class ConditionDefinition(DomainResource):
     _type = "ConditionDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ConditionDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this condition definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this condition definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the condition definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the condition definition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -147,31 +153,31 @@ class ConditionDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this condition definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this condition definition (human friendly)",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the event definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -179,7 +185,7 @@ class ConditionDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the condition definition",
         default=None,
     )
@@ -207,19 +213,19 @@ class ConditionDefinition(DomainResource):
         description="Stage/grade, usually assessed formally",
         default=None,
     )
-    hasSeverity: Optional[Boolean] = Field(
+    hasSeverity: Optional[fhir.boolean] = Field(
         description="Whether Severity is appropriate",
         default=None,
     )
-    hasBodySite: Optional[Boolean] = Field(
+    hasBodySite: Optional[fhir.boolean] = Field(
         description="Whether bodySite is appropriate",
         default=None,
     )
-    hasStage: Optional[Boolean] = Field(
+    hasStage: Optional[fhir.boolean] = Field(
         description="Whether stage is appropriate",
         default=None,
     )
-    definition: Optional[ListType[Uri]] = Field(
+    definition: Optional[ListType[fhir.uri]] = Field(
         description="Formal Definition for the condition",
         default=None,
     )
@@ -259,7 +265,7 @@ class ConditionDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

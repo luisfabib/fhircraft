@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class Slot(DomainResource):
     """
@@ -53,23 +54,23 @@ class Slot(DomainResource):
         description="The schedule resource that this slot defines an interval of status information",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="busy | free | busy-unavailable | busy-tentative | entered-in-error",
         default=None,
     )
-    start: Optional[Instant] = Field(
-        description="Date/Time that the slot is to begin",
+    start: Optional[fhir.instant] = Field(
+        description="Date/time that the slot is to begin",
         default=None,
     )
-    end: Optional[Instant] = Field(
-        description="Date/Time that the slot is to conclude",
+    end: Optional[fhir.instant] = Field(
+        description="Date/time that the slot is to conclude",
         default=None,
     )
-    overbooked: Optional[Boolean] = Field(
+    overbooked: Optional[fhir.boolean] = Field(
         description="This slot has already been overbooked, appointments are unlikely to be accepted for this time",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Comments on the slot to describe any extended information. Such as custom constraints on the slot",
         default=None,
     )

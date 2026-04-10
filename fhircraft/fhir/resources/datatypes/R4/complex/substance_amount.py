@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .codeable_concept import CodeableConcept
 from .element import Element
 from .backbone_element import BackboneElement
@@ -26,7 +26,7 @@ class SubstanceAmount(BackboneElement):
         description="Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field",
         default=None,
     )
@@ -34,7 +34,7 @@ class SubstanceAmount(BackboneElement):
         description="Most elements that require a quantitative value will also have a field called amount type. Amount type should always be specified because the actual value of the amount is often dependent on it. EXAMPLE: In capturing the actual relative amounts of substances or molecular fragments it is essential to indicate whether the amount refers to a mole ratio or weight ratio. For any given element an effort should be made to use same the amount type for all related definitional elements",
         default=None,
     )
-    amountText: Optional[String] = Field(
+    amountText: Optional[fhir.string] = Field(
         description="A textual comment on a numeric value",
         default=None,
     )
@@ -47,7 +47,7 @@ class SubstanceAmount(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["Quantity", "Range", String],
+            field_types=["Quantity", "Range", fhir.string],
             field_name_base="amount",
         )
 

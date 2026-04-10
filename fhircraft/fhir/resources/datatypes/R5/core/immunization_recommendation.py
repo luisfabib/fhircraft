@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
     """
     Vaccine date recommendations.  For example, earliest date to administer, latest date to administer, etc.
@@ -29,10 +30,11 @@ class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
         description="Type of date",
         default=None,
     )
-    value: Optional[DateTime] = Field(
+    value: Optional[fhir.dateTime] = Field(
         description="Recommended date",
         default=None,
     )
+
 
 class ImmunizationRecommendationRecommendation(BackboneElement):
     """
@@ -65,19 +67,19 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Dates governing proposed immunization",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Protocol details",
         default=None,
     )
-    series: Optional[String] = Field(
+    series: Optional[fhir.string] = Field(
         description="Name of vaccination series",
         default=None,
     )
-    doseNumber: Optional[String] = Field(
+    doseNumber: Optional[fhir.string] = Field(
         description="Recommended dose number within series",
         default=None,
     )
-    seriesDoses: Optional[String] = Field(
+    seriesDoses: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
@@ -89,6 +91,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Patient observations supporting recommendation",
         default=None,
     )
+
 
 class ImmunizationRecommendation(DomainResource):
     """
@@ -109,7 +112,7 @@ class ImmunizationRecommendation(DomainResource):
         description="Who this profile is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date recommendation(s) created",
         default=None,
     )

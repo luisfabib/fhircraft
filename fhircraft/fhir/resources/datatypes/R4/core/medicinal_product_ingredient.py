@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
     """
@@ -41,7 +42,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         description="A lower limit for the strength per unitary volume (or mass), for when there is a range. The concentration attribute then becomes the upper limit",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="For when strength is measured at a particular point or distance",
         default=None,
     )
@@ -57,6 +58,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         description="Strength expressed in terms of a reference substance",
         default=None,
     )
+
 
 class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
     """
@@ -82,6 +84,7 @@ class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
         default=None,
     )
 
+
 class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
     BackboneElement
 ):
@@ -101,7 +104,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         description="Strength expressed in terms of a reference substance",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="For when strength is measured at a particular point or distance",
         default=None,
     )
@@ -109,6 +112,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         description="The country or countries for which the strength range applies",
         default=None,
     )
+
 
 class MedicinalProductIngredientSubstanceStrength(BackboneElement):
     """
@@ -131,7 +135,7 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
         description="A lower limit for the strength per unitary volume (or mass), for when there is a range. The concentration attribute then becomes the upper limit",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="For when strength is measured at a particular point or distance",
         default=None,
     )
@@ -146,6 +150,7 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
         default=None,
     )
 
+
 class MedicinalProductIngredientSubstance(BackboneElement):
     """
     The ingredient substance.
@@ -159,6 +164,7 @@ class MedicinalProductIngredientSubstance(BackboneElement):
         description="Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product",
         default=None,
     )
+
 
 class MedicinalProductIngredient(DomainResource):
     """
@@ -191,7 +197,7 @@ class MedicinalProductIngredient(DomainResource):
         description="Ingredient role e.g. Active ingredient, excipient",
         default=None,
     )
-    allergenicIndicator: Optional[Boolean] = Field(
+    allergenicIndicator: Optional[fhir.boolean] = Field(
         description="If the ingredient is a known or suspected allergen",
         default=None,
     )

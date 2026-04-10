@@ -14,7 +14,7 @@ from .codeable_concept import CodeableConcept
 from .meta import Meta
 from .identifier import Identifier
 from .reference import Reference
-from .xhtml import xhtml
+from .xhtml import Xhtml
 from .narrative import Narrative
 from .backbone_element import BackboneElement
 from .attachment import Attachment
@@ -123,7 +123,7 @@ __all__ = [
     "TimingRepeat",
     "TriggerDefinition",
     "UsageContext",
-    "xhtml",
+    "Xhtml",
 ]
 
 # Ensure all forward references (e.g. "Extension" in Element) are resolved

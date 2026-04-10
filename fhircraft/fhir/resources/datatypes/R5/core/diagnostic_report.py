@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DiagnosticReportSupportingInfo(BackboneElement):
     """
     This backbone element contains supporting information that was used in the creation of the report not included in the results already included in the report.
@@ -37,12 +38,13 @@ class DiagnosticReportSupportingInfo(BackboneElement):
         default=None,
     )
 
+
 class DiagnosticReportMedia(BackboneElement):
     """
     A list of key images or data associated with this report. The images or data are generally created during the diagnostic process, and may be directly of the patient, or of treated specimens (i.e. slides of interest).
     """
 
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Comment about the image or data (e.g. explanation)",
         default=None,
     )
@@ -50,6 +52,7 @@ class DiagnosticReportMedia(BackboneElement):
         description="Reference to the image or data source",
         default=None,
     )
+
 
 class DiagnosticReport(DomainResource):
     """
@@ -68,7 +71,7 @@ class DiagnosticReport(DomainResource):
         description="What was requested",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | modified | final | amended | corrected | appended | cancelled | entered-in-error | unknown",
         default=None,
     )
@@ -77,7 +80,7 @@ class DiagnosticReport(DomainResource):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Name/Code for this diagnostic report",
+        description="Name/code for this diagnostic report",
         default=None,
     )
     subject: Optional[Reference] = Field(
@@ -88,7 +91,7 @@ class DiagnosticReport(DomainResource):
         description="Health care event when test ordered",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="Clinically relevant time/time-period for report",
         default=None,
     )
@@ -96,7 +99,7 @@ class DiagnosticReport(DomainResource):
         description="Clinically relevant time/time-period for report",
         default=None,
     )
-    issued: Optional[Instant] = Field(
+    issued: Optional[fhir.instant] = Field(
         description="DateTime this version was made",
         default=None,
     )
@@ -136,7 +139,7 @@ class DiagnosticReport(DomainResource):
         description="Reference to a Composition resource for the DiagnosticReport structure",
         default=None,
     )
-    conclusion: Optional[Markdown] = Field(
+    conclusion: Optional[fhir.markdown] = Field(
         description="Clinical conclusion (interpretation) of test results",
         default=None,
     )
@@ -160,7 +163,7 @@ class DiagnosticReport(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="effective",
             required=False,
         )

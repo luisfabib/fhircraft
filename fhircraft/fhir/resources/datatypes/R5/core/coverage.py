@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -32,7 +32,7 @@ class CoveragePaymentBy(BackboneElement):
         description="Parties performing self-payment",
         default=None,
     )
-    responsibility: Optional[String] = Field(
+    responsibility: Optional[fhir.string] = Field(
         description="Party\u0027s responsibility",
         default=None,
     )
@@ -50,7 +50,7 @@ class CoverageClass(BackboneElement):
         description="Value associated with the type",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human readable description of the type and value",
         default=None,
     )
@@ -136,11 +136,11 @@ class Coverage(DomainResource):
         description="Business identifier(s) for this coverage",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="insurance | self-pay | other",
         default=None,
     )
@@ -168,7 +168,7 @@ class Coverage(DomainResource):
         description="Plan beneficiary",
         default=None,
     )
-    dependent: Optional[String] = Field(
+    dependent: Optional[fhir.string] = Field(
         description="Dependent number",
         default=None,
     )
@@ -189,11 +189,11 @@ class Coverage(DomainResource):
         default=None,
         alias="class",
     )
-    order: Optional[PositiveInt] = Field(
+    order: Optional[fhir.positiveInt] = Field(
         description="Relative order of the coverage",
         default=None,
     )
-    network: Optional[String] = Field(
+    network: Optional[fhir.string] = Field(
         description="Insurer network",
         default=None,
     )
@@ -201,7 +201,7 @@ class Coverage(DomainResource):
         description="Patient payments for services/products",
         default=None,
     )
-    subrogation: Optional[Boolean] = Field(
+    subrogation: Optional[fhir.boolean] = Field(
         description="Reimbursement to insurer",
         default=None,
     )

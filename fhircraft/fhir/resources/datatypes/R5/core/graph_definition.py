@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,88 +22,91 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class GraphDefinitionNode(BackboneElement):
     """
     Potential target for the link.
     """
 
-    nodeId: Optional[Id] = Field(
+    nodeId: Optional[fhir.id_] = Field(
         description="Internal ID - target for link references",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why this node is specified",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="Type of resource this link refers to",
         default=None,
     )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Profile for the target resource",
         default=None,
     )
+
 
 class GraphDefinitionLinkCompartment(BackboneElement):
     """
     Compartment Consistency Rules.
     """
 
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="where | requires",
         default=None,
     )
-    rule: Optional[Code] = Field(
+    rule: Optional[fhir.code] = Field(
         description="identical | matching | different | custom",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Patient | Encounter | RelatedPerson | Practitioner | Device | EpisodeOfCare",
         default=None,
     )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="Custom rule, as a FHIRPath expression",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Documentation for FHIRPath expression",
         default=None,
     )
+
 
 class GraphDefinitionLink(BackboneElement):
     """
     Links this graph makes rules about.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why this link is specified",
         default=None,
     )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Minimum occurrences for this link",
         default=None,
     )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum occurrences for this link",
         default=None,
     )
-    sourceId: Optional[Id] = Field(
+    sourceId: Optional[fhir.id_] = Field(
         description="Source Node for this link",
         default=None,
     )
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="Path in the resource that contains the link",
         default=None,
     )
-    sliceName: Optional[String] = Field(
+    sliceName: Optional[fhir.string] = Field(
         description="Which slice (if profiled)",
         default=None,
     )
-    targetId: Optional[Id] = Field(
+    targetId: Optional[fhir.id_] = Field(
         description="Target Node for this link",
         default=None,
     )
-    params: Optional[String] = Field(
+    params: Optional[fhir.string] = Field(
         description="Criteria for reverse lookup",
         default=None,
     )
@@ -111,6 +114,7 @@ class GraphDefinitionLink(BackboneElement):
         description="Compartment Consistency Rules",
         default=None,
     )
+
 
 class GraphDefinition(DomainResource):
     """
@@ -121,19 +125,19 @@ class GraphDefinition(DomainResource):
     _type = "GraphDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/GraphDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this graph definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this graph definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the GraphDefinition (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the graph definition",
         default=None,
     )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
     )
@@ -141,27 +145,27 @@ class GraphDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this graph definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this graph definition (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -169,7 +173,7 @@ class GraphDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the graph definition",
         default=None,
     )
@@ -181,19 +185,19 @@ class GraphDefinition(DomainResource):
         description="Intended jurisdiction for graph definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this graph definition is defined",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    start: Optional[Id] = Field(
+    start: Optional[fhir.id_] = Field(
         description="Starting Node",
         default=None,
     )
@@ -217,7 +221,7 @@ class GraphDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.string, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

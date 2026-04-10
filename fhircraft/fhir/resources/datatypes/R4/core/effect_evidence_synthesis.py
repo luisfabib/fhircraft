@@ -5,7 +5,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -24,34 +24,36 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EffectEvidenceSynthesisSampleSize(BackboneElement):
     """
     A description of the size of the sample involved in the synthesis.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of sample size",
         default=None,
     )
-    numberOfStudies: Optional[Integer] = Field(
+    numberOfStudies: Optional[fhir.integer] = Field(
         description="How many studies?",
         default=None,
     )
-    numberOfParticipants: Optional[Integer] = Field(
+    numberOfParticipants: Optional[fhir.integer] = Field(
         description="How many participants?",
         default=None,
     )
+
 
 class EffectEvidenceSynthesisResultsByExposure(BackboneElement):
     """
     A description of the results for each exposure considered in the effect estimate.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of results by exposure",
         default=None,
     )
-    exposureState: Optional[Code] = Field(
+    exposureState: Optional[fhir.code] = Field(
         description="exposure | exposure-alternative",
         default=None,
     )
@@ -64,6 +66,7 @@ class EffectEvidenceSynthesisResultsByExposure(BackboneElement):
         default=None,
     )
 
+
 class EffectEvidenceSynthesisEffectEstimatePrecisionEstimate(BackboneElement):
     """
     A description of the precision of the estimate for the effect.
@@ -73,26 +76,27 @@ class EffectEvidenceSynthesisEffectEstimatePrecisionEstimate(BackboneElement):
         description="Type of precision estimate",
         default=None,
     )
-    level: Optional[Decimal] = Field(
+    level: Optional[fhir.decimal] = Field(
         description="Level of confidence interval",
         default=None,
     )
-    from_: Optional[Decimal] = Field(
+    from_: Optional[fhir.decimal] = Field(
         description="Lower bound",
         default=None,
         alias="from",
     )
-    to: Optional[Decimal] = Field(
+    to: Optional[fhir.decimal] = Field(
         description="Upper bound",
         default=None,
     )
+
 
 class EffectEvidenceSynthesisEffectEstimate(BackboneElement):
     """
     The estimated effect of the exposure variant.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of effect estimate",
         default=None,
     )
@@ -104,7 +108,7 @@ class EffectEvidenceSynthesisEffectEstimate(BackboneElement):
         description="Variant exposure states",
         default=None,
     )
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Point estimate",
         default=None,
     )
@@ -118,6 +122,7 @@ class EffectEvidenceSynthesisEffectEstimate(BackboneElement):
         description="How precise the estimate is",
         default=None,
     )
+
 
 class EffectEvidenceSynthesisCertaintyCertaintySubcomponent(BackboneElement):
     """
@@ -136,6 +141,7 @@ class EffectEvidenceSynthesisCertaintyCertaintySubcomponent(BackboneElement):
         description="Used for footnotes or explanatory notes",
         default=None,
     )
+
 
 class EffectEvidenceSynthesisCertainty(BackboneElement):
     """
@@ -156,6 +162,7 @@ class EffectEvidenceSynthesisCertainty(BackboneElement):
         description="A component that contributes to the overall certainty",
         default=None,
     )
+
 
 class EffectEvidenceSynthesis(DomainResource):
     """
@@ -178,35 +185,35 @@ class EffectEvidenceSynthesis(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this effect evidence synthesis, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this effect evidence synthesis, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the effect evidence synthesis",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the effect evidence synthesis",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this effect evidence synthesis (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this effect evidence synthesis (human friendly)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -214,7 +221,7 @@ class EffectEvidenceSynthesis(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the effect evidence synthesis",
         default=None,
     )
@@ -230,15 +237,15 @@ class EffectEvidenceSynthesis(DomainResource):
         description="Intended jurisdiction for effect evidence synthesis (if applicable)",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the effect evidence synthesis was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the effect evidence synthesis was last reviewed",
         default=None,
     )

@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -39,7 +39,7 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
         description="The reference sequence that represents the starting sequence",
         default=None,
     )
-    sequenceString: Optional[String] = Field(
+    sequenceString: Optional[fhir.string] = Field(
         description="The reference sequence that represents the starting sequence",
         default=None,
     )
@@ -47,19 +47,19 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
         description="The reference sequence that represents the starting sequence",
         default=None,
     )
-    windowStart: Optional[Integer] = Field(
+    windowStart: Optional[fhir.integer] = Field(
         description="Start position of the window on the starting sequence",
         default=None,
     )
-    windowEnd: Optional[Integer] = Field(
+    windowEnd: Optional[fhir.integer] = Field(
         description="End position of the window on the starting sequence",
         default=None,
     )
-    orientation: Optional[Code] = Field(
+    orientation: Optional[fhir.code] = Field(
         description="sense | antisense",
         default=None,
     )
-    strand: Optional[Code] = Field(
+    strand: Optional[fhir.code] = Field(
         description="watson | crick",
         default=None,
     )
@@ -75,7 +75,7 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
     def sequence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, String, Reference],
+            field_types=[CodeableConcept, fhir.string, Reference],
             field_name_base="sequence",
             required=False,
         )
@@ -85,19 +85,19 @@ class MolecularSequenceRelativeEdit(BackboneElement):
     Changes in sequence from the starting sequence.
     """
 
-    start: Optional[Integer] = Field(
+    start: Optional[fhir.integer] = Field(
         description="Start position of the edit on the starting sequence",
         default=None,
     )
-    end: Optional[Integer] = Field(
+    end: Optional[fhir.integer] = Field(
         description="End position of the edit on the starting sequence",
         default=None,
     )
-    replacementSequence: Optional[String] = Field(
+    replacementSequence: Optional[fhir.string] = Field(
         description="Allele that was observed",
         default=None,
     )
-    replacedSequence: Optional[String] = Field(
+    replacedSequence: Optional[fhir.string] = Field(
         description="Allele in the starting sequence",
         default=None,
     )
@@ -111,7 +111,7 @@ class MolecularSequenceRelative(BackboneElement):
         description="Ways of identifying nucleotides or amino acids within a sequence",
         default=None,
     )
-    ordinalPosition: Optional[Integer] = Field(
+    ordinalPosition: Optional[fhir.integer] = Field(
         description="Indicates the order in which the sequence should be considered when putting multiple \u0027relative\u0027 elements together",
         default=None,
     )
@@ -141,7 +141,7 @@ class MolecularSequence(DomainResource):
         description="Unique ID for this particular sequence",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="aa | dna | rna",
         default=None,
     )
@@ -165,7 +165,7 @@ class MolecularSequence(DomainResource):
         description="Who should be responsible for test result",
         default=None,
     )
-    literal: Optional[String] = Field(
+    literal: Optional[fhir.string] = Field(
         description="Sequence that was observed",
         default=None,
     )

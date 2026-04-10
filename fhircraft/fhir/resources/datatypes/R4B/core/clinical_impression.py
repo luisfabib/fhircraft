@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ClinicalImpressionInvestigation(BackboneElement):
     """
     One or more sets of investigations (signs, symptoms, etc.). The actual grouping of investigations varies greatly depending on the type and context of the assessment. These investigations may include data generated during the assessment process, or data previously generated and recorded that is pertinent to the outcomes.
@@ -35,6 +36,7 @@ class ClinicalImpressionInvestigation(BackboneElement):
         default=None,
     )
 
+
 class ClinicalImpressionFinding(BackboneElement):
     """
     Specific findings or diagnoses that were considered likely or relevant to ongoing treatment.
@@ -48,10 +50,11 @@ class ClinicalImpressionFinding(BackboneElement):
         description="What was found",
         default=None,
     )
-    basis: Optional[String] = Field(
+    basis: Optional[fhir.string] = Field(
         description="Which investigations support finding",
         default=None,
     )
+
 
 class ClinicalImpression(DomainResource):
     """
@@ -78,7 +81,7 @@ class ClinicalImpression(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | completed | entered-in-error",
         default=None,
     )
@@ -90,7 +93,7 @@ class ClinicalImpression(DomainResource):
         description="Kind of assessment performed",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why/how the assessment was performed",
         default=None,
     )
@@ -102,15 +105,15 @@ class ClinicalImpression(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
-        description="Time of assessment",
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
+        description="time of assessment",
         default=None,
     )
     effectivePeriod: Optional[Period] = Field(
-        description="Time of assessment",
+        description="time of assessment",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the assessment was documented",
         default=None,
     )
@@ -130,11 +133,11 @@ class ClinicalImpression(DomainResource):
         description="One or more sets of investigations (signs, symptoms, etc.)",
         default=None,
     )
-    protocol: Optional[ListType[Uri]] = Field(
+    protocol: Optional[ListType[fhir.uri]] = Field(
         description="Clinical Protocol followed",
         default=None,
     )
-    summary: Optional[String] = Field(
+    summary: Optional[fhir.string] = Field(
         description="Summary of the assessment",
         default=None,
     )
@@ -170,7 +173,7 @@ class ClinicalImpression(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="effective",
             required=False,
         )

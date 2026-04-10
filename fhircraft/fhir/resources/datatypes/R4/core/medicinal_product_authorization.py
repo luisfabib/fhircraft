@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class MedicinalProductAuthorizationJurisdictionalAuthorization(BackboneElement):
     """
@@ -46,6 +47,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization(BackboneElement):
         default=None,
     )
 
+
 class MedicinalProductAuthorizationProcedure(BackboneElement):
     """
     The regulatory procedure for granting or amending a marketing authorization.
@@ -63,7 +65,7 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
         description="Date of procedure",
         default=None,
     )
-    dateDateTime: Optional[DateTime] = Field(
+    dateDateTime: Optional[fhir.dateTime] = Field(
         description="Date of procedure",
         default=None,
     )
@@ -83,10 +85,11 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
     def date_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, DateTime],
+            field_types=[Period, fhir.dateTime],
             field_name_base="date",
             required=False,
         )
+
 
 class MedicinalProductAuthorization(DomainResource):
     """
@@ -131,11 +134,11 @@ class MedicinalProductAuthorization(DomainResource):
         description="The status of the marketing authorization",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="The date at which the given status has become applicable",
         default=None,
     )
-    restoreDate: Optional[DateTime] = Field(
+    restoreDate: Optional[fhir.dateTime] = Field(
         description="The date when a suspended the marketing or the marketing authorization of the product is anticipated to be restored",
         default=None,
     )
@@ -147,11 +150,11 @@ class MedicinalProductAuthorization(DomainResource):
         description="A period of time after authorization before generic product applicatiosn can be submitted",
         default=None,
     )
-    dateOfFirstAuthorization: Optional[DateTime] = Field(
+    dateOfFirstAuthorization: Optional[fhir.dateTime] = Field(
         description="The date when the first authorization was granted by a Medicines Regulatory Agency",
         default=None,
     )
-    internationalBirthDate: Optional[DateTime] = Field(
+    internationalBirthDate: Optional[fhir.dateTime] = Field(
         description="Date of first marketing authorization for a company\u0027s new medicinal product in any country in the World",
         default=None,
     )

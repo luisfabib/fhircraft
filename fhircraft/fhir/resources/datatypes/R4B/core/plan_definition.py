@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -30,6 +30,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class PlanDefinitionGoalTarget(BackboneElement):
     """
@@ -73,6 +74,7 @@ class PlanDefinitionGoalTarget(BackboneElement):
             required=False,
         )
 
+
 class PlanDefinitionGoal(BackboneElement):
     """
     A goal describes an expected outcome that activities within the plan are intended to achieve. For example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, meeting the acceptance criteria for a test as specified by a quality specification, etc.
@@ -83,7 +85,7 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
     description: Optional[CodeableConcept] = Field(
-        description="Code or text describing the goal",
+        description="code or text describing the goal",
         default=None,
     )
     priority: Optional[CodeableConcept] = Field(
@@ -107,39 +109,41 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria or start/stop conditions for the action.
     """
 
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="applicability | start | stop",
         default=None,
     )
     expression: Optional[Expression] = Field(
-        description="Boolean-valued expression",
+        description="boolean-valued expression",
         default=None,
     )
+
 
 class PlanDefinitionActionRelatedAction(BackboneElement):
     """
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    actionId: Optional[Id] = Field(
+    actionId: Optional[fhir.id_] = Field(
         description="What action is this related to",
         default=None,
     )
-    relationship: Optional[Code] = Field(
+    relationship: Optional[fhir.code] = Field(
         description="before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end",
         default=None,
     )
     offsetDuration: Optional[Duration] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
     offsetRange: Optional[Range] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
 
@@ -159,12 +163,13 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
             required=False,
         )
 
+
 class PlanDefinitionActionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="patient | practitioner | related-person | device",
         default=None,
     )
@@ -173,12 +178,13 @@ class PlanDefinitionActionParticipant(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActionDynamicValue(BackboneElement):
     """
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
     """
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="The path to the element to be set dynamically",
         default=None,
     )
@@ -187,33 +193,34 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionAction(BackboneElement):
     """
     An action or group of actions to be taken as part of the plan. For example, in clinical care, an action would be to prescribe a particular indicated medication, or perform a particular test as appropriate. In pharmaceutical quality, an action would be the test that needs to be performed on a drug product as defined in the quality specification.
     """
 
-    prefix: Optional[String] = Field(
+    prefix: Optional[fhir.string] = Field(
         description="User-visible prefix for the action (e.g. 1. or A.)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Brief description of the action",
         default=None,
     )
-    textEquivalent: Optional[String] = Field(
+    textEquivalent: Optional[fhir.string] = Field(
         description="Static text equivalent of the action, used if the dynamic aspects cannot be interpreted by the receiving system",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code representing the meaning of the action or sub-actions",
+        description="code representing the meaning of the action or sub-actions",
         default=None,
     )
     reason: Optional[ListType[CodeableConcept]] = Field(
@@ -224,7 +231,7 @@ class PlanDefinitionAction(BackboneElement):
         description="Supporting documentation for the intended performer of the action",
         default=None,
     )
-    goalId: Optional[ListType[Id]] = Field(
+    goalId: Optional[ListType[fhir.id_]] = Field(
         description="What goals this action supports",
         default=None,
     )
@@ -236,7 +243,7 @@ class PlanDefinitionAction(BackboneElement):
         description="Type of individual the action is focused on",
         default=None,
     )
-    subjectCanonical: Optional[Canonical] = Field(
+    subjectCanonical: Optional[fhir.canonical] = Field(
         description="Type of individual the action is focused on",
         default=None,
     )
@@ -260,7 +267,7 @@ class PlanDefinitionAction(BackboneElement):
         description="Relationship to another action",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="When the action should take place",
         default=None,
     )
@@ -292,35 +299,35 @@ class PlanDefinitionAction(BackboneElement):
         description="create | update | remove | fire-event",
         default=None,
     )
-    groupingBehavior: Optional[Code] = Field(
+    groupingBehavior: Optional[fhir.code] = Field(
         description="visual-group | logical-group | sentence-group",
         default=None,
     )
-    selectionBehavior: Optional[Code] = Field(
+    selectionBehavior: Optional[fhir.code] = Field(
         description="any | all | all-or-none | exactly-one | at-most-one | one-or-more",
         default=None,
     )
-    requiredBehavior: Optional[Code] = Field(
+    requiredBehavior: Optional[fhir.code] = Field(
         description="must | could | must-unless-documented",
         default=None,
     )
-    precheckBehavior: Optional[Code] = Field(
+    precheckBehavior: Optional[fhir.code] = Field(
         description="yes | no",
         default=None,
     )
-    cardinalityBehavior: Optional[Code] = Field(
+    cardinalityBehavior: Optional[fhir.code] = Field(
         description="single | multiple",
         default=None,
     )
-    definitionCanonical: Optional[Canonical] = Field(
+    definitionCanonical: Optional[fhir.canonical] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionUri: Optional[Uri] = Field(
+    definitionUri: Optional[fhir.uri] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    transform: Optional[Canonical] = Field(
+    transform: Optional[fhir.canonical] = Field(
         description="Transform to apply the template",
         default=None,
     )
@@ -358,7 +365,7 @@ class PlanDefinitionAction(BackboneElement):
     def subject_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Reference, Canonical],
+            field_types=[CodeableConcept, Reference, fhir.canonical],
             field_name_base="subject",
             required=False,
         )
@@ -367,7 +374,7 @@ class PlanDefinitionAction(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Duration, Range, Timing],
+            field_types=[fhir.dateTime, Age, Period, Duration, Range, Timing],
             field_name_base="timing",
             required=False,
         )
@@ -376,10 +383,11 @@ class PlanDefinitionAction(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Uri],
+            field_types=[fhir.canonical, fhir.uri],
             field_name_base="definition",
             required=False,
         )
+
 
 class PlanDefinition(DomainResource):
     """
@@ -402,27 +410,27 @@ class PlanDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this plan definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this plan definition, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the plan definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the plan definition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this plan definition (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this plan definition (human friendly)",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the plan definition",
         default=None,
     )
@@ -430,11 +438,11 @@ class PlanDefinition(DomainResource):
         description="order-set | clinical-protocol | eca-rule | workflow-definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
@@ -446,15 +454,15 @@ class PlanDefinition(DomainResource):
         description="Type of individual the plan definition is focused on",
         default=None,
     )
-    subjectCanonical: Optional[Canonical] = Field(
+    subjectCanonical: Optional[fhir.canonical] = Field(
         description="Type of individual the plan definition is focused on",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -462,7 +470,7 @@ class PlanDefinition(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the plan definition",
         default=None,
     )
@@ -474,23 +482,23 @@ class PlanDefinition(DomainResource):
         description="Intended jurisdiction for plan definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this plan definition is defined",
         default=None,
     )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="Describes the clinical usage of the plan",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the plan definition was approved by publisher",
         default=None,
     )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the plan definition was last reviewed",
         default=None,
     )
@@ -522,7 +530,7 @@ class PlanDefinition(DomainResource):
         description="Additional documentation, citations",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the plan definition",
         default=None,
     )
@@ -546,7 +554,7 @@ class PlanDefinition(DomainResource):
     def subject_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Reference, Canonical],
+            field_types=[CodeableConcept, Reference, fhir.canonical],
             field_name_base="subject",
             required=False,
         )

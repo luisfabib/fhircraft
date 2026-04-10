@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .element import Element
 
 class Expression(Element):
@@ -14,23 +14,23 @@ class Expression(Element):
 
     _type = "Expression"
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Natural language description of the condition",
         default=None,
     )
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Short name assigned to expression for reuse",
         default=None,
     )
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="text/cql | text/fhirpath | application/x-fhir-query | etc.",
         default=None,
     )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="Expression in specified language",
         default=None,
     )
-    reference: Optional[Uri] = Field(
+    reference: Optional[fhir.uri] = Field(
         description="Where the expression is found",
         default=None,
     )

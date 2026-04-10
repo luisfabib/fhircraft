@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -26,12 +26,13 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceVariableCharacteristicTimeFromStart(BackboneElement):
     """
     Indicates duration, period, or point of observation from the participant's study entry.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Human readable description",
         default=None,
     )
@@ -48,12 +49,13 @@ class EvidenceVariableCharacteristicTimeFromStart(BackboneElement):
         default=None,
     )
 
+
 class EvidenceVariableCharacteristic(BackboneElement):
     """
     A characteristic that defines the members of the evidence element. Multiple characteristics are applied with "and" semantics.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Natural language description of the characteristic",
         default=None,
     )
@@ -61,7 +63,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="What code or expression defines members?",
         default=None,
     )
-    definitionCanonical: Optional[Canonical] = Field(
+    definitionCanonical: Optional[fhir.canonical] = Field(
         description="What code or expression defines members?",
         default=None,
     )
@@ -81,7 +83,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Device used for determining characteristic",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Whether the characteristic includes or excludes members",
         default=None,
     )
@@ -89,7 +91,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Observation time from study start",
         default=None,
     )
-    groupMeasure: Optional[Code] = Field(
+    groupMeasure: Optional[fhir.code] = Field(
         description="mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median",
         default=None,
     )
@@ -105,17 +107,18 @@ class EvidenceVariableCharacteristic(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Canonical, CodeableConcept, Expression],
+            field_types=[Reference, fhir.canonical, CodeableConcept, Expression],
             field_name_base="definition",
             required=True,
         )
+
 
 class EvidenceVariableCategory(BackboneElement):
     """
     A grouping (or set of values) described along with other groupings to specify the set of groupings allowed for the variable.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Description of the grouping",
         default=None,
     )
@@ -148,6 +151,7 @@ class EvidenceVariableCategory(BackboneElement):
             required=False,
         )
 
+
 class EvidenceVariable(DomainResource):
     """
     The EvidenceVariable resource describes an element that knowledge (Evidence) is about.
@@ -169,43 +173,43 @@ class EvidenceVariable(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this evidence variable, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this evidence variable, represented as a URI (globally unique)",
         default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the evidence variable",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the evidence variable",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this evidence variable (computer friendly)",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this evidence variable (human friendly)",
         default=None,
     )
-    shortTitle: Optional[String] = Field(
+    shortTitle: Optional[fhir.string] = Field(
         description="Title for use in informal contexts",
         default=None,
     )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the EvidenceVariable",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the evidence variable",
         default=None,
     )
@@ -217,7 +221,7 @@ class EvidenceVariable(DomainResource):
         description="The context that the content is intended to support",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
     )
@@ -245,11 +249,11 @@ class EvidenceVariable(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    actual: Optional[Boolean] = Field(
+    actual: Optional[fhir.boolean] = Field(
         description="Actual or conceptual",
         default=None,
     )
-    characteristicCombination: Optional[Code] = Field(
+    characteristicCombination: Optional[fhir.code] = Field(
         description="intersection | union",
         default=None,
     )
@@ -257,7 +261,7 @@ class EvidenceVariable(DomainResource):
         description="What defines the members of the evidence element",
         default=None,
     )
-    handling: Optional[Code] = Field(
+    handling: Optional[fhir.code] = Field(
         description="continuous | dichotomous | ordinal | polychotomous",
         default=None,
     )

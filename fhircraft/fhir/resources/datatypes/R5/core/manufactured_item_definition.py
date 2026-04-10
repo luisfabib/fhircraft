@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -41,15 +41,15 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="A value for the characteristic",
         default=None,
     )
@@ -76,9 +76,9 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
             field_types=[
                 CodeableConcept,
                 Quantity,
-                Date,
-                Boolean,
-                Markdown,
+                fhir.Date,
+                fhir.Boolean,
+                fhir.Markdown,
                 Attachment,
                 Reference,
             ],
@@ -125,15 +125,15 @@ class ManufacturedItemDefinitionComponentProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="A value for the characteristic",
         default=None,
     )
@@ -160,9 +160,9 @@ class ManufacturedItemDefinitionComponentProperty(BackboneElement):
             field_types=[
                 CodeableConcept,
                 Quantity,
-                Date,
-                Boolean,
-                Markdown,
+                fhir.Date,
+                fhir.Boolean,
+                fhir.Markdown,
                 Attachment,
                 Reference,
             ],
@@ -218,11 +218,11 @@ class ManufacturedItemDefinition(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A descriptive name applied to this item",
         default=None,
     )

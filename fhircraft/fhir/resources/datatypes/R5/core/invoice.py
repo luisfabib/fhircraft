@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -43,11 +43,11 @@ class InvoiceLineItem(BackboneElement):
     Each line item represents one charge for goods and services rendered. Details such.ofType(date), code and amount are found in the referenced ChargeItem resource.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Sequence number of line item",
         default=None,
     )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Service data or period",
         default=None,
     )
@@ -86,7 +86,7 @@ class InvoiceLineItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.date_, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -113,11 +113,11 @@ class Invoice(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | issued | balanced | cancelled | entered-in-error",
         default=None,
     )
-    cancelledReason: Optional[String] = Field(
+    cancelledReason: Optional[fhir.string] = Field(
         description="Reason for cancellation of this Invoice",
         default=None,
     )
@@ -133,15 +133,15 @@ class Invoice(DomainResource):
         description="Recipient of this invoice",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="DEPRICATED",
         default=None,
     )
-    creation: Optional[DateTime] = Field(
+    creation: Optional[fhir.dateTime] = Field(
         description="When posted",
         default=None,
     )
-    periodDate: Optional[Date] = Field(
+    periodDate: Optional[fhir.date_] = Field(
         description="Billing date or period",
         default=None,
     )
@@ -177,7 +177,7 @@ class Invoice(DomainResource):
         description="Gross total of this Invoice",
         default=None,
     )
-    paymentTerms: Optional[Markdown] = Field(
+    paymentTerms: Optional[fhir.markdown] = Field(
         description="Payment details",
         default=None,
     )
@@ -197,7 +197,7 @@ class Invoice(DomainResource):
     def period_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.date_, Period],
             field_name_base="period",
             required=False,
         )

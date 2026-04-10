@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
     """
     Information about the use of the medicinal product in relation to other therapies described as part of the contraindication.
@@ -34,6 +35,7 @@ class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
         description="Reference to a specific medication as part of an indication or contraindication",
         default=None,
     )
+
 
 class ClinicalUseDefinitionContraindication(BackboneElement):
     """
@@ -63,6 +65,7 @@ class ClinicalUseDefinitionContraindication(BackboneElement):
         default=None,
     )
 
+
 class ClinicalUseDefinitionIndicationOtherTherapy(BackboneElement):
     """
     Information about the use of the medicinal product in relation to other therapies described as part of the indication.
@@ -76,6 +79,7 @@ class ClinicalUseDefinitionIndicationOtherTherapy(BackboneElement):
         description="Reference to a specific medication as part of an indication or contraindication",
         default=None,
     )
+
 
 class ClinicalUseDefinitionIndication(BackboneElement):
     """
@@ -102,7 +106,7 @@ class ClinicalUseDefinitionIndication(BackboneElement):
         description="Timing or duration information",
         default=None,
     )
-    durationString: Optional[String] = Field(
+    durationString: Optional[fhir.string] = Field(
         description="Timing or duration information",
         default=None,
     )
@@ -128,10 +132,11 @@ class ClinicalUseDefinitionIndication(BackboneElement):
     def duration_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Range, String],
+            field_types=[Range, fhir.string],
             field_name_base="duration",
             required=False,
         )
+
 
 class ClinicalUseDefinitionInteractionInteractant(BackboneElement):
     """
@@ -163,6 +168,7 @@ class ClinicalUseDefinitionInteractionInteractant(BackboneElement):
             required=True,
         )
 
+
 class ClinicalUseDefinitionInteraction(BackboneElement):
     """
     Specifics for when this is an interaction.
@@ -191,6 +197,7 @@ class ClinicalUseDefinitionInteraction(BackboneElement):
         default=None,
     )
 
+
 class ClinicalUseDefinitionUndesirableEffect(BackboneElement):
     """
     Describe the possible undesirable effects (negative outcomes) from the use of the medicinal product as treatment.
@@ -209,12 +216,13 @@ class ClinicalUseDefinitionUndesirableEffect(BackboneElement):
         default=None,
     )
 
+
 class ClinicalUseDefinitionWarning(BackboneElement):
     """
     A critical piece of information about environmental, health or physical risks or hazards that serve as caution to the user. For example 'Do not operate heavy machinery', 'May cause drowsiness', or 'Get medical advice/attention if you feel unwell'.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A textual definition of this warning, with formatting",
         default=None,
     )
@@ -222,6 +230,7 @@ class ClinicalUseDefinitionWarning(BackboneElement):
         description="A coded or unformatted textual definition of this warning",
         default=None,
     )
+
 
 class ClinicalUseDefinition(DomainResource):
     """
@@ -248,7 +257,7 @@ class ClinicalUseDefinition(DomainResource):
         description="Business identifier for this issue",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="indication | contraindication | interaction | undesirable-effect | warning",
         default=None,
     )

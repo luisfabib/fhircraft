@@ -1,11 +1,11 @@
 from typing import Annotated, Any, Optional
 from pydantic import BeforeValidator, Field
 
-from fhircraft.fhir.resources.base import FHIRString as FHIRStringBase
+from fhircraft.fhir.resources.base import StringBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 
 
-class FHIRString(PrimitiveType, FHIRStringBase):
+class String(PrimitiveType, StringBase):
     """A sequence of Unicode characters."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/string"
@@ -18,4 +18,4 @@ class FHIRString(PrimitiveType, FHIRStringBase):
     )
 
 
-String = Annotated[str | FHIRString, BeforeValidator(FHIRString.model_validate)]
+string = Annotated[str | String, BeforeValidator(String.model_validate)]

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -20,16 +20,17 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CompositionAttester(BackboneElement):
     """
     A participant who has attested to the accuracy of the composition/document.
     """
 
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="personal | professional | legal | official",
         default=None,
     )
-    time: Optional[DateTime] = Field(
+    time: Optional[fhir.dateTime] = Field(
         description="When the composition was attested",
         default=None,
     )
@@ -38,12 +39,13 @@ class CompositionAttester(BackboneElement):
         default=None,
     )
 
+
 class CompositionRelatesTo(BackboneElement):
     """
     Relationships that this composition has with other compositions or documents that already exist.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="replaces | transforms | signs | appends",
         default=None,
     )
@@ -72,13 +74,14 @@ class CompositionRelatesTo(BackboneElement):
             required=True,
         )
 
+
 class CompositionEvent(BackboneElement):
     """
     The clinical service, such as a colonoscopy or an appendectomy, being documented.
     """
 
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code(s) that apply to the event being documented",
+        description="code(s) that apply to the event being documented",
         default=None,
     )
     period: Optional[Period] = Field(
@@ -90,12 +93,13 @@ class CompositionEvent(BackboneElement):
         default=None,
     )
 
+
 class CompositionSection(BackboneElement):
     """
     The root of the sections that make up the composition.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
     )
@@ -115,7 +119,7 @@ class CompositionSection(BackboneElement):
         description="Text summary of the section, for human interpretation",
         default=None,
     )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="working | snapshot | changes",
         default=None,
     )
@@ -135,6 +139,7 @@ class CompositionSection(BackboneElement):
         description="Nested Section",
         default=None,
     )
+
 
 class Composition(DomainResource):
     """
@@ -161,7 +166,7 @@ class Composition(DomainResource):
         description="Version-independent identifier for the Composition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preliminary | final | amended | entered-in-error",
         default=None,
     )
@@ -181,7 +186,7 @@ class Composition(DomainResource):
         description="Context of the Composition",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Composition editing time",
         default=None,
     )
@@ -189,11 +194,11 @@ class Composition(DomainResource):
         description="Who and/or what authored the composition",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human Readable name/title",
         default=None,
     )
-    confidentiality: Optional[Code] = Field(
+    confidentiality: Optional[fhir.code] = Field(
         description="As defined by affinity domain",
         default=None,
     )

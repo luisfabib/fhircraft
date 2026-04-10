@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -36,16 +36,16 @@ class AppointmentResponse(DomainResource):
         description="Appointment this response relates to",
         default=None,
     )
-    proposedNewTime: Optional[Boolean] = Field(
+    proposedNewTime: Optional[fhir.boolean] = Field(
         description="Indicator for a counter proposal",
         default=None,
     )
-    start: Optional[Instant] = Field(
-        description="Time from appointment, or requested new start time",
+    start: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new start time",
         default=None,
     )
-    end: Optional[Instant] = Field(
-        description="Time from appointment, or requested new end time",
+    end: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new end time",
         default=None,
     )
     participantType: Optional[ListType[CodeableConcept]] = Field(
@@ -56,23 +56,23 @@ class AppointmentResponse(DomainResource):
         description="Person(s), Location, HealthcareService, or Device",
         default=None,
     )
-    participantStatus: Optional[Code] = Field(
+    participantStatus: Optional[fhir.code] = Field(
         description="accepted | declined | tentative | needs-action | entered-in-error",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Additional comments",
         default=None,
     )
-    recurring: Optional[Boolean] = Field(
+    recurring: Optional[fhir.boolean] = Field(
         description="This response is for all occurrences in a recurring request",
         default=None,
     )
-    occurrenceDate: Optional[Date] = Field(
+    occurrenceDate: Optional[fhir.date_] = Field(
         description="Original date within a recurring request",
         default=None,
     )
-    recurrenceId: Optional[PositiveInt] = Field(
+    recurrenceId: Optional[fhir.positiveInt] = Field(
         description="The recurrence ID of the specific recurring request",
         default=None,
     )

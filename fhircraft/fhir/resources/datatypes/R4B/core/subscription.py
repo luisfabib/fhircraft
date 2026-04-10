@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -22,19 +22,19 @@ class SubscriptionChannel(BackboneElement):
     Details where to send notifications when resources are received that meet the criteria.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="rest-hook | websocket | email | sms | message",
         default=None,
     )
-    endpoint: Optional[Url] = Field(
+    endpoint: Optional[fhir.url] = Field(
         description="Where the channel points to",
         default=None,
     )
-    payload: Optional[Code] = Field(
+    payload: Optional[fhir.code] = Field(
         description="MIME type to send, or omit for no payload",
         default=None,
     )
-    header: Optional[ListType[String]] = Field(
+    header: Optional[ListType[fhir.string]] = Field(
         description="Usage depends on the channel type",
         default=None,
     )
@@ -60,7 +60,7 @@ class Subscription(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="requested | active | error | off",
         default=None,
     )
@@ -68,19 +68,19 @@ class Subscription(DomainResource):
         description="Contact details for source (e.g. troubleshooting)",
         default=None,
     )
-    end: Optional[Instant] = Field(
+    end: Optional[fhir.instant] = Field(
         description="When to automatically delete the subscription",
         default=None,
     )
-    reason: Optional[String] = Field(
+    reason: Optional[fhir.string] = Field(
         description="Description of why this subscription was created",
         default=None,
     )
-    criteria: Optional[String] = Field(
+    criteria: Optional[fhir.string] = Field(
         description="Rule for server push",
         default=None,
     )
-    error: Optional[String] = Field(
+    error: Optional[fhir.string] = Field(
         description="Latest error note",
         default=None,
     )

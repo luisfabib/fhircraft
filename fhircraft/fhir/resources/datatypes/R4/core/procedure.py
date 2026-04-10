@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class ProcedurePerformer(BackboneElement):
     """
@@ -41,6 +42,7 @@ class ProcedurePerformer(BackboneElement):
         default=None,
     )
 
+
 class ProcedureFocalDevice(BackboneElement):
     """
     A device that is implanted, removed or otherwise manipulated (calibration, battery replacement, fitting a prosthesis, attaching a wound-vac, etc.) as a focal portion of the Procedure.
@@ -54,6 +56,7 @@ class ProcedureFocalDevice(BackboneElement):
         description="Device that was changed",
         default=None,
     )
+
 
 class Procedure(DomainResource):
     """
@@ -80,11 +83,11 @@ class Procedure(DomainResource):
         description="External Identifiers for this procedure",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -96,7 +99,7 @@ class Procedure(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
     )
@@ -120,7 +123,7 @@ class Procedure(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    performedDateTime: Optional[DateTime] = Field(
+    performedDateTime: Optional[fhir.dateTime] = Field(
         description="When the procedure was performed",
         default=None,
     )
@@ -128,7 +131,7 @@ class Procedure(DomainResource):
         description="When the procedure was performed",
         default=None,
     )
-    performedString: Optional[String] = Field(
+    performedString: Optional[fhir.string] = Field(
         description="When the procedure was performed",
         default=None,
     )
@@ -216,7 +219,7 @@ class Procedure(DomainResource):
     def performed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, String, Age, Range],
+            field_types=[fhir.dateTime, Period, fhir.string, Age, Range],
             field_name_base="performed",
             required=False,
         )

@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class ObservationReferenceRange(BackboneElement):
     """
@@ -51,10 +52,11 @@ class ObservationReferenceRange(BackboneElement):
         description="Applicable age range, if relevant",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Text based reference range in an observation",
         default=None,
     )
+
 
 class ObservationComponentReferenceRange(BackboneElement):
     """
@@ -81,10 +83,11 @@ class ObservationComponentReferenceRange(BackboneElement):
         description="Applicable age range, if relevant",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Text based reference range in an observation",
         default=None,
     )
+
 
 class ObservationComponent(BackboneElement):
     """
@@ -103,15 +106,15 @@ class ObservationComponent(BackboneElement):
         description="Actual component result",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Actual component result",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Actual component result",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Actual component result",
         default=None,
     )
@@ -127,11 +130,11 @@ class ObservationComponent(BackboneElement):
         description="Actual component result",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Actual component result",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Actual component result",
         default=None,
     )
@@ -166,19 +169,20 @@ class ObservationComponent(BackboneElement):
             field_types=[
                 Quantity,
                 CodeableConcept,
-                String,
-                Boolean,
-                Integer,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
                 Range,
                 Ratio,
                 SampledData,
-                Time,
-                DateTime,
+                fhir.Time,
+                fhir.DateTime,
                 Period,
             ],
             field_name_base="value",
             required=False,
         )
+
 
 class Observation(DomainResource):
     """
@@ -213,7 +217,7 @@ class Observation(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | preliminary | final | amended +",
         default=None,
     )
@@ -237,7 +241,7 @@ class Observation(DomainResource):
         description="Healthcare event during which this observation is made",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="Clinically relevant time/time-period for observation",
         default=None,
     )
@@ -249,12 +253,12 @@ class Observation(DomainResource):
         description="Clinically relevant time/time-period for observation",
         default=None,
     )
-    effectiveInstant: Optional[Instant] = Field(
+    effectiveInstant: Optional[fhir.instant] = Field(
         description="Clinically relevant time/time-period for observation",
         default=None,
     )
-    issued: Optional[Instant] = Field(
-        description="Date/Time this version was made available",
+    issued: Optional[fhir.instant] = Field(
+        description="Date/time this version was made available",
         default=None,
     )
     performer: Optional[ListType[Reference]] = Field(
@@ -269,15 +273,15 @@ class Observation(DomainResource):
         description="Actual result",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Actual result",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Actual result",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Actual result",
         default=None,
     )
@@ -293,11 +297,11 @@ class Observation(DomainResource):
         description="Actual result",
         default=None,
     )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Actual result",
         default=None,
     )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Actual result",
         default=None,
     )
@@ -368,7 +372,7 @@ class Observation(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing, Instant],
+            field_types=[fhir.dateTime, Period, Timing, fhir.instant],
             field_name_base="effective",
             required=False,
         )
@@ -380,14 +384,14 @@ class Observation(DomainResource):
             field_types=[
                 Quantity,
                 CodeableConcept,
-                String,
-                Boolean,
-                Integer,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
                 Range,
                 Ratio,
                 SampledData,
-                Time,
-                DateTime,
+                fhir.Time,
+                fhir.DateTime,
                 Period,
             ],
             field_name_base="value",

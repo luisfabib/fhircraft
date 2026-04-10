@@ -13,7 +13,7 @@ from .codeable_reference import CodeableReference
 from .meta import Meta
 from .reference import Reference
 from .identifier import Identifier
-from .xhtml import xhtml
+from .xhtml import Xhtml
 from .narrative import Narrative
 from .attachment import Attachment
 from .contact_point import ContactPoint
@@ -140,7 +140,7 @@ __all__ = [
     "TriggerDefinition",
     "UsageContext",
     "VirtualServiceDetail",
-    "xhtml",
+    "Xhtml",
 ]
 
 # Ensure all forward references (e.g. "Extension" in Base/Element) are

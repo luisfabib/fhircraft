@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceReportSubjectCharacteristic(BackboneElement):
     """
     Characteristic.
@@ -44,7 +45,7 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         description="Characteristic value",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Characteristic value",
         default=None,
     )
@@ -56,7 +57,7 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         description="Characteristic value",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Is used to express not the characteristic",
         default=None,
     )
@@ -76,10 +77,11 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, CodeableConcept, Boolean, Quantity, Range],
+            field_types=[Reference, CodeableConcept, fhir.boolean, Quantity, Range],
             field_name_base="value",
             required=True,
         )
+
 
 class EvidenceReportSubject(BackboneElement):
     """
@@ -95,12 +97,13 @@ class EvidenceReportSubject(BackboneElement):
         default=None,
     )
 
+
 class EvidenceReportRelatesToTarget(BackboneElement):
     """
     The target composition/document of this relationship.
     """
 
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Target of the relationship URL",
         default=None,
     )
@@ -108,7 +111,7 @@ class EvidenceReportRelatesToTarget(BackboneElement):
         description="Target of the relationship Identifier",
         default=None,
     )
-    display: Optional[Markdown] = Field(
+    display: Optional[fhir.markdown] = Field(
         description="Target of the relationship Display",
         default=None,
     )
@@ -117,12 +120,13 @@ class EvidenceReportRelatesToTarget(BackboneElement):
         default=None,
     )
 
+
 class EvidenceReportRelatesTo(BackboneElement):
     """
     Relationships that this composition has with other compositions or documents that already exist.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="replaces | amends | appends | transforms | replacedWith | amendedWith | appendedWith | transformedWith",
         default=None,
     )
@@ -131,12 +135,13 @@ class EvidenceReportRelatesTo(BackboneElement):
         default=None,
     )
 
+
 class EvidenceReportSection(BackboneElement):
     """
     The root of the sections that make up the composition.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
     )
@@ -156,7 +161,7 @@ class EvidenceReportSection(BackboneElement):
         description="Text summary of the section, for human interpretation",
         default=None,
     )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="working | snapshot | changes",
         default=None,
     )
@@ -185,6 +190,7 @@ class EvidenceReportSection(BackboneElement):
         default=None,
     )
 
+
 class EvidenceReport(DomainResource):
     """
     The EvidenceReport Resource is a specialized container for a collection of resources and codeable concepts, adapted to support compositions of Evidence, EvidenceVariable, and Citation resources and related concepts.
@@ -194,11 +200,11 @@ class EvidenceReport(DomainResource):
     _type = "EvidenceReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceReport"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this EvidenceReport, represented as a globally unique URI",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this EvidenceReport, represented as a globally unique URI",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
@@ -218,7 +224,7 @@ class EvidenceReport(DomainResource):
         description="Citation for this report",
         default=None,
     )
-    citeAsMarkdown: Optional[Markdown] = Field(
+    citeAsMarkdown: Optional[fhir.markdown] = Field(
         description="Citation for this report",
         default=None,
     )
@@ -238,7 +244,7 @@ class EvidenceReport(DomainResource):
         description="Focus of the report",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
     )
@@ -282,7 +288,7 @@ class EvidenceReport(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Markdown],
+            field_types=[Reference, fhir.markdown],
             field_name_base="citeAs",
             required=False,
         )

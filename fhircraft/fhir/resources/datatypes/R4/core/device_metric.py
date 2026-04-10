@@ -5,7 +5,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -25,15 +25,15 @@ class DeviceMetricCalibration(BackboneElement):
     Describes the calibrations that have been performed or that are required to be performed.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="unspecified | offset | gain | two-point",
         default=None,
     )
-    state: Optional[Code] = Field(
+    state: Optional[fhir.code] = Field(
         description="not-calibrated | calibration-required | calibrated | unspecified",
         default=None,
     )
-    time: Optional[Instant] = Field(
+    time: Optional[fhir.instant] = Field(
         description="Describes the time last calibration has been performed",
         default=None,
     )
@@ -79,15 +79,15 @@ class DeviceMetric(DomainResource):
         description="Describes the link to the parent Device",
         default=None,
     )
-    operationalStatus: Optional[Code] = Field(
+    operationalStatus: Optional[fhir.code] = Field(
         description="on | off | standby | entered-in-error",
         default=None,
     )
-    color: Optional[Code] = Field(
+    color: Optional[fhir.code] = Field(
         description="black | red | green | yellow | blue | magenta | cyan | white",
         default=None,
     )
-    category: Optional[Code] = Field(
+    category: Optional[fhir.code] = Field(
         description="measurement | setting | calculation | unspecified",
         default=None,
     )

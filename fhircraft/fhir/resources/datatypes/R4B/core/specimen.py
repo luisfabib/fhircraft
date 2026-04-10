@@ -5,7 +5,7 @@ from typing import Optional, List as ListType, Literal
 NoneType = type(None)
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SpecimenCollection(BackboneElement):
     """
     Details concerning the specimen collection.
@@ -32,7 +33,7 @@ class SpecimenCollection(BackboneElement):
         description="Who collected the specimen",
         default=None,
     )
-    collectedDateTime: Optional[DateTime] = Field(
+    collectedDateTime: Optional[fhir.dateTime] = Field(
         description="Collection time",
         default=None,
     )
@@ -83,7 +84,7 @@ class SpecimenCollection(BackboneElement):
     def collected_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="collected",
             required=False,
         )
@@ -97,12 +98,13 @@ class SpecimenCollection(BackboneElement):
             required=False,
         )
 
+
 class SpecimenProcessing(BackboneElement):
     """
     Details concerning processing and processing steps for the specimen.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of procedure",
         default=None,
     )
@@ -114,7 +116,7 @@ class SpecimenProcessing(BackboneElement):
         description="Material used in the processing step",
         default=None,
     )
-    timeDateTime: Optional[DateTime] = Field(
+    timeDateTime: Optional[fhir.dateTime] = Field(
         description="Date and time of specimen processing",
         default=None,
     )
@@ -134,10 +136,11 @@ class SpecimenProcessing(BackboneElement):
     def time_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.dateTime, Period],
             field_name_base="time",
             required=False,
         )
+
 
 class SpecimenContainer(BackboneElement):
     """
@@ -145,10 +148,10 @@ class SpecimenContainer(BackboneElement):
     """
 
     identifier: Optional[ListType[Identifier]] = Field(
-        description="Id for the container",
+        description="id_ for the container",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the container",
         default=None,
     )
@@ -189,6 +192,7 @@ class SpecimenContainer(BackboneElement):
             required=False,
         )
 
+
 class Specimen(DomainResource):
     """
     A sample to be used for analysis.
@@ -218,7 +222,7 @@ class Specimen(DomainResource):
         description="Identifier assigned by the lab",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="available | unavailable | unsatisfactory | entered-in-error",
         default=None,
     )
@@ -230,7 +234,7 @@ class Specimen(DomainResource):
         description="Where the specimen came from. This may be from patient(s), from a location (e.g., the source of an environmental sample), or a sampling of a substance or a device",
         default=None,
     )
-    receivedTime: Optional[DateTime] = Field(
+    receivedTime: Optional[fhir.dateTime] = Field(
         description="The time when specimen was received for processing",
         default=None,
     )

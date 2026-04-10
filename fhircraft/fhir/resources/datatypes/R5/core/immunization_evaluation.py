@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -18,6 +18,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class ImmunizationEvaluation(DomainResource):
     """
@@ -32,7 +33,7 @@ class ImmunizationEvaluation(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="completed | entered-in-error",
         default=None,
     )
@@ -40,7 +41,7 @@ class ImmunizationEvaluation(DomainResource):
         description="Who this evaluation is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date evaluation was performed",
         default=None,
     )
@@ -64,19 +65,19 @@ class ImmunizationEvaluation(DomainResource):
         description="Reason why the doese is considered valid, invalid or some other status",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Evaluation notes",
         default=None,
     )
-    series: Optional[String] = Field(
+    series: Optional[fhir.string] = Field(
         description="Name of vaccine series",
         default=None,
     )
-    doseNumber: Optional[String] = Field(
+    doseNumber: Optional[fhir.string] = Field(
         description="Dose number within series",
         default=None,
     )
-    seriesDoses: Optional[String] = Field(
+    seriesDoses: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )

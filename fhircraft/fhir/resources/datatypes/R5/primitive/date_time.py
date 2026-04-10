@@ -3,7 +3,7 @@ from datetime import date, datetime
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field, field_validator, model_serializer
 
-from fhircraft.fhir.resources.base import FHIRDateTime as FHIRDateTimeBase
+from fhircraft.fhir.resources.base import DateTimeBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 from fhircraft.fhir.resources.datatypes import (
     YEAR_REGEX,
@@ -22,7 +22,7 @@ _DATETIME_PATTERN = (
 _FULL_DATE_PATTERN = rf"^{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}$"
 
 
-class FHIRDateTime(PrimitiveType, FHIRDateTimeBase):
+class DateTime(PrimitiveType, DateTimeBase):
     """A date, date-time or partial date."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/dateTime"
@@ -65,6 +65,6 @@ class FHIRDateTime(PrimitiveType, FHIRDateTimeBase):
         return self.value
 
 
-DateTime = Annotated[
-    datetime | date | str | FHIRDateTime, BeforeValidator(FHIRDateTime.model_validate)
+dateTime = Annotated[
+    datetime | date | str | DateTime, BeforeValidator(DateTime.model_validate)
 ]

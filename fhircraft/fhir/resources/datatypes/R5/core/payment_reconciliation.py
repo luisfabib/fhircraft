@@ -6,7 +6,7 @@ NoneType = type(None)
 import fhircraft.fhir.resources.validators as fhir_validators
 
 
-from ..primitive import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
+
 
 class PaymentReconciliationAllocation(BackboneElement):
     """
@@ -39,7 +40,7 @@ class PaymentReconciliationAllocation(BackboneElement):
         description="Subject of the payment",
         default=None,
     )
-    targetItemString: Optional[String] = Field(
+    targetItemString: Optional[fhir.string] = Field(
         description="Sub-element of the subject",
         default=None,
     )
@@ -47,7 +48,7 @@ class PaymentReconciliationAllocation(BackboneElement):
         description="Sub-element of the subject",
         default=None,
     )
-    targetItemPositiveInt: Optional[PositiveInt] = Field(
+    targetItemPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Sub-element of the subject",
         default=None,
     )
@@ -71,7 +72,7 @@ class PaymentReconciliationAllocation(BackboneElement):
         description="Response committing to a payment",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Date of commitment to pay",
         default=None,
     )
@@ -99,24 +100,26 @@ class PaymentReconciliationAllocation(BackboneElement):
     def targetItem_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Identifier, PositiveInt],
+            field_types=[fhir.string, Identifier, fhir.positiveInt],
             field_name_base="targetItem",
             required=False,
         )
+
 
 class PaymentReconciliationProcessNote(BackboneElement):
     """
     A note that describes or explains the processing in a human readable form.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="display | print | printoper",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Note explanatory text",
         default=None,
     )
+
 
 class PaymentReconciliation(DomainResource):
     """
@@ -135,7 +138,7 @@ class PaymentReconciliation(DomainResource):
         description="Category of payment",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
@@ -147,7 +150,7 @@ class PaymentReconciliation(DomainResource):
         description="Period covered",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Creation date",
         default=None,
     )
@@ -171,15 +174,15 @@ class PaymentReconciliation(DomainResource):
         description="Responsible practitioner",
         default=None,
     )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="queued | complete | error | partial",
         default=None,
     )
-    disposition: Optional[String] = Field(
+    disposition: Optional[fhir.string] = Field(
         description="Disposition message",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="When payment issued",
         default=None,
     )
@@ -191,27 +194,27 @@ class PaymentReconciliation(DomainResource):
         description="Payment instrument",
         default=None,
     )
-    cardBrand: Optional[String] = Field(
+    cardBrand: Optional[fhir.string] = Field(
         description="Type of card",
         default=None,
     )
-    accountNumber: Optional[String] = Field(
+    accountNumber: Optional[fhir.string] = Field(
         description="Digits for verification",
         default=None,
     )
-    expirationDate: Optional[Date] = Field(
+    expirationDate: Optional[fhir.date_] = Field(
         description="Expiration year-month",
         default=None,
     )
-    processor: Optional[String] = Field(
+    processor: Optional[fhir.string] = Field(
         description="Processor name",
         default=None,
     )
-    referenceNumber: Optional[String] = Field(
+    referenceNumber: Optional[fhir.string] = Field(
         description="Check number or payment reference",
         default=None,
     )
-    authorization: Optional[String] = Field(
+    authorization: Optional[fhir.string] = Field(
         description="Authorization number",
         default=None,
     )
