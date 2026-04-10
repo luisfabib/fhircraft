@@ -37,17 +37,11 @@ class Instant(Element, InstantBase):
     @classmethod
     def _parse(cls, v):
         if isinstance(v, datetime):
-            s = v.isoformat()
-            if "." in s:
-                s = s.rstrip("0").rstrip(".")
-            return s
+            return v.isoformat()
         if isinstance(v, str):
             if not re.match(_INSTANT_PATTERN, v):
                 raise ValueError(f"Invalid Instant: {v!r}")
-            s = datetime.fromisoformat(v.replace("Z", "+00:00")).isoformat()
-            if "." in s:
-                s = s.rstrip("0").rstrip(".")
-            return s
+            return v.replace("Z", "+00:00")
         return v
 
     @model_serializer
