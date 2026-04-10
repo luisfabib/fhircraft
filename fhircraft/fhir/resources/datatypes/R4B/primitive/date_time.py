@@ -45,8 +45,7 @@ class DateTime(Element, DateTimeBase):
             if not re.match(_DATETIME_PATTERN, v):
                 raise ValueError(f"Invalid DateTime: {v!r}")
             if "T" in v:
-                _v = v.replace("Z", "+00:00")
-                return _v
+                return v
             if re.match(_FULL_DATE_PATTERN, v):
                 return v
         return v
@@ -55,7 +54,7 @@ class DateTime(Element, DateTimeBase):
     def serialize_root_value(self):
         if self.value is None:
             return None
-        return self.value.replace("+00:00", "Z")
+        return self.value
 
 
 dateTime = Annotated[

@@ -44,7 +44,7 @@ class Time(Element, TimeBase):
     def serialize_root_value(self):
         if self.value is None:
             return None
-        return self.value.replace("+00:00", "Z")
+        return self.value
 
 
 time_ = Annotated[time | Time, BeforeValidator(Time.model_validate)]

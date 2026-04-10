@@ -37,21 +37,18 @@ class Instant(PrimitiveType, InstantBase):
     @classmethod
     def _parse(cls, v):
         if isinstance(v, datetime):
-            s = v.isoformat()
-            if "." in s:
-                s = s.rstrip("0").rstrip(".")
-            return s
+            return v.isoformat()
         if isinstance(v, str):
             if not re.match(_INSTANT_PATTERN, v):
                 raise ValueError(f"Invalid Instant: {v!r}")
-            return v.replace("Z", "+00:00")
+            return v
         return v
 
     @model_serializer
     def serialize_root_value(self):
         if self.value is None:
             return None
-        return self.value.replace("+00:00", "Z")
+        return self.value
 
 
 instant = Annotated[datetime | Instant, BeforeValidator(Instant.model_validate)]
