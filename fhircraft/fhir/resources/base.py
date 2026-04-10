@@ -2,6 +2,7 @@ from copy import copy
 from datetime import date, datetime, time
 import enum
 from functools import lru_cache
+from itertools import zip_longest
 import operator
 import re
 import threading
@@ -137,6 +138,60 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     @model_validator(mode="before")
     @classmethod
+    def _process_primitive_shadow_fields(cls, data: Any) -> Any:
+        """Process FHIR _fieldname shadow keys, merging id/extension into the corresponding field."""
+        if not isinstance(data, dict):
+            return data
+
+        shadow_keys = [
+            k
+            for k in list(data.keys())
+            if isinstance(k, str) and k.startswith("_") and len(k) > 1
+        ]
+        if not shadow_keys:
+            return data
+
+        data = dict(data)
+        for shadow_key in shadow_keys:
+            field_name = shadow_key[1:]
+            shadow_data = data.pop(shadow_key, None)
+
+            if shadow_data is None:
+                continue
+
+            if not isinstance(shadow_data, (dict, list)):
+                data[shadow_key] = shadow_data
+                continue
+
+            existing = data.get(field_name)
+
+            if isinstance(shadow_data, list):
+                if existing is None:
+                    data[field_name] = list(shadow_data)
+                elif isinstance(existing, list):
+                    merged = []
+                    for val, ext in zip_longest(existing, shadow_data, fillvalue=None):
+                        if ext is None:
+                            merged.append(val)
+                        elif val is None:
+                            merged.append(ext)
+                        elif isinstance(val, dict):
+                            merged.append({**val, **ext})
+                        else:
+                            merged.append({"value": val, **ext})
+                    data[field_name] = merged
+            elif isinstance(shadow_data, dict):
+                if existing is None:
+                    data[field_name] = shadow_data
+                elif isinstance(existing, dict):
+                    data[field_name] = {**existing, **shadow_data}
+                else:
+                    data[field_name] = {"value": existing, **shadow_data}
+
+        return data
+
+    @model_validator(mode="before")
+    @classmethod
     def _validate_resource_type(cls, data: Any) -> Any:
 
         if cls._is_resource():
@@ -263,21 +318,37 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 )
                 data = serializer(self)
 
-            # Apply polymorphic serialization to FHIR fields
+            # Apply polymorphic serialization to FHIR fields and collect primitive shadow data
             for field_name, field_info in type(self).model_fields.items():
+                value = getattr(self, field_name, None)
+                if value is None:
+                    continue
+
                 if field_name in data:
-                    value = getattr(self, field_name, None)
-                    if value is not None:
-                        base_type = self._get_field_base_type(field_info)
-                        if (
-                            base_type != object
-                            and hasattr(base_type, "__mro__")
-                            and issubclass(base_type, FHIRBaseModel)
-                        ):
-                            # Apply polymorphic serialization to this field
-                            data[field_name] = (
-                                self._serialize_fhir_field_polymorphically(value)
-                            )
+                    base_type = self._get_field_base_type(field_info)
+                    if (
+                        base_type != object
+                        and hasattr(base_type, "__mro__")
+                        and issubclass(base_type, FHIRBaseModel)
+                    ):
+                        data[field_name] = self._serialize_fhir_field_polymorphically(
+                            value
+                        )
+
+                shadow = self._get_primitive_shadow_data(value)
+                if shadow is not None:
+                    data[f"_{field_name}"] = shadow
+                    # Suppress the primitive fieldname key when:
+                    # - scalar: serialized value is None
+                    # - list: ALL serialized values are None (extension-only, no actual values)
+                    serialized = data.get(field_name)
+                    if serialized is None:
+                        data.pop(field_name, None)
+                    elif isinstance(serialized, list) and all(
+                        v is None for v in serialized
+                    ):
+                        data.pop(field_name, None)
+
             if (
                 self._is_resource()
                 and hasattr(self, "_type")
@@ -568,6 +639,36 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         else:
             # Other types - convert to string
             field_elem.set("value", str(value))
+
+    @staticmethod
+    def _get_primitive_shadow_data(value: Any) -> "Any | None":
+        """Return the _fieldname shadow dict/list for a primitive with id/extension, or None."""
+        if isinstance(value, FHIRPrimitiveModel):
+            shadow: dict = {}
+            if getattr(value, "id", None) is not None:
+                shadow["id"] = value.id
+            ext = getattr(value, "extension", None)
+            if ext:
+                shadow["extension"] = [e.model_dump() for e in ext]
+            return shadow if shadow else None
+        elif isinstance(value, list):
+            shadow_list = []
+            has_shadow = False
+            for item in value:
+                if isinstance(item, FHIRPrimitiveModel):
+                    item_shadow: dict = {}
+                    if getattr(item, "id", None) is not None:
+                        item_shadow["id"] = item.id
+                    ext = getattr(item, "extension", None)
+                    if ext:
+                        item_shadow["extension"] = [e.model_dump() for e in ext]
+                    if item_shadow:
+                        has_shadow = True
+                    shadow_list.append(item_shadow if item_shadow else None)
+                else:
+                    shadow_list.append(None)
+            return shadow_list if has_shadow else None
+        return None
 
     def _serialize_fhir_field_polymorphically(self, value: Any) -> Any:
         """Serialize FHIR fields polymorphically to preserve runtime type information."""
@@ -1179,9 +1280,9 @@ class FHIRPrimitiveModel(FHIRBaseModel):
 
     def __radd__(self, other):
         return (
-            self.value + other.value  # type: ignore
+            other.value + self.value  # type: ignore
             if isinstance(other, FHIRPrimitiveModel)
-            else self.value + other
+            else other + self.value
         )
 
     def __sub__(self, other):
