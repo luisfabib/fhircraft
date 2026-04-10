@@ -107,7 +107,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, fhir.canonical, CodeableConcept, Expression],
+            field_types=[Reference, fhir.Canonical, CodeableConcept, Expression],
             field_name_base="definition",
             required=True,
         )

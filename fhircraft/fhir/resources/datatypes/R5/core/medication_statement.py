@@ -140,7 +140,7 @@ class MedicationStatement(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="effective",
             required=False,
         )

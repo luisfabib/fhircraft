@@ -76,7 +76,7 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, CodeableConcept, fhir.boolean, Quantity, Range],
+            field_types=[Reference, CodeableConcept, fhir.Boolean, Quantity, Range],
             field_name_base="value",
             required=True,
         )
@@ -296,7 +296,7 @@ class EvidenceReport(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, fhir.markdown],
+            field_types=[Reference, fhir.Markdown],
             field_name_base="citeAs",
             required=False,
         )

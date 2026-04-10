@@ -38,7 +38,7 @@ class ProductShelfLife(BackboneType):
     def period_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Duration, fhir.string],
+            field_types=[Duration, fhir.String],
             field_name_base="period",
         )
 

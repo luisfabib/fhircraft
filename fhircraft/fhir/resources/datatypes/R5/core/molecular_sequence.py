@@ -75,7 +75,7 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
     def sequence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, fhir.string, Reference],
+            field_types=[CodeableConcept, fhir.String, Reference],
             field_name_base="sequence",
             required=False,
         )

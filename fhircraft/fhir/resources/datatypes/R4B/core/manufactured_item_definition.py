@@ -62,7 +62,7 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, fhir.date_, fhir.boolean, Attachment],
+            field_types=[CodeableConcept, Quantity, fhir.Date, fhir.Boolean, Attachment],
             field_name_base="value",
             required=False,
         )

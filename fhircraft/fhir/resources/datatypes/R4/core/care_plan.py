@@ -128,7 +128,7 @@ class CarePlanActivityDetail(BackboneElement):
     def scheduled_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Period, fhir.string],
+            field_types=[Timing, Period, fhir.String],
             field_name_base="scheduled",
             required=False,
         )

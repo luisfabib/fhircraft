@@ -137,7 +137,7 @@ class Practitioner(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, fhir.dateTime],
+            field_types=[fhir.Boolean, fhir.DateTime],
             field_name_base="deceased",
             required=False,
         )

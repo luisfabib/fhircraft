@@ -144,7 +144,7 @@ class Dosage(BackboneElement):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, "CodeableConcept"],
+            field_types=[fhir.Boolean, "CodeableConcept"],
             field_name_base="asNeeded",
         )
 

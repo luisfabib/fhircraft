@@ -115,7 +115,7 @@ class ImplementationGuideDefinitionResource(BackboneElement):
     def example_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, fhir.canonical],
+            field_types=[fhir.Boolean, fhir.Canonical],
             field_name_base="example",
             required=False,
         )
@@ -158,7 +158,7 @@ class ImplementationGuideDefinitionPage(BackboneElement):
     def name_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.url, Reference],
+            field_types=[fhir.Url, Reference],
             field_name_base="name",
             required=True,
         )
@@ -258,7 +258,7 @@ class ImplementationGuideManifestResource(BackboneElement):
     def example_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, fhir.canonical],
+            field_types=[fhir.Boolean, fhir.Canonical],
             field_name_base="example",
             required=False,
         )

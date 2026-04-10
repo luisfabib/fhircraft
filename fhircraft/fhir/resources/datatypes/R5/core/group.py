@@ -73,7 +73,7 @@ class GroupCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, fhir.boolean, Quantity, Range, Reference],
+            field_types=[CodeableConcept, fhir.Boolean, Quantity, Range, Reference],
             field_name_base="value",
             required=True,
         )

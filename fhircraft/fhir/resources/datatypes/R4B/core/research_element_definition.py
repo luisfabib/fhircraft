@@ -143,7 +143,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, fhir.canonical, Expression, DataRequirement],
+            field_types=[CodeableConcept, fhir.Canonical, Expression, DataRequirement],
             field_name_base="definition",
             required=True,
         )
@@ -152,7 +152,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     def studyEffective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period, Duration, Timing],
+            field_types=[fhir.DateTime, Period, Duration, Timing],
             field_name_base="studyEffective",
             required=False,
         )
@@ -161,7 +161,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     def participantEffective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period, Duration, Timing],
+            field_types=[fhir.DateTime, Period, Duration, Timing],
             field_name_base="participantEffective",
             required=False,
         )

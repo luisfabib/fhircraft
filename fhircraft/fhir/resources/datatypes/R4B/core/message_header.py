@@ -171,7 +171,7 @@ class MessageHeader(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, fhir.uri],
+            field_types=[Coding, fhir.Uri],
             field_name_base="event",
             required=True,
         )

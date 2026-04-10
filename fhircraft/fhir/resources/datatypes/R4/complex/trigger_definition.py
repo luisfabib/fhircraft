@@ -55,7 +55,7 @@ class TriggerDefinition(Element):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["Timing", "Reference", fhir.date_, fhir.dateTime],
+            field_types=["Timing", "Reference", fhir.Date, fhir.DateTime],
             field_name_base="timing",
         )
 

@@ -131,7 +131,7 @@ class AuditEventEntityDetail(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, fhir.base64Binary],
+            field_types=[fhir.String, fhir.Base64Binary],
             field_name_base="value",
             required=True,
         )

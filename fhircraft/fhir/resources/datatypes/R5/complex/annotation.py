@@ -34,7 +34,7 @@ class Annotation(Element):
     def author_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, fhir.string],
+            field_types=[Reference, fhir.String],
             field_name_base="author",
         )
 

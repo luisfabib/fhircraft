@@ -84,7 +84,7 @@ class SpecimenCollection(BackboneElement):
     def collected_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="collected",
             required=False,
         )
@@ -136,7 +136,7 @@ class SpecimenProcessing(BackboneElement):
     def time_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="time",
             required=False,
         )

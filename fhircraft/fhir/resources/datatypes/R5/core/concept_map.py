@@ -184,7 +184,7 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.code, Coding, fhir.string, fhir.boolean, Quantity],
+            field_types=[fhir.Code, Coding, fhir.String, fhir.Boolean, Quantity],
             field_name_base="value",
             required=False,
         )
@@ -235,7 +235,7 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.code, Coding, fhir.string, fhir.boolean, Quantity],
+            field_types=[fhir.Code, Coding, fhir.String, fhir.Boolean, Quantity],
             field_name_base="value",
             required=False,
         )
@@ -534,7 +534,7 @@ class ConceptMap(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )
@@ -543,7 +543,7 @@ class ConceptMap(DomainResource):
     def sourceScope_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.uri, fhir.canonical],
+            field_types=[fhir.Uri, fhir.Canonical],
             field_name_base="sourceScope",
             required=False,
         )
@@ -552,7 +552,7 @@ class ConceptMap(DomainResource):
     def targetScope_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.uri, fhir.canonical],
+            field_types=[fhir.Uri, fhir.Canonical],
             field_name_base="targetScope",
             required=False,
         )

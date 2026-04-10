@@ -52,7 +52,7 @@ class CoverageEligibilityResponseEvent(BackboneElement):
     def when_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="when",
             required=True,
         )
@@ -110,7 +110,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
     def allowed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.unsignedInt, fhir.string, Money],
+            field_types=[fhir.UnsignedInt, fhir.String, Money],
             field_name_base="allowed",
             required=False,
         )
@@ -119,7 +119,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
     def used_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.unsignedInt, fhir.string, Money],
+            field_types=[fhir.UnsignedInt, fhir.String, Money],
             field_name_base="used",
             required=False,
         )
@@ -319,7 +319,7 @@ class CoverageEligibilityResponse(DomainResource):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )

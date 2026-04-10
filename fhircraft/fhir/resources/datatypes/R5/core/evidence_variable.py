@@ -168,7 +168,7 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Reference, fhir.dateTime, fhir.id_],
+            field_types=[CodeableConcept, Reference, fhir.DateTime, fhir.Id],
             field_name_base="event",
             required=False,
         )
@@ -467,7 +467,7 @@ class EvidenceVariable(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

@@ -101,7 +101,7 @@ class MedicationRequestSubstitution(BackboneElement):
     def allowed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, CodeableConcept],
+            field_types=[fhir.Boolean, CodeableConcept],
             field_name_base="allowed",
             required=True,
         )
@@ -282,7 +282,7 @@ class MedicationRequest(DomainResource):
     def reported_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, Reference],
+            field_types=[fhir.Boolean, Reference],
             field_name_base="reported",
             required=False,
         )

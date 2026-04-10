@@ -107,7 +107,7 @@ class GoalTarget(BackboneElement):
     def due_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Duration],
+            field_types=[fhir.Date, Duration],
             field_name_base="due",
             required=False,
         )
@@ -201,7 +201,7 @@ class Goal(DomainResource):
     def start_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, CodeableConcept],
+            field_types=[fhir.Date, CodeableConcept],
             field_name_base="start",
             required=False,
         )

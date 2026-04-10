@@ -97,7 +97,7 @@ class AuditEventAgent(BackboneElement):
     def network_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, fhir.uri, fhir.string],
+            field_types=[Reference, fhir.Uri, fhir.String],
             field_name_base="network",
             required=False,
         )
@@ -262,7 +262,7 @@ class AuditEventEntityAgent(BackboneElement):
     def network_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, fhir.uri, fhir.string],
+            field_types=[Reference, fhir.Uri, fhir.String],
             field_name_base="network",
             required=False,
         )
@@ -380,7 +380,7 @@ class AuditEvent(DomainResource):
     def occurred_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, fhir.dateTime],
+            field_types=[Period, fhir.DateTime],
             field_name_base="occurred",
             required=False,
         )

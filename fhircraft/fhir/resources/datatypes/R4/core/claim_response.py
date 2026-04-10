@@ -326,7 +326,7 @@ class ClaimResponseAddItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )

@@ -154,7 +154,7 @@ class ClaimSupportingInfo(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="timing",
             required=False,
         )
@@ -163,7 +163,7 @@ class ClaimSupportingInfo(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, fhir.string, Quantity, Attachment, Reference],
+            field_types=[fhir.Boolean, fhir.String, Quantity, Attachment, Reference],
             field_name_base="value",
             required=False,
         )
@@ -563,7 +563,7 @@ class ClaimItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )

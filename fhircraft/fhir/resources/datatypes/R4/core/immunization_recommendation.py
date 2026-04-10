@@ -117,7 +117,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
     def doseNumber_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.positiveInt, fhir.string],
+            field_types=[fhir.PositiveInt, fhir.String],
             field_name_base="doseNumber",
             required=False,
         )
@@ -126,7 +126,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
     def seriesDoses_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.positiveInt, fhir.string],
+            field_types=[fhir.PositiveInt, fhir.String],
             field_name_base="seriesDoses",
             required=False,
         )

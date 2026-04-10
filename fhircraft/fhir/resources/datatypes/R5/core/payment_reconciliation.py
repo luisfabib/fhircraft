@@ -100,7 +100,7 @@ class PaymentReconciliationAllocation(BackboneElement):
     def targetItem_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, Identifier, fhir.positiveInt],
+            field_types=[fhir.String, Identifier, fhir.PositiveInt],
             field_name_base="targetItem",
             required=False,
         )

@@ -172,7 +172,7 @@ class AllergyIntolerance(DomainResource):
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Age, Period, Range, fhir.string],
+            field_types=[fhir.DateTime, Age, Period, Range, fhir.String],
             field_name_base="onset",
             required=False,
         )

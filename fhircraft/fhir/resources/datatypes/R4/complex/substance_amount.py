@@ -47,7 +47,7 @@ class SubstanceAmount(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["Quantity", "Range", fhir.string],
+            field_types=["Quantity", "Range", fhir.String],
             field_name_base="amount",
         )
 

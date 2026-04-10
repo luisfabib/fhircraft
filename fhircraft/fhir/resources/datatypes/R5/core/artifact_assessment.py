@@ -154,7 +154,7 @@ class ArtifactAssessment(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, fhir.markdown],
+            field_types=[Reference, fhir.Markdown],
             field_name_base="citeAs",
             required=False,
         )
@@ -163,7 +163,7 @@ class ArtifactAssessment(DomainResource):
     def artifact_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, fhir.canonical, fhir.uri],
+            field_types=[Reference, fhir.Canonical, fhir.Uri],
             field_name_base="artifact",
             required=True,
         )

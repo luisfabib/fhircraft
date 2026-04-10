@@ -201,7 +201,7 @@ class MessageDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )
@@ -210,7 +210,7 @@ class MessageDefinition(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, fhir.uri],
+            field_types=[Coding, fhir.Uri],
             field_name_base="event",
             required=True,
         )

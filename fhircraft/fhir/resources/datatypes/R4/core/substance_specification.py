@@ -73,7 +73,7 @@ class SubstanceSpecificationMoiety(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, fhir.string],
+            field_types=[Quantity, fhir.String],
             field_name_base="amount",
             required=False,
         )
@@ -140,7 +140,7 @@ class SubstanceSpecificationProperty(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, fhir.string],
+            field_types=[Quantity, fhir.String],
             field_name_base="amount",
             required=False,
         )
@@ -447,7 +447,7 @@ class SubstanceSpecificationRelationship(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, Range, Ratio, fhir.string],
+            field_types=[Quantity, Range, Ratio, fhir.String],
             field_name_base="amount",
             required=False,
         )

@@ -157,7 +157,7 @@ class ImplementationGuideDefinitionPage(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.url, fhir.string, fhir.markdown],
+            field_types=[fhir.Url, fhir.String, fhir.Markdown],
             field_name_base="source",
             required=False,
         )
@@ -415,7 +415,7 @@ class ImplementationGuide(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

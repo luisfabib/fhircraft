@@ -60,7 +60,7 @@ class MessageHeaderDestination(BackboneElement):
     def endpoint_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.url, Reference],
+            field_types=[fhir.Url, Reference],
             field_name_base="endpoint",
             required=False,
         )
@@ -107,7 +107,7 @@ class MessageHeaderSource(BackboneElement):
     def endpoint_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.url, Reference],
+            field_types=[fhir.Url, Reference],
             field_name_base="endpoint",
             required=False,
         )
@@ -197,7 +197,7 @@ class MessageHeader(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, fhir.canonical],
+            field_types=[Coding, fhir.Canonical],
             field_name_base="event",
             required=True,
         )

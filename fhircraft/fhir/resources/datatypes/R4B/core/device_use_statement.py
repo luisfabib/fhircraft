@@ -114,7 +114,7 @@ class DeviceUseStatement(DomainResource):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Period, fhir.dateTime],
+            field_types=[Timing, Period, fhir.DateTime],
             field_name_base="timing",
             required=False,
         )

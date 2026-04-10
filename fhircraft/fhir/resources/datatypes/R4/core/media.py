@@ -147,7 +147,7 @@ class Media(DomainResource):
     def created_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="created",
             required=False,
         )

@@ -76,7 +76,7 @@ class ExplanationOfBenefitEvent(BackboneElement):
     def when_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="when",
             required=True,
         )
@@ -196,7 +196,7 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="timing",
             required=False,
         )
@@ -785,7 +785,7 @@ class ExplanationOfBenefitItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -1077,7 +1077,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.date_, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -1209,7 +1209,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     def allowed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.unsignedInt, fhir.string, Money],
+            field_types=[fhir.UnsignedInt, fhir.String, Money],
             field_name_base="allowed",
             required=False,
         )
@@ -1218,7 +1218,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     def used_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.unsignedInt, Money],
+            field_types=[fhir.UnsignedInt, Money],
             field_name_base="used",
             required=False,
         )

@@ -289,7 +289,7 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, fhir.string, Quantity, fhir.base64Binary],
+            field_types=[CodeableConcept, fhir.String, Quantity, fhir.Base64Binary],
             field_name_base="value",
             required=False,
         )

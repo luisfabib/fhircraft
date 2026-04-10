@@ -254,7 +254,7 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, fhir.uri],
+            field_types=[fhir.String, fhir.Uri],
             field_name_base="source",
             required=False,
         )

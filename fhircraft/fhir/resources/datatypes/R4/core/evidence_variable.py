@@ -130,7 +130,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
     def participantEffective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period, Duration, Timing],
+            field_types=[fhir.DateTime, Period, Duration, Timing],
             field_name_base="participantEffective",
             required=False,
         )

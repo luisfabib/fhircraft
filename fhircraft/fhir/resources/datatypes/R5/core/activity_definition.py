@@ -349,7 +349,7 @@ class ActivityDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.string, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )
@@ -358,7 +358,7 @@ class ActivityDefinition(DomainResource):
     def subject_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Reference, fhir.canonical],
+            field_types=[CodeableConcept, Reference, fhir.Canonical],
             field_name_base="subject",
             required=False,
         )
@@ -376,7 +376,7 @@ class ActivityDefinition(DomainResource):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, CodeableConcept],
+            field_types=[fhir.Boolean, CodeableConcept],
             field_name_base="asNeeded",
             required=False,
         )

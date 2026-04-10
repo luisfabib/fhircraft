@@ -79,7 +79,7 @@ class RiskAssessmentPrediction(BackboneElement):
     def probability_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.decimal, Range],
+            field_types=[fhir.Decimal, Range],
             field_name_base="probability",
             required=False,
         )
@@ -210,7 +210,7 @@ class RiskAssessment(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="occurrence",
             required=False,
         )

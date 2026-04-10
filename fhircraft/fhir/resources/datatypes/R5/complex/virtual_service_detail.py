@@ -56,7 +56,7 @@ class VirtualServiceDetail(DataType):
     def address_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.url, fhir.string, ContactPoint, "ExtendedContactDetail"],
+            field_types=[fhir.Url, fhir.String, ContactPoint, "ExtendedContactDetail"],
             field_name_base="address",
         )
 

@@ -107,7 +107,7 @@ class GuidanceResponse(DomainResource):
     def module_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.uri, fhir.canonical, CodeableConcept],
+            field_types=[fhir.Uri, fhir.Canonical, CodeableConcept],
             field_name_base="module",
             required=True,
         )

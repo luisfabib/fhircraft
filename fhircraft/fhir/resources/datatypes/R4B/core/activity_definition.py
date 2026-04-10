@@ -324,7 +324,7 @@ class ActivityDefinition(DomainResource):
     def subject_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Reference, fhir.canonical],
+            field_types=[CodeableConcept, Reference, fhir.Canonical],
             field_name_base="subject",
             required=False,
         )
@@ -333,7 +333,7 @@ class ActivityDefinition(DomainResource):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, fhir.dateTime, Age, Period, Range, Duration],
+            field_types=[Timing, fhir.DateTime, Age, Period, Range, Duration],
             field_name_base="timing",
             required=False,
         )

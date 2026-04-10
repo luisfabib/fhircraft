@@ -151,7 +151,7 @@ class TestReportSetupActionAssertRequirement(BackboneElement):
     def link_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.uri, fhir.canonical],
+            field_types=[fhir.Uri, fhir.Canonical],
             field_name_base="link",
             required=False,
         )

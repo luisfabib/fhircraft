@@ -90,7 +90,7 @@ class FamilyMemberHistoryCondition(BackboneElement):
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Age, Range, Period, fhir.string],
+            field_types=[Age, Range, Period, fhir.String],
             field_name_base="onset",
             required=False,
         )
@@ -149,7 +149,7 @@ class FamilyMemberHistoryProcedure(BackboneElement):
     def performed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Age, Range, Period, fhir.string, fhir.dateTime],
+            field_types=[Age, Range, Period, fhir.String, fhir.DateTime],
             field_name_base="performed",
             required=False,
         )
@@ -298,7 +298,7 @@ class FamilyMemberHistory(DomainResource):
     def born_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, fhir.date_, fhir.string],
+            field_types=[Period, fhir.Date, fhir.String],
             field_name_base="born",
             required=False,
         )
@@ -307,7 +307,7 @@ class FamilyMemberHistory(DomainResource):
     def age_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Age, Range, fhir.string],
+            field_types=[Age, Range, fhir.String],
             field_name_base="age",
             required=False,
         )
@@ -316,7 +316,7 @@ class FamilyMemberHistory(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.boolean, Age, Range, fhir.date_, fhir.string],
+            field_types=[fhir.Boolean, Age, Range, fhir.Date, fhir.String],
             field_name_base="deceased",
             required=False,
         )

@@ -118,7 +118,7 @@ class CitationRelatesTo(BackboneElement):
     def target_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.uri, Identifier, Reference, Attachment],
+            field_types=[fhir.Uri, Identifier, Reference, Attachment],
             field_name_base="target",
             required=True,
         )
@@ -260,7 +260,7 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
     def target_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.uri, Identifier, Reference, Attachment],
+            field_types=[fhir.Uri, Identifier, Reference, Attachment],
             field_name_base="target",
             required=True,
         )

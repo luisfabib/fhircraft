@@ -219,7 +219,7 @@ class Procedure(DomainResource):
     def performed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[fhir.dateTime, Period, fhir.string, Age, Range],
+            field_types=[fhir.DateTime, Period, fhir.String, Age, Range],
             field_name_base="performed",
             required=False,
         )
