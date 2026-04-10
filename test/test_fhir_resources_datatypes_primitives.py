@@ -421,16 +421,7 @@ def test_primitives__base64binary_serialization(release, value, expected):
 # Instant
 # ==========================================
 
-INSTANT_DESER_TEST_CASES = [
-    "value, expected",
-    [
-        ("2015-02-07T13:28:17.239", datetime(2015, 2, 7, 13, 28, 17, 239000)),
-        (datetime(2015, 2, 7), datetime(2015, 2, 7)),
-        (datetime(2015, 2, 7, 13, 28, 17), datetime(2015, 2, 7, 13, 28, 17)),
-    ],
-]
-
-INSTANT_SER_TEST_CASES = [
+INSTANT_TEST_CASES = [
     "value, expected",
     [
         ("2015-02-07T13:28:17.239", "2015-02-07T13:28:17.239"),
@@ -440,14 +431,14 @@ INSTANT_SER_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*INSTANT_DESER_TEST_CASES)
+@pytest.mark.parametrize(*INSTANT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__instant_deserialization(release, value, expected):
     instance = modules[release].Instant(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*INSTANT_SER_TEST_CASES)
+@pytest.mark.parametrize(*INSTANT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__instant_serialization(release, value, expected):
     instance = modules[release].Instant(value)
@@ -458,17 +449,7 @@ def test_primitives__instant_serialization(release, value, expected):
 # Date
 # ==========================================
 
-DATE_DESER_TEST_CASES = [
-    "value, expected",
-    [
-        ("2015-02-07", date(2015, 2, 7)),
-        ("2015-02", "2015-02"),
-        ("2015", "2015"),
-        (date(2015, 2, 7), date(2015, 2, 7)),
-    ],
-]
-
-DATE_SER_TEST_CASES = [
+DATE_TEST_CASES = [
     "value, expected",
     [
         ("2015-02-07", "2015-02-07"),
@@ -479,14 +460,14 @@ DATE_SER_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*DATE_DESER_TEST_CASES)
+@pytest.mark.parametrize(*DATE_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__date_deserialization(release, value, expected):
     instance = modules[release].Date(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*DATE_SER_TEST_CASES)
+@pytest.mark.parametrize(*DATE_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__date_serialization(release, value, expected):
     instance = modules[release].Date(value)
@@ -497,19 +478,7 @@ def test_primitives__date_serialization(release, value, expected):
 # DateTime
 # ==========================================
 
-DATETIME_DESER_TEST_CASES = [
-    "value, expected",
-    [
-        ("2015-02-07T13:28:17.239", datetime(2015, 2, 7, 13, 28, 17, 239000)),
-        ("2015-02-07", date(2015, 2, 7)),
-        ("2015-02", "2015-02"),
-        ("2015", "2015"),
-        (datetime(2015, 2, 7), datetime(2015, 2, 7)),
-        (datetime(2015, 2, 7, 13, 28, 17), datetime(2015, 2, 7, 13, 28, 17)),
-    ],
-]
-
-DATETIME_SER_TEST_CASES = [
+DATETIME_TEST_CASES = [
     "value, expected",
     [
         ("2015-02-07T13:28:17.239", "2015-02-07T13:28:17.239"),
@@ -522,14 +491,14 @@ DATETIME_SER_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*DATETIME_DESER_TEST_CASES)
+@pytest.mark.parametrize(*DATETIME_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__datetime_deserialization(release, value, expected):
     instance = modules[release].DateTime(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*DATETIME_SER_TEST_CASES)
+@pytest.mark.parametrize(*DATETIME_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__datetime_serialization(release, value, expected):
     instance = modules[release].DateTime(value)
@@ -540,20 +509,10 @@ def test_primitives__datetime_serialization(release, value, expected):
 # Time
 # ==========================================
 
-TIME_DESER_TEST_CASES = [
+TIME_TEST_CASES = [
     "value, expected",
     [
-        ("12:54", time(12, 54)),
-        ("12:54:32", time(12, 54, 32)),
-        (time(12, 54), time(12, 54)),
-        (time(12, 54, 32), time(12, 54, 32)),
-    ],
-]
-
-TIME_SER_TEST_CASES = [
-    "value, expected",
-    [
-        ("12:54", "12:54:00"),
+        ("12:54", "12:54"),
         ("12:54:32", "12:54:32"),
         (time(12, 54), "12:54:00"),
         (time(12, 54, 32), "12:54:32"),
@@ -561,14 +520,14 @@ TIME_SER_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*TIME_DESER_TEST_CASES)
+@pytest.mark.parametrize(*TIME_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__time_deserialization(release, value, expected):
     instance = modules[release].Time(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*TIME_SER_TEST_CASES)
+@pytest.mark.parametrize(*TIME_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__time_serialization(release, value, expected):
     instance = modules[release].Time(value)

@@ -65,9 +65,6 @@ def _evaluate_boolean_expressions(
                 right_boolean = bool(right_collection[0].value)
         else:
             right_boolean = None
-    print(
-        f"Evaluated left operand to: {left_boolean}, right operand to: {right_boolean}"
-    )
     return left_boolean, right_boolean
 
 

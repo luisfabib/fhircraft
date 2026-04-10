@@ -1306,7 +1306,7 @@ class DateBase(FHIRPrimitiveModel):
     """
 
     _kind = "date"
-    value: date | None = None
+    value: str | None = None
 
 
 class DateTimeBase(FHIRPrimitiveModel):
@@ -1315,7 +1315,7 @@ class DateTimeBase(FHIRPrimitiveModel):
     """
 
     _kind = "dateTime"
-    value: datetime | None = None
+    value: str | None = None
 
 
 class TimeBase(FHIRPrimitiveModel):
@@ -1324,7 +1324,7 @@ class TimeBase(FHIRPrimitiveModel):
     """
 
     _kind = "time"
-    value: time | None = None
+    value: str | None = None
 
 
 class InstantBase(FHIRPrimitiveModel):
@@ -1333,7 +1333,7 @@ class InstantBase(FHIRPrimitiveModel):
     """
 
     _kind = "instant"
-    value: time | None = None
+    value: str | None = None
 
 
 class Base64BinaryBase(FHIRPrimitiveModel):

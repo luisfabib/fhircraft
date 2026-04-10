@@ -24,7 +24,7 @@ class Time(PrimitiveType, TimeBase):
     _type = "time"
     _kind = "primitive-type"
 
-    value: Optional[time] = Field(
+    value: Optional[str] = Field(
         default=None,
         description="The actual value",
     )
@@ -33,18 +33,17 @@ class Time(PrimitiveType, TimeBase):
     @classmethod
     def _parse(cls, v):
         if isinstance(v, time):
-            return v
+            return v.isoformat()
         if isinstance(v, str):
             if not re.match(_TIME_PATTERN, v):
                 raise ValueError(f"Invalid Time: {v!r}")
-            return time.fromisoformat(v)
         return v
 
     @model_serializer
     def serialize_root_value(self):
         if self.value is None:
             return None
-        return self.value.isoformat()
+        return self.value.replace("+00:00", "Z")
 
 
 time_ = Annotated[time | Time, BeforeValidator(Time.model_validate)]

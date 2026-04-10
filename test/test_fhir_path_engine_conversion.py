@@ -587,11 +587,11 @@ todatetime_cases = (
     (date(2014, 2, 1), "2014-02-01"),
     (datetime(2014, 2, 1), "2014-02-01T00:00:00"),
     (Date("@2014-02-01"), "2014-02-01"),
-    (DateTime("@2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00+00:00"),
+    (DateTime("@2012-02-01T00:00:00.000Z"), "2012-02-01T00:00:00Z"),
     # FHIR primitive class instances
     (FHIRString(value="2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00.000Z"),
     (FHIRDate(value="2014-02-01"), "2014-02-01"),
-    (FHIRDateTime(value="2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00+00:00"),
+    (FHIRDateTime(value="2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00.000Z"),
 )
 
 
@@ -599,6 +599,7 @@ todatetime_cases = (
 def test_todatetime_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDateTime().evaluate(collection, env)
+    print(result[0].value, expected)
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 

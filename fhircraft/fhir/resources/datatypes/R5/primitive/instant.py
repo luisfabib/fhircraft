@@ -28,7 +28,7 @@ class Instant(PrimitiveType, InstantBase):
     _type = "instant"
     _kind = "primitive-type"
 
-    value: Optional[datetime] = Field(
+    value: Optional[str] = Field(
         default=None,
         description="The actual value",
     )
@@ -37,21 +37,24 @@ class Instant(PrimitiveType, InstantBase):
     @classmethod
     def _parse(cls, v):
         if isinstance(v, datetime):
-            return v
+            s = v.isoformat()
+            if "." in s:
+                s = s.rstrip("0").rstrip(".")
+            return s
         if isinstance(v, str):
             if not re.match(_INSTANT_PATTERN, v):
                 raise ValueError(f"Invalid Instant: {v!r}")
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            s = datetime.fromisoformat(v.replace("Z", "+00:00")).isoformat()
+            if "." in s:
+                s = s.rstrip("0").rstrip(".")
+            return s
         return v
 
     @model_serializer
     def serialize_root_value(self):
         if self.value is None:
             return None
-        s = self.value.isoformat()
-        if "." in s:
-            s = s.rstrip("0").rstrip(".")
-        return s
+        return self.value.replace("+00:00", "Z")
 
 
 instant = Annotated[datetime | Instant, BeforeValidator(Instant.model_validate)]

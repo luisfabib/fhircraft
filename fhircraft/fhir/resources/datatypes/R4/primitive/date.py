@@ -22,7 +22,7 @@ class Date(Element, DateBase):
     _type = "date"
     _kind = "primitive-type"
 
-    value: Optional[date | str] = Field(
+    value: Optional[str] = Field(
         default=None,
         description="The actual value",
     )
@@ -31,22 +31,18 @@ class Date(Element, DateBase):
     @classmethod
     def _parse(cls, v):
         if isinstance(v, datetime):
-            return v.date()
+            return v.date().isoformat()
         if isinstance(v, date):
-            return v
+            return v.isoformat()
         if isinstance(v, str):
             if not re.match(_DATE_PATTERN, v):
                 raise ValueError(f"Invalid Date: {v!r}")
-            if re.match(_FULL_DATE_PATTERN, v):
-                return date.fromisoformat(v)
         return v
 
     @model_serializer
     def serialize_root_value(self):
         if self.value is None:
             return None
-        if isinstance(self.value, date):
-            return self.value.isoformat()
         return self.value
 
 

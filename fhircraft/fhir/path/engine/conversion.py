@@ -431,15 +431,25 @@ class ToDateTime(FHIRTypeConversionFunction):
                 value,
             )
             if date_match or datetime_match:
-                return [FHIRPathCollectionItem.wrap(value)]
+                return [FHIRPathCollectionItem.wrap(value.replace("+00:00", "Z"))]
             else:
                 return []
         elif isinstance(value, (datetime, date)):
-            return [FHIRPathCollectionItem.wrap(value.isoformat())]
+            return [
+                FHIRPathCollectionItem.wrap(value.isoformat().replace("+00:00", "Z"))
+            ]
         elif isinstance(value, DateTime):
-            return [FHIRPathCollectionItem.wrap(value.to_datetime().isoformat())]
+            return [
+                FHIRPathCollectionItem.wrap(
+                    value.to_datetime().isoformat().replace("+00:00", "Z")
+                )
+            ]
         elif isinstance(value, Date):
-            return [FHIRPathCollectionItem.wrap(value.to_date().isoformat())]
+            return [
+                FHIRPathCollectionItem.wrap(
+                    value.to_date().isoformat().replace("+00:00", "Z")
+                )
+            ]
         else:
             return []
 
@@ -791,9 +801,15 @@ class ToTime(FHIRTypeConversionFunction):
             else:
                 return []
         elif isinstance(value, time):
-            return [FHIRPathCollectionItem.wrap(value.isoformat())]
+            return [
+                FHIRPathCollectionItem.wrap(value.isoformat().replace("+00:00", "Z"))
+            ]
         elif isinstance(value, Time):
-            return [FHIRPathCollectionItem.wrap(value.to_time().isoformat())]
+            return [
+                FHIRPathCollectionItem.wrap(
+                    value.to_time().isoformat().replace("+00:00", "Z")
+                )
+            ]
         else:
             return []
 

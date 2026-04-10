@@ -20,10 +20,6 @@ _DATETIME_PATTERN = (
     rf"(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?$"
 )
 _FULL_DATE_PATTERN = rf"^{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}$"
-_FULL_DATETIME_PATTERN = (
-    rf"^{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}"
-    rf"T{HOUR_REGEX}:{MINUTES_REGEX}:{SECONDS_REGEX}({TIMEZONE_REGEX})?$"
-)
 
 
 class DateTime(Element, DateTimeBase):
@@ -33,7 +29,7 @@ class DateTime(Element, DateTimeBase):
     _type = "dateTime"
     _kind = "primitive-type"
 
-    value: Optional[datetime | date | str] = Field(
+    value: Optional[str] = Field(
         default=None,
         description="The actual value",
     )
@@ -42,31 +38,24 @@ class DateTime(Element, DateTimeBase):
     @classmethod
     def _parse(cls, v):
         if isinstance(v, datetime):
-            return v
+            return v.isoformat()
         if isinstance(v, date):
-            return v
+            return v.isoformat()
         if isinstance(v, str):
             if not re.match(_DATETIME_PATTERN, v):
                 raise ValueError(f"Invalid DateTime: {v!r}")
             if "T" in v:
                 _v = v.replace("Z", "+00:00")
-                return datetime.fromisoformat(_v)
+                return _v
             if re.match(_FULL_DATE_PATTERN, v):
-                return date.fromisoformat(v)
+                return v
         return v
 
     @model_serializer
     def serialize_root_value(self):
         if self.value is None:
             return None
-        if isinstance(self.value, datetime):
-            s = self.value.isoformat()
-            if "." in s:
-                s = s.rstrip("0").rstrip(".")
-            return s
-        if isinstance(self.value, date):
-            return self.value.isoformat()
-        return self.value
+        return self.value.replace("+00:00", "Z")
 
 
 dateTime = Annotated[

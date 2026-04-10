@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ParametersParameter(BackboneElement):
     """
     A parameter passed to or received from the operation.
@@ -274,25 +275,25 @@ class ParametersParameter(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                "base64Binary",
-                "boolean",
-                "canonical",
-                "code",
-                "date",
-                "dateTime",
-                "decimal",
-                "id_",
-                "instant",
-                "integer",
-                "markdown",
-                "oid",
-                "positiveInt",
-                "string",
-                "time",
-                "unsignedInt",
-                "uri",
-                "url",
-                "uuid",
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 "Address",
                 "Age",
                 "Annotation",
@@ -328,6 +329,7 @@ class ParametersParameter(BackboneElement):
             field_name_base="value",
             required=False,
         )
+
 
 class Parameters(Resource):
     """

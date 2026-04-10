@@ -66,7 +66,6 @@ def is_fhir_primitive_type(
                 fhir_type.model_validate(value)
                 return True
             except ValidationError as e:
-                print(e)
                 return False
     else:
         return False
