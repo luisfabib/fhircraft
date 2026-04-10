@@ -105,6 +105,8 @@ class IndexOf(StringManipulationFunction):
             FHIRPathError: If the item in the input collection is not a string.
 
         """
+        from fhircraft.fhir.resources.base import StringBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -113,7 +115,10 @@ class IndexOf(StringManipulationFunction):
         # Update the evaluation context
         environment = get_expression_context(environment, item=string_item, index=0)
         if not isinstance(
-            substring := self.substring.single(collection, environment=environment), str
+            substring := self.substring.single(collection, environment=environment),
+            (str, StringBase),
+        ) or (
+            isinstance(substring, StringBase) and (substring := substring.value) is None
         ):
             raise FHIRPathError(
                 "IndexOf() argument must resolve in a non-empty string."
@@ -127,7 +132,7 @@ class Substring(StringManipulationFunction):
 
     Attributes:
         start (int | FHIRPath): Start index of the substring  or FHIRPath that resolves to an integer.
-        end (Optional[int | FHIRPath]): Optinoasl, end index of the substring  or FHIRPath that resolves to an integer.
+        end (Optional[int | FHIRPath]): Optional, end index of the substring  or FHIRPath that resolves to an integer.
     """
 
     def __init__(self, start: int | FHIRPath, end: int | FHIRPath | None = None):
@@ -160,6 +165,8 @@ class Substring(StringManipulationFunction):
             FHIRPathError: If the item in the input collection is not a string.
 
         """
+        from fhircraft.fhir.resources.base import IntegerBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -169,19 +176,24 @@ class Substring(StringManipulationFunction):
         )
         # Get start and end positions
         if not isinstance(
-            (start := self.start.single(collection, environment=environment)), int
-        ):
+            (start := self.start.single(collection, environment=environment)),
+            (int, IntegerBase),
+        ) or (isinstance(start, IntegerBase) and (start := start.value) is None):
             raise FHIRPathError(
                 "Substring() start argument must resolve to an integer."
             )
         end = self.end.single(collection, environment=environment) if self.end else None
         if (
-            end := (
-                self.end.single(collection, environment=environment)
-                if self.end
-                else None
+            (
+                end := (
+                    self.end.single(collection, environment=environment)
+                    if self.end
+                    else None
+                )
             )
-        ) and not isinstance(end, int):
+            and not isinstance(end, (int, IntegerBase))
+            or (isinstance(end, IntegerBase) and (end := end.value) is None)
+        ):
             raise FHIRPathError("Substring() end argument must resolve to an integer.")
 
         if start > len(string_item) - 1:
@@ -231,6 +243,8 @@ class StartsWith(StringManipulationFunction):
             FHIRPathError: If the item in the input collection is not a string.
 
         """
+        from fhircraft.fhir.resources.base import StringBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -240,8 +254,9 @@ class StartsWith(StringManipulationFunction):
         )
         # Get prefix value
         if not isinstance(
-            prefix := self.prefix.single(collection, environment=environment), str
-        ):
+            prefix := self.prefix.single(collection, environment=environment),
+            (str, StringBase),
+        ) or (isinstance(prefix, StringBase) and (prefix := prefix.value) is None):
             raise FHIRPathError("StartsWith() argument must resolve to a string.")
         if not prefix:
             return [FHIRPathCollectionItem.wrap(True)]
@@ -287,6 +302,8 @@ class EndsWith(StringManipulationFunction):
             FHIRPathError: If the item in the input collection is not a string.
 
         """
+        from fhircraft.fhir.resources.base import StringBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -296,9 +313,10 @@ class EndsWith(StringManipulationFunction):
         )
         # Get suffix value
         if not isinstance(
-            suffix := self.suffix.single(collection, environment=environment), str
-        ):
-            raise FHIRPathError("StartsWith() argument must resolve to a string.")
+            suffix := self.suffix.single(collection, environment=environment),
+            (str, StringBase),
+        ) or (isinstance(suffix, StringBase) and (suffix := suffix.value) is None):
+            raise FHIRPathError("EndsWith() argument must resolve to a string.")
         if not suffix:
             return [FHIRPathCollectionItem.wrap(True)]
         # Check for suffix presence
@@ -348,6 +366,8 @@ class Contains(StringManipulationFunction):
             is a list operator that looks for an element in a list.
 
         """
+        from fhircraft.fhir.resources.base import StringBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -357,7 +377,10 @@ class Contains(StringManipulationFunction):
         )
         # Get substring value
         if not isinstance(
-            substring := self.substring.single(collection, environment=environment), str
+            substring := self.substring.single(collection, environment=environment),
+            (str, StringBase),
+        ) or (
+            isinstance(substring, StringBase) and (substring := substring.value) is None
         ):
             raise FHIRPathError("Contains() argument must resolve to a string.")
         if not substring:
@@ -502,6 +525,8 @@ class Replace(StringManipulationFunction):
             FHIRPathError: If input collection has more than one item.
             FHIRPathError: If the item in the input collection is not a string.
         """
+        from fhircraft.fhir.resources.base import StringBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -516,14 +541,18 @@ class Replace(StringManipulationFunction):
             return []
         # Get pattern and substitution values
         if not isinstance(
-            pattern := self.pattern.single(collection, environment=environment), str
-        ):
+            pattern := self.pattern.single(collection, environment=environment),
+            (str, StringBase),
+        ) or (isinstance(pattern, StringBase) and (pattern := pattern.value) is None):
             raise FHIRPathError("Replace() pattern argument must resolve to a string.")
         if not isinstance(
             substitution := self.substitution.single(
                 collection, environment=environment
             ),
-            str,
+            (str, StringBase),
+        ) or (
+            isinstance(substitution, StringBase)
+            and (substitution := substitution.value) is None
         ):
             raise FHIRPathError(
                 "Replace() substitution argument must resolve to a string."
@@ -570,6 +599,8 @@ class Matches(StringManipulationFunction):
             FHIRPathError: If input collection has more than one item.
             FHIRPathError: If the item in the input collection is not a string.
         """
+        from fhircraft.fhir.resources.base import StringBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -581,8 +612,9 @@ class Matches(StringManipulationFunction):
         if self.regex.is_empty(collection, environment=environment):
             return []
         if not isinstance(
-            regex := self.regex.single(collection, environment=environment), str
-        ):
+            regex := self.regex.single(collection, environment=environment),
+            (str, StringBase),
+        ) or (isinstance(regex, StringBase) and (regex := regex.value) is None):
             raise FHIRPathError("Matches() argument must resolve to a string.")
         # Apply regex match
         return [FHIRPathCollectionItem.wrap(bool(re.match(regex, string_item)))]
@@ -633,6 +665,8 @@ class ReplaceMatches(StringManipulationFunction):
             FHIRPathError: If input collection has more than one item.
             FHIRPathError: If the item in the input collection is not a string.
         """
+        from fhircraft.fhir.resources.base import StringBase
+
         if not collection:
             return []
         string_item = self.validate_collection(collection)
@@ -646,8 +680,9 @@ class ReplaceMatches(StringManipulationFunction):
         ) or self.substitution.is_empty(collection, environment=environment):
             return []
         if not isinstance(
-            regex := self.regex.single(collection, environment=environment), str
-        ):
+            regex := self.regex.single(collection, environment=environment),
+            (str, StringBase),
+        ) or (isinstance(regex, StringBase) and (regex := regex.value) is None):
             raise FHIRPathError(
                 "ReplaceMatches() regex argument must resolve to a string."
             )
@@ -655,7 +690,10 @@ class ReplaceMatches(StringManipulationFunction):
             substitution := self.substitution.single(
                 collection, environment=environment
             ),
-            str,
+            (str, StringBase),
+        ) or (
+            isinstance(substitution, StringBase)
+            and (substitution := substitution.value) is None
         ):
             raise FHIRPathError(
                 "ReplaceMatches() substitution argument must resolve to a string."
