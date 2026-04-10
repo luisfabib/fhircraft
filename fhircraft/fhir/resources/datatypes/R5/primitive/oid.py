@@ -1,10 +1,11 @@
-from typing import Optional
-from pydantic import Field
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field
 
-from .uri import Uri
+from fhircraft.fhir.resources.base import FHIROid as FHIROidBase
+from .uri import FHIRUri
 
 
-class Oid(Uri):
+class FHIROid(FHIRUri, FHIROidBase):
     """An OID represented as a URI."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/oid"
@@ -15,3 +16,6 @@ class Oid(Uri):
         description="The actual value",
         pattern=r"^urn:oid:[0-2](\.(0|[1-9][0-9]*))+$",
     )
+
+
+Oid = Annotated[str | FHIROid, BeforeValidator(FHIROid.model_validate)]

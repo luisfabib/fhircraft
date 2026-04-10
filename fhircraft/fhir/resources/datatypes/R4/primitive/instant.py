@@ -1,9 +1,9 @@
 import re
 from datetime import datetime
-from typing import Optional
-from pydantic import Field, field_validator
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field, field_validator, model_serializer
 
-from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+from fhircraft.fhir.resources.base import FHIRInstant as FHIRInstantBase
 from fhircraft.fhir.resources.datatypes.R4.complex.element import Element
 from fhircraft.fhir.resources.datatypes import (
     YEAR_REGEX,
@@ -21,14 +21,14 @@ _INSTANT_PATTERN = (
 )
 
 
-class Instant(Element, FHIRPrimitiveModel):
+class FHIRInstant(Element, FHIRInstantBase):
     """An instant in time in the format YYYY-MM-DDThh:mm:ss.sss+zz:zz."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/instant"
     _type = "instant"
     _kind = "primitive-type"
 
-    value: Optional[str] = Field(
+    value: Optional[datetime] = Field(
         default=None,
         description="The actual value",
     )
@@ -37,7 +37,21 @@ class Instant(Element, FHIRPrimitiveModel):
     @classmethod
     def _parse(cls, v):
         if isinstance(v, datetime):
-            return v.isoformat()
-        if isinstance(v, str) and not re.match(_INSTANT_PATTERN, v):
-            raise ValueError(f"Invalid Instant: {v!r}")
+            return v
+        if isinstance(v, str):
+            if not re.match(_INSTANT_PATTERN, v):
+                raise ValueError(f"Invalid Instant: {v!r}")
+            return datetime.fromisoformat(v.replace("Z", "+00:00"))
         return v
+
+    @model_serializer
+    def serialize_root_value(self):
+        if self.value is None:
+            return None
+        s = self.value.isoformat()
+        if "." in s:
+            s = s.rstrip("0").rstrip(".")
+        return s
+
+
+Instant = Annotated[datetime | FHIRInstant, BeforeValidator(FHIRInstant.model_validate)]

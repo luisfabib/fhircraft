@@ -1,10 +1,11 @@
-from typing import Optional
-from pydantic import Field
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field
 
-from .string import String
+from fhircraft.fhir.resources.base import FHIRCode as FHIRCodeBase
+from .string import FHIRString
 
 
-class Code(String):
+class FHIRCode(FHIRString, FHIRCodeBase):
     """A string which has at least one character and no leading/trailing whitespace."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/code"
@@ -15,3 +16,6 @@ class Code(String):
         description="The actual value",
         pattern=r"^[^\s]+(\s[^\s]+)*$",
     )
+
+
+Code = Annotated[str | FHIRCode, BeforeValidator(FHIRCode.model_validate)]

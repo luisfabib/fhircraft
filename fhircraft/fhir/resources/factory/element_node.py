@@ -385,16 +385,14 @@ class ElementNode:
         Strings that contain no alphanumeric characters are treated as absent and the next candidate is tried instead.
         """
 
-        def _has_content(value: str | None) -> bool:
-            return bool(value and re.search(r"[A-Za-z0-9]", value))
-
         for candidate in (
             self.definition.definition,
             self.definition.short,
             self.definition.comment,
         ):
-            if _has_content(candidate):
-                return str(candidate)
+            candidate = str(candidate) if candidate is not None else None
+            if candidate and bool(re.search(r"[A-Za-z0-9]", candidate)):
+                return candidate
         return ""
 
     # ------------------------------------------------------------------

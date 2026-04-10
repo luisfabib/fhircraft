@@ -1,4 +1,5 @@
 from pydantic import BaseModel, create_model, Field
+from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.datatypes.R4.primitive as R4_primitives
 import fhircraft.fhir.resources.datatypes.R4B.primitive as R4B_primitives
 import fhircraft.fhir.resources.datatypes.R5.primitive as R5_primitives
@@ -38,14 +39,14 @@ STRING_TEST_CASES = [
 @pytest.mark.parametrize(*STRING_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__string_deserialization(release, value, expected):
-    instance = modules[release].String(value=value)
+    instance = modules[release].FHIRString(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*STRING_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__string_serialization(release, value, expected):
-    instance = modules[release].String(value=value)
+    instance = modules[release].FHIRString(value)
     assert instance.model_dump() == expected
 
 
@@ -65,14 +66,14 @@ ID_TEST_CASES = [
 @pytest.mark.parametrize(*ID_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__id_deserialization(release, value, expected):
-    instance = modules[release].Id(value=value)
+    instance = modules[release].FHIRId(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*ID_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__id_serialization(release, value, expected):
-    instance = modules[release].Id(value=value)
+    instance = modules[release].FHIRId(value)
     assert instance.model_dump() == expected
 
 
@@ -94,14 +95,14 @@ BOOLEAN_TEST_CASES = [
 @pytest.mark.parametrize(*BOOLEAN_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__boolean_deserialization(release, value, expected):
-    instance = modules[release].Boolean(value=value)
+    instance = modules[release].FHIRBoolean(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*BOOLEAN_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__boolean_serialization(release, value, expected):
-    instance = modules[release].Boolean(value=value)
+    instance = modules[release].FHIRBoolean(value)
     assert instance.model_dump() == expected
 
 
@@ -123,14 +124,14 @@ INTEGER_TEST_CASES = [
 @pytest.mark.parametrize(*INTEGER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__integer_deserialization(release, value, expected):
-    instance = modules[release].Integer(value=value)
+    instance = modules[release].FHIRInteger(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*INTEGER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__integer_serialization(release, value, expected):
-    instance = modules[release].Integer(value=value)
+    instance = modules[release].FHIRInteger(value)
     assert instance.model_dump() == expected
 
 
@@ -151,13 +152,13 @@ INTEGER64_TEST_CASES = [
 
 @pytest.mark.parametrize(*INTEGER64_TEST_CASES)
 def test_primitives__integer64_deserialization(value, expected):
-    instance = modules["R5"].Integer64(value=value)
+    instance = modules["R5"].FHIRInteger64(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*INTEGER64_TEST_CASES)
 def test_primitives__integer64_serialization(value, expected):
-    instance = modules["R5"].Integer64(value=value)
+    instance = modules["R5"].FHIRInteger64(value)
     assert instance.model_dump() == expected
 
 
@@ -179,14 +180,14 @@ DECIMAL_TEST_CASES = [
 @pytest.mark.parametrize(*DECIMAL_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__decimal_deserialization(release, value, expected):
-    instance = modules[release].Decimal(value=value)
+    instance = modules[release].FHIRDecimal(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*DECIMAL_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__decimal_serialization(release, value, expected):
-    instance = modules[release].Decimal(value=value)
+    instance = modules[release].FHIRDecimal(value)
     assert instance.model_dump() == expected
 
 
@@ -210,14 +211,14 @@ URI_TEST_CASES = [
 @pytest.mark.parametrize(*URI_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__uri_deserialization(release, value, expected):
-    instance = modules[release].Uri(value=value)
+    instance = modules[release].FHIRUri(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*URI_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__uri_serialization(release, value, expected):
-    instance = modules[release].Uri(value=value)
+    instance = modules[release].FHIRUri(value)
     assert instance.model_dump() == expected
 
 
@@ -237,14 +238,14 @@ URL_TEST_CASES = [
 @pytest.mark.parametrize(*URL_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__url_deserialization(release, value, expected):
-    instance = modules[release].Url(value=value)
+    instance = modules[release].FHIRUrl(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*URL_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__url_serialization(release, value, expected):
-    instance = modules[release].Url(value=value)
+    instance = modules[release].FHIRUrl(value)
     assert instance.model_dump() == expected
 
 
@@ -267,14 +268,14 @@ CANONICAL_TEST_CASES = [
 @pytest.mark.parametrize(*CANONICAL_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__canonical_deserialization(release, value, expected):
-    instance = modules[release].Canonical(value=value)
+    instance = modules[release].FHIRCanonical(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*CANONICAL_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__canonical_serialization(release, value, expected):
-    instance = modules[release].Canonical(value=value)
+    instance = modules[release].FHIRCanonical(value)
     assert instance.model_dump() == expected
 
 
@@ -295,14 +296,14 @@ CODE_TEST_CASES = [
 @pytest.mark.parametrize(*CODE_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__code_deserialization(release, value, expected):
-    instance = modules[release].Code(value=value)
+    instance = modules[release].FHIRCode(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*CODE_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__code_serialization(release, value, expected):
-    instance = modules[release].Code(value=value)
+    instance = modules[release].FHIRCode(value)
     assert instance.model_dump() == expected
 
 
@@ -322,14 +323,14 @@ MARKDOWN_TEST_CASES = [
 @pytest.mark.parametrize(*MARKDOWN_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__markdown_deserialization(release, value, expected):
-    instance = modules[release].Markdown(value=value)
+    instance = modules[release].FHIRMarkdown(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*MARKDOWN_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__markdown_serialization(release, value, expected):
-    instance = modules[release].Markdown(value=value)
+    instance = modules[release].FHIRMarkdown(value)
     assert instance.model_dump() == expected
 
 
@@ -349,14 +350,14 @@ OID_TEST_CASES = [
 @pytest.mark.parametrize(*OID_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__oid_deserialization(release, value, expected):
-    instance = modules[release].Oid(value=value)
+    instance = modules[release].FHIROid(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*OID_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__oid_serialization(release, value, expected):
-    instance = modules[release].Oid(value=value)
+    instance = modules[release].FHIROid(value)
     assert instance.model_dump() == expected
 
 
@@ -378,14 +379,14 @@ UUID_TEST_CASES = [
 @pytest.mark.parametrize(*UUID_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__uuid_deserialization(release, value, expected):
-    instance = modules[release].Uuid(value=value)
+    instance = modules[release].FHIRUuid(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*UUID_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__uuid_serialization(release, value, expected):
-    instance = modules[release].Uuid(value=value)
+    instance = modules[release].FHIRUuid(value)
     assert instance.model_dump() == expected
 
 
@@ -405,14 +406,14 @@ BASE64BINARY_TEST_CASES = [
 @pytest.mark.parametrize(*BASE64BINARY_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__base64binary_deserialization(release, value, expected):
-    instance = modules[release].Base64Binary(value=value)
+    instance = modules[release].FHIRBase64Binary(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*BASE64BINARY_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__base64binary_serialization(release, value, expected):
-    instance = modules[release].Base64Binary(value=value)
+    instance = modules[release].FHIRBase64Binary(value)
     assert instance.model_dump() == expected
 
 
@@ -420,7 +421,16 @@ def test_primitives__base64binary_serialization(release, value, expected):
 # Instant
 # ==========================================
 
-INSTANT_TEST_CASES = [
+INSTANT_DESER_TEST_CASES = [
+    "value, expected",
+    [
+        ("2015-02-07T13:28:17.239", datetime(2015, 2, 7, 13, 28, 17, 239000)),
+        (datetime(2015, 2, 7), datetime(2015, 2, 7)),
+        (datetime(2015, 2, 7, 13, 28, 17), datetime(2015, 2, 7, 13, 28, 17)),
+    ],
+]
+
+INSTANT_SER_TEST_CASES = [
     "value, expected",
     [
         ("2015-02-07T13:28:17.239", "2015-02-07T13:28:17.239"),
@@ -430,17 +440,17 @@ INSTANT_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*INSTANT_TEST_CASES)
+@pytest.mark.parametrize(*INSTANT_DESER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__instant_deserialization(release, value, expected):
-    instance = modules[release].Instant(value=value)
+    instance = modules[release].FHIRInstant(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*INSTANT_TEST_CASES)
+@pytest.mark.parametrize(*INSTANT_SER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__instant_serialization(release, value, expected):
-    instance = modules[release].Instant(value=value)
+    instance = modules[release].FHIRInstant(value)
     assert instance.model_dump() == expected
 
 
@@ -448,7 +458,17 @@ def test_primitives__instant_serialization(release, value, expected):
 # Date
 # ==========================================
 
-DATE_TEST_CASES = [
+DATE_DESER_TEST_CASES = [
+    "value, expected",
+    [
+        ("2015-02-07", date(2015, 2, 7)),
+        ("2015-02", "2015-02"),
+        ("2015", "2015"),
+        (date(2015, 2, 7), date(2015, 2, 7)),
+    ],
+]
+
+DATE_SER_TEST_CASES = [
     "value, expected",
     [
         ("2015-02-07", "2015-02-07"),
@@ -459,17 +479,17 @@ DATE_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*DATE_TEST_CASES)
+@pytest.mark.parametrize(*DATE_DESER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__date_deserialization(release, value, expected):
-    instance = modules[release].Date(value=value)
+    instance = modules[release].FHIRDate(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*DATE_TEST_CASES)
+@pytest.mark.parametrize(*DATE_SER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__date_serialization(release, value, expected):
-    instance = modules[release].Date(value=value)
+    instance = modules[release].FHIRDate(value)
     assert instance.model_dump() == expected
 
 
@@ -477,7 +497,19 @@ def test_primitives__date_serialization(release, value, expected):
 # DateTime
 # ==========================================
 
-DATETIME_TEST_CASES = [
+DATETIME_DESER_TEST_CASES = [
+    "value, expected",
+    [
+        ("2015-02-07T13:28:17.239", datetime(2015, 2, 7, 13, 28, 17, 239000)),
+        ("2015-02-07", date(2015, 2, 7)),
+        ("2015-02", "2015-02"),
+        ("2015", "2015"),
+        (datetime(2015, 2, 7), datetime(2015, 2, 7)),
+        (datetime(2015, 2, 7, 13, 28, 17), datetime(2015, 2, 7, 13, 28, 17)),
+    ],
+]
+
+DATETIME_SER_TEST_CASES = [
     "value, expected",
     [
         ("2015-02-07T13:28:17.239", "2015-02-07T13:28:17.239"),
@@ -490,17 +522,17 @@ DATETIME_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*DATETIME_TEST_CASES)
+@pytest.mark.parametrize(*DATETIME_DESER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__datetime_deserialization(release, value, expected):
-    instance = modules[release].DateTime(value=value)
+    instance = modules[release].FHIRDateTime(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*DATETIME_TEST_CASES)
+@pytest.mark.parametrize(*DATETIME_SER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__datetime_serialization(release, value, expected):
-    instance = modules[release].DateTime(value=value)
+    instance = modules[release].FHIRDateTime(value)
     assert instance.model_dump() == expected
 
 
@@ -508,10 +540,20 @@ def test_primitives__datetime_serialization(release, value, expected):
 # Time
 # ==========================================
 
-TIME_TEST_CASES = [
+TIME_DESER_TEST_CASES = [
     "value, expected",
     [
-        ("12:54", "12:54"),
+        ("12:54", time(12, 54)),
+        ("12:54:32", time(12, 54, 32)),
+        (time(12, 54), time(12, 54)),
+        (time(12, 54, 32), time(12, 54, 32)),
+    ],
+]
+
+TIME_SER_TEST_CASES = [
+    "value, expected",
+    [
+        ("12:54", "12:54:00"),
         ("12:54:32", "12:54:32"),
         (time(12, 54), "12:54:00"),
         (time(12, 54, 32), "12:54:32"),
@@ -519,17 +561,17 @@ TIME_TEST_CASES = [
 ]
 
 
-@pytest.mark.parametrize(*TIME_TEST_CASES)
+@pytest.mark.parametrize(*TIME_DESER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__time_deserialization(release, value, expected):
-    instance = modules[release].Time(value=value)
+    instance = modules[release].FHIRTime(value)
     assert instance == expected
 
 
-@pytest.mark.parametrize(*TIME_TEST_CASES)
+@pytest.mark.parametrize(*TIME_SER_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__time_serialization(release, value, expected):
-    instance = modules[release].Time(value=value)
+    instance = modules[release].FHIRTime(value)
     assert instance.model_dump() == expected
 
 
@@ -550,14 +592,14 @@ UNSIGNED_INT_TEST_CASES = [
 @pytest.mark.parametrize(*UNSIGNED_INT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__unsignedint_deserialization(release, value, expected):
-    instance = modules[release].UnsignedInt(value=value)
+    instance = modules[release].FHIRUnsignedInt(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*UNSIGNED_INT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__unsignedint_serialization(release, value, expected):
-    instance = modules[release].UnsignedInt(value=value)
+    instance = modules[release].FHIRUnsignedInt(value)
     assert instance.model_dump() == expected
 
 
@@ -578,14 +620,14 @@ POSITIVE_INT_TEST_CASES = [
 @pytest.mark.parametrize(*POSITIVE_INT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__positiveint_deserialization(release, value, expected):
-    instance = modules[release].PositiveInt(value=value)
+    instance = modules[release].FHIRPositiveInt(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*POSITIVE_INT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__positiveint_serialization(release, value, expected):
-    instance = modules[release].PositiveInt(value=value)
+    instance = modules[release].FHIRPositiveInt(value)
     assert instance.model_dump() == expected
 
 
@@ -605,12 +647,12 @@ XHTML_TEST_CASES = [
 @pytest.mark.parametrize(*XHTML_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__xhtml_deserialization(release, value, expected):
-    instance = modules[release].Xhtml(value=value)
+    instance = modules[release].FHIRXhtml(value)
     assert instance == expected
 
 
 @pytest.mark.parametrize(*XHTML_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__xhtml_serialization(release, value, expected):
-    instance = modules[release].Xhtml(value=value)
+    instance = modules[release].FHIRXhtml(value)
     assert instance.model_dump() == expected

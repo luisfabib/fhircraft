@@ -1,11 +1,11 @@
-from typing import Optional
-from pydantic import Field, field_validator
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field, field_validator
 
-from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+from fhircraft.fhir.resources.base import FHIRBoolean as FHIRBooleanBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 
 
-class Boolean(PrimitiveType, FHIRPrimitiveModel):
+class FHIRBoolean(PrimitiveType, FHIRBooleanBase):
     """Value of 'true' or 'false'."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/boolean"
@@ -27,3 +27,6 @@ class Boolean(PrimitiveType, FHIRPrimitiveModel):
                 return False
             raise ValueError(f"Expected 'true' or 'false', got {v!r}")
         return v
+
+
+Boolean = Annotated[bool | FHIRBoolean, BeforeValidator(FHIRBoolean.model_validate)]

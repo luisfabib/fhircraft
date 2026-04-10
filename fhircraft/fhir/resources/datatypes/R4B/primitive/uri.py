@@ -1,10 +1,11 @@
-from typing import Optional
-from pydantic import Field
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field
 
-from .string import String
+from fhircraft.fhir.resources.base import FHIRUri as FHIRUriBase
+from .string import FHIRString
 
 
-class Uri(String):
+class FHIRUri(FHIRString, FHIRUriBase):
     """A Uniform Resource Identifier Reference."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/uri"
@@ -15,3 +16,6 @@ class Uri(String):
         description="The actual value",
         pattern=r"^\S+$",
     )
+
+
+Uri = Annotated[str | FHIRUri, BeforeValidator(FHIRUri.model_validate)]

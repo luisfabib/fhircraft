@@ -1,11 +1,11 @@
-from typing import Optional
-from pydantic import Field
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field
 
-from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+from fhircraft.fhir.resources.base import FHIRXhtml as FHIRXhtmlBase
 from fhircraft.fhir.resources.datatypes.R4.complex.element import Element
 
 
-class Xhtml(Element, FHIRPrimitiveModel):
+class FHIRXhtml(Element, FHIRXhtmlBase):
     """A string of XHTML content."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/xhtml"
@@ -16,3 +16,6 @@ class Xhtml(Element, FHIRPrimitiveModel):
         default=None,
         description="The actual value",
     )
+
+
+Xhtml = Annotated[str | FHIRXhtml, BeforeValidator(FHIRXhtml.model_validate)]

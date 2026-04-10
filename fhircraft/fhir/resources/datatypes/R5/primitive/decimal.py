@@ -1,14 +1,14 @@
 import re
-from typing import Optional
-from pydantic import Field, field_validator
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field, field_validator
 
-from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+from fhircraft.fhir.resources.base import FHIRDecimal as FHIRDecimalBase
 from fhircraft.fhir.resources.datatypes.R5.complex.primitive_type import PrimitiveType
 
 _DECIMAL_PATTERN = r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$"
 
 
-class Decimal(PrimitiveType, FHIRPrimitiveModel):
+class FHIRDecimal(PrimitiveType, FHIRDecimalBase):
     """A rational number."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/decimal"
@@ -28,3 +28,6 @@ class Decimal(PrimitiveType, FHIRPrimitiveModel):
                 raise ValueError(f"Invalid decimal string: {v!r}")
             return float(v)
         return v
+
+
+Decimal = Annotated[float | FHIRDecimal, BeforeValidator(FHIRDecimal.model_validate)]

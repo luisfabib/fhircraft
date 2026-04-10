@@ -1,10 +1,11 @@
-from typing import Optional
-from pydantic import Field
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field
 
-from .string import String
+from fhircraft.fhir.resources.base import FHIRMarkdown as FHIRMarkdownBase
+from .string import FHIRString
 
 
-class Markdown(String):
+class FHIRMarkdown(FHIRString, FHIRMarkdownBase):
     """A string that may contain Github Flavored Markdown syntax."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/markdown"
@@ -15,3 +16,6 @@ class Markdown(String):
         description="The actual value",
         pattern=r"^\s*(\S|\s)*$",
     )
+
+
+Markdown = Annotated[str | FHIRMarkdown, BeforeValidator(FHIRMarkdown.model_validate)]

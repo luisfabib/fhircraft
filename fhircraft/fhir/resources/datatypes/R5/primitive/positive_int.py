@@ -1,14 +1,15 @@
 import re
-from typing import Optional
-from pydantic import Field, field_validator
+from typing import Annotated, Optional
+from pydantic import BeforeValidator, Field, field_validator
 
 from fhircraft.fhir.resources.datatypes import MAX_SIGNED_32BIT_INT
-from .integer import Integer
+from fhircraft.fhir.resources.base import FHIRPositiveInt as FHIRPositiveIntBase
+from .integer import FHIRInteger
 
 _POSITIVE_INT_PATTERN = r"^\+?[1-9][0-9]*$"
 
 
-class PositiveInt(Integer):
+class FHIRPositiveInt(FHIRInteger, FHIRPositiveIntBase):
     """An integer with a value greater than 0."""
 
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/positiveInt"
@@ -32,3 +33,8 @@ class PositiveInt(Integer):
                     f"Integer {v} must be positive and within 32-bit signed range"
                 )
         return v
+
+
+PositiveInt = Annotated[
+    int | FHIRPositiveInt, BeforeValidator(FHIRPositiveInt.model_validate)
+]
