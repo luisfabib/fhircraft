@@ -33,6 +33,8 @@ def _evaluate_boolean_expressions(
         tuple[bool | None, bool | None]: A tuple containing the boolean values of the left and right operands.
             Each value is True, False, or None if the operand cannot be evaluated to a boolean.
     """
+    from fhircraft.fhir.resources.base import BooleanBase
+
     left_collection = (
         left.evaluate(collection, environment, create)
         if isinstance(left, FHIRPath)
@@ -42,7 +44,10 @@ def _evaluate_boolean_expressions(
         left_boolean = left_collection
     else:
         if len(left_collection) > 0:
-            left_boolean = bool(left_collection[0].value)
+            if isinstance(left_collection[0].value, BooleanBase):
+                left_boolean = bool(left_collection[0].value.value)
+            else:
+                left_boolean = bool(left_collection[0].value)
         else:
             left_boolean = None
     right_collection = (
@@ -54,9 +59,15 @@ def _evaluate_boolean_expressions(
         right_boolean = right_collection
     else:
         if len(right_collection) > 0:
-            right_boolean = bool(right_collection[0].value)
+            if isinstance(right_collection[0].value, BooleanBase):
+                right_boolean = bool(right_collection[0].value.value)
+            else:
+                right_boolean = bool(right_collection[0].value)
         else:
             right_boolean = None
+    print(
+        f"Evaluated left operand to: {left_boolean}, right operand to: {right_boolean}"
+    )
     return left_boolean, right_boolean
 
 
@@ -342,6 +353,8 @@ class Not(FHIRPathFunction):
         Returns:
             FHIRPathCollection: The output collection
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
         if len(collection) > 1:
             raise FHIRPathRuntimeError(
                 "Cannot assert Not() for a collection that has more than one item."
@@ -349,5 +362,8 @@ class Not(FHIRPathFunction):
         elif len(collection) == 0:
             return []
         else:
-            boolean = bool(collection[0].value)
+            value = collection[0].value
+            if isinstance(value, FHIRPrimitiveModel):
+                value = value.value
+            boolean = bool(value)
             return [FHIRPathCollectionItem.wrap(not boolean)]

@@ -6,6 +6,12 @@ from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.equality import *
 from fhircraft.fhir.path.engine.literals import *
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    String as FHIRString,
+    Integer as FHIRInteger,
+    Boolean as FHIRBoolean,
+    Decimal as FHIRDecimal,
+)
 
 env = dict()
 
@@ -35,6 +41,14 @@ equals_boolean_logic_cases = (
     ("1 cm", "1 m", False),
     ("ABC", [], []),
     ([], "ABC", []),
+    # FHIR primitive class instances
+    (FHIRString(value="ABC"), FHIRString(value="ABC"), True),
+    (FHIRString(value="ABC"), FHIRString(value="DEF"), False),
+    (FHIRInteger(value=123), FHIRInteger(value=123), True),
+    (FHIRInteger(value=123), FHIRInteger(value=456), False),
+    (FHIRDecimal(value=1.23), FHIRDecimal(value=1.23), True),
+    (FHIRBoolean(value=True), FHIRBoolean(value=True), True),
+    (FHIRBoolean(value=False), FHIRBoolean(value=True), False),
 )
 
 
@@ -112,6 +126,13 @@ equivalent_boolean_logic_cases = (
     (dict(a=1, b=2), dict(b=2, a=1), True),
     (dict(a=1, b=2, id="123"), dict(b=2, a=1, id="456"), True),
     (dict(a=1, b=2, c=3), dict(b=2, a=1, id="456"), False),
+    # FHIR primitive class instances (equivalent is case-insensitive for strings)
+    (FHIRString(value="ABC"), FHIRString(value="abc"), True),
+    (FHIRString(value="ABC"), FHIRString(value="DEF"), False),
+    (FHIRInteger(value=123), FHIRInteger(value=123), True),
+    (FHIRDecimal(value=1.23), FHIRDecimal(value=1.23), True),
+    (FHIRBoolean(value=True), FHIRBoolean(value=True), True),
+    (FHIRBoolean(value=False), FHIRBoolean(value=True), False),
 )
 
 

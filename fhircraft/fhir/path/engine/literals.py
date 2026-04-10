@@ -79,7 +79,10 @@ class Quantity(FHIRPathLiteralType):
                 )
             if not instance.value:
                 raise ValueError("Quantity value is required")
-            return cls(value=float(instance.value), unit=instance.code or instance.unit)
+            return cls(
+                value=float(str(instance.value)),
+                unit=str(instance.code or instance.unit),
+            )
         elif isinstance(instance, (int, float)):
             return cls(value=instance, unit="")
         else:

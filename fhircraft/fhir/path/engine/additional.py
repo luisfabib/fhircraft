@@ -211,6 +211,7 @@ class Resolve(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
+        from fhircraft.fhir.resources.base import StringBase
 
         output_collection = []
         for item in collection:
@@ -224,7 +225,7 @@ class Resolve(FHIRPathFunction):
                     )
                 )
                 or ((resource_url := value))
-            ) or not isinstance(resource_url, str):
+            ) or not isinstance(resource_url, (str, StringBase)):
                 raise FHIRPathError(
                     "The resolve() function requires either a collection of URIs, Canonicals, URLs or References."
                 )

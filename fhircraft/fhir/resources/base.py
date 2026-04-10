@@ -1,4 +1,5 @@
 from copy import copy
+from datetime import date, datetime, time
 import enum
 from functools import lru_cache
 import operator
@@ -1102,6 +1103,12 @@ class FHIRPrimitiveModel(FHIRBaseModel):
             raise AttributeError(f"Cannot access '{name}' because value is None")
         return getattr(v, name)
 
+    def __getitem__(self, key):
+        v = self.value
+        if v is None:
+            raise TypeError("Cannot index into None value")
+        return v[key]
+
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, FHIRPrimitiveModel):
             return self.value == other.value
@@ -1114,11 +1121,25 @@ class FHIRPrimitiveModel(FHIRBaseModel):
             else self.value > other
         )
 
+    def __rgt__(self, other):
+        return (
+            self.value < other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value < other
+        )
+
     def __lt__(self, other):
         return (
             self.value < other.value  # type: ignore
             if isinstance(other, FHIRPrimitiveModel)
             else self.value < other
+        )
+
+    def __rlt__(self, other):
+        return (
+            self.value > other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value > other
         )
 
     def __ge__(self, other):
@@ -1128,12 +1149,119 @@ class FHIRPrimitiveModel(FHIRBaseModel):
             else self.value >= other
         )
 
+    def __rge__(self, other):
+        return (
+            self.value <= other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value <= other
+        )
+
     def __le__(self, other):
         return (
             self.value <= other.value  # type: ignore
             if isinstance(other, FHIRPrimitiveModel)
             else self.value <= other
         )
+
+    def __rle__(self, other):
+        return (
+            self.value >= other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value >= other
+        )
+
+    def __add__(self, other):
+        return (
+            self.value + other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value + other
+        )
+
+    def __radd__(self, other):
+        return (
+            self.value + other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value + other
+        )
+
+    def __sub__(self, other):
+        return (
+            self.value - other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value - other
+        )
+
+    def __rsub__(self, other):
+        return (
+            other.value - self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other - self.value
+        )
+
+    def __mul__(self, other):
+        return (
+            self.value * other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value * other
+        )
+
+    def __rmul__(self, other):
+        return (
+            self.value * other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value * other
+        )
+
+    def __truediv__(self, other):
+        return (
+            self.value / other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value / other
+        )
+
+    def __rtruediv__(self, other):
+        return (
+            other.value / self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other / self.value
+        )
+
+    def __mod__(self, other):
+        return (
+            self.value % other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value % other
+        )
+
+    def __rmod__(self, other):
+        return (
+            other.value % self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other % self.value
+        )
+
+    def __floordiv__(self, other):
+        return (
+            self.value // other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value // other
+        )
+
+    def __rfloordiv__(self, other):
+        return (
+            other.value // self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other // self.value
+        )
+
+    def __neg__(self):
+        return -self.value  # type: ignore
+
+    def __pos__(self):
+        return +self.value  # type: ignore
+
+    def __abs__(self):
+        return abs(self.value)  # type: ignore
 
     def __hash__(self) -> int:
         return hash(self.value)
@@ -1151,6 +1279,7 @@ class StringBase(FHIRPrimitiveModel):
     """
 
     _kind = "string"
+    value: str | None = None
 
 
 class BooleanBase(FHIRPrimitiveModel):
@@ -1159,6 +1288,7 @@ class BooleanBase(FHIRPrimitiveModel):
     """
 
     _kind = "boolean"
+    value: bool | None = None
 
 
 class DecimalBase(FHIRPrimitiveModel):
@@ -1167,6 +1297,7 @@ class DecimalBase(FHIRPrimitiveModel):
     """
 
     _kind = "decimal"
+    value: float | None = None
 
 
 class DateBase(FHIRPrimitiveModel):
@@ -1175,6 +1306,7 @@ class DateBase(FHIRPrimitiveModel):
     """
 
     _kind = "date"
+    value: date | None = None
 
 
 class DateTimeBase(FHIRPrimitiveModel):
@@ -1183,6 +1315,7 @@ class DateTimeBase(FHIRPrimitiveModel):
     """
 
     _kind = "dateTime"
+    value: datetime | None = None
 
 
 class TimeBase(FHIRPrimitiveModel):
@@ -1191,6 +1324,7 @@ class TimeBase(FHIRPrimitiveModel):
     """
 
     _kind = "time"
+    value: time | None = None
 
 
 class InstantBase(FHIRPrimitiveModel):
@@ -1199,6 +1333,7 @@ class InstantBase(FHIRPrimitiveModel):
     """
 
     _kind = "instant"
+    value: time | None = None
 
 
 class Base64BinaryBase(FHIRPrimitiveModel):
@@ -1207,6 +1342,7 @@ class Base64BinaryBase(FHIRPrimitiveModel):
     """
 
     _kind = "base64Binary"
+    value: str | None = None
 
 
 class UriBase(StringBase):
@@ -1287,6 +1423,7 @@ class IntegerBase(FHIRPrimitiveModel):
     """
 
     _kind = "integer"
+    value: int | None = None
 
 
 class PositiveIntBase(IntegerBase):

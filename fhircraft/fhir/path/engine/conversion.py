@@ -158,9 +158,12 @@ class ToBoolean(FHIRTypeConversionFunction):
             return []
 
         # Use type_utils for conversion
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
         from fhircraft.fhir.resources.datatypes.utils import to_boolean
 
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
         result = to_boolean(value)
 
         if result is not None:
@@ -233,9 +236,12 @@ class ToInteger(FHIRTypeConversionFunction):
             return []
 
         # Use type_utils for conversion
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
         from fhircraft.fhir.resources.datatypes.utils import to_integer
 
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
         result = to_integer(value)
 
         if result is not None:
@@ -306,10 +312,14 @@ class ToDate(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
         self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
         if isinstance(value, str):
             date_match = re.match(
                 rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$",
@@ -403,10 +413,14 @@ class ToDateTime(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
         self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
         if isinstance(value, str):
             date_match = re.match(
                 rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$",
@@ -495,10 +509,14 @@ class ToDecimal(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
         self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
         if isinstance(value, (int, float, bool)):
             return [FHIRPathCollectionItem.wrap(float(value))]
         elif isinstance(value, str):
@@ -575,11 +593,14 @@ class ToQuantity(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
         self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
         if isinstance(value, (bool, int, float)):
             return [FHIRPathCollectionItem.wrap(Quantity(value=float(value), unit=""))]
         elif isinstance(value, str):
@@ -597,7 +618,7 @@ class ToQuantity(FHIRTypeConversionFunction):
                 ]
             else:
                 return []
-        elif Quantity.is_quantity(value):
+        elif Quantity.is_quantity(value) and value is not None:
             return [FHIRPathCollectionItem.wrap(Quantity.parse_quantity(value))]
         else:
             return []
@@ -668,16 +689,19 @@ class ToString(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
         self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
         if isinstance(value, bool):
             return [FHIRPathCollectionItem.wrap("true" if value else "false")]
         elif isinstance(value, (str, int, float)):
             return [FHIRPathCollectionItem.wrap(str(value))]
-        elif Quantity.is_quantity(value):
+        elif Quantity.is_quantity(value) and value is not None:
             value = Quantity.parse_quantity(value)
             return [FHIRPathCollectionItem.wrap(f"{value.value} {value.unit}")]
         else:
@@ -748,10 +772,15 @@ class ToTime(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
         self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
+        if isinstance(value, FHIRPrimitiveModel):
+            value = value.value
+
         if isinstance(value, str):
             time_match = re.match(
                 rf"^{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?",

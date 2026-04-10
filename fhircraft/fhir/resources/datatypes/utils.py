@@ -184,6 +184,10 @@ def to_boolean(value: Any) -> Union[bool, None]:
         >>> to_boolean("invalid")
         None
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, bool):
         return value
     elif isinstance(value, str):
@@ -210,6 +214,10 @@ def to_integer(value: Any) -> Union[int, None]:
     Returns:
         int or None: Converted integer value or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, int):
         return value
     elif isinstance(value, bool):
@@ -236,7 +244,11 @@ def to_decimal(value: Any) -> Union[float, None]:
     Returns:
         float or None: Converted decimal value or None if conversion fails
     """
-    if isinstance(value, (int, float)):
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
+    elif isinstance(value, (int, float)):
         return float(value)
     elif isinstance(value, bool):
         return float(value)
@@ -263,6 +275,10 @@ def to_date(value: Any) -> Union[str, None]:
     Returns:
         str or None: Converted date string or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         # Check if it's already a valid date
         date_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?$"
@@ -290,6 +306,10 @@ def to_datetime(value: Any) -> Union[str, None]:
     Returns:
         str or None: Converted datetime string or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         # Check if it's already a valid datetime
         datetime_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?(T{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?)?$"
@@ -316,6 +336,10 @@ def to_time(value: Any) -> Union[str, None]:
     Returns:
         str or None: Converted time string or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         # Check if it's already a valid time
         time_pattern = rf"^{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?$"
@@ -343,6 +367,10 @@ def to_string(value: Any) -> Union[str, None]:
     Returns:
         str or None: String representation or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         return value
     elif isinstance(value, (int, float, bool)):

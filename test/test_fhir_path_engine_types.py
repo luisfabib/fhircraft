@@ -2,9 +2,29 @@ from collections import namedtuple
 
 import pytest
 
-from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.core import (
+    Element,
+    This,
+    FHIRPathCollectionItem,
+    TypeSpecifier,
+)
 from fhircraft.fhir.path.engine.literals import Date, Quantity
-from fhircraft.fhir.path.engine.types import *
+from fhircraft.fhir.path.engine.types import Is, As, LegacyIs, LegacyAs
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    Code,
+    String as FHIRString,
+    Integer as FHIRInteger,
+    Boolean as FHIRBoolean,
+    Decimal as FHIRDecimal,
+    Date as FHIRDate,
+    DateTime as FHIRDateTime,
+    Time as FHIRTime,
+    Instant as FHIRInstant,
+    Uri as FHIRUri,
+    Canonical as FHIRCanonical,
+    PositiveInt as FHIRPositiveInt,
+    UnsignedInt as FHIRUnsignedInt,
+)
 from fhircraft.fhir.resources.datatypes.R4.core.observation import Observation
 from fhircraft.fhir.resources.datatypes.R4.core.practitioner import Practitioner
 
@@ -69,13 +89,33 @@ test_cases = (
     # FHIR Complex type checking
     (Date("@2024"), "FHIR.date", True),
     (Quantity(12, "g"), "FHIR.Quantity", True),
-    (Practitioner(id="example"), "FHIR.Practitioner", True),
-    (Observation(id="example"), "FHIR.Observation", True),
+    (Practitioner(gender="example"), "FHIR.Practitioner", True),
+    (Observation(status="example"), "FHIR.Observation", True),
     # System Complex type checking
     (Date("@2024"), "System.Date", True),
     (Quantity(12, "g"), "System.Quantity", True),
-    (Practitioner(id="example"), "System.Quantity", False),
-    (Observation(id="example"), "System.Quantity", False),
+    (Practitioner(gender="example"), "System.Quantity", False),
+    (Observation(status="example"), "System.Quantity", False),
+    # FHIR primitive class instances — type checking via is/as
+    (FHIRString(value="ABC"), "FHIR.string", True),
+    (FHIRInteger(value=12), "FHIR.integer", True),
+    (FHIRBoolean(value=True), "FHIR.boolean", True),
+    (FHIRDecimal(value=23.32), "FHIR.decimal", True),
+    (FHIRDate(value="2024-01-01"), "FHIR.date", True),
+    (FHIRDateTime(value="2024-01-01T10:30:00"), "FHIR.dateTime", True),
+    (FHIRTime(value="10:30:00"), "FHIR.time", True),
+    (FHIRInstant(value="2024-01-15T10:30:00Z"), "FHIR.instant", True),
+    (FHIRUri(value="http://example.com"), "FHIR.uri", True),
+    (
+        FHIRCanonical(value="http://hl7.org/fhir/ValueSet/example"),
+        "FHIR.canonical",
+        True,
+    ),
+    (FHIRPositiveInt(value=5), "FHIR.positiveInt", True),
+    (FHIRUnsignedInt(value=5), "FHIR.unsignedInt", True),
+    # Cross-type checks — primitive instance against wrong type specifier
+    (FHIRString(value="ABC"), "FHIR.integer", False),
+    (FHIRInteger(value=12), "FHIR.string", False),
 )
 
 

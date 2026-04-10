@@ -12,6 +12,9 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional
 from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
 
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
 # Get logger name
 logger = logging.getLogger(__name__)
 
@@ -675,9 +678,9 @@ class Element(FHIRPath):
         label (str): The name of the element.
     """
 
-    def __init__(self, label: str | Literal):
-        if isinstance(label, Literal):
-            label = label.value
+    def __init__(self, label: "str | Literal | FHIRPrimitiveModel"):
+        if isinstance(label, Literal) or getattr(label, "_type", None) == "string":
+            label = str(label)
         if not isinstance(label, str):
             raise FHIRPathError("Element() argument must be a string.")
         self.label = label
