@@ -18,15 +18,15 @@ Fhircraft uses Pydantic v2 to create strongly-typed Python representations of FH
 from pydantic import Field, model_validator
 from typing import Optional, List
 from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.R5.primitive import Boolean, Code
+from fhircraft.fhir.resources.datatypes.R5.primitive import boolean, code  # (1)!
 from fhircraft.fhir.resources.datatypes.R5.complex import HumanName, Identifier
 
 class Patient(FHIRBaseModel):
 
-    active: Optional[Boolean] = Field(...)
+    active: Optional[boolean] = Field(...)  # (2)!
     name: Optional[List[HumanName]] = Field(...)
-    gender: Optional[Code] = Field(...)
-    ... 
+    gender: Optional[code] = Field(...)
+    ...
 
     # FHIR invariant validation
     @model_validator(mode="after")
@@ -34,60 +34,91 @@ class Patient(FHIRBaseModel):
         ...
 ```
 
+1. Primitive **type aliases** (`boolean`, `code`) are the recommended annotation for resource fields — they accept both native Python values and FHIR primitive model instances.
+2. Field values are stored as FHIR primitive model instances that behave transparently as their underlying Python types.
+
 ## Data Type System
 
 Fhircraft implements FHIR's complete type hierarchy using Python objects. This ensures that every piece of healthcare data maintains its semantic meaning while being fully accessible in Python.
 
 ### Primitive Types  
 
-Fhircraft implements all [:material-fire: FHIR Primitive Types](https://hl7.org/fhir/datatypes.html#primitive) as Python type aliases that accept both their native Python types and string representations. The types are validated using regex patterns to ensure FHIR compliance.
+Fhircraft implements all [:material-fire: FHIR Primitive Types](https://hl7.org/fhir/datatypes.html#primitive) through a **dual-type design**: each primitive type has both a **model class** and a **type alias**.
 
-| FHIR Primitive | Fhircraft Primitive | Python types   | Regex                                                                         |
-| -------------- | ------------------- | -------------- | ----------------------------------------------------------------------------- |
-| boolean        | `Boolean`           | `bool`, `str`  | `true                                                                         | false`                                     |
-| integer        | `Integer`           | `int`, `str`   | `[0]                                                                          | [-+]?[1-9][0-9]*`                          |
-| integer64      | `Integer64`         | `int`, `str`   | `[0]                                                                          | [-+]?[1-9][0-9]*`                          |
-| string         | `String`            | `str`          | `.*`                                                                          |
-| decimal        | `Decimal`           | `float`, `str` | `-?(0                                                                         | [1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?` |
-| uri            | `Uri`               | `str`          | `\S*`                                                                         |
-| url            | `Url`               | `str`          | `\S*`                                                                         |
-| canonical      | `Canonical`         | `str`          | `\S*`                                                                         |
-| base64Binary   | `Base64Binary`      | `str`          | `(\s*([0-9a-zA-Z\+\=]){4}\s*)+`                                               |
-| instant        | `Instant`           | `str`          | `([0-9]([0-9]([0-9][1-9]                                                      | [1-9]0)                                    | [1-9]00)          | [1-9]000)-(0[1-9]  | 1[0-2])-(0[1-9]  | [1-2][0-9]         | 3[0-1])T([01][0-9]      | 2[0-3]):[0-5][0-9]:([0-5][0-9]   | 60)(\\.[0-9]+)?(Z | (\\+ | -)((0[0-9] | 1[0-3]):[0-5][0-9] | 14:00))?`       |
-| date           | `Date`              | `str`          | `([0-9]([0-9]([0-9][1-9]                                                      | [1-9]0)                                    | [1-9]00)          | [1-9]000)(-(0[1-9] | 1[0-2])(-(0[1-9] | [1-2][0-9]         | 3[0-1]))?)?`            |
-| time           | `Time`              | `str`          | `([01][0-9]                                                                   | 2[0-3])(:[0-5][0-9](:([0-5][0-9]           | 60)(\\.[0-9]+)?(Z | (\\+               | -)((0[0-9]       | 1[0-3]):[0-5][0-9] | 14:00))?)?)?`           |
-| datetime       | `DateTime`          | `str`          | `([0-9]([0-9]([0-9][1-9]                                                      | [1-9]0)                                    | [1-9]00)          | [1-9]000)(-(0[1-9] | 1[0-2])(-(0[1-9] | [1-2][0-9]         | 3[0-1]))?)?(T([01][0-9] | 2[0-3])(:[0-5][0-9](:([0-5][0-9] | 60)(\\.[0-9]+)?(Z | (\\+ | -)((0[0-9] | 1[0-3]):[0-5][0-9] | 14:00))?)?)?)?` |
-| code           | `Code`              | `str`          | `[^\s]+(\s[^\s]+)*`                                                           |
-| oid            | `Oid`               | `str`          | `urn:oid:[0-2](\.(0                                                           | [1-9][0-9]*))+`                            |
-| id             | `Id`                | `str`          | `[A-Za-z0-9\-\.]{1,64}`                                                       |
-| markdown       | `Markdown`          | `str`          | `\s*(\S                                                                       | \s)*`                                      |
-| unsignedInt    | `UnsignedInt`       | `int`,`str`    | `[0]                                                                          | ([1-9][0-9]*)`                             |
-| positiveInt    | `PositiveInt`       | `int`,`str`    | `\+?[1-9][0-9]*`                                                              |
-| uuid           | `Uuid`              | `str`          | `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}` |
+**Model classes** (uppercase, e.g. `String`, `Boolean`) are the full FHIR representation of a primitive. Each one wraps the raw value in a `.value` attribute and carries the rest of the FHIR element payload—`id`, `extension`, and other metadata—right alongside it. The value is also validated against the FHIR-specified regex for that type, so invalid data is caught early.
 
+**Type aliases** (lowercase, e.g. `string`, `boolean`) are what you'll use day-to-day when annotating fields in your resource models. Behind the scenes they're `Annotated` types that automatically coerce whatever you pass in—a plain Python value *or* a full model instance—into the corresponding model class. You get the convenience of working with native Python types without losing any FHIR fidelity.
+
+```python
+from fhircraft.fhir.resources.datatypes.R5.primitive import (
+    String, string,    # model class + type alias
+    Boolean, boolean,
+    Date, date_,
+)
+```
+
+| FHIR Primitive | Type Alias    | Model Class    | Accepted native types  |
+| -------------- | ------------- | -------------- | ---------------------- |
+| `boolean`      | `boolean`     | `Boolean`      | `bool`, `str`          |
+| `integer`      | `integer`     | `Integer`      | `int`, `str`           |
+| `integer64`    | `integer64`   | `Integer64`    | `int`, `str`           |
+| `string`       | `string`      | `String`       | `str`                  |
+| `decimal`      | `decimal`     | `Decimal`      | `float`, `str`         |
+| `uri`          | `uri`         | `Uri`          | `str`                  |
+| `url`          | `url`         | `Url`          | `str`                  |
+| `canonical`    | `canonical`   | `Canonical`    | `str`                  |
+| `base64Binary` | `base64Binary`| `Base64Binary` | `str`                  |
+| `instant`      | `instant`     | `Instant`      | `str`                  |
+| `date`         | `date_`       | `Date`         | `str`                  |
+| `time`         | `time_`       | `Time`         | `str`                  |
+| `dateTime`     | `dateTime`    | `DateTime`     | `str`                  |
+| `code`         | `code`        | `Code`         | `str`                  |
+| `oid`          | `oid`         | `Oid`          | `str`                  |
+| `id`           | `id_`         | `Id`           | `str`                  |
+| `markdown`     | `markdown`    | `Markdown`     | `str`                  |
+| `unsignedInt`  | `unsignedInt` | `UnsignedInt`  | `int`, `str`           |
+| `positiveInt`  | `positiveInt` | `PositiveInt`  | `int`, `str`           |
+| `uuid`         | `uuid`        | `Uuid`         | `str`                  |
+| `xhtml`        | `xhtml`       | `Xhtml`        | `str`                  |
+
+!!! note "Why the trailing underscore?"
+    A handful of alias names (`date_`, `time_`, `id_`) use a trailing underscore to avoid shadowing Python built-ins (`date`, `time`) or commonly-used names (`id`).
+
+#### Transparent value access
+
+Fields annotated with a type alias store their values as the corresponding model class instance, not as a plain Python value. The model classes are designed to be **transparent**: they delegate all comparison, arithmetic, and string operations to the underlying `.value`, so they behave like the native type in most contexts.
 
 !!! example "Primitive Types"
 
     ```python
     from fhircraft.fhir.resources.datatypes.R5.core import Patient
-    from datetime import date
 
-    # Case 1: Use string representation
-    patient = Patient(birthDate="1990-05-15")
+    patient = Patient(birthDate="1990-05-15")  # (1)!
+
+    # The field stores a model instance...
+    print(type(patient.birthDate))
+    #> <class 'fhircraft.fhir.resources.datatypes.R5.primitive.date.Date'>
+
+    # ...but it compares and prints like the underlying value:
     print(patient.birthDate)
     #> 1990-05-15
 
-    # Case 2: Use a date object
-    patient = Patient(birthDate=date(1990,5,15))
-    print(patient.birthDate)
+    print(patient.birthDate == "1990-05-15")
+    #> True
+
+    # Access the raw Python value directly:
+    print(patient.birthDate.value)
     #> 1990-05-15
+    print(type(patient.birthDate.value))
+    #> <class 'str'>
     ```
+
+    1. Any compatible native Python value is automatically coerced into the model class by the type alias's `BeforeValidator`.
 
 
 ??? abstract "Technical Documentation"
 
     [`fhircraft.fhir.path.mixin`](/fhircraft/reference/fhir-resources-types-primitives.md/)
-
 
 ### Complex Types
 FHIR complex types represent structured data with multiple fields—such as addresses, names, and codeable concepts. Unlike primitive types that represent single values, complex types bundle related fields into cohesive data structures. Fhircraft provides Pydantic models for all [:material-fire: FHIR complex types](https://hl7.org/fhir/datatypes.html#complex), ensuring built-in validation, type safety, and seamless integration with the rest of the FHIR ecosystem.
@@ -150,7 +181,7 @@ For list-type elements, the length of the list is constrained by the minimal and
 class MyPatient(FHIRBaseModel):    
     
     # Cardinality 0..1 
-    active: Optional[Boolean] = Field(default=None)
+    active: Optional[boolean] = Field(default=None)
     
     # Cardinality 1..2
     name: Optional[List[HumanName]] = Field(default=None, max_length=3)
@@ -348,37 +379,44 @@ Fixed and pattern value constraints are treated as follows: if the field is not 
 
 ### Extensions
 
-FHIR extensions allow you to add custom data to any element in a resource, enabling implementation-specific requirements while maintaining FHIR conformance. Fhircraft supports extensions in two ways: through standard `extension` arrays available on all complex types and resources, and through special `_ext` companion fields for primitive values. 
+FHIR extensions allow you to add custom data to any element in a resource, enabling implementation-specific requirements while maintaining FHIR conformance. Fhircraft supports extensions on all element types.
 
-For complex types and resources, you can add extensions using the `extension` field, which accepts a list of `Extension` objects. Each extension has a `url` identifying its definition and a type choice value field (such as `valueString`, `valueCodeableConcept`, or `valueQuantity`) containing the extension data.
+For complex types and resources, add extensions via the `extension` field, which accepts a list of `Extension` objects. Each extension has a `url` identifying its definition and a type-choice value field (`valueString`, `valueCodeableConcept`, `valueQuantity`, etc.).
 
-Primitive fields present a unique challenge because they hold simple values like strings or numbers. To attach extension data to these primitives, Fhircraft automatically generates companion fields with an `_ext` suffix. For example, if a resource has an `active` field of type `Boolean`, there's also an `active_ext` field where you can attach extension metadata about that boolean value that is aware of the serialization rules for primitive extensions. This pattern applies to all primitive fields throughout the FHIR specification.
-
+For **primitive fields**, because field values are now stored as model class instances (e.g. `Boolean`, `Date`) that already inherit from `Element`, you can attach extensions directly to the primitive value by constructing the model class explicitly:
 
 ```python
 from fhircraft.fhir.resources.datatypes.R5.core import Patient
-from fhircraft.fhir.resources.datatypes.R5.complex import Extension, Element
+from fhircraft.fhir.resources.datatypes.R5.primitive import Date, Boolean
+from fhircraft.fhir.resources.datatypes.R5.complex import Extension
 
-# Extensions on primitive fields
+# Extensions directly on a primitive value
 patient = Patient(
-    active=True,
-    active_ext=Element(
+    birthDate=Date(
+        value="1990-05-15",
         extension=[
             Extension(
-                url="http://example.org/certainty",
-                valueString="high-confidence" 
+                url="http://example.org/data-quality",
+                valueCode="estimated"
             )
-        ],
-     ) # (1)!
+        ]
+    )  # (1)!
 )
 
-print(patient.active_ext.extension[0].valueString)  # (3)!
-#> high-confidence
+# The value still behaves transparently:
+print(patient.birthDate)
+#> 1990-05-15
+print(patient.birthDate == "1990-05-15")
+#> True
 
-# Extensions on complex elements  
+# But the extension metadata is preserved:
+print(patient.birthDate.extension[0].url)  # (2)!
+#> http://example.org/data-quality
+
+# Extensions on complex elements
 patient.extension = [
     Extension(
-        url="http://example.org/patient-category", 
+        url="http://example.org/patient-category",
         valueCodeableConcept={
             "coding": [{
                 "system": "http://example.org/categories",
@@ -386,15 +424,15 @@ patient.extension = [
             }]
         }
     )
-] # (2)!
+]  # (3)!
 
-print(patient.extension[0].valueCodeableConcept.coding[0].code)  # (3)!
+print(patient.extension[0].valueCodeableConcept.coding[0].code)
 #> VIP
 ```
 
-1. Primitive fields can have companion `_ext` fields for a placeholder element that can hold extensions.
-2. All elements support standard `extension` arrays.
-3. Access extension data like any other FHIR element.
+1. Construct the model class directly to attach extensions to a primitive value. A plain Python value (e.g. `"1990-05-15"`) is also accepted and coerced automatically — the model class form is only needed when you want to include extensions or other element metadata.
+2. The extension is accessible directly on the primitive model instance.
+3. All elements support the standard `extension` array.
 
 ### FHIR Invariant Constraints
 

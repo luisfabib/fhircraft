@@ -269,7 +269,7 @@ patient = Patient.model_validate_json(fhir_json)
 print(f"Parsed patient ID: {patient.id}")
 #> Parsed patient ID: example-patient
 
-print(f"Name: {patient.name[0].family}, {' '.join(patient.name[0].given)}")
+print(f"Name: {patient.name[0].family}, {' '.join([str(n) for n in patient.name[0].given])}")
 #> Name: Johnson, Bob Carl
 ```
 
@@ -302,7 +302,7 @@ patient = Patient.model_validate_xml(fhir_xml)
 print(f"Parsed patient ID: {patient.id}")
 #> Parsed patient ID: example-patient
 
-print(f"Name: {patient.name[0].family}, {' '.join(patient.name[0].given)}")
+print(f"Name: {patient.name[0].family}, {' '.join([str(n) for n in patient.name[0].given])}")
 #> Name: Johnson, Bob Carl
 ```
 
