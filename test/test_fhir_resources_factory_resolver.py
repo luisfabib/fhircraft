@@ -12,6 +12,13 @@ from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinitionSlicingDiscriminator,
 )
 
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    String,
+    Url,
+    Integer,
+    Uri,
+)
+
 from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import (
@@ -30,7 +37,7 @@ def make_element(id: str, path: str | None = None, **kwargs) -> ElementDefinitio
     """Return an ElementDefinition built with model_construct (no validation)."""
     return ElementDefinition.model_construct(
         id=id,
-        path=path if path is not None else id,
+        path=String(value=path) if path is not None else String(value=id),
         **kwargs,
     )
 
@@ -49,8 +56,8 @@ def make_structure_def(
 ):
     """Build a minimal StructureDefinition mock."""
     sd = MagicMock()
-    sd.name = "MockProfile"
-    sd.url = "http://example.org/MockProfile"
+    sd.name = String(value="MockProfile")
+    sd.url = Url(value="http://example.org/MockProfile")
     sd.baseDefinition = base_definition
 
     if snapshot_elements is not None:
@@ -129,7 +136,7 @@ def base_index():
         make_element(
             "BaseResource.component.code",
             "BaseResource.component.code",
-            min=0,
+            min=1,
             max="1",
             short="Component code",
             type=[ElementDefinitionType(code="CodeableConcept")],
@@ -481,9 +488,9 @@ def test_build_intermediate_node__preserves_slicing_from_base(resolver):
         "_build_intermediate_node stripped slicing when expanding "
         "Observation.code.extension from CodeableConcept"
     )
-    assert node.is_slice_entry, (
-        "Synthesised Observation.code.extension node should be a slice entry"
-    )
+    assert (
+        node.is_slice_entry
+    ), "Synthesised Observation.code.extension node should be a slice entry"
 
 
 # ------------------------------------------------------------------
@@ -630,7 +637,7 @@ def test_resolve_differential__intermediate_nodes_filled_from_base(
     assert node.min_cardinality == 0
     assert node.max_cardinality == None
     assert (node := index.get("MyProfile.component.code"))
-    assert node.min_cardinality == 0
+    assert node.min_cardinality == 1
     assert node.max_cardinality == 1
 
 
@@ -668,7 +675,7 @@ def test_resolve_differential__multiple_diff_elements_all_in_result(
     assert node.min_cardinality == 3
     assert node.max_cardinality == None
     assert (node := index.get("MyProfile.component:sliceB.code"))
-    assert node.min_cardinality == 0
+    assert node.min_cardinality == 1
     assert node.max_cardinality == 1
     assert (node := index.get("MyProfile.component:sliceB.code.coding.system"))
     assert node.min_cardinality == 0

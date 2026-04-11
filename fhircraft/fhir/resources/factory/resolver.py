@@ -118,7 +118,7 @@ class SnapshotResolver:
                     f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition, which is required for differential resolution."
                 )
             # Obtain the base snapshot for differential resolution
-            base_definition = self._registry.get(base_canonical)
+            base_definition = self._registry.get(str(base_canonical))
             partial_base_index = self.resolve(base_definition, mode="auto")
             if base_definition.snapshot and base_definition.snapshot.element:
                 base_index = DefinitionIndex.from_elements(
@@ -483,7 +483,7 @@ class SnapshotResolver:
                 resolved_nodes.append(node)
                 continue
 
-            reference: str = node.definition.contentReference  # type: ignore[union-attr]
+            reference: str = str(node.definition.contentReference)  # type: ignore[union-attr]
             resource_url, ref_path = (
                 reference.split("#") if "#" in reference else ("", reference)
             )

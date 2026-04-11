@@ -271,7 +271,7 @@ class FHIRMappingEngine:
 
                 if input.type:
                     # Explicit type specified - match by type
-                    source_instance = validated_sources.get(input.type)
+                    source_instance = validated_sources.get(str(input.type))
                     if not source_instance:
                         raise TypeError(
                             f"Invalid source provided. None of the source arguments matches the '{input.name}' parameter of type {input.type} for the entrypoint group '{target_group.name}'."
@@ -279,7 +279,7 @@ class FHIRMappingEngine:
                 else:
                     # No type specified - use first available source or match by parameter name
                     source_instance = (
-                        validated_sources.get(input.name)
+                        validated_sources.get(str(input.name))
                         or validated_sources.get("source")
                         or next(iter(validated_sources.values()), None)
                     )
@@ -292,7 +292,9 @@ class FHIRMappingEngine:
                 parameters.append(fhirpath.Element(source_instance_id))
 
             if input.mode == StructureMapModelMode.TARGET:
-                target_type = global_scope.types.get(input.type) if input.type else None
+                target_type = (
+                    global_scope.types.get(str(input.type)) if input.type else None
+                )
 
                 if target_type is not None:
                     # Type specified and model available - create or find typed instance
@@ -421,7 +423,9 @@ class FHIRMappingEngine:
                 except AttributeError:
                     pass
             try:
-                structure_def = self.structure_definition_registry.get(canonical_url)
+                structure_def = self.structure_definition_registry.get(
+                    str(canonical_url)
+                )
                 model = self.factory.build(structure_def)
                 resolved[s.alias or structure_def.name] = model
             except (KeyError, ValueError, AttributeError) as e:

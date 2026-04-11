@@ -42,7 +42,7 @@ class Copy(MappingTransform):
             raise ValueError("Copy transform requires exactly one parameter")
         parameter = parameters[0]
         if parameter.valueId:
-            self.source = parameter.valueId
+            self.source = str(parameter.valueId)
         else:
             self.literal = parameter.value
 
@@ -117,7 +117,7 @@ class Truncate(MappingTransform):
         if len(parameters) != 2:
             raise ValueError("Truncate transform requires exactly two parameters")
         self.source = parameters[0].value
-        self.length = int(parameters[1].value)
+        self.length = int(str(parameters[1].value))
 
     def process(self, scope: "MappingScope") -> Any:
         """
@@ -273,7 +273,7 @@ class Reference(MappingTransform):
         if len(parameters) != 1:
             raise ValueError("Reference transform requires exactly one parameter")
         if param := parameters[0].valueId:
-            self.source = param
+            self.source = str(param)
         else:
             raise ValueError("Reference transform parameter must be of type Id")
 
@@ -409,8 +409,8 @@ class Evaluate(MappingTransform):
                 "Evaluate transform requires exactly one or two parameters"
             )
         if len(parameters) == 2:
-            self.source = parameters[0].value
-        self.expression = parameters[-1].value
+            self.source = str(parameters[0].value)
+        self.expression = str(parameters[-1].value)
 
     def process(self, scope: "MappingScope") -> Any:
         """
@@ -458,24 +458,24 @@ class CodeableConcept(MappingTransform):
             self.text = (
                 fp.Literal(text.value)
                 if not (text := parameters[0]).valueId
-                else text.valueId
+                else str(text.valueId)
             )
         else:
             self.code = (
                 fp.Literal(code.value)
                 if not (code := parameters[0]).valueId
-                else code.valueId
+                else str(code.valueId)
             )
             self.system = (
                 fp.Literal(system.value)
                 if not (system := parameters[1]).valueId
-                else system.valueId
+                else str(system.valueId)
             )
             if len(parameters) == 3:
                 self.display = (
                     fp.Literal(display.value)
                     if not (display := parameters[2]).valueId
-                    else display.valueId
+                    else str(display.valueId)
                 )
 
     def process(self, scope: "MappingScope") -> Any:
@@ -494,7 +494,7 @@ class CodeableConcept(MappingTransform):
                 if isinstance(self.text, str)
                 else self.text
             ).single(scope.get_instances())
-            return {"text": text}
+            return {"text": str(text)}
         elif self.code and self.system:
             code = (
                 scope.resolve_fhirpath(self.code)
@@ -516,9 +516,9 @@ class CodeableConcept(MappingTransform):
             return {
                 "coding": [
                     {
-                        "code": code,
-                        "system": system,
-                        "display": display,
+                        "code": str(code) if code else None,
+                        "system": str(system) if system else None,
+                        "display": str(display) if display else None,
                     }
                 ]
             }
@@ -546,18 +546,18 @@ class Coding(MappingTransform):
         self.code = (
             fp.Literal(code.value)
             if not (code := parameters[0]).valueId
-            else code.valueId
+            else str(code.valueId)
         )
         self.system = (
             fp.Literal(system.value)
             if not (system := parameters[1]).valueId
-            else system.valueId
+            else str(system.valueId)
         )
         if len(parameters) == 3:
             self.display = (
                 fp.Literal(display.value)
                 if not (display := parameters[2]).valueId
-                else display.valueId
+                else str(display.valueId)
             )
 
     def process(self, scope: "MappingScope") -> Any:
@@ -589,9 +589,9 @@ class Coding(MappingTransform):
                     else self.display
                 ).single(scope.get_instances())
             return {
-                "code": code,
-                "system": system,
-                "display": display,
+                "code": str(code) if code else None,
+                "system": str(system) if system else None,
+                "display": str(display) if display else None,
             }
         else:
             raise ValueError(
@@ -620,29 +620,29 @@ class Quantity(MappingTransform):
             self.text = (
                 fp.Literal(text.value)
                 if not (text := parameters[0]).valueId
-                else text.valueId
+                else str(text.valueId)
             )
         else:
             self.value = (
                 fp.Literal(value.value)
                 if not (value := parameters[0]).valueId
-                else value.valueId
+                else str(value.valueId)
             )
             self.unit = (
                 fp.Literal(unit.value)
                 if not (unit := parameters[1]).valueId
-                else unit.valueId
+                else str(unit.valueId)
             )
             if len(parameters) == 4:
                 self.system = (
                     fp.Literal(system.value)
                     if not (system := parameters[2]).valueId
-                    else system.valueId
+                    else str(system.valueId)
                 )
                 self.code = (
                     fp.Literal(code.value)
                     if not (code := parameters[3]).valueId
-                    else code.valueId
+                    else str(code.valueId)
                 )
 
     def process(self, scope: "MappingScope") -> Any:
@@ -669,7 +669,7 @@ class Quantity(MappingTransform):
                 if isinstance(self.text, str)
                 else self.text
             ).single(scope.get_instances())
-            matches = re.search(r"(<|<=|>=|>|ad)?(\d+((\.|\,)\d+)?) (.*)", text)
+            matches = re.search(r"(<|<=|>=|>|ad)?(\d+((\.|\,)\d+)?) (.*)", str(text))
             if not matches:
                 raise MappingError(
                     "The 'qty' transform single parameter must be of the form '[<|<=|>=|>|ad]<number> <unit>'"
@@ -678,41 +678,45 @@ class Quantity(MappingTransform):
             return dict(
                 comparator=matches.group(1) if matches.group(1) else None,
                 value=float(matches.group(2).replace(",", ".")),
-                unit=matches.group(5),
+                unit=str(matches.group(5)) if matches.group(5) else None,
                 system=None,
                 code=None,
             )
         else:
             assert self.value and self.unit
+            value = (
+                scope.resolve_fhirpath(self.value)
+                if isinstance(self.value, str)
+                else self.value
+            ).single(scope.get_instances())
+            unit = (
+                scope.resolve_fhirpath(self.unit)
+                if isinstance(self.unit, str)
+                else self.unit
+            ).single(scope.get_instances())
+            system = (
+                (
+                    scope.resolve_fhirpath(self.system)
+                    if isinstance(self.system, str)
+                    else self.system
+                ).single(scope.get_instances())
+                if self.system
+                else None
+            )
+            code = (
+                (
+                    scope.resolve_fhirpath(self.code)
+                    if isinstance(self.code, str)
+                    else self.code
+                ).single(scope.get_instances())
+                if self.code
+                else None
+            )
             return dict(
-                value=(
-                    scope.resolve_fhirpath(self.value)
-                    if isinstance(self.value, str)
-                    else self.value
-                ).single(scope.get_instances()),
-                unit=(
-                    scope.resolve_fhirpath(self.unit)
-                    if isinstance(self.unit, str)
-                    else self.unit
-                ).single(scope.get_instances()),
-                system=(
-                    (
-                        scope.resolve_fhirpath(self.system)
-                        if isinstance(self.system, str)
-                        else self.system
-                    ).single(scope.get_instances())
-                    if self.system
-                    else None
-                ),
-                code=(
-                    (
-                        scope.resolve_fhirpath(self.code)
-                        if isinstance(self.code, str)
-                        else self.code
-                    ).single(scope.get_instances())
-                    if self.code
-                    else None
-                ),
+                value=float(str(value)) if value is not None else None,
+                unit=str(unit) if unit else None,
+                system=str(system) if system else None,
+                code=str(code) if code else None,
             )
 
 
@@ -734,17 +738,17 @@ class Identifier(MappingTransform):
         self.system = (
             fp.Literal(system.value)
             if not (system := parameters[0]).valueId
-            else system.valueId
+            else str(system.valueId)
         )
         self.value = (
             fp.Literal(value.value)
             if not (value := parameters[1]).valueId
-            else value.valueId
+            else str(value.valueId)
         )
         self.type = (
             fp.Literal(type_.value)
             if not (type_ := parameters[2]).valueId
-            else type_.valueId
+            else str(type_.valueId)
         )
 
     def process(self, scope: "MappingScope") -> Any:
@@ -773,12 +777,12 @@ class Identifier(MappingTransform):
             else self.type
         ).single(scope.get_instances())
         return {
-            "system": system,
-            "value": value,
+            "system": str(system) if system else None,
+            "value": str(value) if value else None,
             "type": {
                 "coding": [
                     {
-                        "code": type_,
+                        "code": str(type_) if type_ else None,
                         "system": "http://hl7.org/fhir/ValueSet/identifier-type",
                     }
                 ]
@@ -804,12 +808,12 @@ class ContactPoint(MappingTransform):
             self.system = (
                 fp.Literal(system.value)
                 if not (system := parameters[0]).valueId
-                else system.valueId
+                else str(system.valueId)
             )
         self.value = (
             fp.Literal(value.value)
             if not (value := parameters[-1]).valueId
-            else value.valueId
+            else str(value.valueId)
         )
 
     def process(self, scope: "MappingScope") -> Any:
@@ -835,20 +839,20 @@ class ContactPoint(MappingTransform):
             ).single(scope.get_instances())
         else:
             # Determine through regex which system type to use
-            if re.match(r"^[+]{1}(?:[0-9\-\$$\$$\/\.]\s?){6,15}[0-9]{1}$", value):
+            if re.match(r"^[+]{1}(?:[0-9\-\$$\$$\/\.]\s?){6,15}[0-9]{1}$", str(value)):
                 system = "phone"
-            elif re.match(r"^[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$", value):
+            elif re.match(r"^[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$", str(value)):
                 system = "email"
-            elif re.match(r"^\+1[2-9][0-9]{9}$", value):
+            elif re.match(r"^\+1[2-9][0-9]{9}$", str(value)):
                 system = "fax"
             elif re.match(
                 r"^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$",
-                value,
+                str(value),
             ):
                 system = "url"
             else:
                 system = "other"
         return {
-            "system": system,
-            "value": value,
+            "system": str(system),
+            "value": str(value),
         }

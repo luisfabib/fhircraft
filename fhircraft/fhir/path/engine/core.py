@@ -682,7 +682,9 @@ class Element(FHIRPath):
         if isinstance(label, Literal) or getattr(label, "_type", None) == "string":
             label = str(label)
         if not isinstance(label, str):
-            raise FHIRPathError("Element() argument must be a string.")
+            raise FHIRPathError(
+                "Element() argument must be a string, got %r" % (type(label).__name__,)
+            )
         self.label = label
 
     def create_element(self, parent: typing.Any) -> typing.Any:

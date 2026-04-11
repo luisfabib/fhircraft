@@ -418,11 +418,11 @@ class Builder(ABC):
         if type_code.startswith(FHIR_SD_PREFIX):
             type_code = type_code.removeprefix(FHIR_SD_PREFIX)
 
-        type_code = capitalize(type_code)
+        type_code = capitalize(str(type_code))
 
         # If a profile is specified and it's not a FHIRPath system type, resolve and build the profile to get the actual type to use
         if type.profile and not is_fhirpath_system_type:
-            fhir_type = self.context.factory.build(canonical_url=type.profile[0])
+            fhir_type = self.context.factory.build(canonical_url=str(type.profile[0]))
         else:
             # Get the Fhircraft type
             fhir_type = get_fhir_type(type_code, fhir_release)

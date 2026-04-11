@@ -21,6 +21,6 @@ class FHIRMappingEngineComponent(ABC):
         """Resolve FHIRPath expressions within the given context."""
         for variable_name, variable_path in scope.variables.items():
             expression = re.sub(
-                rf"(?<!\.|\w){variable_name}", str(variable_path), expression
+                rf"(?<!\.|\w){str(variable_name)}", str(variable_path), expression
             )
         return fhirpath_parser.parse(expression)

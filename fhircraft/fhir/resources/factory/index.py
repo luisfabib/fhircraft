@@ -123,11 +123,15 @@ class DefinitionIndex:
                 node = self._get_without_root(id=id)
             elif path:
                 node = self._get_without_root(path=path)
+            else:
+                return False
         else:
             if id:
                 node = self._nodes_by_id.get(id)
             elif path:
                 node = self._nodes_by_path.get(path, [])
+            else:
+                return False
         return bool(node)
 
     def get(self, id: str, ignore_root: bool = False) -> ElementNode:

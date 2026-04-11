@@ -1182,14 +1182,16 @@ class FHIRPrimitiveModel(FHIRBaseModel):
 
     @model_serializer
     def serialize_root_value(self) -> Any:
-        return self.value
+        if isinstance(self, FHIRPrimitiveModel):
+            return self.value
+        return self
 
     @model_validator(mode="before")
     @classmethod
     def coerce_root_value(cls, data: Any) -> Any:
         if data is not None and not isinstance(data, (dict, cls)):
             return {"value": data}
-        elif isinstance(data, cls):
+        elif isinstance(data, FHIRPrimitiveModel):
             return {"value": data.value}
         return data
 

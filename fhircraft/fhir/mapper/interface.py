@@ -184,7 +184,7 @@ class FHIRStructureMapper:
             List of group name strings.
         """
         structure_map = self._resolve_mapping(mapping)
-        return [g.name for g in (structure_map.group or []) if g.name]
+        return [str(g.name) for g in (structure_map.group or []) if g.name]
 
     # ------------------------------------------------------------------
     # StructureDefinition registry

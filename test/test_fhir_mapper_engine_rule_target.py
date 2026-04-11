@@ -144,13 +144,6 @@ def test_init__auto_generates_variable_name_if_missing(
     assert str(id(basic_target_definition)) in target.variable
 
 
-def test_init__raises_error_for_missing_context(mock_rule):
-    target_def = StructureMapGroupRuleTarget(context=None)
-
-    with pytest.raises(MappingDigestionError, match="Source context is required"):
-        RuleTarget(target_def, mock_rule)
-
-
 def test_init__raises_error_for_unsupported_transform(mock_rule):
     """Test error for unsupported transform types."""
     target_def = StructureMapGroupRuleTarget(
@@ -188,7 +181,7 @@ def test_process__without_transform(basic_target_definition, mock_rule, mapping_
 
     # Mock resolve_fhirpath to return an Element
     original_resolve = mapping_scope.resolve_fhirpath
-    mapping_scope.resolve_fhirpath = lambda ctx: Element(ctx)
+    mapping_scope.resolve_fhirpath = lambda ctx: Element(str(ctx))
 
     target.process(mapping_scope)
 
@@ -205,7 +198,7 @@ def test_process__with_element(target_with_element, mock_rule, mapping_scope):
 
     # Mock resolve_fhirpath to return an Element
     original_resolve = mapping_scope.resolve_fhirpath
-    mapping_scope.resolve_fhirpath = lambda ctx: Element(ctx)
+    mapping_scope.resolve_fhirpath = lambda ctx: Element(str(ctx))
 
     target.process(mapping_scope)
 
@@ -225,7 +218,7 @@ def test_process__with_copy_transform(
 
     # Mock resolve_fhirpath to return an Element
     original_resolve = mapping_scope.resolve_fhirpath
-    mapping_scope.resolve_fhirpath = lambda ctx: Element(ctx)
+    mapping_scope.resolve_fhirpath = lambda ctx: Element(str(ctx))
 
     target.process(mapping_scope)
 

@@ -5,7 +5,15 @@ that require a function in this section to be called explicitly.
 
 import re
 from datetime import datetime, date, time
-import fhircraft.fhir.resources.datatypes.primitives as primitives
+from fhircraft.fhir.resources.datatypes import (
+    YEAR_REGEX,
+    MONTH_REGEX,
+    DAY_REGEX,
+    HOUR_REGEX,
+    MINUTES_REGEX,
+    SECONDS_REGEX,
+    TIMEZONE_REGEX,
+)
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
@@ -322,11 +330,11 @@ class ToDate(FHIRTypeConversionFunction):
             value = value.value
         if isinstance(value, str):
             date_match = re.match(
-                rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$",
+                rf"^{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?$",
                 value,
             )
             datetime_match = re.match(
-                rf"^({primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?)(T{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?)?",
+                rf"^({YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?)(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?",
                 value,
             )
             if date_match:
@@ -423,11 +431,11 @@ class ToDateTime(FHIRTypeConversionFunction):
             value = value.value
         if isinstance(value, str):
             date_match = re.match(
-                rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$",
+                rf"^{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?$",
                 value,
             )
             datetime_match = re.match(
-                rf"^({primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?)(T{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?)?",
+                rf"^({YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?)(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?",
                 value,
             )
             if date_match or datetime_match:
@@ -793,7 +801,7 @@ class ToTime(FHIRTypeConversionFunction):
 
         if isinstance(value, str):
             time_match = re.match(
-                rf"^{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?",
+                rf"^{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?",
                 value,
             )
             if time_match:

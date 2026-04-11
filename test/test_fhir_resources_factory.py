@@ -939,7 +939,7 @@ def test_factory__resource_with_sliced_extensions_processes_correctly(
     assert "extension" in PatientModel.model_fields, "Model should have extension field"
 
     # The model should be constructable
-    instance = PatientModel()
+    instance = PatientModel.model_construct()
     assert isinstance(instance, Patient), "Instance should be a Patient"
 
 
@@ -1191,7 +1191,8 @@ def test_factory__construct_diff_min_cardinality(factory: FHIRModelFactory):
 
     # Test valid dataset
     assert (
-        mock_resource.model_validate({"id": "test"}) is not None
+        mock_resource.model_validate({"id": "test", "created": "2023-01-01"})
+        is not None
     ), "Valid dataset did not validate correctly"
     # Test invalid dataset
     with pytest.raises(ValidationError):

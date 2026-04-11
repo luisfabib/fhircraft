@@ -46,7 +46,9 @@ class Group(FHIRMappingEngineComponent):
             SourceProcessingError: If required fields are missing.
         """
         self.definition = definition
-        self.name = definition.name or f"group-{id(definition)}"
+        self.name = (
+            str(definition.name) if definition.name else f"group-{id(definition)}"
+        )
         self.parent_group = parent_group
         self.rules: List[Rule] = [
             Rule(rule, parent_group=self) for rule in definition.rule or []
@@ -140,7 +142,7 @@ class Group(FHIRMappingEngineComponent):
 
             if input.type:
                 try:
-                    scope.get_type(input.type)
+                    scope.get_type(str(input.type))
                 except MappingError:
                     raise MappingError(
                         f"Input '{input.name}' in group '{self.name}' has unknown type '{input.type}'."
@@ -150,7 +152,7 @@ class Group(FHIRMappingEngineComponent):
                     f"A {input.mode} input in group '{self.name}' is missing a name."
                 )
 
-            scope.define_variable(input.name, parameter)
+            scope.define_variable(str(input.name), parameter)
 
     def process(
         self,

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from fhircraft.fhir.resources.datatypes import primitives
+from fhircraft.fhir.resources.datatypes.R4 import primitive as primitives
 from fhircraft.fhir.resources.datatypes.R4 import complex as r4_complex
 from fhircraft.fhir.resources.factory.builders.base import (
     Build,

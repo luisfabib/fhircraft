@@ -51,10 +51,13 @@ class RuleTarget(FHIRMappingEngineComponent):
         if self.definition.context is None:
             raise MappingDigestionError("Source context is required")
         self.parent_rule = parent_rule
-        self.variable = source.variable or f"target-{id(source)}"
+        self.variable = (
+            str(source.variable) if source.variable else f"target-{id(source)}"
+        )
         self.resolved_path: Optional[FHIRPath] = None
         self.transform = self._resolve_transform(
-            self.definition.transform, self.definition.parameter
+            str(self.definition.transform) if self.definition.transform else None,
+            self.definition.parameter,
         )
 
     def process(

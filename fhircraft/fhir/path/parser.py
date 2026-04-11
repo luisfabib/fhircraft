@@ -89,12 +89,12 @@ class FhirPathParser:
         self._parse_cache: dict[str, FHIRPath] = {}
 
     def parse(self, string, lexer=None) -> FHIRPath | Any:
-        self.string = string
-        if string not in self._parse_cache:
-            self._parse_cache[string] = self.parse_token_stream(
-                self.lexer.tokenize(string)
+        self.string = str(string)
+        if self.string not in self._parse_cache:
+            self._parse_cache[self.string] = self.parse_token_stream(
+                self.lexer.tokenize(self.string)
             )
-        return self._parse_cache[string]
+        return self._parse_cache[self.string]
 
     def cache_info(self) -> dict:
         """Return basic cache statistics (size and stored expression strings)."""

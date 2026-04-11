@@ -2,11 +2,22 @@ import functools
 import inspect
 import os
 import re
+import sys
 from collections import defaultdict
 from datetime import datetime
 from enum import Enum
 from importlib.metadata import version
-from typing import Any, Dict, ForwardRef, List, get_args, get_origin
+from typing import (
+    Annotated,
+    Any,
+    Dict,
+    ForwardRef,
+    List,
+    Optional,
+    Tuple,
+    get_args,
+    get_origin,
+)
 
 from jinja2 import Environment, FileSystemLoader, Template
 from pydantic import BaseModel
@@ -181,7 +192,12 @@ class CodeGenerator:
                     "set": "Set",
                 }
                 typing_name = typing_name_map.get(origin_name, origin_name)
-                if typing_name and typing_name not in self.import_statements["typing"]:
+                # UnionType (from `types`, used by X | Y syntax) is NOT importable from `typing`
+                if (
+                    typing_name
+                    and typing_name not in ("UnionType",)
+                    and typing_name not in self.import_statements["typing"]
+                ):
                     self.import_statements["typing"].append(typing_name)
 
         # Get the type object
@@ -230,6 +246,117 @@ class CodeGenerator:
                 for item in value:
                     if isinstance(item, BaseModel):
                         self._add_constant_value_imports(item)
+
+    def _resolve_annotated_primitive(
+        self, annotation: Any
+    ) -> Optional[Tuple[str, str]]:
+        """
+        Try to find the module-level alias name for an Annotated primitive type.
+
+        When primitive types like `string` are defined as
+        `Annotated[str | String, BeforeValidator(...)]`, pydantic strips the
+        `Annotated` wrapper when storing field info. This method recovers the
+        original alias name by looking up the exact object in its source module.
+
+        Returns:
+            A (module_name, alias_name) tuple if found, else None.
+        """
+        if get_origin(annotation) is not Annotated:
+            return None
+        metadata = getattr(annotation, "__metadata__", ())
+        for meta in metadata:
+            func = getattr(meta, "func", None)
+            if func is None:
+                continue
+            # BeforeValidator stores a bound classmethod (e.g. String.model_validate)
+            klass = getattr(func, "__self__", None)
+            if not isinstance(klass, type):
+                continue
+            module = sys.modules.get(klass.__module__)
+            if module is None:
+                continue
+            for name, val in vars(module).items():
+                if val is annotation and not name.startswith("_"):
+                    return klass.__module__, name
+        return None
+
+    def _annotation_to_string(self, annotation: Any) -> str:
+        """
+        Convert a type annotation to a string suitable for code generation.
+
+        Replaces known Annotated primitive aliases (e.g. ``string``, ``boolean``)
+        with their alias names, and falls back to ``repr()`` for all other types
+        so that the module-path cleanup performed in the post-processing step
+        continues to work unchanged.
+        """
+        import types as _types
+        from typing import Union
+
+        if annotation is type(None):
+            return "None"
+
+        # Direct Annotated primitive alias (e.g. string, boolean, …)
+        resolved = self._resolve_annotated_primitive(annotation)
+        if resolved is not None:
+            module, name = resolved
+            if name not in self.import_statements[module]:
+                self.import_statements[module].append(name)
+            return name
+
+        origin = get_origin(annotation)
+        args = get_args(annotation)
+
+        # Non-primitive Annotated: strip the metadata and use the inner type
+        if origin is Annotated:
+            return self._annotation_to_string(args[0]) if args else repr(annotation)
+
+        # No args -> simple type; use repr (full module path is cleaned up later)
+        if not args:
+            return repr(annotation)
+
+        # Fast path: if no arg (recursively) contains an Annotated, use repr as-is
+        def _has_annotated(ann: Any) -> bool:
+            if get_origin(ann) is Annotated:
+                return True
+            return any(_has_annotated(a) for a in get_args(ann))
+
+        if not any(_has_annotated(a) for a in args):
+            return repr(annotation)
+
+        # Union / Optional (both "X | Y" UnionType and typing.Union[X, Y])
+        is_union = origin is Union or (
+            hasattr(_types, "UnionType") and isinstance(annotation, _types.UnionType)
+        )
+        if is_union:
+            non_none = [a for a in args if a is not type(None)]
+            has_none = len(non_none) < len(args)
+            parts = [self._annotation_to_string(a) for a in non_none]
+            if has_none and len(parts) == 1:
+                if "Optional" not in self.import_statements["typing"]:
+                    self.import_statements["typing"].append("Optional")
+                return f"Optional[{parts[0]}]"
+            elif has_none:
+                if "Optional" not in self.import_statements["typing"]:
+                    self.import_statements["typing"].append("Optional")
+                if "Union" not in self.import_statements["typing"]:
+                    self.import_statements["typing"].append("Union")
+                return f"Optional[Union[{', '.join(parts)}]]"
+            if "Union" not in self.import_statements["typing"]:
+                self.import_statements["typing"].append("Union")
+            return f"Union[{', '.join(parts)}]"
+
+        # Other generics: List, Dict, etc.
+        origin_name = getattr(origin, "__name__", None) or getattr(
+            origin, "_name", None
+        )
+        if origin_name:
+            if origin_name in ("List", "Dict", "Set", "Tuple", "FrozenSet"):
+                if origin_name not in self.import_statements["typing"]:
+                    self.import_statements["typing"].append(origin_name)
+            parts = [self._annotation_to_string(a) for a in args]
+            return f"{origin_name}[{', '.join(parts)}]"
+
+        return repr(annotation)
 
     def _track_pydantic_import(self, obj_name: str) -> None:
         """
@@ -384,12 +511,11 @@ class CodeGenerator:
                     )
                 ):
                     continue
+                # Use the original class annotation to recover any Annotated primitive
+                # aliases that pydantic may have unwrapped when building model_fields.
+                original_annotation = model.__annotations__.get(field, info.annotation)
                 self._recursively_import_annotation_types(info.annotation)
-                # type(None) (NoneType) renders as "<class 'NoneType'>" via repr(); map it to "None"
-                if info.annotation is type(None):
-                    annotation_string = "None"
-                else:
-                    annotation_string = repr(info.annotation)
+                annotation_string = self._annotation_to_string(original_annotation)
 
                 # Handle forward references
                 if "ForwardRef" in annotation_string:
@@ -430,8 +556,10 @@ class CodeGenerator:
 
                 subdata[field] = {
                     "annotation": annotation_string,
-                    "title": info.title,
-                    "description": info.description,
+                    "title": str(info.title) if info.title is not None else None,
+                    "description": (
+                        str(info.description) if info.description is not None else None
+                    ),
                     "alias": info.alias,
                     "default": default,
                     "default_factory": default_factory,

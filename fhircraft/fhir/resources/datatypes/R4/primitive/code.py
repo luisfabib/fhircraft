@@ -18,4 +18,4 @@ class Code(String, CodeBase):
     )
 
 
-code = Annotated[str | Code, BeforeValidator(Code.model_validate)]
+code = Annotated[str | String | Code, BeforeValidator(Code.model_validate)]
