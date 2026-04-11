@@ -171,12 +171,18 @@ def test_build_type_node__returns_correct_node(base_index, resolver, id):
 
 
 @pytest.mark.parametrize(
-    "type",
+    "primitive_type",
     ["string", "boolean", "integer", "decimal", "uri", "code", "dateTime"],
 )
-def test_build_type_node__ignores_fhir_primitive_type_nodes(base_index, resolver, type):
-    with pytest.raises(DefinitionResolutionError):
-        resolver._build_type_node([type], "Observation.value", base_index)
+def test_build_type_node__resolves_sub_elements_on_primitive_types(
+    base_index, resolver, primitive_type
+):
+    node = resolver._build_type_node(
+        [primitive_type], "Observation.extension", base_index
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.extension"
+    assert node.path == "Observation.extension"
 
 
 @pytest.mark.parametrize(
@@ -236,11 +242,13 @@ def test_build_type_node__raises_error_for_all_fhirpath_types(base_index, resolv
         )
 
 
-def test_build_type_node__raises_error_for_all_primitive_types(base_index, resolver):
+def test_build_type_node__raises_error_when_local_id_absent_in_all_types(
+    base_index, resolver
+):
     with pytest.raises(DefinitionResolutionError):
         resolver._build_type_node(
             ["string", "integer", "boolean"],
-            "Observation.value.text",
+            "Observation.value.nonExistentField",
             base_index,
         )
 
@@ -266,6 +274,37 @@ def test_build_type_node__preserves_slicing_from_base_type(resolver):
         node.definition.slicing is not None
     ), "_build_type_node stripped slicing from CodeableConcept.extension"
     assert node.is_slice_entry, "Type-expanded extension node should be a slice entry"
+
+
+def test_build_type_node__resolves_extension_element_on_primitive_type(
+    base_index, resolver
+):
+    # BaseResource.status has type 'code' (a primitive); its StructureDefinition
+    # carries a snapshot element 'code.extension' that should be resolvable.
+    node = resolver._build_type_node(
+        ["code"], "BaseResource.status.extension", base_index
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "BaseResource.status.extension"
+    assert node.path == "BaseResource.status.extension"
+
+
+def test_build_intermediate_node__resolves_extension_on_primitive_element(resolver):
+    index = make_base_index(
+        make_element("MyProfile", "MyProfile"),
+        make_element(
+            "MyProfile.birthDate",
+            "MyProfile.birthDate",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="date")],
+        ),
+    )
+    node = resolver._build_intermediate_node("MyProfile.birthDate.extension", index)
+    assert node is not None
+    assert isinstance(node, ElementNode)
+    assert node.id == "MyProfile.birthDate.extension"
+    assert node.path == "MyProfile.birthDate.extension"
 
 
 # ------------------------------------------------------------------

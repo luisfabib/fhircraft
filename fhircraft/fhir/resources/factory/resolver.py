@@ -384,8 +384,6 @@ class SnapshotResolver:
                 )
             except FileNotFoundError:
                 continue
-            if type_structure_definition.kind != "complex-type":
-                continue
             snapshot = type_structure_definition.snapshot
             if not snapshot or not snapshot.element:
                 continue
