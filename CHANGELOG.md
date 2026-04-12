@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.8.0 - 2026-04-12
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.0...0.7.1)
+
+### Added
+
+- Introduced class-based FHIR primitive type implementations (`String`, `Boolean`, `Integer`, `Decimal`, `Date`, `DateTime`, `Instant`, `Time`, `Code`, `Uri`, `Url`, `Canonical`, `Base64Binary`, `Oid`, `Id`, `Markdown`, `Uuid`, `Xhtml`, `PositiveInt`, `UnsignedInt`, and `Integer64` for R5) as dedicated modules under versioned `primitive/` packages for R4, R4B, and R5.
+- Added a new base model `FHIRPrimitiveModel` to support operations and subclasssing of primitive classes.
+- Added support for serializing and deserializing FHIR primitive placeholder fields (e.g. `_fieldName` extension containers) in the resource base model.
+- Added `DefinitionIndex` exclusion of slice child nodes from path queries to avoid false positives in element lookups.
+
+### Changed
+
+- Replaced `TypeAliasType`-based primitive definitions in `TypeRegistry` and the old `datatypes/primitives.py` module with the new class-based primitive implementations ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+- Updated all built-in models to use the new primitive definitions and removed all old placeholder elements (`{fieldname}_ext`) throughout ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+- Updated the model factory to no longer create primitive extension placeholder elements and to resolve the new primitive types ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+- Updated the FHIRPath engine (string functions, math operations, type conversions, equality, boolean logic, and literals) to operate correctly on `FHIRPrimitive` model instances rather than raw Python scalars ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+- Updated the FHIR mapper engine (transforms, parser, rules, and source/target handlers) to consume the new primitive type classes ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+- Updated type utility functions to use the new primitive classes throughout ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+- Updated the documentation to reflect the class-based primitive model and shadow-field serialization behaviour ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+
+### Fixed
+
+- Fixed `SnapshotResolver` to remove an unnecessary complex-type guard, allowing primitive type nodes to be constructed during snapshot resolution, fixing construction of resources with primitive-type extensions. ([#339](https://github.com/luisfabib/fhircraft/pull/339), fixes [#336](https://github.com/luisfabib/fhircraft/pull/336))
+
+### Removed
+
+- Removed the `fhircraft.fhir.resources.datatypes.primitives` module (replaced by per-version, per-type class modules) ([#339](https://github.com/luisfabib/fhircraft/pull/339))
+
+----------------- 
+
 ## v0.7.1 - 2026-03-28
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.1...0.7.0)
