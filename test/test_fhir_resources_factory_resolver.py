@@ -897,6 +897,124 @@ def test_resolve_differential__slicing_preserved_on_intermediate_complex_type_no
     )
 
 
+def test_resolve_differential__base_index_has_slice_and_non_sliced_child(
+    resolver,
+):
+    base_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.component",
+            "Observation.component",
+            min=0,
+            max="*",
+            type=[ElementDefinitionType(code="BackboneElement")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string",
+            "Observation.component",
+            min=0,
+            max="1",
+        ),
+        make_element(
+            "Observation.component.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+        ),
+    ]
+    base_index = make_base_index(*base_snapshot)
+
+    diff = [
+        make_element("MyProfile", "MyProfile"),
+        make_element(
+            "MyProfile.component",
+            "MyProfile.component",
+            min=0,
+            max="*",
+        ),
+        make_element(
+            "MyProfile.component:sliceA",
+            "MyProfile.component",
+            min=1,
+            max="1",
+        ),
+        make_element(
+            "MyProfile.component:sliceA.code",
+            "MyProfile.component.code",
+            min=1,
+            max="1",
+            short="Constrained slice code",
+        ),
+    ]
+
+    result = resolver._resolve_differential(diff, base_index)
+    node = result.get("MyProfile.component:sliceA.code")
+    assert node is not None
+    assert node.min_cardinality == 1
+    assert node.max_cardinality == 1
+
+
+def test_build_intermediate_node__base_has_named_slice_child_with_same_path(
+    resolver,
+):
+    """Regression: _build_intermediate_node must synthesise a node correctly when
+    the base index contains a named-slice child that shares a path with the base
+    element ('Observation.component:conclusion-string.code' has path
+    'Observation.component.code', same as 'Observation.component.code').
+
+    The intermediate id under test is 'MyProfile.component:sliceA.code':
+    its id_segments differ from the base element (contains ':sliceA'), so the
+    id-based lookup fails and the resolver falls back to the path-based lookup.
+    Before the fix, get_single_by_path found TWO nodes for path
+    'Observation.component.code' (the base element plus the conclusion-string
+    slice child) and raised DefinitionIndexError."""
+    base_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.component",
+            "Observation.component",
+            min=0,
+            max="*",
+            type=[ElementDefinitionType(code="BackboneElement")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string",
+            "Observation.component",
+            min=0,
+            max="1",
+        ),
+        make_element(
+            "Observation.component.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+        ),
+    ]
+    base_index = make_base_index(*base_snapshot)
+
+    # :sliceA is not in the base, so id lookup fails and path lookup is used.
+    node = resolver._build_intermediate_node(
+        "MyProfile.component:sliceA.code", base_index
+    )
+    assert node is not None
+    assert node.id == "MyProfile.component:sliceA.code"
+    assert node.path == "MyProfile.component.code"
+
+
 # ==================================================================
 # SnapshotResolver._resolve_content_references
 # ==================================================================

@@ -158,6 +158,10 @@ class DefinitionIndex:
             nodes = self._nodes_by_path.get(path, [])
         if nodes and ignore_slices:
             nodes = [n for n in nodes if not n.is_slice and not n.is_type_choice_slice]
+            if len(nodes) > 1:
+                non_slice_child_nodes = [n for n in nodes if not n.is_slice_child]
+                if non_slice_child_nodes:
+                    nodes = non_slice_child_nodes
         if not nodes:
             raise DefinitionIndexError(f"Element path {path!r} not found in index.")
         return nodes
@@ -173,7 +177,7 @@ class DefinitionIndex:
         )
         if len(nodes) > 1:
             raise DefinitionIndexError(
-                f"expected a single element node but found {len(nodes)} for path {path!r} in index."
+                f"expected a single element node but found {len(nodes)} for path {path!r} in index. The following nodes were found: {[n.id for n in nodes]}"
             )
         return nodes[0]
 
