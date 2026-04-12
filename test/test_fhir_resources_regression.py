@@ -540,7 +540,7 @@ def test_regression_issue_262():
     from fhircraft.fhir.resources.datatypes.R5.core import Patient
     from typing import List, Optional
     from fhircraft.fhir.resources.datatypes.R5.complex import HumanName, Meta
-    from fhircraft.fhir.resources.datatypes.primitives import String
+    from fhircraft.fhir.resources.datatypes.R4.primitive import String
     from fhircraft.fhir.resources.validators import validate_element_constraint
 
     class ExamplePatientName(HumanName):

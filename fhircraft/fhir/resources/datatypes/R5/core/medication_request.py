@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-    Markdown,
-    UnsignedInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -34,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationRequestDispenseRequestInitialFill(BackboneElement):
     """
     Indicates the quantity or duration for the first dispense of the medication.
@@ -48,7 +39,6 @@ class MedicationRequestDispenseRequestInitialFill(BackboneElement):
         description="First fill duration",
         default=None,
     )
-
 
 class MedicationRequestDispenseRequest(BackboneElement):
     """
@@ -64,17 +54,12 @@ class MedicationRequestDispenseRequest(BackboneElement):
         default=None,
     )
     validityPeriod: Optional[Period] = Field(
-        description="Time period supply is authorized for",
+        description="time period supply is authorized for",
         default=None,
     )
-    numberOfRepeatsAllowed: Optional[UnsignedInt] = Field(
+    numberOfRepeatsAllowed: Optional[fhir.unsignedInt] = Field(
         description="Number of refills authorized",
         default=None,
-    )
-    numberOfRepeatsAllowed_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfRepeatsAllowed extensions",
-        default=None,
-        alias="_numberOfRepeatsAllowed",
     )
     quantity: Optional[Quantity] = Field(
         description="Amount of medication to supply per dispense",
@@ -97,20 +82,14 @@ class MedicationRequestDispenseRequest(BackboneElement):
         default=None,
     )
 
-
 class MedicationRequestSubstitution(BackboneElement):
     """
     Indicates whether or not substitution can or should be part of the dispense. In some cases, substitution must happen, in other cases substitution must not happen. This block explains the prescriber's intent. If nothing is specified substitution may be done.
     """
 
-    allowedBoolean: Optional[Boolean] = Field(
+    allowedBoolean: Optional[fhir.boolean] = Field(
         description="Whether substitution is allowed or not",
         default=None,
-    )
-    allowedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedBoolean extensions",
-        default=None,
-        alias="_allowedBoolean",
     )
     allowedCodeableConcept: Optional[CodeableConcept] = Field(
         description="Whether substitution is allowed or not",
@@ -132,11 +111,10 @@ class MedicationRequestSubstitution(BackboneElement):
     def allowed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, CodeableConcept],
+            field_types=[fhir.Boolean, CodeableConcept],
             field_name_base="allowed",
             required=True,
         )
-
 
 class MedicationRequest(DomainResource):
     """
@@ -163,58 +141,33 @@ class MedicationRequest(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | on-hold | ended | stopped | completed | cancelled | entered-in-error | draft | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
     )
-    statusChanged: Optional[DateTime] = Field(
+    statusChanged: Optional[fhir.dateTime] = Field(
         description="When the status was changed",
         default=None,
     )
-    statusChanged_ext: Optional[Element] = Field(
-        description="Placeholder element for statusChanged extensions",
-        default=None,
-        alias="_statusChanged",
-    )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Grouping or category of medication request",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if patient is to stop taking or not to start taking the medication",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     medication: Optional[CodeableReference] = Field(
         description="Medication to be taken",
@@ -236,27 +189,17 @@ class MedicationRequest(DomainResource):
         description="Information to support fulfilling of the medication",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When request was initially authored",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Who/What requested the Request",
         default=None,
     )
-    reported: Optional[Boolean] = Field(
+    reported: Optional[fhir.boolean] = Field(
         description="Reported rather than primary record",
         default=None,
-    )
-    reported_ext: Optional[Element] = Field(
-        description="Placeholder element for reported extensions",
-        default=None,
-        alias="_reported",
     )
     performerType: Optional[CodeableConcept] = Field(
         description="Desired kind of performer of the medication administration",
@@ -290,14 +233,9 @@ class MedicationRequest(DomainResource):
         description="Information about the prescription",
         default=None,
     )
-    renderedDosageInstruction: Optional[Markdown] = Field(
+    renderedDosageInstruction: Optional[fhir.markdown] = Field(
         description="Full representation of the dosage instructions",
         default=None,
-    )
-    renderedDosageInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for renderedDosageInstruction extensions",
-        default=None,
-        alias="_renderedDosageInstruction",
     )
     effectiveDosePeriod: Optional[Period] = Field(
         description="Period over which the medication is to be taken",

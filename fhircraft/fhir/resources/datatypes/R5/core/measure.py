@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -45,14 +36,9 @@ class MeasureTerm(BackboneElement):
         description="What term?",
         default=None,
     )
-    definition: Optional[Markdown] = Field(
+    definition: Optional[fhir.markdown] = Field(
         description="Meaning of the term",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
 
 
@@ -61,27 +47,17 @@ class MeasureGroupPopulation(BackboneElement):
     A population criteria for the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for population in measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this population criteria",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     criteria: Optional[Expression] = Field(
         description="The criteria that defines this population",
@@ -91,14 +67,9 @@ class MeasureGroupPopulation(BackboneElement):
         description="A group resource that defines this population",
         default=None,
     )
-    inputPopulationId: Optional[String] = Field(
+    inputPopulationId: Optional[fhir.string] = Field(
         description="Which population",
         default=None,
-    )
-    inputPopulationId_ext: Optional[Element] = Field(
-        description="Placeholder element for inputPopulationId extensions",
-        default=None,
-        alias="_inputPopulationId",
     )
     aggregateMethod: Optional[CodeableConcept] = Field(
         description="Aggregation method for a measure score (e.g. sum, average, median, minimum, maximum, count)",
@@ -111,27 +82,17 @@ class MeasureGroupStratifierComponent(BackboneElement):
     A component of the stratifier criteria for the measure report, specified as either the name of a valid CQL expression defined within a referenced library or a valid FHIR Resource Path.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for stratifier component in measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="Meaning of the stratifier component",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this stratifier component",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     criteria: Optional[Expression] = Field(
         description="Component of how the measure should be stratified",
@@ -148,27 +109,17 @@ class MeasureGroupStratifier(BackboneElement):
     The stratifier criteria for the measure report, specified as either the name of a valid CQL expression defined within a referenced library or a valid FHIR Resource Path.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for stratifier in measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="Meaning of the stratifier",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this stratifier",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     criteria: Optional[Expression] = Field(
         description="How the measure should be stratified",
@@ -189,27 +140,17 @@ class MeasureGroup(BackboneElement):
     A group of population criteria for the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for group in measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="Meaning of the group",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Summary description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="process | outcome | structure | patient-reported-outcome | composite",
@@ -223,14 +164,9 @@ class MeasureGroup(BackboneElement):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    basis: Optional[Code] = Field(
+    basis: Optional[fhir.code] = Field(
         description="Population basis",
         default=None,
-    )
-    basis_ext: Optional[Element] = Field(
-        description="Placeholder element for basis extensions",
-        default=None,
-        alias="_basis",
     )
     scoring: Optional[CodeableConcept] = Field(
         description="proportion | ratio | continuous-variable | cohort",
@@ -240,27 +176,17 @@ class MeasureGroup(BackboneElement):
         description="What units?",
         default=None,
     )
-    rateAggregation: Optional[Markdown] = Field(
+    rateAggregation: Optional[fhir.markdown] = Field(
         description="How is rate aggregation performed for this measure",
         default=None,
-    )
-    rateAggregation_ext: Optional[Element] = Field(
-        description="Placeholder element for rateAggregation extensions",
-        default=None,
-        alias="_rateAggregation",
     )
     improvementNotation: Optional[CodeableConcept] = Field(
         description="increase | decrease",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the measure group",
         default=None,
-    )
-    library_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
     )
     population: Optional[ListType[MeasureGroupPopulation]] = Field(
         description="Population criteria",
@@ -293,14 +219,9 @@ class MeasureSupplementalData(BackboneElement):
     The supplemental data criteria for the measure report, specified as either the name of a valid CQL expression within a referenced library, or a valid FHIR Resource Path.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for supplementalData in measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="Meaning of the supplemental data",
@@ -310,14 +231,9 @@ class MeasureSupplementalData(BackboneElement):
         description="supplemental-data | risk-adjustment-factor",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The human readable description of this supplemental data",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     criteria: Optional[Expression] = Field(
         description="Expression describing additional data to be reported",
@@ -334,85 +250,45 @@ class Measure(DomainResource):
     _type = "Measure"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Measure"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this measure, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this measure, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the measure",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the measure",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this measure (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this measure (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the measure",
         default=None,
     )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
@@ -422,45 +298,25 @@ class Measure(DomainResource):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    basis: Optional[Code] = Field(
+    basis: Optional[fhir.code] = Field(
         description="Population basis",
         default=None,
     )
-    basis_ext: Optional[Element] = Field(
-        description="Placeholder element for basis extensions",
-        default=None,
-        alias="_basis",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the measure",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -470,59 +326,29 @@ class Measure(DomainResource):
         description="Intended jurisdiction for measure (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this measure is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    usage: Optional[Markdown] = Field(
+    usage: Optional[fhir.markdown] = Field(
         description="Describes the clinical usage of the measure",
         default=None,
     )
-    usage_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the measure was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the measure was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the measure is expected to be used",
@@ -552,23 +378,13 @@ class Measure(DomainResource):
         description="Additional documentation, citations, etc",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the measure",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
-    )
-    disclaimer: Optional[Markdown] = Field(
+    disclaimer: Optional[fhir.markdown] = Field(
         description="Disclaimer for use of the measure or its referenced content",
         default=None,
-    )
-    disclaimer_ext: Optional[Element] = Field(
-        description="Placeholder element for disclaimer extensions",
-        default=None,
-        alias="_disclaimer",
     )
     scoring: Optional[CodeableConcept] = Field(
         description="proportion | ratio | continuous-variable | cohort",
@@ -586,41 +402,21 @@ class Measure(DomainResource):
         description="process | outcome | structure | patient-reported-outcome | composite",
         default=None,
     )
-    riskAdjustment: Optional[Markdown] = Field(
+    riskAdjustment: Optional[fhir.markdown] = Field(
         description="How risk adjustment is applied for this measure",
         default=None,
     )
-    riskAdjustment_ext: Optional[Element] = Field(
-        description="Placeholder element for riskAdjustment extensions",
-        default=None,
-        alias="_riskAdjustment",
-    )
-    rateAggregation: Optional[Markdown] = Field(
+    rateAggregation: Optional[fhir.markdown] = Field(
         description="How is rate aggregation performed for this measure",
         default=None,
     )
-    rateAggregation_ext: Optional[Element] = Field(
-        description="Placeholder element for rateAggregation extensions",
-        default=None,
-        alias="_rateAggregation",
-    )
-    rationale: Optional[Markdown] = Field(
+    rationale: Optional[fhir.markdown] = Field(
         description="Detailed description of why the measure exists",
         default=None,
     )
-    rationale_ext: Optional[Element] = Field(
-        description="Placeholder element for rationale extensions",
-        default=None,
-        alias="_rationale",
-    )
-    clinicalRecommendationStatement: Optional[Markdown] = Field(
+    clinicalRecommendationStatement: Optional[fhir.markdown] = Field(
         description="Summary of clinical guidelines",
         default=None,
-    )
-    clinicalRecommendationStatement_ext: Optional[Element] = Field(
-        description="Placeholder element for clinicalRecommendationStatement extensions",
-        default=None,
-        alias="_clinicalRecommendationStatement",
     )
     improvementNotation: Optional[CodeableConcept] = Field(
         description="increase | decrease",
@@ -630,14 +426,9 @@ class Measure(DomainResource):
         description="Defined terms used in the measure documentation",
         default=None,
     )
-    guidance: Optional[Markdown] = Field(
+    guidance: Optional[fhir.markdown] = Field(
         description="Additional guidance for implementers (deprecated)",
         default=None,
-    )
-    guidance_ext: Optional[Element] = Field(
-        description="Placeholder element for guidance extensions",
-        default=None,
-        alias="_guidance",
     )
     group: Optional[ListType[MeasureGroup]] = Field(
         description="Population criteria group",
@@ -666,7 +457,7 @@ class Measure(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

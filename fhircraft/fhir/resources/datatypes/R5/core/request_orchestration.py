@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Markdown,
-    Id,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -44,17 +36,12 @@ class RequestOrchestrationActionCondition(BackboneElement):
     An expression that describes applicability criteria, or start/stop conditions for the action.
     """
 
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="applicability | start | stop",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
     expression: Optional[Expression] = Field(
-        description="Boolean-valued expression",
+        description="boolean-valued expression",
         default=None,
     )
 
@@ -64,27 +51,17 @@ class RequestOrchestrationActionInput(BackboneElement):
     Defines input data requirements for the action.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     requirement: Optional[DataRequirement] = Field(
         description="What data is provided",
         default=None,
     )
-    relatedData: Optional[Id] = Field(
+    relatedData: Optional[fhir.id_] = Field(
         description="What data is provided",
         default=None,
-    )
-    relatedData_ext: Optional[Element] = Field(
-        description="Placeholder element for relatedData extensions",
-        default=None,
-        alias="_relatedData",
     )
 
 
@@ -93,27 +70,17 @@ class RequestOrchestrationActionOutput(BackboneElement):
     Defines the outputs of the action, if any.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     requirement: Optional[DataRequirement] = Field(
         description="What data is provided",
         default=None,
     )
-    relatedData: Optional[String] = Field(
+    relatedData: Optional[fhir.string] = Field(
         description="What data is provided",
         default=None,
-    )
-    relatedData_ext: Optional[Element] = Field(
-        description="Placeholder element for relatedData extensions",
-        default=None,
-        alias="_relatedData",
     )
 
 
@@ -122,39 +89,24 @@ class RequestOrchestrationActionRelatedAction(BackboneElement):
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    targetId: Optional[Id] = Field(
+    targetId: Optional[fhir.id_] = Field(
         description="What action this is related to",
         default=None,
     )
-    targetId_ext: Optional[Element] = Field(
-        description="Placeholder element for targetId extensions",
-        default=None,
-        alias="_targetId",
-    )
-    relationship: Optional[Code] = Field(
+    relationship: Optional[fhir.code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
     )
-    relationship_ext: Optional[Element] = Field(
-        description="Placeholder element for relationship extensions",
-        default=None,
-        alias="_relationship",
-    )
-    endRelationship: Optional[Code] = Field(
+    endRelationship: Optional[fhir.code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
         default=None,
-    )
-    endRelationship_ext: Optional[Element] = Field(
-        description="Placeholder element for endRelationship extensions",
-        default=None,
-        alias="_endRelationship",
     )
     offsetDuration: Optional[Duration] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
     offsetRange: Optional[Range] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
 
@@ -180,23 +132,13 @@ class RequestOrchestrationActionParticipant(BackboneElement):
     The participant that should perform or be responsible for this action.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="careteam | device | group | healthcareservice | location | organization | patient | practitioner | practitionerrole | relatedperson",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    typeCanonical: Optional[Canonical] = Field(
+    typeCanonical: Optional[fhir.canonical] = Field(
         description="Who or what can participate",
         default=None,
-    )
-    typeCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for typeCanonical extensions",
-        default=None,
-        alias="_typeCanonical",
     )
     typeReference: Optional[Reference] = Field(
         description="Who or what can participate",
@@ -210,14 +152,9 @@ class RequestOrchestrationActionParticipant(BackboneElement):
         description="E.g. Author, Reviewer, Witness, etc",
         default=None,
     )
-    actorCanonical: Optional[Canonical] = Field(
+    actorCanonical: Optional[fhir.canonical] = Field(
         description="Who/what is participating?",
         default=None,
-    )
-    actorCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for actorCanonical extensions",
-        default=None,
-        alias="_actorCanonical",
     )
     actorReference: Optional[Reference] = Field(
         description="Who/what is participating?",
@@ -235,7 +172,7 @@ class RequestOrchestrationActionParticipant(BackboneElement):
     def actor_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Reference],
+            field_types=[fhir.Canonical, Reference],
             field_name_base="actor",
             required=False,
         )
@@ -246,14 +183,9 @@ class RequestOrchestrationActionDynamicValue(BackboneElement):
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
     """
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="The path to the element to be set dynamically",
         default=None,
-    )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
     )
     expression: Optional[Expression] = Field(
         description="An expression that provides the dynamic value for the customization",
@@ -266,62 +198,32 @@ class RequestOrchestrationAction(BackboneElement):
     The actions, if any, produced by the evaluation of the artifact.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific item from the PlanDefinition",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
-    prefix: Optional[String] = Field(
+    prefix: Optional[fhir.string] = Field(
         description="User-visible prefix for the action (e.g. 1. or A.)",
         default=None,
     )
-    prefix_ext: Optional[Element] = Field(
-        description="Placeholder element for prefix extensions",
-        default=None,
-        alias="_prefix",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Short description of the action",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    textEquivalent: Optional[Markdown] = Field(
+    textEquivalent: Optional[fhir.markdown] = Field(
         description="Static text equivalent of the action, used if the dynamic aspects cannot be interpreted by the receiving system",
         default=None,
     )
-    textEquivalent_ext: Optional[Element] = Field(
-        description="Placeholder element for textEquivalent extensions",
-        default=None,
-        alias="_textEquivalent",
-    )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code representing the meaning of the action or sub-actions",
+        description="code representing the meaning of the action or sub-actions",
         default=None,
     )
     documentation: Optional[ListType[RelatedArtifact]] = Field(
@@ -348,14 +250,9 @@ class RequestOrchestrationAction(BackboneElement):
         description="Relationship to another action",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="When the action should take place",
         default=None,
-    )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
     )
     timingAge: Optional[Age] = Field(
         description="When the action should take place",
@@ -389,81 +286,41 @@ class RequestOrchestrationAction(BackboneElement):
         description="create | update | remove | fire-event",
         default=None,
     )
-    groupingBehavior: Optional[Code] = Field(
+    groupingBehavior: Optional[fhir.code] = Field(
         description="visual-group | logical-group | sentence-group",
         default=None,
     )
-    groupingBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for groupingBehavior extensions",
-        default=None,
-        alias="_groupingBehavior",
-    )
-    selectionBehavior: Optional[Code] = Field(
+    selectionBehavior: Optional[fhir.code] = Field(
         description="any | all | all-or-none | exactly-one | at-most-one | one-or-more",
         default=None,
     )
-    selectionBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for selectionBehavior extensions",
-        default=None,
-        alias="_selectionBehavior",
-    )
-    requiredBehavior: Optional[Code] = Field(
+    requiredBehavior: Optional[fhir.code] = Field(
         description="must | could | must-unless-documented",
         default=None,
     )
-    requiredBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for requiredBehavior extensions",
-        default=None,
-        alias="_requiredBehavior",
-    )
-    precheckBehavior: Optional[Code] = Field(
+    precheckBehavior: Optional[fhir.code] = Field(
         description="yes | no",
         default=None,
     )
-    precheckBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for precheckBehavior extensions",
-        default=None,
-        alias="_precheckBehavior",
-    )
-    cardinalityBehavior: Optional[Code] = Field(
+    cardinalityBehavior: Optional[fhir.code] = Field(
         description="single | multiple",
         default=None,
-    )
-    cardinalityBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for cardinalityBehavior extensions",
-        default=None,
-        alias="_cardinalityBehavior",
     )
     resource: Optional[Reference] = Field(
         description="The target of the action",
         default=None,
     )
-    definitionCanonical: Optional[Canonical] = Field(
+    definitionCanonical: Optional[fhir.canonical] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
-    )
-    definitionUri: Optional[Uri] = Field(
+    definitionUri: Optional[fhir.uri] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionUri_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionUri extensions",
-        default=None,
-        alias="_definitionUri",
-    )
-    transform: Optional[Canonical] = Field(
+    transform: Optional[fhir.canonical] = Field(
         description="Transform to apply the template",
         default=None,
-    )
-    transform_ext: Optional[Element] = Field(
-        description="Placeholder element for transform extensions",
-        default=None,
-        alias="_transform",
     )
     dynamicValue: Optional[ListType[RequestOrchestrationActionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
@@ -492,7 +349,7 @@ class RequestOrchestrationAction(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Duration, Range, Timing],
+            field_types=[fhir.DateTime, Age, Period, Duration, Range, Timing],
             field_name_base="timing",
             required=False,
         )
@@ -501,7 +358,7 @@ class RequestOrchestrationAction(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Uri],
+            field_types=[fhir.Canonical, fhir.Uri],
             field_name_base="definition",
             required=False,
         )
@@ -520,23 +377,13 @@ class RequestOrchestration(DomainResource):
         description="Business identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal, or order",
@@ -550,32 +397,17 @@ class RequestOrchestration(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     code: Optional[CodeableConcept] = Field(
         description="What\u0027s being requested/ordered",
@@ -589,14 +421,9 @@ class RequestOrchestration(DomainResource):
         description="Created as part of",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When the request orchestration was authored",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     author: Optional[Reference] = Field(
         description="Device or practitioner that authored the request orchestration",

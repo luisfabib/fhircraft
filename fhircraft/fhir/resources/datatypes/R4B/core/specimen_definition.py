@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
     """
@@ -53,7 +52,6 @@ class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
             required=True,
         )
 
-
 class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     """
     The specimen's container.
@@ -71,14 +69,9 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Color of container cap",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Container description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     capacity: Optional[Quantity] = Field(
         description="Container capacity",
@@ -88,27 +81,17 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Minimum volume",
         default=None,
     )
-    minimumVolumeString: Optional[String] = Field(
+    minimumVolumeString: Optional[fhir.string] = Field(
         description="Minimum volume",
         default=None,
-    )
-    minimumVolumeString_ext: Optional[Element] = Field(
-        description="Placeholder element for minimumVolumeString extensions",
-        default=None,
-        alias="_minimumVolumeString",
     )
     additive: Optional[ListType[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,
     )
-    preparation: Optional[String] = Field(
+    preparation: Optional[fhir.string] = Field(
         description="Specimen container preparation",
         default=None,
-    )
-    preparation_ext: Optional[Element] = Field(
-        description="Placeholder element for preparation extensions",
-        default=None,
-        alias="_preparation",
     )
 
     @property
@@ -122,11 +105,10 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     def minimumVolume_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, String],
+            field_types=[Quantity, fhir.String],
             field_name_base="minimumVolume",
             required=False,
         )
-
 
 class SpecimenDefinitionTypeTestedHandling(BackboneElement):
     """
@@ -145,56 +127,35 @@ class SpecimenDefinitionTypeTestedHandling(BackboneElement):
         description="Maximum preservation time",
         default=None,
     )
-    instruction: Optional[String] = Field(
+    instruction: Optional[fhir.string] = Field(
         description="Preservation instruction",
         default=None,
     )
-    instruction_ext: Optional[Element] = Field(
-        description="Placeholder element for instruction extensions",
-        default=None,
-        alias="_instruction",
-    )
-
 
 class SpecimenDefinitionTypeTested(BackboneElement):
     """
     Specimen conditioned in a container as expected by the testing laboratory.
     """
 
-    isDerived: Optional[Boolean] = Field(
+    isDerived: Optional[fhir.boolean] = Field(
         description="Primary or secondary specimen",
         default=None,
-    )
-    isDerived_ext: Optional[Element] = Field(
-        description="Placeholder element for isDerived extensions",
-        default=None,
-        alias="_isDerived",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of intended specimen",
         default=None,
     )
-    preference: Optional[Code] = Field(
+    preference: Optional[fhir.code] = Field(
         description="preferred | alternate",
         default=None,
-    )
-    preference_ext: Optional[Element] = Field(
-        description="Placeholder element for preference extensions",
-        default=None,
-        alias="_preference",
     )
     container: Optional[SpecimenDefinitionTypeTestedContainer] = Field(
         description="The specimen\u0027s container",
         default=None,
     )
-    requirement: Optional[String] = Field(
+    requirement: Optional[fhir.string] = Field(
         description="Specimen requirements",
         default=None,
-    )
-    requirement_ext: Optional[Element] = Field(
-        description="Placeholder element for requirement extensions",
-        default=None,
-        alias="_requirement",
     )
     retentionTime: Optional[Duration] = Field(
         description="Specimen retention time",
@@ -208,7 +169,6 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Specimen handling before testing",
         default=None,
     )
-
 
 class SpecimenDefinition(DomainResource):
     """
@@ -243,14 +203,9 @@ class SpecimenDefinition(DomainResource):
         description="Patient preparation for collection",
         default=None,
     )
-    timeAspect: Optional[String] = Field(
-        description="Time aspect for collection",
+    timeAspect: Optional[fhir.string] = Field(
+        description="time aspect for collection",
         default=None,
-    )
-    timeAspect_ext: Optional[Element] = Field(
-        description="Placeholder element for timeAspect extensions",
-        default=None,
-        alias="_timeAspect",
     )
     collection: Optional[ListType[CodeableConcept]] = Field(
         description="Specimen collection procedure",

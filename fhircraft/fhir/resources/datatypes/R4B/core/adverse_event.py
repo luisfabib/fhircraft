@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class AdverseEventSuspectEntityCausality(BackboneElement):
     """
     Information on the possible cause of the event.
@@ -29,14 +28,9 @@ class AdverseEventSuspectEntityCausality(BackboneElement):
         description="Assessment of if the entity caused the event",
         default=None,
     )
-    productRelatedness: Optional[String] = Field(
+    productRelatedness: Optional[fhir.string] = Field(
         description="AdverseEvent.suspectEntity.causalityProductRelatedness",
         default=None,
-    )
-    productRelatedness_ext: Optional[Element] = Field(
-        description="Placeholder element for productRelatedness extensions",
-        default=None,
-        alias="_productRelatedness",
     )
     author: Optional[Reference] = Field(
         description="AdverseEvent.suspectEntity.causalityAuthor",
@@ -46,7 +40,6 @@ class AdverseEventSuspectEntityCausality(BackboneElement):
         description="ProbabilityScale | Bayesian | Checklist",
         default=None,
     )
-
 
 class AdverseEventSuspectEntity(BackboneElement):
     """
@@ -61,7 +54,6 @@ class AdverseEventSuspectEntity(BackboneElement):
         description="Information on the possible cause of the event",
         default=None,
     )
-
 
 class AdverseEvent(DomainResource):
     """
@@ -88,14 +80,9 @@ class AdverseEvent(DomainResource):
         description="Business identifier for the event",
         default=None,
     )
-    actuality: Optional[Code] = Field(
+    actuality: Optional[fhir.code] = Field(
         description="actual | potential",
         default=None,
-    )
-    actuality_ext: Optional[Element] = Field(
-        description="Placeholder element for actuality extensions",
-        default=None,
-        alias="_actuality",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="product-problem | product-quality | product-use-error | wrong-dose | incorrect-prescribing-information | wrong-technique | wrong-route-of-administration | wrong-rate | wrong-duration | wrong-time | expired-drug | medical-device-use-error | problem-different-manufacturer | unsafe-physical-environment",
@@ -113,32 +100,17 @@ class AdverseEvent(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the event occurred",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    detected: Optional[DateTime] = Field(
+    detected: Optional[fhir.dateTime] = Field(
         description="When the event was detected",
         default=None,
     )
-    detected_ext: Optional[Element] = Field(
-        description="Placeholder element for detected extensions",
-        default=None,
-        alias="_detected",
-    )
-    recordedDate: Optional[DateTime] = Field(
+    recordedDate: Optional[fhir.dateTime] = Field(
         description="When the event was recorded",
         default=None,
-    )
-    recordedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedDate extensions",
-        default=None,
-        alias="_recordedDate",
     )
     resultingCondition: Optional[ListType[Reference]] = Field(
         description="Effect on the subject due to this event",

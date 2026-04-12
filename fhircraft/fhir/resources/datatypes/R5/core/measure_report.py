@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Integer,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -38,27 +30,17 @@ class MeasureReportGroupPopulation(BackboneElement):
     The populations that make up the population group, one for each type of population appropriate for the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific population from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     subjectResults: Optional[Reference] = Field(
         description="For subject-list reports, the subject results in this population",
@@ -79,14 +61,9 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     A stratifier component value.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific stratifier component from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="What stratifier component of the group",
@@ -96,14 +73,9 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
         description="The stratum component value, e.g. male",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The stratum component value, e.g. male",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The stratum component value, e.g. male",
@@ -129,7 +101,7 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Boolean, Quantity, Range, Reference],
+            field_types=[CodeableConcept, fhir.Boolean, Quantity, Range, Reference],
             field_name_base="value",
             required=True,
         )
@@ -140,27 +112,17 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
     The populations that make up the stratum, one for each type of population appropriate to the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific population from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     subjectResults: Optional[Reference] = Field(
         description="For subject-list reports, the subject results in this population",
@@ -185,14 +147,9 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="The stratum value, e.g. male",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The stratum value, e.g. male",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The stratum value, e.g. male",
@@ -220,14 +177,9 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="What score this stratum achieved",
         default=None,
     )
-    measureScoreDateTime: Optional[DateTime] = Field(
+    measureScoreDateTime: Optional[fhir.dateTime] = Field(
         description="What score this stratum achieved",
         default=None,
-    )
-    measureScoreDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for measureScoreDateTime extensions",
-        default=None,
-        alias="_measureScoreDateTime",
     )
     measureScoreCodeableConcept: Optional[CodeableConcept] = Field(
         description="What score this stratum achieved",
@@ -264,7 +216,7 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Boolean, Quantity, Range, Reference],
+            field_types=[CodeableConcept, fhir.Boolean, Quantity, Range, Reference],
             field_name_base="value",
             required=False,
         )
@@ -273,7 +225,14 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
     def measureScore_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, DateTime, CodeableConcept, Period, Range, Duration],
+            field_types=[
+                Quantity,
+                fhir.DateTime,
+                CodeableConcept,
+                Period,
+                Range,
+                Duration,
+            ],
             field_name_base="measureScore",
             required=False,
         )
@@ -284,14 +243,9 @@ class MeasureReportGroupStratifier(BackboneElement):
     When a measure includes multiple stratifiers, there will be a stratifier group for each stratifier defined by the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific stratifier from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="What stratifier of the group",
@@ -308,14 +262,9 @@ class MeasureReportGroup(BackboneElement):
     The results of the calculation, one for each population group in the measure.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Pointer to specific group from Measure",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     code: Optional[CodeableConcept] = Field(
         description="Meaning of the group",
@@ -333,14 +282,9 @@ class MeasureReportGroup(BackboneElement):
         description="What score this group achieved",
         default=None,
     )
-    measureScoreDateTime: Optional[DateTime] = Field(
+    measureScoreDateTime: Optional[fhir.dateTime] = Field(
         description="What score this group achieved",
         default=None,
-    )
-    measureScoreDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for measureScoreDateTime extensions",
-        default=None,
-        alias="_measureScoreDateTime",
     )
     measureScoreCodeableConcept: Optional[CodeableConcept] = Field(
         description="What score this group achieved",
@@ -374,7 +318,14 @@ class MeasureReportGroup(BackboneElement):
     def measureScore_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, DateTime, CodeableConcept, Period, Range, Duration],
+            field_types=[
+                Quantity,
+                fhir.DateTime,
+                CodeableConcept,
+                Period,
+                Range,
+                Duration,
+            ],
             field_name_base="measureScore",
             required=False,
         )
@@ -393,54 +344,29 @@ class MeasureReport(DomainResource):
         description="Additional identifier for the MeasureReport",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="complete | pending | error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="individual | subject-list | summary | data-exchange",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    dataUpdateType: Optional[Code] = Field(
+    dataUpdateType: Optional[fhir.code] = Field(
         description="incremental | snapshot",
         default=None,
     )
-    dataUpdateType_ext: Optional[Element] = Field(
-        description="Placeholder element for dataUpdateType extensions",
-        default=None,
-        alias="_dataUpdateType",
-    )
-    measure: Optional[Canonical] = Field(
+    measure: Optional[fhir.canonical] = Field(
         description="What measure was calculated",
         default=None,
-    )
-    measure_ext: Optional[Element] = Field(
-        description="Placeholder element for measure extensions",
-        default=None,
-        alias="_measure",
     )
     subject: Optional[Reference] = Field(
         description="What individual(s) the report is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the measure was calculated",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     reporter: Optional[Reference] = Field(
         description="Who is reporting the data",

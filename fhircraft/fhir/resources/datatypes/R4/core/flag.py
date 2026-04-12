@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -45,14 +45,9 @@ class Flag(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Clinical, administrative, etc.",
@@ -67,7 +62,7 @@ class Flag(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period when flag is active",
+        description="time period when flag is active",
         default=None,
     )
     encounter: Optional[Reference] = Field(

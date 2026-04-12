@@ -3,8 +3,8 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 from pydantic import Field
-from fhircraft.fhir.resources.datatypes.primitives import Date
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     ContactDetail,
@@ -13,7 +13,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     RelatedArtifact,
 )
 from .canonical_resource import CanonicalResource
-
 
 class MetadataResource(CanonicalResource):
     """
@@ -24,23 +23,13 @@ class MetadataResource(CanonicalResource):
     _type = "MetadataResource"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MetadataResource"
 
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the {{title}} was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the {{title}} was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the {{title}} is expected to be used",

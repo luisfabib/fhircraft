@@ -10,7 +10,7 @@ from pydantic import field_validator, model_validator
 from fhircraft.fhir.resources.datatypes.R4.core.domain_resource import DomainResource
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRSliceModel
-from fhircraft.fhir.resources.datatypes import primitives
+from fhircraft.fhir.resources.datatypes.R4B import primitive as primitives
 from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding
 from fhircraft.fhir.resources.generator import generate_resource_model_code
 
@@ -34,7 +34,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
     def _normalize(self, s):
         import re
 
-        return re.sub(r"\s+", " ", s.strip())
+        return re.sub(r"\s+", " ", s.strip()).replace("'", '"')
 
     def assertBlockInCode(self, expected_block, model):
         # Generate source code
@@ -142,9 +142,10 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Expected code block
         expected_block = """
         class ModelWithDefaultFactoryModel(BaseModel):
+        
             codes: CodeableConcept = Field(
                 description="A default CodeableConcept.",
-                default_factory=lambda: CodeableConcept(coding=[Coding(code="12345", system="http://example.org")]),
+                default_factory=lambda: CodeableConcept(coding=[Coding(code='12345', system='http://example.org')]),
             )
         """
         self.assertBlockInCode(expected_block, model)
@@ -402,7 +403,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Create model dynamically
         model = create_model(
             "ModelWithDocstring",
-            value=(primitives.String, Field(description="A string field.")),
+            value=(primitives.string, Field(description="A string field.")),
             __doc__="This is a model with a docstring.",
         )
         expected_block = '''
@@ -410,7 +411,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             """
             This is a model with a docstring.
             """
-            value: String = Field(
+            value: string = Field(
                 description="A string field.",
             )
 

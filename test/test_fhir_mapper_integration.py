@@ -210,6 +210,7 @@ def test_implicit_evaluate_context(engine):
     uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
     group main(source src, target tgt: Patient) {
+        src -> tgt.language = "en";
         src.id -> tgt.id = (src.id.replace('A', 'B'));
     }
     """
@@ -260,6 +261,7 @@ def test_reserved_words_as_identifiers(engine):
     uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
     group main(source src, target tgt: Patient) {
         src.group -> tgt.id;
+        src.group -> tgt.language = "en";
     }
     """
     result = engine.map(mapping_script, {"group": "A123-45-678"})
@@ -336,6 +338,7 @@ def test_extends_group_inherits_parent_rules(engine):
     uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
 
     group BaseGroup(source src, target tgt: Patient) {
+        src -> tgt.language = "en";
         src.patientId as v -> tgt.id = v;
     }
 
@@ -361,6 +364,7 @@ def test_extends_group_inherits_imported_parent_rules(engine):
     uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
 
     group BaseGroup(source src, target tgt: Patient) {
+        src -> tgt.language = "en";
         src.patientId as v -> tgt.id = v;
     }
     """

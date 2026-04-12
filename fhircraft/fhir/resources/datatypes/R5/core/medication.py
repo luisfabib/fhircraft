@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -39,14 +33,9 @@ class MedicationIngredient(BackboneElement):
         description="The ingredient (substance or medication) that the ingredient.strength relates to",
         default=None,
     )
-    isActive: Optional[Boolean] = Field(
+    isActive: Optional[fhir.boolean] = Field(
         description="Active ingredient indicator",
         default=None,
-    )
-    isActive_ext: Optional[Element] = Field(
-        description="Placeholder element for isActive extensions",
-        default=None,
-        alias="_isActive",
     )
     strengthRatio: Optional[Ratio] = Field(
         description="Quantity of ingredient present",
@@ -83,23 +72,13 @@ class MedicationBatch(BackboneElement):
     Information that only applies to packages (not products).
     """
 
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="Identifier assigned to batch",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
-    expirationDate: Optional[DateTime] = Field(
+    expirationDate: Optional[fhir.dateTime] = Field(
         description="When batch will expire",
         default=None,
-    )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
     )
 
 
@@ -120,14 +99,9 @@ class Medication(DomainResource):
         description="Codes that identify this medication",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     marketingAuthorizationHolder: Optional[Reference] = Field(
         description="Organization that has authorization to market medication",

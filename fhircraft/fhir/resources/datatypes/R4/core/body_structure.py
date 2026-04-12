@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class BodyStructure(DomainResource):
     """
@@ -45,14 +44,9 @@ class BodyStructure(DomainResource):
         description="Bodystructure identifier",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     morphology: Optional[CodeableConcept] = Field(
         description="Kind of Structure",
@@ -66,14 +60,9 @@ class BodyStructure(DomainResource):
         description="Body site modifier",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Text description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     image: Optional[ListType[Attachment]] = Field(
         description="Attached images",

@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Integer,
-    Decimal,
-    Boolean,
-    Url,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -46,19 +37,14 @@ class InventoryItemName(BackboneElement):
         description="The type of name e.g. \u0027brand-name\u0027, \u0027functional-name\u0027, \u0027common-name\u0027",
         default=None,
     )
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="The language used to express the item name",
         default=None,
     )
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The name or designation of the item",
         default=None,
-    )
-    name_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
 
 
@@ -82,19 +68,14 @@ class InventoryItemDescription(BackboneElement):
     The descriptive characteristics of the inventory item.
     """
 
-    language: Optional[Code] = Field(
+    language: Optional[fhir.code] = Field(
         description="The language that is used in the item description",
         default=None,
     )
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the item",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
 
 
@@ -126,59 +107,29 @@ class InventoryItemCharacteristic(BackboneElement):
         description="The characteristic that is being defined",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="The value of the attribute",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The value of the attribute",
         default=None,
-    )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The value of the attribute",
@@ -221,12 +172,12 @@ class InventoryItemCharacteristic(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                String,
-                Integer,
-                Decimal,
-                Boolean,
-                Url,
-                DateTime,
+                fhir.String,
+                fhir.Integer,
+                fhir.Decimal,
+                fhir.Boolean,
+                fhir.Url,
+                fhir.DateTime,
                 Quantity,
                 Range,
                 Ratio,
@@ -249,23 +200,13 @@ class InventoryItemInstance(BackboneElement):
         description="The identifier for the physical instance, typically a serial number",
         default=None,
     )
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="The lot or batch number of the item",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
-    expiry: Optional[DateTime] = Field(
+    expiry: Optional[fhir.dateTime] = Field(
         description="The expiry date or date and time for the product",
         default=None,
-    )
-    expiry_ext: Optional[Element] = Field(
-        description="Placeholder element for expiry extensions",
-        default=None,
-        alias="_expiry",
     )
     subject: Optional[Reference] = Field(
         description="The subject that the item is associated with",
@@ -290,21 +231,16 @@ class InventoryItem(DomainResource):
         description="Business identifier for the inventory item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Category or class of the item",
         default=None,
     )
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code designating the specific type of item",
+        description="code designating the specific type of item",
         default=None,
     )
     name: Optional[ListType[InventoryItemName]] = Field(

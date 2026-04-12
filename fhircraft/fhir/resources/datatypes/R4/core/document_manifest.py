@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class DocumentManifestRelated(BackboneElement):
     """
@@ -33,7 +32,6 @@ class DocumentManifestRelated(BackboneElement):
         description="Related Resource",
         default=None,
     )
-
 
 class DocumentManifest(DomainResource):
     """
@@ -64,14 +62,9 @@ class DocumentManifest(DomainResource):
         description="Other identifiers for the manifest",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | superseded | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of document set",
@@ -81,14 +74,9 @@ class DocumentManifest(DomainResource):
         description="The subject of the set of documents",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="When this document manifest created",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the DocumentManifest",
@@ -98,23 +86,13 @@ class DocumentManifest(DomainResource):
         description="Intended to get notified about this set of documents",
         default=None,
     )
-    source: Optional[Uri] = Field(
+    source: Optional[fhir.uri] = Field(
         description="The source system/application/software",
         default=None,
     )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Human-readable description (title)",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     content: Optional[ListType[Reference]] = Field(
         description="Items in manifest",

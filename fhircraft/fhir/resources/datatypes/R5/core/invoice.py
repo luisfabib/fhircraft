@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-    PositiveInt,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -32,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class InvoiceParticipant(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -47,29 +38,18 @@ class InvoiceParticipant(BackboneElement):
         default=None,
     )
 
-
 class InvoiceLineItem(BackboneElement):
     """
     Each line item represents one charge for goods and services rendered. Details such.ofType(date), code and amount are found in the referenced ChargeItem resource.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Sequence number of line item",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Service data or period",
         default=None,
-    )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Service data or period",
@@ -106,7 +86,7 @@ class InvoiceLineItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -119,7 +99,6 @@ class InvoiceLineItem(BackboneElement):
             field_name_base="chargeItem",
             required=True,
         )
-
 
 class Invoice(DomainResource):
     """
@@ -134,23 +113,13 @@ class Invoice(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | issued | balanced | cancelled | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    cancelledReason: Optional[String] = Field(
+    cancelledReason: Optional[fhir.string] = Field(
         description="Reason for cancellation of this Invoice",
         default=None,
-    )
-    cancelledReason_ext: Optional[Element] = Field(
-        description="Placeholder element for cancelledReason extensions",
-        default=None,
-        alias="_cancelledReason",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of Invoice",
@@ -164,32 +133,17 @@ class Invoice(DomainResource):
         description="Recipient of this invoice",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="DEPRICATED",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    creation: Optional[DateTime] = Field(
+    creation: Optional[fhir.dateTime] = Field(
         description="When posted",
         default=None,
     )
-    creation_ext: Optional[Element] = Field(
-        description="Placeholder element for creation extensions",
-        default=None,
-        alias="_creation",
-    )
-    periodDate: Optional[Date] = Field(
+    periodDate: Optional[fhir.date_] = Field(
         description="Billing date or period",
         default=None,
-    )
-    periodDate_ext: Optional[Element] = Field(
-        description="Placeholder element for periodDate extensions",
-        default=None,
-        alias="_periodDate",
     )
     periodPeriod: Optional[Period] = Field(
         description="Billing date or period",
@@ -223,14 +177,9 @@ class Invoice(DomainResource):
         description="Gross total of this Invoice",
         default=None,
     )
-    paymentTerms: Optional[Markdown] = Field(
+    paymentTerms: Optional[fhir.markdown] = Field(
         description="Payment details",
         default=None,
-    )
-    paymentTerms_ext: Optional[Element] = Field(
-        description="Placeholder element for paymentTerms extensions",
-        default=None,
-        alias="_paymentTerms",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the invoice",
@@ -248,7 +197,7 @@ class Invoice(DomainResource):
     def period_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="period",
             required=False,
         )

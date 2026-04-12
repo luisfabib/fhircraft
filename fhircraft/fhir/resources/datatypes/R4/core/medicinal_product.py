@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -27,14 +27,9 @@ class MedicinalProductNameNamePart(BackboneElement):
     Coding words or phrases of the name.
     """
 
-    part: Optional[String] = Field(
+    part: Optional[fhir.string] = Field(
         description="A fragment of a product name",
         default=None,
-    )
-    part_ext: Optional[Element] = Field(
-        description="Placeholder element for part extensions",
-        default=None,
-        alias="_part",
     )
     type: Optional[Coding] = Field(
         description="Idenifying type for this part of the name (e.g. strength part)",
@@ -66,14 +61,9 @@ class MedicinalProductName(BackboneElement):
     The product's name, including full name and possibly coded parts.
     """
 
-    productName: Optional[String] = Field(
+    productName: Optional[fhir.string] = Field(
         description="The full product name",
         default=None,
-    )
-    productName_ext: Optional[Element] = Field(
-        description="Placeholder element for productName extensions",
-        default=None,
-        alias="_productName",
     )
     namePart: Optional[ListType[MedicinalProductNameNamePart]] = Field(
         description="Coding words or phrases of the name",
@@ -98,14 +88,9 @@ class MedicinalProductManufacturingBusinessOperation(BackboneElement):
         description="Regulatory authorization reference number",
         default=None,
     )
-    effectiveDate: Optional[DateTime] = Field(
+    effectiveDate: Optional[fhir.dateTime] = Field(
         description="Regulatory authorization date",
         default=None,
-    )
-    effectiveDate_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveDate extensions",
-        default=None,
-        alias="_effectiveDate",
     )
     confidentialityIndicator: Optional[CodeableConcept] = Field(
         description="To indicate if this proces is commercially confidential",
@@ -150,14 +135,9 @@ class MedicinalProductSpecialDesignation(BackboneElement):
         description="For example granted, pending, expired or withdrawn",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date when the designation was granted",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     species: Optional[CodeableConcept] = Field(
         description="Animal species for which this applies",
@@ -226,14 +206,9 @@ class MedicinalProduct(DomainResource):
         description="Whether the Medicinal Product is subject to additional monitoring for regulatory reasons",
         default=None,
     )
-    specialMeasures: Optional[ListType[String]] = Field(
+    specialMeasures: Optional[ListType[fhir.string]] = Field(
         description="Whether the Medicinal Product is subject to special measures for regulatory reasons",
         default=None,
-    )
-    specialMeasures_ext: Optional[Element] = Field(
-        description="Placeholder element for specialMeasures extensions",
-        default=None,
-        alias="_specialMeasures",
     )
     paediatricUseIndicator: Optional[CodeableConcept] = Field(
         description="If authorised for use in children",

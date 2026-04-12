@@ -4,16 +4,8 @@ from typing import Optional, List as ListType
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Canonical,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -34,42 +26,22 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     A set of additional dependencies for this mapping to hold. This mapping is only applicable if the specified element can be resolved, and it has the specified value.
     """
 
-    property_: Optional[Uri] = Field(
+    property_: Optional[fhir.uri] = Field(
         description="Reference to property mapping depends on",
         default=None,
         alias="property",
     )
-    property_ext: Optional[Element] = Field(
-        description="Placeholder element for property extensions",
-        default=None,
-        alias="_property",
-    )
-    system: Optional[Canonical] = Field(
-        description="Code System (if necessary)",
+    system: Optional[fhir.canonical] = Field(
+        description="code System (if necessary)",
         default=None,
     )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="Value of the referenced element",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Display for the code (if value is a code)",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
 
 
@@ -78,41 +50,21 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
     A set of additional outcomes from this mapping to other elements. To properly execute this mapping, the specified element must be mapped to some data element or source that is in context. The mapping may still be useful without a place for the additional data elements, but the equivalence cannot be relied on.
     """
 
-    property_: Optional[Uri] = Field(
+    property_: Optional[fhir.uri] = Field(
         description="Reference to property mapping depends on",
         default=None,
     )
-    property_ext: Optional[Element] = Field(
-        description="Placeholder element for property extensions",
-        default=None,
-        alias="_property",
-    )
-    system: Optional[Canonical] = Field(
-        description="Code System (if necessary)",
+    system: Optional[fhir.canonical] = Field(
+        description="code System (if necessary)",
         default=None,
     )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="Value of the referenced element",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Display for the code (if value is a code)",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
 
 
@@ -121,41 +73,21 @@ class ConceptMapGroupElementTarget(BackboneElement):
     A concept from the target value set that this concept maps to.
     """
 
-    code: Optional[Code] = Field(
-        description="Code that identifies the target element",
+    code: Optional[fhir.code] = Field(
+        description="code that identifies the target element",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Display for the code",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
-    equivalence: Optional[Code] = Field(
+    equivalence: Optional[fhir.code] = Field(
         description="relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint",
         default=None,
     )
-    equivalence_ext: Optional[Element] = Field(
-        description="Placeholder element for equivalence extensions",
-        default=None,
-        alias="_equivalence",
-    )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Description of status/issues in mapping",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     dependsOn: Optional[ListType[ConceptMapGroupElementTargetDependsOn]] = Field(
         description="Other elements required for this mapping (from context)",
@@ -172,23 +104,13 @@ class ConceptMapGroupElement(BackboneElement):
     Mappings for an individual concept in the source to one or more concepts in the target.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Identifies element being mapped",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Display for the code",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
     target: Optional[ListType[ConceptMapGroupElementTarget]] = Field(
         description="Concept in target system for element",
@@ -201,41 +123,21 @@ class ConceptMapGroupUnmapped(BackboneElement):
     What to do when there is no mapping for the source concept. "Unmapped" does not include codes that are unmatched, and the unmapped element is ignored in a code is specified to have equivalence = unmatched.
     """
 
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="provided | fixed | other-map",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Fixed code when mode = fixed",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Display for the code",
         default=None,
     )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
-    )
-    url: Optional[Canonical] = Field(
+    url: Optional[fhir.canonical] = Field(
         description="canonical reference to an additional ConceptMap to use for mapping if the source concept is unmapped",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
 
 
@@ -244,41 +146,21 @@ class ConceptMapGroup(BackboneElement):
     A group of mappings that all have the same source and target system.
     """
 
-    source: Optional[Uri] = Field(
+    source: Optional[fhir.uri] = Field(
         description="Source system where concepts to be mapped are defined",
         default=None,
     )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
-    )
-    sourceVersion: Optional[String] = Field(
+    sourceVersion: Optional[fhir.string] = Field(
         description="Specific version of the  code system",
         default=None,
     )
-    sourceVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceVersion extensions",
-        default=None,
-        alias="_sourceVersion",
-    )
-    target: Optional[Uri] = Field(
+    target: Optional[fhir.uri] = Field(
         description="Target system that the concepts are to be mapped to",
         default=None,
     )
-    target_ext: Optional[Element] = Field(
-        description="Placeholder element for target extensions",
-        default=None,
-        alias="_target",
-    )
-    targetVersion: Optional[String] = Field(
+    targetVersion: Optional[fhir.string] = Field(
         description="Specific version of the  code system",
         default=None,
-    )
-    targetVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for targetVersion extensions",
-        default=None,
-        alias="_targetVersion",
     )
     element: Optional[ListType[ConceptMapGroupElement]] = Field(
         description="Mappings for a concept from the source set",
@@ -311,94 +193,49 @@ class ConceptMap(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this concept map, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this concept map, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[Identifier] = Field(
         description="Additional identifier for the concept map",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the concept map",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this concept map (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this concept map (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the concept map",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -408,59 +245,29 @@ class ConceptMap(DomainResource):
         description="Intended jurisdiction for concept map (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this concept map is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    sourceUri: Optional[Uri] = Field(
+    sourceUri: Optional[fhir.uri] = Field(
         description="The source value set that contains the concepts that are being mapped",
         default=None,
     )
-    sourceUri_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceUri extensions",
-        default=None,
-        alias="_sourceUri",
-    )
-    sourceCanonical: Optional[Canonical] = Field(
+    sourceCanonical: Optional[fhir.canonical] = Field(
         description="The source value set that contains the concepts that are being mapped",
         default=None,
     )
-    sourceCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceCanonical extensions",
-        default=None,
-        alias="_sourceCanonical",
-    )
-    targetUri: Optional[Uri] = Field(
+    targetUri: Optional[fhir.uri] = Field(
         description="The target value set which provides context for the mappings",
         default=None,
     )
-    targetUri_ext: Optional[Element] = Field(
-        description="Placeholder element for targetUri extensions",
-        default=None,
-        alias="_targetUri",
-    )
-    targetCanonical: Optional[Canonical] = Field(
+    targetCanonical: Optional[fhir.canonical] = Field(
         description="The target value set which provides context for the mappings",
         default=None,
-    )
-    targetCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for targetCanonical extensions",
-        default=None,
-        alias="_targetCanonical",
     )
     group: Optional[ListType[ConceptMapGroup]] = Field(
         description="Same source and target systems",
@@ -485,7 +292,7 @@ class ConceptMap(DomainResource):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Uri, Canonical],
+            field_types=[fhir.Uri, fhir.Canonical],
             field_name_base="source",
             required=False,
         )
@@ -494,7 +301,7 @@ class ConceptMap(DomainResource):
     def target_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Uri, Canonical],
+            field_types=[fhir.Uri, fhir.Canonical],
             field_name_base="target",
             required=False,
         )

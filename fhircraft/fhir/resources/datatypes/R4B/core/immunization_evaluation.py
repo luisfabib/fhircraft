@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -50,27 +44,17 @@ class ImmunizationEvaluation(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="completed | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     patient: Optional[Reference] = Field(
         description="Who this evaluation is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date evaluation was performed",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     authority: Optional[Reference] = Field(
         description="Who is responsible for publishing the recommendations",
@@ -92,59 +76,29 @@ class ImmunizationEvaluation(DomainResource):
         description="Reason for the dose status",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Evaluation notes",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    series: Optional[String] = Field(
+    series: Optional[fhir.string] = Field(
         description="Name of vaccine series",
         default=None,
     )
-    series_ext: Optional[Element] = Field(
-        description="Placeholder element for series extensions",
-        default=None,
-        alias="_series",
-    )
-    doseNumberPositiveInt: Optional[PositiveInt] = Field(
+    doseNumberPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Dose number within series",
         default=None,
     )
-    doseNumberPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberPositiveInt extensions",
-        default=None,
-        alias="_doseNumberPositiveInt",
-    )
-    doseNumberString: Optional[String] = Field(
+    doseNumberString: Optional[fhir.string] = Field(
         description="Dose number within series",
         default=None,
     )
-    doseNumberString_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberString extensions",
-        default=None,
-        alias="_doseNumberString",
-    )
-    seriesDosesPositiveInt: Optional[PositiveInt] = Field(
+    seriesDosesPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
-    seriesDosesPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesPositiveInt extensions",
-        default=None,
-        alias="_seriesDosesPositiveInt",
-    )
-    seriesDosesString: Optional[String] = Field(
+    seriesDosesString: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
         default=None,
-    )
-    seriesDosesString_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesString extensions",
-        default=None,
-        alias="_seriesDosesString",
     )
 
     @property
@@ -165,7 +119,7 @@ class ImmunizationEvaluation(DomainResource):
     def doseNumber_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[PositiveInt, String],
+            field_types=[fhir.PositiveInt, fhir.String],
             field_name_base="doseNumber",
             required=False,
         )
@@ -174,7 +128,7 @@ class ImmunizationEvaluation(DomainResource):
     def seriesDoses_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[PositiveInt, String],
+            field_types=[fhir.PositiveInt, fhir.String],
             field_name_base="seriesDoses",
             required=False,
         )

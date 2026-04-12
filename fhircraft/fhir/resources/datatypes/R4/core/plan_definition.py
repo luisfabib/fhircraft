@@ -4,18 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-    Id,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -95,7 +85,7 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
     description: Optional[CodeableConcept] = Field(
-        description="Code or text describing the goal",
+        description="code or text describing the goal",
         default=None,
     )
     priority: Optional[CodeableConcept] = Field(
@@ -125,17 +115,12 @@ class PlanDefinitionActionCondition(BackboneElement):
     An expression that describes applicability criteria or start/stop conditions for the action.
     """
 
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="applicability | start | stop",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
     expression: Optional[Expression] = Field(
-        description="Boolean-valued expression",
+        description="boolean-valued expression",
         default=None,
     )
 
@@ -145,30 +130,20 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    actionId: Optional[Id] = Field(
+    actionId: Optional[fhir.id_] = Field(
         description="What action is this related to",
         default=None,
     )
-    actionId_ext: Optional[Element] = Field(
-        description="Placeholder element for actionId extensions",
-        default=None,
-        alias="_actionId",
-    )
-    relationship: Optional[Code] = Field(
+    relationship: Optional[fhir.code] = Field(
         description="before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end",
         default=None,
     )
-    relationship_ext: Optional[Element] = Field(
-        description="Placeholder element for relationship extensions",
-        default=None,
-        alias="_relationship",
-    )
     offsetDuration: Optional[Duration] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
     offsetRange: Optional[Range] = Field(
-        description="Time offset for the relationship",
+        description="time offset for the relationship",
         default=None,
     )
 
@@ -194,14 +169,9 @@ class PlanDefinitionActionParticipant(BackboneElement):
     Indicates who should participate in performing the action described.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="patient | practitioner | related-person | device",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     role: Optional[CodeableConcept] = Field(
         description="E.g. Nurse, Surgeon, Parent",
@@ -214,14 +184,9 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
     """
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="The path to the element to be set dynamically",
         default=None,
-    )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
     )
     expression: Optional[Expression] = Field(
         description="An expression that provides the dynamic value for the customization",
@@ -234,53 +199,28 @@ class PlanDefinitionAction(BackboneElement):
     An action or group of actions to be taken as part of the plan.
     """
 
-    prefix: Optional[String] = Field(
+    prefix: Optional[fhir.string] = Field(
         description="User-visible prefix for the action (e.g. 1. or A.)",
         default=None,
     )
-    prefix_ext: Optional[Element] = Field(
-        description="Placeholder element for prefix extensions",
-        default=None,
-        alias="_prefix",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="User-visible title",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Brief description of the action",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    textEquivalent: Optional[String] = Field(
+    textEquivalent: Optional[fhir.string] = Field(
         description="Static text equivalent of the action, used if the dynamic aspects cannot be interpreted by the receiving system",
         default=None,
     )
-    textEquivalent_ext: Optional[Element] = Field(
-        description="Placeholder element for textEquivalent extensions",
-        default=None,
-        alias="_textEquivalent",
-    )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
     code: Optional[ListType[CodeableConcept]] = Field(
-        description="Code representing the meaning of the action or sub-actions",
+        description="code representing the meaning of the action or sub-actions",
         default=None,
     )
     reason: Optional[ListType[CodeableConcept]] = Field(
@@ -291,14 +231,9 @@ class PlanDefinitionAction(BackboneElement):
         description="Supporting documentation for the intended performer of the action",
         default=None,
     )
-    goalId: Optional[ListType[Id]] = Field(
+    goalId: Optional[ListType[fhir.id_]] = Field(
         description="What goals this action supports",
         default=None,
-    )
-    goalId_ext: Optional[Element] = Field(
-        description="Placeholder element for goalId extensions",
-        default=None,
-        alias="_goalId",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of individual the action is focused on",
@@ -328,14 +263,9 @@ class PlanDefinitionAction(BackboneElement):
         description="Relationship to another action",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="When the action should take place",
         default=None,
-    )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
     )
     timingAge: Optional[Age] = Field(
         description="When the action should take place",
@@ -365,77 +295,37 @@ class PlanDefinitionAction(BackboneElement):
         description="create | update | remove | fire-event",
         default=None,
     )
-    groupingBehavior: Optional[Code] = Field(
+    groupingBehavior: Optional[fhir.code] = Field(
         description="visual-group | logical-group | sentence-group",
         default=None,
     )
-    groupingBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for groupingBehavior extensions",
-        default=None,
-        alias="_groupingBehavior",
-    )
-    selectionBehavior: Optional[Code] = Field(
+    selectionBehavior: Optional[fhir.code] = Field(
         description="any | all | all-or-none | exactly-one | at-most-one | one-or-more",
         default=None,
     )
-    selectionBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for selectionBehavior extensions",
-        default=None,
-        alias="_selectionBehavior",
-    )
-    requiredBehavior: Optional[Code] = Field(
+    requiredBehavior: Optional[fhir.code] = Field(
         description="must | could | must-unless-documented",
         default=None,
     )
-    requiredBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for requiredBehavior extensions",
-        default=None,
-        alias="_requiredBehavior",
-    )
-    precheckBehavior: Optional[Code] = Field(
+    precheckBehavior: Optional[fhir.code] = Field(
         description="yes | no",
         default=None,
     )
-    precheckBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for precheckBehavior extensions",
-        default=None,
-        alias="_precheckBehavior",
-    )
-    cardinalityBehavior: Optional[Code] = Field(
+    cardinalityBehavior: Optional[fhir.code] = Field(
         description="single | multiple",
         default=None,
     )
-    cardinalityBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for cardinalityBehavior extensions",
-        default=None,
-        alias="_cardinalityBehavior",
-    )
-    definitionCanonical: Optional[Canonical] = Field(
+    definitionCanonical: Optional[fhir.canonical] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
-    )
-    definitionUri: Optional[Uri] = Field(
+    definitionUri: Optional[fhir.uri] = Field(
         description="Description of the activity to be performed",
         default=None,
     )
-    definitionUri_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionUri extensions",
-        default=None,
-        alias="_definitionUri",
-    )
-    transform: Optional[Canonical] = Field(
+    transform: Optional[fhir.canonical] = Field(
         description="Transform to apply the template",
         default=None,
-    )
-    transform_ext: Optional[Element] = Field(
-        description="Placeholder element for transform extensions",
-        default=None,
-        alias="_transform",
     )
     dynamicValue: Optional[ListType[PlanDefinitionActionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
@@ -480,7 +370,7 @@ class PlanDefinitionAction(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Duration, Range, Timing],
+            field_types=[fhir.DateTime, Age, Period, Duration, Range, Timing],
             field_name_base="timing",
             required=False,
         )
@@ -489,7 +379,7 @@ class PlanDefinitionAction(BackboneElement):
     def definition_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Uri],
+            field_types=[fhir.Canonical, fhir.Uri],
             field_name_base="definition",
             required=False,
         )
@@ -516,76 +406,41 @@ class PlanDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this plan definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this plan definition, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the plan definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the plan definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this plan definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this plan definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the plan definition",
         default=None,
-    )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
     )
     type: Optional[CodeableConcept] = Field(
         description="order-set | clinical-protocol | eca-rule | workflow-definition",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of individual the plan definition is focused on",
@@ -595,36 +450,21 @@ class PlanDefinition(DomainResource):
         description="Type of individual the plan definition is focused on",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the plan definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -634,50 +474,25 @@ class PlanDefinition(DomainResource):
         description="Intended jurisdiction for plan definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this plan definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="Describes the clinical usage of the plan",
         default=None,
     )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the plan definition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the plan definition was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the plan definition is expected to be used",
@@ -707,14 +522,9 @@ class PlanDefinition(DomainResource):
         description="Additional documentation, citations",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the plan definition",
         default=None,
-    )
-    library_ext: Optional[Element] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
     )
     goal: Optional[ListType[PlanDefinitionGoal]] = Field(
         description="What the plan is trying to accomplish",

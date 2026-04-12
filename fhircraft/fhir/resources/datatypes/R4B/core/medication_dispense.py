@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationDispensePerformer(BackboneElement):
     """
     Indicates who or what performed the event.
@@ -43,23 +36,17 @@ class MedicationDispensePerformer(BackboneElement):
         default=None,
     )
 
-
 class MedicationDispenseSubstitution(BackboneElement):
     """
     Indicates whether or not substitution was made as part of the dispense.  In some cases, substitution will be expected but does not happen, in other cases substitution is not expected but does happen.  This block explains what substitution did or did not happen and why.  If nothing is specified, substitution was not done.
     """
 
-    wasSubstituted: Optional[Boolean] = Field(
+    wasSubstituted: Optional[fhir.boolean] = Field(
         description="Whether a substitution was or was not performed on the dispense",
         default=None,
     )
-    wasSubstituted_ext: Optional[Element] = Field(
-        description="Placeholder element for wasSubstituted extensions",
-        default=None,
-        alias="_wasSubstituted",
-    )
     type: Optional[CodeableConcept] = Field(
-        description="Code signifying whether a different drug was dispensed from what was prescribed",
+        description="code signifying whether a different drug was dispensed from what was prescribed",
         default=None,
     )
     reason: Optional[ListType[CodeableConcept]] = Field(
@@ -70,7 +57,6 @@ class MedicationDispenseSubstitution(BackboneElement):
         description="Who is responsible for the substitution",
         default=None,
     )
-
 
 class MedicationDispense(DomainResource):
     """
@@ -101,14 +87,9 @@ class MedicationDispense(DomainResource):
         description="Event that dispense is part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReasonCodeableConcept: Optional[CodeableConcept] = Field(
         description="Why a dispense was not performed",
@@ -166,23 +147,13 @@ class MedicationDispense(DomainResource):
         description="Amount of medication expressed as a timing amount",
         default=None,
     )
-    whenPrepared: Optional[DateTime] = Field(
+    whenPrepared: Optional[fhir.dateTime] = Field(
         description="When product was packaged and reviewed",
         default=None,
     )
-    whenPrepared_ext: Optional[Element] = Field(
-        description="Placeholder element for whenPrepared extensions",
-        default=None,
-        alias="_whenPrepared",
-    )
-    whenHandedOver: Optional[DateTime] = Field(
+    whenHandedOver: Optional[fhir.dateTime] = Field(
         description="When product was given out",
         default=None,
-    )
-    whenHandedOver_ext: Optional[Element] = Field(
-        description="Placeholder element for whenHandedOver extensions",
-        default=None,
-        alias="_whenHandedOver",
     )
     destination: Optional[Reference] = Field(
         description="Where the medication was sent",

@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -57,27 +49,17 @@ class ServiceRequestOrderDetailParameter(BackboneElement):
         description="The value for the order detail",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The value for the order detail",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="The value for the order detail",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The value for the order detail",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valuePeriod: Optional[Period] = Field(
         description="The value for the order detail",
@@ -99,9 +81,9 @@ class ServiceRequestOrderDetailParameter(BackboneElement):
                 Quantity,
                 Ratio,
                 Range,
-                Boolean,
+                fhir.Boolean,
                 CodeableConcept,
-                String,
+                fhir.String,
                 Period,
             ],
             field_name_base="value",
@@ -129,14 +111,9 @@ class ServiceRequestPatientInstruction(BackboneElement):
     Instructions in terms that are understood by the patient or consumer.
     """
 
-    instructionMarkdown: Optional[Markdown] = Field(
+    instructionMarkdown: Optional[fhir.markdown] = Field(
         description="Patient or consumer-oriented instructions",
         default=None,
-    )
-    instructionMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for instructionMarkdown extensions",
-        default=None,
-        alias="_instructionMarkdown",
     )
     instructionReference: Optional[Reference] = Field(
         description="Patient or consumer-oriented instructions",
@@ -154,7 +131,7 @@ class ServiceRequestPatientInstruction(BackboneElement):
     def instruction_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Markdown, Reference],
+            field_types=[fhir.Markdown, Reference],
             field_name_base="instruction",
             required=False,
         )
@@ -173,23 +150,13 @@ class ServiceRequest(DomainResource):
         description="Identifiers assigned to this order",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",
@@ -203,45 +170,25 @@ class ServiceRequest(DomainResource):
         description="Composite Request ID",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order +",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of service",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if service/procedure should not be performed",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     code: Optional[CodeableReference] = Field(
         description="What is being requested/ordered",
@@ -275,14 +222,9 @@ class ServiceRequest(DomainResource):
         description="Encounter in which the request was created",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When service should occur",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When service should occur",
@@ -292,27 +234,17 @@ class ServiceRequest(DomainResource):
         description="When service should occur",
         default=None,
     )
-    asNeededBoolean: Optional[Boolean] = Field(
+    asNeededBoolean: Optional[fhir.boolean] = Field(
         description="Preconditions for service",
         default=None,
-    )
-    asNeededBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeededBoolean extensions",
-        default=None,
-        alias="_asNeededBoolean",
     )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="Date request signed",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Who/what is requesting service",
@@ -401,7 +333,7 @@ class ServiceRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )
@@ -410,7 +342,7 @@ class ServiceRequest(DomainResource):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, CodeableConcept],
+            field_types=[fhir.Boolean, CodeableConcept],
             field_name_base="asNeeded",
             required=False,
         )

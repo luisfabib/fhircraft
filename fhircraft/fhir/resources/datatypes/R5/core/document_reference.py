@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    DateTime,
-    Markdown,
-    Canonical,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -42,14 +34,9 @@ class DocumentReferenceAttester(BackboneElement):
         description="personal | professional | legal | official",
         default=None,
     )
-    time: Optional[DateTime] = Field(
+    time: Optional[fhir.dateTime] = Field(
         description="When the document was attested",
         default=None,
-    )
-    time_ext: Optional[Element] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
     )
     party: Optional[Reference] = Field(
         description="Who attested the document",
@@ -78,26 +65,16 @@ class DocumentReferenceContentProfile(BackboneElement):
     """
 
     valueCoding: Optional[Coding] = Field(
-        description="Code|uri|canonical",
+        description="code|uri|canonical",
         default=None,
     )
-    valueUri: Optional[Uri] = Field(
-        description="Code|uri|canonical",
+    valueUri: Optional[fhir.uri] = Field(
+        description="code|uri|canonical",
         default=None,
     )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
+    valueCanonical: Optional[fhir.canonical] = Field(
+        description="code|uri|canonical",
         default=None,
-        alias="_valueUri",
-    )
-    valueCanonical: Optional[Canonical] = Field(
-        description="Code|uri|canonical",
-        default=None,
-    )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
     )
 
     @property
@@ -111,7 +88,7 @@ class DocumentReferenceContentProfile(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, Uri, Canonical],
+            field_types=[Coding, fhir.Uri, fhir.Canonical],
             field_name_base="value",
             required=True,
         )
@@ -145,36 +122,21 @@ class DocumentReference(DomainResource):
         description="Business identifiers for the document",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="An explicitly assigned identifer of a variation of the content in the DocumentReference",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Procedure that caused this media to be created",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | superseded | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    docStatus: Optional[Code] = Field(
+    docStatus: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
         default=None,
-    )
-    docStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for docStatus extensions",
-        default=None,
-        alias="_docStatus",
     )
     modality: Optional[ListType[CodeableConcept]] = Field(
         description="Imaging modality used",
@@ -213,17 +175,12 @@ class DocumentReference(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time of service that is being documented",
+        description="time of service that is being documented",
         default=None,
     )
-    date: Optional[Instant] = Field(
+    date: Optional[fhir.instant] = Field(
         description="When this document reference was created",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the document",
@@ -241,14 +198,9 @@ class DocumentReference(DomainResource):
         description="Relationships to other documents",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-readable description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Document security-tags",

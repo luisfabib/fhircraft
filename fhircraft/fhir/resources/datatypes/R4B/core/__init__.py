@@ -1,3 +1,7 @@
+# Import complex first to ensure it's in sys.modules before primitives try to
+# import element.py - this breaks the potential circular import chain.
+from ..complex import *
+
 from .resource import *
 from .account import *
 from .activity_definition import *
@@ -141,3 +145,24 @@ from .test_script import *
 from .value_set import *
 from .verification_result import *
 from .vision_prescription import *
+
+# Pull in complex types and primitives so that forward references inside
+# resource models (e.g. "Extension", "CodeableConcept") can be resolved when
+# types are imported directly from this package.
+from fhircraft.fhir.resources.base import FHIRBaseModel as _FHIRBaseModel
+import typing as _typing
+
+from ..primitive import *
+
+_ns = {
+    **vars(_typing),
+    **{k: v for k, v in globals().items() if not k.startswith("__")},
+}
+for _cls in [*globals().values()]:
+    if (
+        isinstance(_cls, type)
+        and issubclass(_cls, _FHIRBaseModel)
+        and not getattr(_cls, "__pydantic_complete__", True)
+    ):
+        _cls.model_rebuild(_types_namespace=_ns)
+del _cls, _ns, _typing  # type: ignore

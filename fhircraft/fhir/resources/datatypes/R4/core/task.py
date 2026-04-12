@@ -4,28 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    PositiveInt,
-    Base64Binary,
-    Boolean,
-    Date,
-    Decimal,
-    Id,
-    Instant,
-    Integer,
-    Markdown,
-    Oid,
-    Time,
-    UnsignedInt,
-    Url,
-    Uuid,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -72,14 +52,9 @@ class TaskRestriction(BackboneElement):
     If the Task.focus is a request resource and the task is seeking fulfillment (i.e. is asking for the request to be actioned), this element identifies any limitations on what parts of the referenced request should be actioned.
     """
 
-    repetitions: Optional[PositiveInt] = Field(
+    repetitions: Optional[fhir.positiveInt] = Field(
         description="How many times to repeat",
         default=None,
-    )
-    repetitions_ext: Optional[Element] = Field(
-        description="Placeholder element for repetitions extensions",
-        default=None,
-        alias="_repetitions",
     )
     period: Optional[Period] = Field(
         description="When fulfillment sought",
@@ -100,176 +75,81 @@ class TaskInput(BackboneElement):
         description="Label for the input",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueCanonical: Optional[Canonical] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
-    )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
-    )
-    valueInstant: Optional[Instant] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInstant extensions",
-        default=None,
-        alias="_valueInstant",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
-    )
-    valueOid: Optional[Oid] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueOid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueOid extensions",
-        default=None,
-        alias="_valueOid",
-    )
-    valuePositiveInt: Optional[PositiveInt] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valuePositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valuePositiveInt extensions",
-        default=None,
-        alias="_valuePositiveInt",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
-    valueUnsignedInt: Optional[UnsignedInt] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUnsignedInt extensions",
-        default=None,
-        alias="_valueUnsignedInt",
-    )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
-    )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="Content to use in performing the task",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
-    valueUuid: Optional[Uuid] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="Content to use in performing the task",
         default=None,
-    )
-    valueUuid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUuid extensions",
-        default=None,
-        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="Content to use in performing the task",
@@ -408,25 +288,25 @@ class TaskInput(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Base64Binary,
-                Boolean,
-                Canonical,
-                Code,
-                Date,
-                DateTime,
-                Decimal,
-                Id,
-                Instant,
-                Integer,
-                Markdown,
-                Oid,
-                PositiveInt,
-                String,
-                Time,
-                UnsignedInt,
-                Uri,
-                Url,
-                Uuid,
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 Address,
                 Age,
                 Annotation,
@@ -473,176 +353,81 @@ class TaskOutput(BackboneElement):
         description="Label for output",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Result of output",
         default=None,
     )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Result of output",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueCanonical: Optional[Canonical] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="Result of output",
         default=None,
     )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
-    )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="Result of output",
         default=None,
     )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Result of output",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Result of output",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Result of output",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Result of output",
         default=None,
     )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
-    )
-    valueInstant: Optional[Instant] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="Result of output",
         default=None,
     )
-    valueInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInstant extensions",
-        default=None,
-        alias="_valueInstant",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Result of output",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="Result of output",
         default=None,
     )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
-    )
-    valueOid: Optional[Oid] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="Result of output",
         default=None,
     )
-    valueOid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueOid extensions",
-        default=None,
-        alias="_valueOid",
-    )
-    valuePositiveInt: Optional[PositiveInt] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Result of output",
         default=None,
     )
-    valuePositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valuePositiveInt extensions",
-        default=None,
-        alias="_valuePositiveInt",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Result of output",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Result of output",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
-    valueUnsignedInt: Optional[UnsignedInt] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Result of output",
         default=None,
     )
-    valueUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUnsignedInt extensions",
-        default=None,
-        alias="_valueUnsignedInt",
-    )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Result of output",
         default=None,
     )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
-    )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="Result of output",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
-    valueUuid: Optional[Uuid] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="Result of output",
         default=None,
-    )
-    valueUuid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUuid extensions",
-        default=None,
-        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="Result of output",
@@ -781,25 +566,25 @@ class TaskOutput(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Base64Binary,
-                Boolean,
-                Canonical,
-                Code,
-                Date,
-                DateTime,
-                Decimal,
-                Id,
-                Instant,
-                Integer,
-                Markdown,
-                Oid,
-                PositiveInt,
-                String,
-                Time,
-                UnsignedInt,
-                Uri,
-                Url,
-                Uuid,
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 Address,
                 Age,
                 Annotation,
@@ -862,23 +647,13 @@ class Task(DomainResource):
         description="Task Instance Identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[Canonical] = Field(
+    instantiatesCanonical: Optional[fhir.canonical] = Field(
         description="Formal definition of task",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[Uri] = Field(
+    instantiatesUri: Optional[fhir.uri] = Field(
         description="Formal definition of task",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this task",
@@ -892,14 +667,9 @@ class Task(DomainResource):
         description="Composite task",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | requested | received | accepted | +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -909,36 +679,21 @@ class Task(DomainResource):
         description='E.g. "Specimen collected", "IV prepped"',
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="unknown | proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     code: Optional[CodeableConcept] = Field(
         description="Task Type",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Human-readable explanation of task",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     focus: Optional[Reference] = Field(
         description="What task is acting on",
@@ -957,23 +712,13 @@ class Task(DomainResource):
         description="Start and end time of execution",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
-        description="Task Creation Date",
+    authoredOn: Optional[fhir.dateTime] = Field(
+        description="Task Creation date",
         default=None,
     )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
+    lastModified: Optional[fhir.dateTime] = Field(
+        description="Task Last Modified date",
         default=None,
-        alias="_authoredOn",
-    )
-    lastModified: Optional[DateTime] = Field(
-        description="Task Last Modified Date",
-        default=None,
-    )
-    lastModified_ext: Optional[Element] = Field(
-        description="Placeholder element for lastModified extensions",
-        default=None,
-        alias="_lastModified",
     )
     requester: Optional[Reference] = Field(
         description="Who is asking for task to be done",

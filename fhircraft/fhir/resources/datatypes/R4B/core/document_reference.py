@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -28,14 +28,9 @@ class DocumentReferenceRelatesTo(BackboneElement):
     Relationships that this document has with other document references that already exist.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="replaces | transforms | signs | appends",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     target: Optional[Reference] = Field(
         description="Target of the relationship",
@@ -72,7 +67,7 @@ class DocumentReferenceContext(BackboneElement):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time of service that is being documented",
+        description="time of service that is being documented",
         default=None,
     )
     facilityType: Optional[CodeableConcept] = Field(
@@ -122,23 +117,13 @@ class DocumentReference(DomainResource):
         description="Other identifiers for the document",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | superseded | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    docStatus: Optional[Code] = Field(
+    docStatus: Optional[fhir.code] = Field(
         description="preliminary | final | amended | entered-in-error",
         default=None,
-    )
-    docStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for docStatus extensions",
-        default=None,
-        alias="_docStatus",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of document (LOINC if possible)",
@@ -152,14 +137,9 @@ class DocumentReference(DomainResource):
         description="Who/what is the subject of the document",
         default=None,
     )
-    date: Optional[Instant] = Field(
+    date: Optional[fhir.instant] = Field(
         description="When this document reference was created",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the document",
@@ -177,14 +157,9 @@ class DocumentReference(DomainResource):
         description="Relationships to other documents",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Human-readable description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Document security-tags",

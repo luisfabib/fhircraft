@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -33,41 +26,21 @@ class NamingSystemUniqueId(BackboneElement):
     Indicates how the system may be identified when referenced in electronic exchange.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="oid | uuid | uri | other",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The unique identifier",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Is this the id that should be used for this type",
         default=None,
     )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
-    )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Notes about identifier usage",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     period: Optional[Period] = Field(
         description="When is identifier valid?",
@@ -96,76 +69,41 @@ class NamingSystem(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this naming system (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="codesystem | identifier | root",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    responsible: Optional[String] = Field(
+    responsible: Optional[fhir.string] = Field(
         description="Who maintains system namespace?",
         default=None,
-    )
-    responsible_ext: Optional[Element] = Field(
-        description="Placeholder element for responsible extensions",
-        default=None,
-        alias="_responsible",
     )
     type: Optional[CodeableConcept] = Field(
         description="e.g. driver,  provider,  patient, bank etc.",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the naming system",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -175,14 +113,9 @@ class NamingSystem(DomainResource):
         description="Intended jurisdiction for naming system (if applicable)",
         default=None,
     )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="How/where is it used",
         default=None,
-    )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
     )
     uniqueId: Optional[ListType[NamingSystemUniqueId]] = Field(
         description="Unique identifiers used for system",

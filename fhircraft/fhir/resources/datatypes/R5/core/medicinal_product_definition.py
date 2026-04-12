@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Integer,
-    Date,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -56,14 +47,9 @@ class MedicinalProductDefinitionNamePart(BackboneElement):
     Coding words or phrases of the name.
     """
 
-    part: Optional[String] = Field(
+    part: Optional[fhir.string] = Field(
         description="A fragment of a product name",
         default=None,
-    )
-    part_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for part extensions",
-        default=None,
-        alias="_part",
     )
     type: Optional[CodeableConcept] = Field(
         description="Identifying type for this part of the name (e.g. strength part)",
@@ -95,14 +81,9 @@ class MedicinalProductDefinitionName(BackboneElement):
     The product's name, including full name and possibly coded parts.
     """
 
-    productName: Optional[String] = Field(
+    productName: Optional[fhir.string] = Field(
         description="The full product name",
         default=None,
-    )
-    productName_ext: Optional[Element] = Field(
-        description="Placeholder element for productName extensions",
-        default=None,
-        alias="_productName",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of product name, such as rINN, BAN, Proprietary, Non-Proprietary",
@@ -169,45 +150,25 @@ class MedicinalProductDefinitionCharacteristic(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -227,11 +188,11 @@ class MedicinalProductDefinitionCharacteristic(BackboneElement):
             self,
             field_types=[
                 CodeableConcept,
-                Markdown,
+                fhir.Markdown,
                 Quantity,
-                Integer,
-                Date,
-                Boolean,
+                fhir.Integer,
+                fhir.Date,
+                fhir.Boolean,
                 Attachment,
             ],
             field_name_base="value",
@@ -262,36 +223,21 @@ class MedicinalProductDefinition(DomainResource):
         description="If this medicine applies to human or veterinary uses",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="A business identifier relating to a specific version of the product",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     status: Optional[CodeableConcept] = Field(
         description="The status within the lifecycle of this product record",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="The date at which the given status became applicable",
         default=None,
     )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="General description of this product",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     combinedPharmaceuticalDoseForm: Optional[CodeableConcept] = Field(
         description="The dose form for a single part product, or combined form of a multiple part product",
@@ -301,14 +247,9 @@ class MedicinalProductDefinition(DomainResource):
         description="The path by which the product is taken into or makes contact with the body",
         default=None,
     )
-    indication: Optional[Markdown] = Field(
+    indication: Optional[fhir.markdown] = Field(
         description="Description of indication(s) for this product, used when structured indications are not required",
         default=None,
-    )
-    indication_ext: Optional[Element] = Field(
-        description="Placeholder element for indication extensions",
-        default=None,
-        alias="_indication",
     )
     legalStatusOfSupply: Optional[CodeableConcept] = Field(
         description="The legal status of supply of the medicinal product as classified by the regulator",

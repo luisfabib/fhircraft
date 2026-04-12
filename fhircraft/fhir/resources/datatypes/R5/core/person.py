@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -31,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PersonCommunication(BackboneElement):
     """
     A language which may be used to communicate with the person about his or her health.
@@ -41,16 +33,10 @@ class PersonCommunication(BackboneElement):
         description="The language which can be used to communicate with the person about his or her health",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
         default=None,
     )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
-    )
-
 
 class PersonLink(BackboneElement):
     """
@@ -61,16 +47,10 @@ class PersonLink(BackboneElement):
         description="The resource to which this actual person is associated",
         default=None,
     )
-    assurance: Optional[Code] = Field(
+    assurance: Optional[fhir.code] = Field(
         description="level1 | level2 | level3 | level4",
         default=None,
     )
-    assurance_ext: Optional[Element] = Field(
-        description="Placeholder element for assurance extensions",
-        default=None,
-        alias="_assurance",
-    )
-
 
 class Person(DomainResource):
     """
@@ -85,14 +65,9 @@ class Person(DomainResource):
         description="A human identifier for this person",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="This person\u0027s record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     name: Optional[ListType[HumanName]] = Field(
         description="A name associated with the person",
@@ -102,41 +77,21 @@ class Person(DomainResource):
         description="A contact detail for the person",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date on which the person was born",
         default=None,
     )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
-    )
-    deceasedBoolean: Optional[Boolean] = Field(
+    deceasedBoolean: Optional[fhir.boolean] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
-    deceasedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedBoolean extensions",
-        default=None,
-        alias="_deceasedBoolean",
-    )
-    deceasedDateTime: Optional[DateTime] = Field(
+    deceasedDateTime: Optional[fhir.dateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
-    )
-    deceasedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedDateTime extensions",
-        default=None,
-        alias="_deceasedDateTime",
     )
     address: Optional[ListType[Address]] = Field(
         description="One or more addresses for the person",
@@ -174,7 +129,7 @@ class Person(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, DateTime],
+            field_types=[fhir.Boolean, fhir.DateTime],
             field_name_base="deceased",
             required=False,
         )

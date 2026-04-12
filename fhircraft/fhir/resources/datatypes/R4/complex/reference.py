@@ -3,13 +3,12 @@ from typing import Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .element import Element
 
 if TYPE_CHECKING:
     from .identifier import Identifier
-
 
 class Reference(Element):
     """
@@ -18,36 +17,21 @@ class Reference(Element):
 
     _type = "Reference"
 
-    reference: Optional[String] = Field(
+    reference: Optional[fhir.string] = Field(
         description="Literal reference, Relative, internal or absolute URL",
         default=None,
     )
-    reference_ext: Optional[Element] = Field(
-        description="Placeholder element for reference extensions",
-        default=None,
-        alias="_reference",
-    )
-    type: Optional[Uri] = Field(
+    type: Optional[fhir.uri] = Field(
         description='Type the reference refers to (e.g. "Patient")',
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     identifier: Optional["Identifier"] = Field(
         description="Logical reference, when literal reference is not known",
         default=None,
     )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="Text alternative for the resource",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
 
     @model_validator(mode="after")

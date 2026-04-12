@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    Integer,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -56,14 +48,9 @@ class DeviceRequestParameter(BackboneElement):
         description="Value of detail",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of detail",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
 
     @property
@@ -77,7 +64,7 @@ class DeviceRequestParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Range, Boolean],
+            field_types=[CodeableConcept, Quantity, Range, fhir.Boolean],
             field_name_base="value",
             required=False,
         )
@@ -96,23 +83,13 @@ class DeviceRequest(DomainResource):
         description="External Request identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",
@@ -126,54 +103,29 @@ class DeviceRequest(DomainResource):
         description="Identifier of composite request",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if the request is to stop or not to start using the device",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     code: Optional[CodeableReference] = Field(
         description="Device requested",
         default=None,
     )
-    quantity: Optional[Integer] = Field(
+    quantity: Optional[fhir.integer] = Field(
         description="Quantity of devices to supply",
         default=None,
-    )
-    quantity_ext: Optional[Element] = Field(
-        description="Placeholder element for quantity extensions",
-        default=None,
-        alias="_quantity",
     )
     parameter: Optional[ListType[DeviceRequestParameter]] = Field(
         description="Device details",
@@ -187,14 +139,9 @@ class DeviceRequest(DomainResource):
         description="Encounter motivating request",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="Desired time or schedule for use",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="Desired time or schedule for use",
@@ -204,14 +151,9 @@ class DeviceRequest(DomainResource):
         description="Desired time or schedule for use",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When recorded",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Who/what submitted the device request",
@@ -225,14 +167,9 @@ class DeviceRequest(DomainResource):
         description="Coded/Linked Reason for request",
         default=None,
     )
-    asNeeded: Optional[Boolean] = Field(
+    asNeeded: Optional[fhir.boolean] = Field(
         description="PRN status of request",
         default=None,
-    )
-    asNeeded_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeeded extensions",
-        default=None,
-        alias="_asNeeded",
     )
     asNeededFor: Optional[CodeableConcept] = Field(
         description="Device usage reason",
@@ -266,7 +203,7 @@ class DeviceRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

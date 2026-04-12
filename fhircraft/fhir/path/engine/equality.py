@@ -195,9 +195,15 @@ class Equivalent(FHIRPath):
         Returns:
             bool: True if the items are equivalent, False otherwise
         """
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
         left_value = left_item.value
         right_value = right_item.value
 
+        if isinstance(left_value, FHIRPrimitiveModel):
+            left_value = left_value.value
+        if isinstance(right_value, FHIRPrimitiveModel):
+            right_value = right_value.value
         # Handle None values
         if left_value is None and right_value is None:
             return True

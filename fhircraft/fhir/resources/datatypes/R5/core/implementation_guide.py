@@ -5,18 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Id,
-    Canonical,
-    Url,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -39,41 +29,21 @@ class ImplementationGuideDependsOn(BackboneElement):
     Another implementation guide that this implementation depends on. Typically, an implementation guide uses value sets, profiles etc.defined in other implementation guides.
     """
 
-    uri: Optional[Canonical] = Field(
+    uri: Optional[fhir.canonical] = Field(
         description="Identity of the IG that this depends on",
         default=None,
     )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
-    )
-    packageId: Optional[Id] = Field(
+    packageId: Optional[fhir.id_] = Field(
         description="NPM Package name for IG this depends on",
         default=None,
     )
-    packageId_ext: Optional[Element] = Field(
-        description="Placeholder element for packageId extensions",
-        default=None,
-        alias="_packageId",
-    )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version of the IG",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    reason: Optional[Markdown] = Field(
+    reason: Optional[fhir.markdown] = Field(
         description="Why dependency exists",
         default=None,
-    )
-    reason_ext: Optional[Element] = Field(
-        description="Placeholder element for reason extensions",
-        default=None,
-        alias="_reason",
     )
 
 
@@ -82,23 +52,13 @@ class ImplementationGuideGlobal(BackboneElement):
     A set of profiles that all resources covered by this implementation guide must conform to.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="Type this profile applies to",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Profile that all resources must conform to",
         default=None,
-    )
-    profile_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
 
 
@@ -107,23 +67,13 @@ class ImplementationGuideDefinitionGrouping(BackboneElement):
     A logical group of resources. Logical groups can be used when building pages.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Descriptive name for the package",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human readable text describing the package",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
 
 
@@ -136,59 +86,29 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         description="Location of the resource",
         default=None,
     )
-    fhirVersion: Optional[ListType[Code]] = Field(
+    fhirVersion: Optional[ListType[fhir.code]] = Field(
         description="Versions this applies to (if different to IG)",
         default=None,
     )
-    fhirVersion_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for fhirVersion extensions",
-        default=None,
-        alias="_fhirVersion",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human readable name for the resource",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Reason why included in guide",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    isExample: Optional[Boolean] = Field(
+    isExample: Optional[fhir.boolean] = Field(
         description="Is this an example",
         default=None,
     )
-    isExample_ext: Optional[Element] = Field(
-        description="Placeholder element for isExample extensions",
-        default=None,
-        alias="_isExample",
-    )
-    profile: Optional[ListType[Canonical]] = Field(
+    profile: Optional[ListType[fhir.canonical]] = Field(
         description="Profile(s) this is an example of",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
-    )
-    groupingId: Optional[Id] = Field(
+    groupingId: Optional[fhir.id_] = Field(
         description="Grouping this is part of",
         default=None,
-    )
-    groupingId_ext: Optional[Element] = Field(
-        description="Placeholder element for groupingId extensions",
-        default=None,
-        alias="_groupingId",
     )
 
 
@@ -197,59 +117,29 @@ class ImplementationGuideDefinitionPage(BackboneElement):
     A page / section in the implementation guide. The root page is the implementation guide home page.
     """
 
-    sourceUrl: Optional[Url] = Field(
+    sourceUrl: Optional[fhir.url] = Field(
         description="Source for page",
         default=None,
     )
-    sourceUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceUrl extensions",
-        default=None,
-        alias="_sourceUrl",
-    )
-    sourceString: Optional[String] = Field(
+    sourceString: Optional[fhir.string] = Field(
         description="Source for page",
         default=None,
     )
-    sourceString_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceString extensions",
-        default=None,
-        alias="_sourceString",
-    )
-    sourceMarkdown: Optional[Markdown] = Field(
+    sourceMarkdown: Optional[fhir.markdown] = Field(
         description="Source for page",
         default=None,
     )
-    sourceMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceMarkdown extensions",
-        default=None,
-        alias="_sourceMarkdown",
-    )
-    name: Optional[Url] = Field(
+    name: Optional[fhir.url] = Field(
         description="Name of the page when published",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Short title shown for navigational assistance",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    generation: Optional[Code] = Field(
+    generation: Optional[fhir.code] = Field(
         description="html | markdown | xml | generated",
         default=None,
-    )
-    generation_ext: Optional[Element] = Field(
-        description="Placeholder element for generation extensions",
-        default=None,
-        alias="_generation",
     )
     page: Optional[ListType["ImplementationGuideDefinitionPage"]] = Field(
         description="Nested Pages / Sections",
@@ -267,7 +157,7 @@ class ImplementationGuideDefinitionPage(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Url, String, Markdown],
+            field_types=[fhir.Url, fhir.String, fhir.Markdown],
             field_name_base="source",
             required=False,
         )
@@ -279,17 +169,12 @@ class ImplementationGuideDefinitionParameter(BackboneElement):
     """
 
     code: Optional[Coding] = Field(
-        description="Code that identifies parameter",
+        description="code that identifies parameter",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="Value for named type",
         default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
     )
 
 
@@ -298,32 +183,17 @@ class ImplementationGuideDefinitionTemplate(BackboneElement):
     A template for building resources.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Type of template specified",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    source: Optional[String] = Field(
+    source: Optional[fhir.string] = Field(
         description="The source location for the template",
         default=None,
     )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
-    )
-    scope: Optional[String] = Field(
+    scope: Optional[fhir.string] = Field(
         description="The scope in which the template applies",
         default=None,
-    )
-    scope_ext: Optional[Element] = Field(
-        description="Placeholder element for scope extensions",
-        default=None,
-        alias="_scope",
     )
 
 
@@ -363,32 +233,17 @@ class ImplementationGuideManifestResource(BackboneElement):
         description="Location of the resource",
         default=None,
     )
-    isExample: Optional[Boolean] = Field(
+    isExample: Optional[fhir.boolean] = Field(
         description="Is this an example",
         default=None,
     )
-    isExample_ext: Optional[Element] = Field(
-        description="Placeholder element for isExample extensions",
-        default=None,
-        alias="_isExample",
-    )
-    profile: Optional[ListType[Canonical]] = Field(
+    profile: Optional[ListType[fhir.canonical]] = Field(
         description="Profile(s) this is an example of",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
-    )
-    relativePath: Optional[Url] = Field(
+    relativePath: Optional[fhir.url] = Field(
         description="Relative path for page in IG",
         default=None,
-    )
-    relativePath_ext: Optional[Element] = Field(
-        description="Placeholder element for relativePath extensions",
-        default=None,
-        alias="_relativePath",
     )
 
 
@@ -397,32 +252,17 @@ class ImplementationGuideManifestPage(BackboneElement):
     Information about a page within the IG.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="HTML page name",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Title of the page, for references",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    anchor: Optional[ListType[String]] = Field(
+    anchor: Optional[ListType[fhir.string]] = Field(
         description="Anchor available on the page",
         default=None,
-    )
-    anchor_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for anchor extensions",
-        default=None,
-        alias="_anchor",
     )
 
 
@@ -431,14 +271,9 @@ class ImplementationGuideManifest(BackboneElement):
     Information about an assembled implementation guide, created by the publication tooling.
     """
 
-    rendering: Optional[Url] = Field(
+    rendering: Optional[fhir.url] = Field(
         description="Location of rendered implementation guide",
         default=None,
-    )
-    rendering_ext: Optional[Element] = Field(
-        description="Placeholder element for rendering extensions",
-        default=None,
-        alias="_rendering",
     )
     resource: Optional[ListType[ImplementationGuideManifestResource]] = Field(
         description="Resource in the implementation guide",
@@ -448,23 +283,13 @@ class ImplementationGuideManifest(BackboneElement):
         description="HTML page within the parent IG",
         default=None,
     )
-    image: Optional[ListType[String]] = Field(
+    image: Optional[ListType[fhir.string]] = Field(
         description="Image within the IG",
         default=None,
     )
-    image_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for image extensions",
-        default=None,
-        alias="_image",
-    )
-    other: Optional[ListType[String]] = Field(
+    other: Optional[ListType[fhir.string]] = Field(
         description="Additional linkable file in IG",
         default=None,
-    )
-    other_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for other extensions",
-        default=None,
-        alias="_other",
     )
 
 
@@ -477,107 +302,57 @@ class ImplementationGuide(DomainResource):
     _type = "ImplementationGuide"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImplementationGuide"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this implementation guide, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this implementation guide, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the implementation guide (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the implementation guide",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this implementation guide (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this implementation guide (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the implementation guide",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -587,59 +362,29 @@ class ImplementationGuide(DomainResource):
         description="Intended jurisdiction for implementation guide (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this implementation guide is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    packageId: Optional[Id] = Field(
+    packageId: Optional[fhir.id_] = Field(
         description="NPM Package name for IG",
         default=None,
     )
-    packageId_ext: Optional[Element] = Field(
-        description="Placeholder element for packageId extensions",
-        default=None,
-        alias="_packageId",
-    )
-    license: Optional[Code] = Field(
+    license: Optional[fhir.code] = Field(
         description="SPDX license code for this IG (or not-open-source)",
         default=None,
     )
-    license_ext: Optional[Element] = Field(
-        description="Placeholder element for license extensions",
-        default=None,
-        alias="_license",
-    )
-    fhirVersion: Optional[ListType[Code]] = Field(
+    fhirVersion: Optional[ListType[fhir.code]] = Field(
         description="FHIR Version(s) this Implementation Guide targets",
         default=None,
-    )
-    fhirVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for fhirVersion extensions",
-        default=None,
-        alias="_fhirVersion",
     )
     dependsOn: Optional[ListType[ImplementationGuideDependsOn]] = Field(
         description="Another Implementation guide this depends on",
@@ -670,7 +415,7 @@ class ImplementationGuide(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

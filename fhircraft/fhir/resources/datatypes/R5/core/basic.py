@@ -5,8 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -41,14 +41,9 @@ class Basic(DomainResource):
         description="Identifies the focus of this resource",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="When created",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     author: Optional[Reference] = Field(
         description="Who created",

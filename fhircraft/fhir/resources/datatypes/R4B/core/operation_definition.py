@@ -4,17 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Canonical,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -34,23 +25,13 @@ class OperationDefinitionParameterBinding(BackboneElement):
     Binds to a value set if this parameter is coded (code, Coding, CodeableConcept).
     """
 
-    strength: Optional[Code] = Field(
+    strength: Optional[fhir.code] = Field(
         description="required | extensible | preferred | example",
         default=None,
     )
-    strength_ext: Optional[Element] = Field(
-        description="Placeholder element for strength extensions",
-        default=None,
-        alias="_strength",
-    )
-    valueSet: Optional[Canonical] = Field(
+    valueSet: Optional[fhir.canonical] = Field(
         description="Source of value set",
         default=None,
-    )
-    valueSet_ext: Optional[Element] = Field(
-        description="Placeholder element for valueSet extensions",
-        default=None,
-        alias="_valueSet",
     )
 
 
@@ -59,23 +40,13 @@ class OperationDefinitionParameterReferencedFrom(BackboneElement):
     Identifies other resource parameters within the operation invocation that are expected to resolve to this resource.
     """
 
-    source: Optional[String] = Field(
+    source: Optional[fhir.string] = Field(
         description="Referencing parameter",
         default=None,
     )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
-    )
-    sourceId: Optional[String] = Field(
+    sourceId: Optional[fhir.string] = Field(
         description="Element id of reference",
         default=None,
-    )
-    sourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceId extensions",
-        default=None,
-        alias="_sourceId",
     )
 
 
@@ -84,77 +55,37 @@ class OperationDefinitionParameter(BackboneElement):
     The parameters for the operation/query.
     """
 
-    name: Optional[Code] = Field(
+    name: Optional[fhir.code] = Field(
         description="Name in Parameters.parameter.name or in URL",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="in | out",
         default=None,
     )
-    use_ext: Optional[Element] = Field(
-        description="Placeholder element for use extensions",
-        default=None,
-        alias="_use",
-    )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Minimum Cardinality",
         default=None,
     )
-    min_ext: Optional[Element] = Field(
-        description="Placeholder element for min extensions",
-        default=None,
-        alias="_min",
-    )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum Cardinality (a number or *)",
         default=None,
     )
-    max_ext: Optional[Element] = Field(
-        description="Placeholder element for max extensions",
-        default=None,
-        alias="_max",
-    )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Description of meaning/use",
         default=None,
     )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="What type this parameter has",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    targetProfile: Optional[ListType[Canonical]] = Field(
+    targetProfile: Optional[ListType[fhir.canonical]] = Field(
         description="If type is Reference | canonical, allowed targets",
         default=None,
     )
-    targetProfile_ext: Optional[Element] = Field(
-        description="Placeholder element for targetProfile extensions",
-        default=None,
-        alias="_targetProfile",
-    )
-    searchType: Optional[Code] = Field(
+    searchType: Optional[fhir.code] = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
         default=None,
-    )
-    searchType_ext: Optional[Element] = Field(
-        description="Placeholder element for searchType extensions",
-        default=None,
-        alias="_searchType",
     )
     binding: Optional[OperationDefinitionParameterBinding] = Field(
         description="ValueSet details if this is coded",
@@ -177,23 +108,13 @@ class OperationDefinitionOverload(BackboneElement):
     Defines an appropriate combination of parameters to use when invoking this operation, to help code generators when generating overloaded parameter sets for this operation.
     """
 
-    parameterName: Optional[ListType[String]] = Field(
+    parameterName: Optional[ListType[fhir.string]] = Field(
         description="Name of parameter to include in overload",
         default=None,
     )
-    parameterName_ext: Optional[Element] = Field(
-        description="Placeholder element for parameterName extensions",
-        default=None,
-        alias="_parameterName",
-    )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Comments to go on overload",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
 
 
@@ -218,99 +139,49 @@ class OperationDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this operation definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this operation definition, represented as a URI (globally unique)",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the operation definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this operation definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this operation definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="operation | query",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the operation definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -320,104 +191,49 @@ class OperationDefinition(DomainResource):
         description="Intended jurisdiction for operation definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this operation definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    affectsState: Optional[Boolean] = Field(
+    affectsState: Optional[fhir.boolean] = Field(
         description="Whether content is changed by the operation",
         default=None,
     )
-    affectsState_ext: Optional[Element] = Field(
-        description="Placeholder element for affectsState extensions",
-        default=None,
-        alias="_affectsState",
-    )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Name used to invoke the operation",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Additional information about use",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
-    )
-    base: Optional[Canonical] = Field(
+    base: Optional[fhir.canonical] = Field(
         description="Marks this as a profile of the base",
         default=None,
     )
-    base_ext: Optional[Element] = Field(
-        description="Placeholder element for base extensions",
-        default=None,
-        alias="_base",
-    )
-    resource: Optional[ListType[Code]] = Field(
+    resource: Optional[ListType[fhir.code]] = Field(
         description="Types this operation applies to",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
-    system: Optional[Boolean] = Field(
+    system: Optional[fhir.boolean] = Field(
         description="Invoke at the system level?",
         default=None,
     )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    type: Optional[Boolean] = Field(
+    type: Optional[fhir.boolean] = Field(
         description="Invoke at the type level?",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    instance: Optional[Boolean] = Field(
+    instance: Optional[fhir.boolean] = Field(
         description="Invoke on an instance?",
         default=None,
     )
-    instance_ext: Optional[Element] = Field(
-        description="Placeholder element for instance extensions",
-        default=None,
-        alias="_instance",
-    )
-    inputProfile: Optional[Canonical] = Field(
+    inputProfile: Optional[fhir.canonical] = Field(
         description="Validation information for in parameters",
         default=None,
     )
-    inputProfile_ext: Optional[Element] = Field(
-        description="Placeholder element for inputProfile extensions",
-        default=None,
-        alias="_inputProfile",
-    )
-    outputProfile: Optional[Canonical] = Field(
+    outputProfile: Optional[fhir.canonical] = Field(
         description="Validation information for out parameters",
         default=None,
-    )
-    outputProfile_ext: Optional[Element] = Field(
-        description="Placeholder element for outputProfile extensions",
-        default=None,
-        alias="_outputProfile",
     )
     parameter: Optional[ListType[OperationDefinitionParameter]] = Field(
         description="Parameters for the operation/query",
@@ -466,7 +282,7 @@ class OperationDefinition(DomainResource):
             self,
             elements=("parameter",),
             expression="targetProfile.exists() implies (type = 'Reference' or type = 'canonical')",
-            human="A targetProfile can only be specified for parameters of type Reference or Canonical",
+            human="A targetProfile can only be specified for parameters of type Reference or canonical",
             key="opd-3",
             severity="error",
         )

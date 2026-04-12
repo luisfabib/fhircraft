@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -36,14 +30,9 @@ class IngredientManufacturer(BackboneElement):
     The organization(s) that manufacture this ingredient. Can be used to indicate:         1) Organizations we are aware of that manufacture this ingredient         2) Specific Manufacturer(s) currently being used         3) Set of organisations allowed to manufacture this ingredient for this product         Users must be clear on the application of context relevant to their use case.
     """
 
-    role: Optional[Code] = Field(
+    role: Optional[fhir.code] = Field(
         description="allowed | possible | actual",
         default=None,
-    )
-    role_ext: Optional[Element] = Field(
-        description="Placeholder element for role extensions",
-        default=None,
-        alias="_role",
     )
     manufacturer: Optional[Reference] = Field(
         description="An organization that manufactures this ingredient",
@@ -72,14 +61,9 @@ class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
         description="Strength expressed in terms of a reference substance",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="When strength is measured at a particular point or distance",
         default=None,
-    )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
     )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="Where the strength range applies",
@@ -124,14 +108,9 @@ class IngredientSubstanceStrength(BackboneElement):
         description="The quantity of substance in the unit of presentation",
         default=None,
     )
-    textPresentation: Optional[String] = Field(
+    textPresentation: Optional[fhir.string] = Field(
         description="Text of either the whole presentation strength or a part of it (rest being in Strength.presentation as a ratio)",
         default=None,
-    )
-    textPresentation_ext: Optional[Element] = Field(
-        description="Placeholder element for textPresentation extensions",
-        default=None,
-        alias="_textPresentation",
     )
     concentrationRatio: Optional[Ratio] = Field(
         description="The strength per unitary volume (or mass)",
@@ -149,27 +128,17 @@ class IngredientSubstanceStrength(BackboneElement):
         description="The strength per unitary volume (or mass)",
         default=None,
     )
-    textConcentration: Optional[String] = Field(
+    textConcentration: Optional[fhir.string] = Field(
         description="Text of either the whole concentration strength or a part of it (rest being in Strength.concentration as a ratio)",
         default=None,
-    )
-    textConcentration_ext: Optional[Element] = Field(
-        description="Placeholder element for textConcentration extensions",
-        default=None,
-        alias="_textConcentration",
     )
     basis: Optional[CodeableConcept] = Field(
         description="A code that indicates if the strength is, for example, based on the ingredient substance as stated or on the substance base (when the ingredient is a salt)",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="When strength is measured at a particular point or distance",
         default=None,
-    )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
     )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="Where the strength range applies",
@@ -243,14 +212,9 @@ class Ingredient(DomainResource):
         description="An identifier or code by which the ingredient can be referenced",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     for_: Optional[ListType[Reference]] = Field(
         description="The product which this ingredient is a constituent part of",
@@ -269,23 +233,13 @@ class Ingredient(DomainResource):
         description="A classification of the ingredient according to where in the physical item it tends to be used, such the outer shell of a tablet, inner body or ink",
         default=None,
     )
-    allergenicIndicator: Optional[Boolean] = Field(
+    allergenicIndicator: Optional[fhir.boolean] = Field(
         description="If the ingredient is a known or suspected allergen",
         default=None,
     )
-    allergenicIndicator_ext: Optional[Element] = Field(
-        description="Placeholder element for allergenicIndicator extensions",
-        default=None,
-        alias="_allergenicIndicator",
-    )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="A place for providing any notes that are relevant to the component, e.g. removed during process, adjusted for loss on drying",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     manufacturer: Optional[ListType[IngredientManufacturer]] = Field(
         description="An organization that manufactures this ingredient",

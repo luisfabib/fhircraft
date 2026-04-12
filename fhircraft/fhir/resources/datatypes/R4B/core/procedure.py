@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -89,23 +83,13 @@ class Procedure(DomainResource):
         description="External Identifiers for this procedure",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="A request for this procedure",
@@ -115,14 +99,9 @@ class Procedure(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -144,27 +123,17 @@ class Procedure(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    performedDateTime: Optional[DateTime] = Field(
+    performedDateTime: Optional[fhir.dateTime] = Field(
         description="When the procedure was performed",
         default=None,
-    )
-    performedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for performedDateTime extensions",
-        default=None,
-        alias="_performedDateTime",
     )
     performedPeriod: Optional[Period] = Field(
         description="When the procedure was performed",
         default=None,
     )
-    performedString: Optional[String] = Field(
+    performedString: Optional[fhir.string] = Field(
         description="When the procedure was performed",
         default=None,
-    )
-    performedString_ext: Optional[Element] = Field(
-        description="Placeholder element for performedString extensions",
-        default=None,
-        alias="_performedString",
     )
     performedAge: Optional[Age] = Field(
         description="When the procedure was performed",
@@ -250,7 +219,7 @@ class Procedure(DomainResource):
     def performed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, String, Age, Range],
+            field_types=[fhir.DateTime, Period, fhir.String, Age, Range],
             field_name_base="performed",
             required=False,
         )

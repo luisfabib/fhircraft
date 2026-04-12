@@ -4,15 +4,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Code,
-    PositiveInt,
-    Markdown,
-    Boolean,
-    DateTime,
-    Instant,
-)
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Identifier,
@@ -35,14 +27,9 @@ class AccountCoverage(BackboneElement):
         description="The party(s), such as insurances, that may contribute to the payment of this account",
         default=None,
     )
-    priority: Optional[PositiveInt] = Field(
+    priority: Optional[fhir.positiveInt] = Field(
         description="The priority of the coverage in the context of this account",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
 
 
@@ -55,14 +42,9 @@ class AccountGuarantor(BackboneElement):
         description="Responsible entity",
         default=None,
     )
-    onHold: Optional[Boolean] = Field(
+    onHold: Optional[fhir.boolean] = Field(
         description="Credit or other hold applied",
         default=None,
-    )
-    onHold_ext: Optional[Element] = Field(
-        description="Placeholder element for onHold extensions",
-        default=None,
-        alias="_onHold",
     )
     period: Optional[Period] = Field(
         description="Guarantee account during",
@@ -75,43 +57,28 @@ class AccountDiagnosis(BackboneElement):
     When using an account for billing a specific Encounter the set of diagnoses that are relevant for billing are stored here on the account where they are able to be sequenced appropriately prior to processing to produce claim(s).
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Ranking of the diagnosis (for each type)",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     condition: Optional[CodeableReference] = Field(
         description="The diagnosis relevant to the account",
         default=None,
     )
-    dateOfDiagnosis: Optional[DateTime] = Field(
+    dateOfDiagnosis: Optional[fhir.dateTime] = Field(
         description="Date of the diagnosis (when coded diagnosis)",
         default=None,
-    )
-    dateOfDiagnosis_ext: Optional[Element] = Field(
-        description="Placeholder element for dateOfDiagnosis extensions",
-        default=None,
-        alias="_dateOfDiagnosis",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Type that this diagnosis has relevant to the account (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-    onAdmission: Optional[Boolean] = Field(
+    onAdmission: Optional[fhir.boolean] = Field(
         description="Diagnosis present on Admission",
         default=None,
     )
-    onAdmission_ext: Optional[Element] = Field(
-        description="Placeholder element for onAdmission extensions",
-        default=None,
-        alias="_onAdmission",
-    )
     packageCode: Optional[ListType[CodeableConcept]] = Field(
-        description="Package Code specific for billing",
+        description="Package code specific for billing",
         default=None,
     )
 
@@ -121,34 +88,24 @@ class AccountProcedure(BackboneElement):
     When using an account for billing a specific Encounter the set of procedures that are relevant for billing are stored here on the account where they are able to be sequenced appropriately prior to processing to produce claim(s).
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Ranking of the procedure (for each type)",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     code: Optional[CodeableReference] = Field(
         description="The procedure relevant to the account",
         default=None,
     )
-    dateOfService: Optional[DateTime] = Field(
+    dateOfService: Optional[fhir.dateTime] = Field(
         description="Date of the procedure (when coded procedure)",
         default=None,
-    )
-    dateOfService_ext: Optional[Element] = Field(
-        description="Placeholder element for dateOfService extensions",
-        default=None,
-        alias="_dateOfService",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="How this procedure value should be used in charging the account",
         default=None,
     )
     packageCode: Optional[ListType[CodeableConcept]] = Field(
-        description="Package Code specific for billing",
+        description="Package code specific for billing",
         default=None,
     )
     device: Optional[ListType[Reference]] = Field(
@@ -187,14 +144,9 @@ class AccountBalance(BackboneElement):
         description="current | 30 | 60 | 90 | 120",
         default=None,
     )
-    estimate: Optional[Boolean] = Field(
+    estimate: Optional[fhir.boolean] = Field(
         description="Estimated balance",
         default=None,
-    )
-    estimate_ext: Optional[Element] = Field(
-        description="Placeholder element for estimate extensions",
-        default=None,
-        alias="_estimate",
     )
     amount: Optional[Money] = Field(
         description="Calculated amount",
@@ -215,14 +167,9 @@ class Account(DomainResource):
         description="Account number",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error | on-hold | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     billingStatus: Optional[CodeableConcept] = Field(
         description="Tracks the lifecycle of the account through the billing process",
@@ -232,14 +179,9 @@ class Account(DomainResource):
         description="E.g. patient, expense, depreciation",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human-readable label",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     subject: Optional[ListType[Reference]] = Field(
         description="The entity that caused the expenses",
@@ -257,14 +199,9 @@ class Account(DomainResource):
         description="Entity managing the Account",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Explanation of purpose/use",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     guarantor: Optional[ListType[AccountGuarantor]] = Field(
         description="The parties ultimately responsible for balancing the Account",
@@ -290,14 +227,9 @@ class Account(DomainResource):
         description="Calculated account balance(s)",
         default=None,
     )
-    calculatedAt: Optional[Instant] = Field(
-        description="Time the balance amount was calculated",
+    calculatedAt: Optional[fhir.instant] = Field(
+        description="time the balance amount was calculated",
         default=None,
-    )
-    calculatedAt_ext: Optional[Element] = Field(
-        description="Placeholder element for calculatedAt extensions",
-        default=None,
-        alias="_calculatedAt",
     )
 
     @model_validator(mode="after")

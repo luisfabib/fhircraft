@@ -5,8 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -49,14 +49,9 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         description="Type of benefit",
         default=None,
     )
-    requirement: Optional[String] = Field(
+    requirement: Optional[fhir.string] = Field(
         description="Referral requirements",
         default=None,
-    )
-    requirement_ext: Optional[Element] = Field(
-        description="Placeholder element for requirement extensions",
-        default=None,
-        alias="_requirement",
     )
     limit: Optional[ListType[InsurancePlanCoverageBenefitLimit]] = Field(
         description="Benefit limits",
@@ -92,27 +87,17 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         description="Type of cost",
         default=None,
     )
-    groupSize: Optional[PositiveInt] = Field(
+    groupSize: Optional[fhir.positiveInt] = Field(
         description="Number of enrollees",
         default=None,
-    )
-    groupSize_ext: Optional[Element] = Field(
-        description="Placeholder element for groupSize extensions",
-        default=None,
-        alias="_groupSize",
     )
     cost: Optional[Money] = Field(
         description="Cost value",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Additional cost information",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
 
 
@@ -213,36 +198,21 @@ class InsurancePlan(DomainResource):
         description="Business Identifier for Product",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of product",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Official name",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="Alternate names",
         default=None,
-    )
-    alias_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
     )
     period: Optional[Period] = Field(
         description="When the product is available",

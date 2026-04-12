@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PersonLink(BackboneElement):
     """
     Link to a resource that concerns the same actual person.
@@ -38,16 +31,10 @@ class PersonLink(BackboneElement):
         description="The resource to which this actual person is associated",
         default=None,
     )
-    assurance: Optional[Code] = Field(
+    assurance: Optional[fhir.code] = Field(
         description="level1 | level2 | level3 | level4",
         default=None,
     )
-    assurance_ext: Optional[Element] = Field(
-        description="Placeholder element for assurance extensions",
-        default=None,
-        alias="_assurance",
-    )
-
 
 class Person(DomainResource):
     """
@@ -82,23 +69,13 @@ class Person(DomainResource):
         description="A contact detail for the person",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date on which the person was born",
         default=None,
-    )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
     )
     address: Optional[ListType[Address]] = Field(
         description="One or more addresses for the person",
@@ -112,14 +89,9 @@ class Person(DomainResource):
         description="The organization that is the custodian of the person record",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="This person\u0027s record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     link: Optional[ListType[PersonLink]] = Field(
         description="Link to a resource that concerns the same actual person",

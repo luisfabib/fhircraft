@@ -11,6 +11,7 @@ from fhircraft.fhir.resources.datatypes import get_fhir_type
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity as R4_Quantity,
     Age as R4_Age,
+    Extension as R4_Extension,
 )
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity as R4B_Quantity,
@@ -37,15 +38,9 @@ def test_extension_returns_empty_for_empty_collection():
 def test_extension_selects_correct_extension_by_url():
     resource = namedtuple("Resource", "extension")(
         extension=[
-            get_fhir_type("Extension", "R4")(
-                url="http://domain.org/extension1", valueInteger=1
-            ),
-            get_fhir_type("Extension", "R4")(
-                url="http://domain.org/extension2", valueInteger=2
-            ),
-            get_fhir_type("Extension", "R4")(
-                url="http://domain.org/extension3", valueInteger=3
-            ),
+            R4_Extension(url="http://domain.org/extension1", valueInteger=1),
+            R4_Extension(url="http://domain.org/extension2", valueInteger=2),
+            R4_Extension(url="http://domain.org/extension3", valueInteger=3),
         ]
     )
     collection = [FHIRPathCollectionItem(value=resource)]
@@ -87,9 +82,7 @@ def test_hasvalue_returns_true_for_singleton_collection_with_primitive_value(val
 def test_hasvalue_returns_false_for_singleton_collection_without_primitive_value():
     collection = [
         FHIRPathCollectionItem(
-            value=get_fhir_type("Extension", "R4")(
-                url="http://domain.org/extension1", valueInteger=1
-            )
+            value=R4_Extension(url="http://domain.org/extension1", valueInteger=1)
         )
     ]
     result = HasValue().evaluate(collection, env)
@@ -142,9 +135,7 @@ def test_getvalue_returns_value_for_singleton_collection_with_primitive_value(va
 def test_getvalue_returns_empty_for_singleton_collection_without_primitive_value():
     collection = [
         FHIRPathCollectionItem(
-            value=get_fhir_type("Extension", "R4")(
-                url="http://domain.org/extension1", valueInteger=1
-            )
+            value=R4_Extension(url="http://domain.org/extension1", valueInteger=1)
         )
     ]
     result = GetValue().evaluate(collection, env)

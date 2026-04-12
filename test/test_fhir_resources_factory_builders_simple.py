@@ -5,8 +5,10 @@ from typing import get_args
 import pytest
 from pydantic.aliases import AliasChoices
 
-from fhircraft.fhir.resources.datatypes import primitives
-from fhircraft.fhir.resources.datatypes.R4 import complex as r4_complex, core as r4_core
+from fhircraft.fhir.resources.datatypes.R4 import (
+    complex as r4_complex,
+    primitive as r4_primitives,
+)
 from fhircraft.fhir.resources.factory.builders.base import (
     Build,
     Builder,
@@ -68,13 +70,10 @@ def make_node(
     return node
 
 
-def make_type_info(
-    python_type, kind: str = "complex-type", requires_primitive_extension: bool = False
-):
+def make_type_info(python_type, kind: str = "complex-type"):
     return TypeInformation(
         type=python_type,
         kind=kind,
-        requires_primitive_extension=requires_primitive_extension,
     )
 
 
@@ -134,46 +133,17 @@ def test_build__single_resource_type_produces_one_field(builder: Builder, index)
     assert len(build.fields) == 1
 
 
-def test_build__no_ext_placeholder_for_complex_type(builder: Builder, index):
-    node = make_node("code", type_codes=["CodeableConcept"])
-    build = builder.build(node, index)
-    names = [f.name for f in build.fields]
-    assert "code_ext" not in names
-
-
-def test_build__primitive_type_produces_two_fields(builder: Builder, index):
+def test_build__primitive_type_produces_one_field(builder: Builder, index):
     node = make_node("status", type_codes=["string"])
     build = builder.build(node, index)
-    assert len(build.fields) == 2
+    assert len(build.fields) == 1
 
 
-def test_build__primitive_placeholder_field_name(builder: Builder, index):
+def test_build__primitive_no_placeholder(builder: Builder, index):
     node = make_node("status", type_codes=["string"])
     build = builder.build(node, index)
     names = [f.name for f in build.fields]
-    assert "status_ext" in names
-
-
-def test_build__primitive_placeholder_does_not_set_default(builder: Builder, index):
-    node = make_node("status", type_codes=["string"], default_value="active")
-    build = builder.build(node, index)
-    placeholder = next((f for f in build.fields if f.name == "status_ext"), None)
-    assert placeholder is not None
-    assert placeholder.default is None
-
-
-def test_build__primitive_placeholder_alias_is_underscore_name(builder: Builder, index):
-    node = make_node("status", type_codes=["string"])
-    build = builder.build(node, index)
-    placeholder = next(f for f in build.fields if f.name == "status_ext")
-    assert placeholder.alias == "_status"
-
-
-def test_build__primitive_main_field_comes_first(builder: Builder, index):
-    node = make_node("status", type_codes=["string"])
-    build = builder.build(node, index)
-    assert build.fields[0].name == "status"
-    assert build.fields[1].name == "status_ext"
+    assert "status_ext" not in names
 
 
 @pytest.mark.parametrize(
@@ -215,7 +185,7 @@ def test_build__non_array_annotation_is_optional(builder: Builder, index):
         base_is_array=False,
         max_cardinality=1,
     )
-    ti = make_type_info(r4_complex.CodeableConcept, "complex-type", False)
+    ti = make_type_info(r4_complex.CodeableConcept, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     assert result.fields[0].annotation == Optional[r4_complex.CodeableConcept]
@@ -235,21 +205,7 @@ def test_build__two_types_annotation_contains_both_types(builder: Builder, index
     for arg in inner:
         union_args.update(get_args(arg) or [arg])
     assert r4_complex.Quantity in union_args
-    assert primitives.String in union_args
-
-
-def test_build__two_types_one_primitive_adds_placeholder(builder: Builder, index):
-    """When any resolved type requires_primitive_extension, a placeholder is added."""
-    node = make_node("value", type_codes=["Quantity", "string"])
-    build = builder.build(node, index)
-    assert len(build.fields) == 2
-    assert build.fields[1].name == "value_ext"
-
-
-def test_build__two_types_neither_primitive_no_placeholder(builder: Builder, index):
-    node = make_node("value", type_codes=["CodeableConcept", "Quantity"])
-    build = builder.build(node, index)
-    assert len(build.fields) == 1
+    assert r4_primitives.String in union_args
 
 
 def test_build__validators_list_populated_from_build_field_validators(

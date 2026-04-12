@@ -11,12 +11,13 @@ import importlib
 import re
 from pathlib import Path
 from threading import Lock
-from typing import Any, Literal, overload
-from typing_extensions import TypeAliasType
+from typing import Any, Literal, overload, TYPE_CHECKING
 
-import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.indexer import Manifest, ManifestEntry
 from fhircraft.utils import to_snake_case, capitalize
+
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.base import FHIRBaseModel
 
 # Supported FHIR releases that have a definitions manifest
 SUPPORTED_RELEASES = ("R4", "R4B", "R5")
@@ -32,8 +33,7 @@ _DEFINITIONS_DIR = Path(__file__).parent.parent / "definitions"
 class TypeRegistry:
     """Per-release index mapping FHIR type names and canonical URLs to Python types.
 
-    Primitive types (from ``primitives.py``) are eagerly loaded at construction
-    time.  Complex types and resource classes are imported lazily on first access.
+    All classes are imported lazily on first access.
 
     Args:
         release: FHIR release string, e.g. ``"R4B"``.
@@ -45,17 +45,16 @@ class TypeRegistry:
             _DEFINITIONS_DIR / release / ".manifest.json"
         )
         # name → Python type  (both PascalCase and manifest camelCase for primitives)
-        self._by_name: dict[str, type | TypeAliasType] = {}
+        self._by_name: dict[str, type[FHIRBaseModel]] = {}
         # canonical url → Python type
-        self._by_url: dict[str, type | TypeAliasType] = {}
+        self._by_url: dict[str, type[FHIRBaseModel]] = {}
         self._lock = Lock()
-        self._populate_primitives()
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
-    def get_by_name(self, name: str) -> type | TypeAliasType | None:
+    def get_by_name(self, name: str) -> type[FHIRBaseModel] | None:
         """Return the Python type for a FHIR type *name*, or ``None``.
 
         Accepts both the Python PascalCase name used in the datatypes modules
@@ -87,7 +86,7 @@ class TypeRegistry:
                 self._by_url[entry.url] = python_type
         return python_type
 
-    def get_by_url(self, url: str) -> type | TypeAliasType | None:
+    def get_by_url(self, url: str) -> type[FHIRBaseModel] | None:
         """Return the Python type for a canonical FHIR URL, or ``None``.
 
         The factory singleton's ``construction_cache`` is checked first so that
@@ -159,48 +158,27 @@ class TypeRegistry:
     def __repr__(self) -> str:  # pragma: no cover
         return f"TypeRegistry(release={self.release!r}, entries={len(self._manifest.definitions)})"
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
-
-    def _populate_primitives(self) -> None:
-        """Eagerly cache all primitive TypeAliasTypes from ``primitives.py``."""
-        for attr_name in dir(primitives):
-            if attr_name.startswith("_"):
-                continue
-            obj = getattr(primitives, attr_name)
-            if not isinstance(obj, TypeAliasType):
-                continue
-            # Store under the Python PascalCase name (e.g. "Boolean")
-            self._by_name[attr_name] = obj
-            # Also map the manifest camelCase name (e.g. "boolean") → same object
-            # Manifest primitives start with a lowercase letter
-            manifest_name = capitalize(attr_name)
-            if manifest_name != attr_name:
-                self._by_name[manifest_name] = obj
-            # Wire the canonical URL(s) from the manifest
-            for candidate in (manifest_name, attr_name):
-                urls = self._manifest.by_name.get(candidate)
-                if urls:
-                    for url in urls:
-                        self._by_url[url] = obj
-                    break
-
-    def _load_type(self, entry: ManifestEntry) -> type | TypeAliasType | None:
+    def _load_type(self, entry: ManifestEntry) -> type[FHIRBaseModel] | None:
         """Load the Python class for a :class:`ManifestEntry`, returning ``None`` on failure."""
-        if entry.kind == "primitive-type":
-            # Primitives are already populated at init — look up by either casing
-            return self._by_name.get(entry.name) or self._by_name.get(
-                capitalize(entry.name)
-            )
 
         # Complex types and resources: derive module path from PascalCase name
         try:
             module = importlib.import_module(self._build_module_path(entry))
-            obj: type = getattr(module, entry.name)
-            # Trigger Pydantic model rebuild if forward refs are unresolved
+            obj: type = getattr(module, capitalize(entry.name))
+            # Trigger Pydantic model rebuild if forward refs are unresolved.
+            # We must pass an explicit namespace so that forward references like
+            # "Extension" (which only appear under TYPE_CHECKING in element.py)
+            # can be resolved regardless of which frame calls model_rebuild.
             if not getattr(obj, "__pydantic_complete__", True):
-                obj.model_rebuild()  # type: ignore[union-attr]
+                complex_pkg = importlib.import_module(
+                    f"fhircraft.fhir.resources.datatypes.{self.release}.complex"
+                )
+                prim_pkg = importlib.import_module(
+                    f"fhircraft.fhir.resources.datatypes.{self.release}.primitive"
+                )
+                obj.model_rebuild(  # type: ignore[union-attr]
+                    _types_namespace={**vars(prim_pkg), **vars(complex_pkg)}
+                )
             return obj
         except (ImportError, AttributeError):
             return None
@@ -208,7 +186,15 @@ class TypeRegistry:
     def _build_module_path(self, entry: ManifestEntry) -> str:
         """Derive the dotted module import path for a complex type or resource."""
         snake = to_snake_case(entry.name)
-        tier = "complex" if entry.kind == "complex-type" else "core"
+        match entry.kind:
+            case "primitive-type":
+                tier = "primitive"
+            case "complex-type":
+                tier = "complex"
+            case "resource":
+                tier = "core"
+            case _:
+                raise ValueError(f"Unknown entry kind: {entry.kind}")
         return f"fhircraft.fhir.resources.datatypes.{self.release}.{tier}.{snake}"
 
     @staticmethod
@@ -253,75 +239,19 @@ def get_registry(release: str = "R4B") -> TypeRegistry:
 
 @overload
 def get_fhir_type(
-    type_str: Literal[
-        "Canonical",
-        "Code",
-        "Date",
-        "DateTime",
-        "Id",
-        "Markdown",
-        "Oid",
-        "String",
-        "Uri",
-        "Url",
-        "Uuid",
-        "Decimal",
-        "Base64Binary",
-        "Instant",
-        "Time",
-        "UnsignedInt",
-        "PositiveInt",
-        "Boolean",
-        "Integer",
-    ],
-    release: str,
-    fail_if_not_found: bool = True,
-) -> TypeAliasType: ...
+    type_str: str, release: str, fail_if_not_found: Literal[True] = True
+) -> type[FHIRBaseModel]: ...
 
 
 @overload
 def get_fhir_type(
-    type_str: Literal[
-        "Canonical",
-        "Code",
-        "Date",
-        "DateTime",
-        "Id",
-        "Markdown",
-        "Oid",
-        "String",
-        "Uri",
-        "Url",
-        "Uuid",
-        "Decimal",
-        "Base64Binary",
-        "Instant",
-        "Time",
-        "UnsignedInt",
-        "PositiveInt",
-        "Boolean",
-        "Integer",
-    ],
-    release: str,
-    fail_if_not_found: bool = False,
-) -> TypeAliasType | None: ...
-
-
-@overload
-def get_fhir_type(
-    type_str: str, release: str, fail_if_not_found: bool = True
-) -> type[Any]: ...
-
-
-@overload
-def get_fhir_type(
-    type_str: str, release: str, fail_if_not_found: bool = False
-) -> type[Any] | None: ...
+    type_str: str, release: str, fail_if_not_found: Literal[False] = False
+) -> type[FHIRBaseModel] | None: ...
 
 
 def get_fhir_type(
     type_str: str, release: str, fail_if_not_found: bool = True
-) -> type[Any] | TypeAliasType | None:
+) -> type[FHIRBaseModel] | None:
     """
     Get the FHIR type (primitive, complex, or resource) by its string name.
 
@@ -331,7 +261,7 @@ def get_fhir_type(
         fail_if_not_found (bool): Whether to raise an error if the type is not found (default: True).
 
     Returns:
-        type | TypeAliasType | None: The corresponding FHIR type class, or None if not found and fail_if_not_found is False.
+        The corresponding FHIR type class, or None if not found and fail_if_not_found is False.
 
     Raises:
         AttributeError: If the type is not found and `fail_if_not_found` is True.
@@ -344,19 +274,19 @@ def get_fhir_type(
 
 @overload
 def get_fhir_type_by_url(
-    url: str, release, fail_if_not_found: bool = False
-) -> type | TypeAliasType | None: ...
+    url: str, release, fail_if_not_found: Literal[True] = True
+) -> type[FHIRBaseModel]: ...
 
 
 @overload
 def get_fhir_type_by_url(
-    url: str, release, fail_if_not_found: bool = False
-) -> type | TypeAliasType | None: ...
+    url: str, release, fail_if_not_found: Literal[False] = False
+) -> type[FHIRBaseModel] | None: ...
 
 
 def get_fhir_type_by_url(
     url: str, release, fail_if_not_found: bool = True
-) -> type | TypeAliasType | None:
+) -> type[FHIRBaseModel] | None:
     """Return the FHIR type (primitive, complex, or resource) for a canonical URL.
 
     Args:

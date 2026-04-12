@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    DateTime,
-    Date,
-    Canonical,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -37,23 +28,13 @@ class ArtifactAssessmentContent(BackboneElement):
     A component comment, classifier, or rating of the artifact.
     """
 
-    informationType: Optional[Code] = Field(
+    informationType: Optional[fhir.code] = Field(
         description="comment | classifier | rating | container | response | change-request",
         default=None,
     )
-    informationType_ext: Optional[Element] = Field(
-        description="Placeholder element for informationType extensions",
-        default=None,
-        alias="_informationType",
-    )
-    summary: Optional[Markdown] = Field(
+    summary: Optional[fhir.markdown] = Field(
         description="Brief summary of the content",
         default=None,
-    )
-    summary_ext: Optional[Element] = Field(
-        description="Placeholder element for summary extensions",
-        default=None,
-        alias="_summary",
     )
     type: Optional[CodeableConcept] = Field(
         description="What type of content",
@@ -71,27 +52,17 @@ class ArtifactAssessmentContent(BackboneElement):
         description="Who authored the content",
         default=None,
     )
-    path: Optional[ListType[Uri]] = Field(
+    path: Optional[ListType[fhir.uri]] = Field(
         description="What the comment is directed to",
         default=None,
-    )
-    path_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
     )
     relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional information",
         default=None,
     )
-    freeToShare: Optional[Boolean] = Field(
+    freeToShare: Optional[fhir.boolean] = Field(
         description="Acceptable to publicly share the resource content",
         default=None,
-    )
-    freeToShare_ext: Optional[Element] = Field(
-        description="Placeholder element for freeToShare extensions",
-        default=None,
-        alias="_freeToShare",
     )
     component: Optional[ListType["ArtifactAssessmentContent"]] = Field(
         description="Contained content",
@@ -112,107 +83,57 @@ class ArtifactAssessment(DomainResource):
         description="Additional identifier for the artifact assessment",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="A short title for the assessment for use in displaying and selecting",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     citeAsReference: Optional[Reference] = Field(
         description="How to cite the comment or rating",
         default=None,
     )
-    citeAsMarkdown: Optional[Markdown] = Field(
+    citeAsMarkdown: Optional[fhir.markdown] = Field(
         description="How to cite the comment or rating",
         default=None,
     )
-    citeAsMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for citeAsMarkdown extensions",
-        default=None,
-        alias="_citeAsMarkdown",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the artifact assessment was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the artifact assessment was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     artifactReference: Optional[Reference] = Field(
         description="The artifact assessed, commented upon or rated",
         default=None,
     )
-    artifactCanonical: Optional[Canonical] = Field(
+    artifactCanonical: Optional[fhir.canonical] = Field(
         description="The artifact assessed, commented upon or rated",
         default=None,
     )
-    artifactCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for artifactCanonical extensions",
-        default=None,
-        alias="_artifactCanonical",
-    )
-    artifactUri: Optional[Uri] = Field(
+    artifactUri: Optional[fhir.uri] = Field(
         description="The artifact assessed, commented upon or rated",
         default=None,
-    )
-    artifactUri_ext: Optional[Element] = Field(
-        description="Placeholder element for artifactUri extensions",
-        default=None,
-        alias="_artifactUri",
     )
     content: Optional[ListType[ArtifactAssessmentContent]] = Field(
         description="Comment, classifier, or rating content",
         default=None,
     )
-    workflowStatus: Optional[Code] = Field(
+    workflowStatus: Optional[fhir.code] = Field(
         description="submitted | triaged | waiting-for-input | resolved-no-change | resolved-change-required | deferred | duplicate | applied | published | entered-in-error",
         default=None,
     )
-    workflowStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for workflowStatus extensions",
-        default=None,
-        alias="_workflowStatus",
-    )
-    disposition: Optional[Code] = Field(
+    disposition: Optional[fhir.code] = Field(
         description="unresolved | not-persuasive | persuasive | persuasive-with-modification | not-persuasive-with-modification",
         default=None,
-    )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
     )
 
     @property
@@ -233,7 +154,7 @@ class ArtifactAssessment(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Markdown],
+            field_types=[Reference, fhir.Markdown],
             field_name_base="citeAs",
             required=False,
         )
@@ -242,7 +163,7 @@ class ArtifactAssessment(DomainResource):
     def artifact_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Canonical, Uri],
+            field_types=[Reference, fhir.Canonical, fhir.Uri],
             field_name_base="artifact",
             required=True,
         )

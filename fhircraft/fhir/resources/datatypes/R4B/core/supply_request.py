@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -51,14 +45,9 @@ class SupplyRequestParameter(BackboneElement):
         description="Value of detail",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of detail",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
 
     @property
@@ -72,7 +61,7 @@ class SupplyRequestParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Range, Boolean],
+            field_types=[CodeableConcept, Quantity, Range, fhir.Boolean],
             field_name_base="value",
             required=False,
         )
@@ -103,27 +92,17 @@ class SupplyRequest(DomainResource):
         description="Business Identifier for SupplyRequest",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | suspended +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[CodeableConcept] = Field(
         description="The kind of supply (central, non-stock, etc.)",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     itemCodeableConcept: Optional[CodeableConcept] = Field(
         description="Medication, Substance, or Device requested to be supplied",
@@ -141,14 +120,9 @@ class SupplyRequest(DomainResource):
         description="Ordered item details",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the request should be fulfilled",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When the request should be fulfilled",
@@ -158,14 +132,9 @@ class SupplyRequest(DomainResource):
         description="When the request should be fulfilled",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="When the request was made",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Individual making the request",
@@ -219,7 +188,7 @@ class SupplyRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

@@ -5,8 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class BiologicallyDerivedProductDispensePerformer(BackboneElement):
     """
     Indicates who or what performed an action.
@@ -36,7 +35,6 @@ class BiologicallyDerivedProductDispensePerformer(BackboneElement):
         description="Who performed the action",
         default=None,
     )
-
 
 class BiologicallyDerivedProductDispense(DomainResource):
     """
@@ -61,14 +59,9 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Short description",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | allocated | issued | unfulfilled | returned | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     originRelationshipType: Optional[CodeableConcept] = Field(
         description="Relationship between the donor and intended recipient",
@@ -98,23 +91,13 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Amount dispensed",
         default=None,
     )
-    preparedDate: Optional[DateTime] = Field(
+    preparedDate: Optional[fhir.dateTime] = Field(
         description="When product was selected/matched",
         default=None,
     )
-    preparedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for preparedDate extensions",
-        default=None,
-        alias="_preparedDate",
-    )
-    whenHandedOver: Optional[DateTime] = Field(
+    whenHandedOver: Optional[fhir.dateTime] = Field(
         description="When the product was dispatched",
         default=None,
-    )
-    whenHandedOver_ext: Optional[Element] = Field(
-        description="Placeholder element for whenHandedOver extensions",
-        default=None,
-        alias="_whenHandedOver",
     )
     destination: Optional[Reference] = Field(
         description="Where the product was dispatched to",
@@ -124,12 +107,7 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Additional notes",
         default=None,
     )
-    usageInstruction: Optional[String] = Field(
+    usageInstruction: Optional[fhir.string] = Field(
         description="Specific instructions for use",
         default=None,
-    )
-    usageInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for usageInstruction extensions",
-        default=None,
-        alias="_usageInstruction",
     )

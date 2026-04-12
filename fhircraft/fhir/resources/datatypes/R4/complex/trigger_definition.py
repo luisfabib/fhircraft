@@ -3,14 +3,13 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .data_requirement import DataRequirement
 from .element import Element
 from .expression import Expression
 from .reference import Reference
 from .timing import Timing
-
 
 class TriggerDefinition(Element):
     """
@@ -19,23 +18,13 @@ class TriggerDefinition(Element):
 
     _type = "TriggerDefinition"
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name or URI that identifies the event",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     timingTiming: Optional[Timing] = Field(
         description="Timing of the event",
@@ -45,11 +34,11 @@ class TriggerDefinition(Element):
         description="Timing of the event",
         default=None,
     )
-    timingDate: Optional[Date] = Field(
+    timingDate: Optional[fhir.date_] = Field(
         description="Timing of the event",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="Timing of the event",
         default=None,
     )
@@ -66,7 +55,7 @@ class TriggerDefinition(Element):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["Timing", "Reference", Date, DateTime],
+            field_types=["Timing", "Reference", fhir.Date, fhir.DateTime],
             field_name_base="timing",
         )
 

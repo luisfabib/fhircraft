@@ -5,27 +5,7 @@ NoneType = type(None)
 from typing import List as ListType, Optional
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import (
-    Base64Binary,
-    Boolean,
-    Canonical,
-    Code,
-    Date,
-    DateTime,
-    Decimal,
-    Id,
-    Instant,
-    Integer,
-    Markdown,
-    Oid,
-    PositiveInt,
-    String,
-    Time,
-    UnsignedInt,
-    Uri,
-    Url,
-    Uuid,
-)
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Address,
     Age,
@@ -70,185 +50,85 @@ class ParametersParameter(BackboneElement):
     A parameter passed to or received from the operation.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name from the definition",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueCanonical: Optional[Canonical] = Field(
+    valueCanonical: Optional[fhir.canonical] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCanonical extensions",
-        default=None,
-        alias="_valueCanonical",
-    )
-    valueCode: Optional[Code] = Field(
+    valueCode: Optional[fhir.code] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for valueCode extensions",
-        default=None,
-        alias="_valueCode",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
-    )
-    valueInstant: Optional[Instant] = Field(
+    valueInstant: Optional[fhir.instant] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInstant extensions",
-        default=None,
-        alias="_valueInstant",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
-    )
-    valueOid: Optional[Oid] = Field(
+    valueOid: Optional[fhir.oid] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueOid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueOid extensions",
-        default=None,
-        alias="_valueOid",
-    )
-    valuePositiveInt: Optional[PositiveInt] = Field(
+    valuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valuePositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valuePositiveInt extensions",
-        default=None,
-        alias="_valuePositiveInt",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
-    valueUnsignedInt: Optional[UnsignedInt] = Field(
+    valueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUnsignedInt extensions",
-        default=None,
-        alias="_valueUnsignedInt",
-    )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
-    )
-    valueUrl: Optional[Url] = Field(
+    valueUrl: Optional[fhir.url] = Field(
         description="If parameter is a data type",
         default=None,
     )
-    valueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUrl extensions",
-        default=None,
-        alias="_valueUrl",
-    )
-    valueUuid: Optional[Uuid] = Field(
+    valueUuid: Optional[fhir.uuid] = Field(
         description="If parameter is a data type",
         default=None,
-    )
-    valueUuid_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUuid extensions",
-        default=None,
-        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="If parameter is a data type",
@@ -395,25 +275,25 @@ class ParametersParameter(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                "Base64Binary",
-                "Boolean",
-                "Canonical",
-                "Code",
-                "Date",
-                "DateTime",
-                "Decimal",
-                "Id",
-                "Instant",
-                "Integer",
-                "Markdown",
-                "Oid",
-                "PositiveInt",
-                "String",
-                "Time",
-                "UnsignedInt",
-                "Uri",
-                "Url",
-                "Uuid",
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 "Address",
                 "Age",
                 "Annotation",

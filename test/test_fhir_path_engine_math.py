@@ -7,7 +7,15 @@ from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Quantity
-from fhircraft.fhir.resources.datatypes.R4.complex import Quantity as R4_Quantity, Age as R4_Age
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Quantity as R4_Quantity,
+    Age as R4_Age,
+)
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    String as FHIRString,
+    Integer as FHIRInteger,
+    Decimal as FHIRDecimal,
+)
 from fhircraft.fhir.path.engine.math import *
 
 env = dict()
@@ -21,8 +29,20 @@ addition_cases = (
     (2.2, 2.2, 4.4),
     ("AB", "C", "ABC"),
     (Quantity(2, "mg"), Quantity(2, "mg"), Quantity(4, "mg")),
-    (R4_Quantity(value=2, unit="g"), R4_Quantity(value=500, unit="mg"), Quantity(value=2.5, unit="g")),
-    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=6, unit="a")),
+    (
+        R4_Quantity(value=2, unit="g"),
+        R4_Quantity(value=500, unit="mg"),
+        Quantity(value=2.5, unit="g"),
+    ),
+    (
+        R4_Age(value=4, code="a", system="http://unitsofmeasure.org"),
+        R4_Age(value=2, code="a", system="http://unitsofmeasure.org"),
+        Quantity(value=6, unit="a"),
+    ),
+    # FHIR primitive class instances
+    (FHIRInteger(value=2), FHIRInteger(value=2), 4),
+    (FHIRString(value="AB"), FHIRString(value="C"), "ABC"),
+    (FHIRDecimal(value=2.2), FHIRDecimal(value=2.2), 4.4),
 )
 
 
@@ -50,8 +70,19 @@ subtraction_cases = (
     (5, 2, 3),
     (3.2, 2.2, 1),
     (Quantity(5, "mg"), Quantity(2, "mg"), Quantity(3, "mg")),
-    (R4_Quantity(value=2, unit="g"), R4_Quantity(value=500, unit="mg"), Quantity(value=1.5, unit="g")),
-    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=2, unit="a")),
+    (
+        R4_Quantity(value=2, unit="g"),
+        R4_Quantity(value=500, unit="mg"),
+        Quantity(value=1.5, unit="g"),
+    ),
+    (
+        R4_Age(value=4, code="a", system="http://unitsofmeasure.org"),
+        R4_Age(value=2, code="a", system="http://unitsofmeasure.org"),
+        Quantity(value=2, unit="a"),
+    ),
+    # FHIR primitive class instances
+    (FHIRInteger(value=5), FHIRInteger(value=2), 3),
+    (FHIRDecimal(value=3.2), FHIRDecimal(value=2.2), 1.0),
 )
 
 
@@ -80,8 +111,19 @@ multiplication_cases = (
     (2.2, 2, 4.4),
     (Quantity(2, "mg"), Quantity(2, "mg"), Quantity(4, "mg*mg")),
     (Quantity(2, "mg"), Quantity(2, "L"), Quantity(4, "mg*L")),
-    (R4_Quantity(value=2, unit="g"), R4_Quantity(value=500, unit="mg"), Quantity(value=1000, unit="g*mg")),
-    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=8, unit="a*a")),
+    (
+        R4_Quantity(value=2, unit="g"),
+        R4_Quantity(value=500, unit="mg"),
+        Quantity(value=1000, unit="g*mg"),
+    ),
+    (
+        R4_Age(value=4, code="a", system="http://unitsofmeasure.org"),
+        R4_Age(value=2, code="a", system="http://unitsofmeasure.org"),
+        Quantity(value=8, unit="a*a"),
+    ),
+    # FHIR primitive class instances
+    (FHIRInteger(value=2), FHIRInteger(value=2), 4),
+    (FHIRDecimal(value=2.2), FHIRDecimal(value=2.0), 4.4),
 )
 
 
@@ -112,8 +154,19 @@ division_cases = (
     (5.5, 0, []),
     (Quantity(4, "mg"), Quantity(2, "mg"), Quantity(2, "")),
     (Quantity(4, "mg"), Quantity(2, "L"), Quantity(2, "mg/L")),
-    (R4_Quantity(value=8, unit="g"), R4_Quantity(value=2, unit="g"), Quantity(value=4, unit="")),
-    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=2, unit="")),
+    (
+        R4_Quantity(value=8, unit="g"),
+        R4_Quantity(value=2, unit="g"),
+        Quantity(value=4, unit=""),
+    ),
+    (
+        R4_Age(value=4, code="a", system="http://unitsofmeasure.org"),
+        R4_Age(value=2, code="a", system="http://unitsofmeasure.org"),
+        Quantity(value=2, unit=""),
+    ),
+    # FHIR primitive class instances
+    (FHIRInteger(value=4), FHIRInteger(value=2), 2),
+    (FHIRDecimal(value=5.5), FHIRDecimal(value=2.0), 2.75),
 )
 
 
@@ -142,6 +195,9 @@ div_cases = (
     (5, 2, 2),
     (5.5, 0.7, 7),
     (5, 0, []),
+    (FHIRInteger(value=5), 2, 2),
+    (FHIRDecimal(value=5.5), 0.7, 7),
+    (FHIRDecimal(value=5), 0, []),
 )
 
 
@@ -169,6 +225,8 @@ def test_div_string_representation():
 mod_cases = (
     (5, 2, 1),
     (5.5, 0.7, 0.6),
+    (FHIRInteger(value=5), FHIRInteger(value=2), 1),
+    (FHIRDecimal(value=5.5), FHIRDecimal(value=0.7), 0.6),
 )
 
 
@@ -197,10 +255,14 @@ abs_cases = (
     (5.5, 5.5),
     (Quantity(5, "mg"), Quantity(5, "mg")),
     (Quantity(5.5, "mg"), Quantity(5.5, "mg")),
+    (FHIRInteger(value=5), 5),
+    (FHIRDecimal(value=5.5), 5.5),
     (-5, 5),
     (-5.5, 5.5),
     (Quantity(-5, "mg"), Quantity(5, "mg")),
     (Quantity(-5.5, "mg"), Quantity(5.5, "mg")),
+    (FHIRInteger(value=-5), 5),
+    (FHIRDecimal(value=-5.5), 5.5),
 )
 
 
@@ -226,10 +288,14 @@ ceiling_cases = (
     (5.5, 6),
     (Quantity(5, "mg"), Quantity(5, "mg")),
     (Quantity(5.5, "mg"), Quantity(6, "mg")),
+    (FHIRInteger(value=5), 5),
+    (FHIRDecimal(value=5.5), 6),
     (-5, -5),
     (-5.5, -5),
     (Quantity(-5, "mg"), Quantity(-5, "mg")),
     (Quantity(-5.5, "mg"), Quantity(-5, "mg")),
+    (FHIRInteger(value=-5), -5),
+    (FHIRDecimal(value=-5.5), -5),
 )
 
 
@@ -253,10 +319,14 @@ def test_ceiling_string_representation():
 exp_cases = (
     (5, 148.41316),
     (5.5, 244.69193),
+    (FHIRInteger(value=5), 148.41316),
+    (FHIRDecimal(value=5.5), 244.69193),
     (Quantity(5, "mg"), Quantity(148.41316, "mg")),
     (Quantity(5.5, "mg"), Quantity(244.69193, "mg")),
     (-5, 0.00673795),
     (-5.5, 0.00408677),
+    (FHIRInteger(value=-5), 0.00673795),
+    (FHIRDecimal(value=-5.5), 0.00408677),
     (Quantity(-5, "mg"), Quantity(0.00673795, "mg")),
     (Quantity(-5.5, "mg"), Quantity(0.00408677, "mg")),
 )
@@ -286,10 +356,14 @@ def test_exp_string_representation():
 floor_cases = (
     (5, 5),
     (5.5, 5),
+    (FHIRInteger(value=5), 5),
+    (FHIRDecimal(value=5.5), 5),
     (Quantity(5, "mg"), Quantity(5, "mg")),
     (Quantity(5.5, "mg"), Quantity(5, "mg")),
     (-5, -5),
     (-5.5, -6),
+    (FHIRInteger(value=-5), -5),
+    (FHIRDecimal(value=-5.5), -6),
     (Quantity(-5, "mg"), Quantity(-5, "mg")),
     (Quantity(-5.5, "mg"), Quantity(-6, "mg")),
 )
@@ -321,6 +395,8 @@ ln_cases = (
     (5.5, 1.70474809),
     (Quantity(5, "mg"), Quantity(1.60943791, "mg")),
     (Quantity(5.5, "mg"), Quantity(1.70474809, "mg")),
+    (FHIRInteger(value=5), 1.60943791),
+    (FHIRDecimal(value=5.5), 1.70474809),
 )
 
 
@@ -350,6 +426,8 @@ log_cases = (
     (5.5, 0.740362689),
     (Quantity(5, "mg"), Quantity(0.698970004, "mg")),
     (Quantity(5.5, "mg"), Quantity(0.740362689, "mg")),
+    (FHIRInteger(value=5), 0.698970004),
+    (FHIRDecimal(value=5.5), 0.740362689),
 )
 
 
@@ -369,14 +447,19 @@ def test_log_string_representation():
     expression = Invocation(Element("value"), Log(10))
     assert str(expression) == "value.log(10)"
 
+
 def test_log_uses_evaluation_context():
     value = 2.1654
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal(10).evaluate) as mock_evaluate:
+    with patch(
+        "fhircraft.fhir.path.engine.strings.Literal.evaluate",
+        wraps=Literal(10).evaluate,
+    ) as mock_evaluate:
         Invocation(Element("value"), Log(10)).evaluate(collection, env)
         mock_evaluate.assert_called()
         assert mock_evaluate.call_args[0][1]["$this"] == value
+
 
 def test_log_returns_correct_value_with_fhirpath():
     resource = namedtuple("Resource", ["value"])(value=5)
@@ -396,6 +479,8 @@ power_cases = (
     (5.5, 30.25),
     (Quantity(5, "mg"), Quantity(25, "mg")),
     (Quantity(5.5, "mg"), Quantity(30.25, "mg")),
+    (FHIRInteger(value=5), 25),
+    (FHIRDecimal(value=5.5), 30.25),
     (-5, 25),
     (-5.5, 30.25),
     (Quantity(-5, "mg"), Quantity(25, "mg")),
@@ -424,7 +509,10 @@ def test_power_uses_evaluation_context():
     value = 2.3152
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal(10).evaluate) as mock_evaluate:
+    with patch(
+        "fhircraft.fhir.path.engine.strings.Literal.evaluate",
+        wraps=Literal(10).evaluate,
+    ) as mock_evaluate:
         Invocation(Element("value"), Power(10)).evaluate(collection, env)
         mock_evaluate.assert_called()
         assert mock_evaluate.call_args[0][1]["$this"] == value
@@ -447,12 +535,18 @@ round_cases = (
     (5, 5.0),
     (5.05, 5.0),
     (5.15, 5.2),
+    (FHIRInteger(value=5), 5.0),
+    (FHIRDecimal(value=5.05), 5.0),
+    (FHIRDecimal(value=5.15), 5.2),
     (Quantity(5, "mg"), Quantity(5.0, "mg")),
     (Quantity(5.05, "mg"), Quantity(5.0, "mg")),
     (Quantity(5.15, "mg"), Quantity(5.2, "mg")),
     (-5, -5.0),
     (-5.05, -5.0),
     (-5.15, -5.2),
+    (FHIRInteger(value=-5), -5.0),
+    (FHIRDecimal(value=-5.05), -5.0),
+    (FHIRDecimal(value=-5.15), -5.2),
     (Quantity(-5, "mg"), Quantity(-5.0, "mg")),
     (Quantity(-5.05, "mg"), Quantity(-5.0, "mg")),
     (Quantity(-5.15, "mg"), Quantity(-5.2, "mg")),
@@ -475,14 +569,19 @@ def test_round_string_representation():
     expression = Invocation(Element("value"), Round(1))
     assert str(expression) == "value.round(1)"
 
+
 def test_round_uses_evaluation_context():
     value = 2.2565
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal(10).evaluate) as mock_evaluate:
+    with patch(
+        "fhircraft.fhir.path.engine.strings.Literal.evaluate",
+        wraps=Literal(10).evaluate,
+    ) as mock_evaluate:
         Invocation(Element("value"), Round(10)).evaluate(collection, env)
         mock_evaluate.assert_called()
         assert mock_evaluate.call_args[0][1]["$this"] == value
+
 
 def test_round_returns_correct_value_with_fhirpath():
     resource = namedtuple("Resource", ["value"])(value=5.559)
@@ -500,6 +599,8 @@ def test_round_returns_correct_value_with_fhirpath():
 sqrt_cases = (
     (5, 2.236067977),
     (5.5, 2.345207879),
+    (FHIRInteger(value=5), 2.236067977),
+    (FHIRDecimal(value=5.5), 2.345207879),
     (Quantity(5, "mg"), Quantity(2.236067977, "mg")),
     (Quantity(5.5, "mg"), Quantity(2.345207879, "mg")),
 )
@@ -529,10 +630,14 @@ def test_sqrt_string_representation():
 truncate_cases = (
     (5, 5),
     (5.05, 5),
+    (FHIRInteger(value=5), 5),
+    (FHIRDecimal(value=5.05), 5),
     (Quantity(5, "mg"), Quantity(5, "mg")),
     (Quantity(5.05, "mg"), Quantity(5, "mg")),
     (-5, -5),
     (-5.05, -5),
+    (FHIRInteger(value=-5), -5),
+    (FHIRDecimal(value=-5.05), -5),
     (Quantity(-5, "mg"), Quantity(-5, "mg")),
     (Quantity(-5.05, "mg"), Quantity(-5, "mg")),
 )

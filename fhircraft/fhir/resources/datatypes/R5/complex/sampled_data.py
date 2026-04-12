@@ -3,9 +3,8 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import DataType, Element, Quantity
-
 
 class SampledData(DataType):
     """
@@ -18,86 +17,41 @@ class SampledData(DataType):
         description="Zero value and units",
         default=None,
     )
-    interval: Optional[Decimal] = Field(
+    interval: Optional[fhir.decimal] = Field(
         description="Number of intervalUnits between samples",
         default=None,
     )
-    interval_ext: Optional[Element] = Field(
-        description="Placeholder element for interval extensions",
-        default=None,
-        alias="_interval",
-    )
-    intervalUnit: Optional[Code] = Field(
+    intervalUnit: Optional[fhir.code] = Field(
         description="The measurement unit of the interval between samples",
         default=None,
     )
-    intervalUnit_ext: Optional[Element] = Field(
-        description="Placeholder element for intervalUnit extensions",
-        default=None,
-        alias="_intervalUnit",
-    )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Multiply data by this before adding to origin",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
-    lowerLimit: Optional[Decimal] = Field(
+    lowerLimit: Optional[fhir.decimal] = Field(
         description="Lower limit of detection",
         default=None,
     )
-    lowerLimit_ext: Optional[Element] = Field(
-        description="Placeholder element for lowerLimit extensions",
-        default=None,
-        alias="_lowerLimit",
-    )
-    upperLimit: Optional[Decimal] = Field(
+    upperLimit: Optional[fhir.decimal] = Field(
         description="Upper limit of detection",
         default=None,
     )
-    upperLimit_ext: Optional[Element] = Field(
-        description="Placeholder element for upperLimit extensions",
-        default=None,
-        alias="_upperLimit",
-    )
-    dimensions: Optional[PositiveInt] = Field(
+    dimensions: Optional[fhir.positiveInt] = Field(
         description="Number of sample points at each time point",
         default=None,
     )
-    dimensions_ext: Optional[Element] = Field(
-        description="Placeholder element for dimensions extensions",
-        default=None,
-        alias="_dimensions",
-    )
-    codeMap: Optional[Canonical] = Field(
+    codeMap: Optional[fhir.canonical] = Field(
         description="Defines the codes used in the data",
         default=None,
     )
-    codeMap_ext: Optional[Element] = Field(
-        description="Placeholder element for codeMap extensions",
-        default=None,
-        alias="_codeMap",
-    )
-    offsets: Optional[String] = Field(
+    offsets: Optional[fhir.string] = Field(
         description="Offsets, typically in time, at which data values were taken",
         default=None,
     )
-    offsets_ext: Optional[Element] = Field(
-        description="Placeholder element for offsets extensions",
+    data: Optional[fhir.string] = Field(
+        description='decimal values with spaces, or "E" | "U" | "L", or another code',
         default=None,
-        alias="_offsets",
-    )
-    data: Optional[String] = Field(
-        description='Decimal values with spaces, or "E" | "U" | "L", or another code',
-        default=None,
-    )
-    data_ext: Optional[Element] = Field(
-        description="Placeholder element for data extensions",
-        default=None,
-        alias="_data",
     )
 
     @model_validator(mode="after")

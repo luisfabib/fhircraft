@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    Url,
-    Boolean,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -42,14 +34,9 @@ class ConsentPolicyBasis(BackboneElement):
         description="Reference backing policy resource",
         default=None,
     )
-    url: Optional[Url] = Field(
+    url: Optional[fhir.url] = Field(
         description="URL to a computable backing policy",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
 
 
@@ -58,14 +45,9 @@ class ConsentVerification(BackboneElement):
     Whether a treatment instruction (e.g. artificial respiration: yes or no) was verified with the patient, his/her family or another authorized person.
     """
 
-    verified: Optional[Boolean] = Field(
+    verified: Optional[fhir.boolean] = Field(
         description="Has been verified",
         default=None,
-    )
-    verified_ext: Optional[Element] = Field(
-        description="Placeholder element for verified extensions",
-        default=None,
-        alias="_verified",
     )
     verificationType: Optional[CodeableConcept] = Field(
         description="Business case of verification",
@@ -79,14 +61,9 @@ class ConsentVerification(BackboneElement):
         description="Person who verified",
         default=None,
     )
-    verificationDate: Optional[ListType[DateTime]] = Field(
+    verificationDate: Optional[ListType[fhir.dateTime]] = Field(
         description="When consent verified",
         default=None,
-    )
-    verificationDate_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for verificationDate extensions",
-        default=None,
-        alias="_verificationDate",
     )
 
 
@@ -110,14 +87,9 @@ class ConsentProvisionData(BackboneElement):
     The resources controlled by this provision if specific resources are referenced.
     """
 
-    meaning: Optional[Code] = Field(
+    meaning: Optional[fhir.code] = Field(
         description="instance | related | dependents | authoredby",
         default=None,
-    )
-    meaning_ext: Optional[Element] = Field(
-        description="Placeholder element for meaning extensions",
-        default=None,
-        alias="_meaning",
     )
     reference: Optional[Reference] = Field(
         description="The actual data reference",
@@ -189,14 +161,9 @@ class Consent(DomainResource):
         description="Identifier for this record (external references)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | inactive | not-done | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of the consent statement - for indexing/retrieval",
@@ -206,14 +173,9 @@ class Consent(DomainResource):
         description="Who the consent applies to",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Fully executed date of the consent",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     period: Optional[Period] = Field(
         description="Effective period for this Consent",
@@ -259,14 +221,9 @@ class Consent(DomainResource):
         description="Consent Verified by patient or family",
         default=None,
     )
-    decision: Optional[Code] = Field(
+    decision: Optional[fhir.code] = Field(
         description="deny | permit",
         default=None,
-    )
-    decision_ext: Optional[Element] = Field(
-        description="Placeholder element for decision extensions",
-        default=None,
-        alias="_decision",
     )
     provision: Optional[ListType[ConsentProvision]] = Field(
         description="Constraints to the base Consent.policyRule/Consent.policy",

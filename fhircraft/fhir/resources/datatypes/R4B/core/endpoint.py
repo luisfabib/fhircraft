@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Url
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class Endpoint(DomainResource):
     """
@@ -47,27 +46,17 @@ class Endpoint(DomainResource):
         description="Identifies this endpoint across multiple systems",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | suspended | error | off | entered-in-error | test",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     connectionType: Optional[Coding] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A name that this endpoint can be identified by",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     managingOrganization: Optional[Reference] = Field(
         description="Organization that manages this endpoint (might not be the organization that exposes the endpoint)",
@@ -85,30 +74,15 @@ class Endpoint(DomainResource):
         description="The type of content that may be used at this endpoint (e.g. XDS Discharge summaries)",
         default=None,
     )
-    payloadMimeType: Optional[ListType[Code]] = Field(
+    payloadMimeType: Optional[ListType[fhir.code]] = Field(
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    payloadMimeType_ext: Optional[Element] = Field(
-        description="Placeholder element for payloadMimeType extensions",
-        default=None,
-        alias="_payloadMimeType",
-    )
-    address: Optional[Url] = Field(
+    address: Optional[fhir.url] = Field(
         description="The technical base address for connecting to this endpoint",
         default=None,
     )
-    address_ext: Optional[Element] = Field(
-        description="Placeholder element for address extensions",
-        default=None,
-        alias="_address",
-    )
-    header: Optional[ListType[String]] = Field(
+    header: Optional[ListType[fhir.string]] = Field(
         description="Usage depends on the channel type",
         default=None,
-    )
-    header_ext: Optional[Element] = Field(
-        description="Placeholder element for header extensions",
-        default=None,
-        alias="_header",
     )

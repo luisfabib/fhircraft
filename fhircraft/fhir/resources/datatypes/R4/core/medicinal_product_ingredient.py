@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -42,14 +42,9 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         description="A lower limit for the strength per unitary volume (or mass), for when there is a range. The concentration attribute then becomes the upper limit",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="For when strength is measured at a particular point or distance",
         default=None,
-    )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
     )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
@@ -109,14 +104,9 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         description="Strength expressed in terms of a reference substance",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="For when strength is measured at a particular point or distance",
         default=None,
-    )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
     )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
@@ -145,14 +135,9 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
         description="A lower limit for the strength per unitary volume (or mass), for when there is a range. The concentration attribute then becomes the upper limit",
         default=None,
     )
-    measurementPoint: Optional[String] = Field(
+    measurementPoint: Optional[fhir.string] = Field(
         description="For when strength is measured at a particular point or distance",
         default=None,
-    )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
     )
     country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
@@ -212,14 +197,9 @@ class MedicinalProductIngredient(DomainResource):
         description="Ingredient role e.g. Active ingredient, excipient",
         default=None,
     )
-    allergenicIndicator: Optional[Boolean] = Field(
+    allergenicIndicator: Optional[fhir.boolean] = Field(
         description="If the ingredient is a known or suspected allergen",
         default=None,
-    )
-    allergenicIndicator_ext: Optional[Element] = Field(
-        description="Placeholder element for allergenicIndicator extensions",
-        default=None,
-        alias="_allergenicIndicator",
     )
     manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this Ingredient",

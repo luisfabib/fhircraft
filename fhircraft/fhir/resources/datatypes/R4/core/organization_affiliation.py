@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -46,14 +46,9 @@ class OrganizationAffiliation(DomainResource):
         description="Business identifiers that are specific to this role",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this organization affiliation record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     period: Optional[Period] = Field(
         description="The period during which the participatingOrganization is affiliated with the primary organization",

@@ -3,9 +3,8 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import Element, DataType, Coding
-
 
 class Meta(DataType):
     """
@@ -14,41 +13,21 @@ class Meta(DataType):
 
     _type = "Meta"
 
-    versionId: Optional[Id] = Field(
+    versionId: Optional[fhir.id_] = Field(
         description="Version specific identifier",
         default=None,
     )
-    versionId_ext: Optional[Element] = Field(
-        description="Placeholder element for versionId extensions",
-        default=None,
-        alias="_versionId",
-    )
-    lastUpdated: Optional[Instant] = Field(
+    lastUpdated: Optional[fhir.instant] = Field(
         description="When the resource version last changed",
         default=None,
     )
-    lastUpdated_ext: Optional[Element] = Field(
-        description="Placeholder element for lastUpdated extensions",
-        default=None,
-        alias="_lastUpdated",
-    )
-    source: Optional[Uri] = Field(
+    source: Optional[fhir.uri] = Field(
         description="Identifies where the resource comes from",
         default=None,
     )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
-    )
-    profile: Optional[List[Canonical]] = Field(
+    profile: Optional[List[fhir.canonical]] = Field(
         description="Profiles this resource claims to conform to",
         default=None,
-    )
-    profile_ext: Optional[List[Optional[Element]]] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
     security: Optional[List[Coding]] = Field(
         description="Security Labels applied to this resource",

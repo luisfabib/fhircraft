@@ -4,16 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    DateTime,
-    Boolean,
-    UnsignedInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -39,45 +31,25 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
         description="Benefit classification",
         default=None,
     )
-    allowedUnsignedInt: Optional[UnsignedInt] = Field(
+    allowedUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Benefits allowed",
         default=None,
     )
-    allowedUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedUnsignedInt extensions",
-        default=None,
-        alias="_allowedUnsignedInt",
-    )
-    allowedString: Optional[String] = Field(
+    allowedString: Optional[fhir.string] = Field(
         description="Benefits allowed",
         default=None,
-    )
-    allowedString_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedString extensions",
-        default=None,
-        alias="_allowedString",
     )
     allowedMoney: Optional[Money] = Field(
         description="Benefits allowed",
         default=None,
     )
-    usedUnsignedInt: Optional[UnsignedInt] = Field(
+    usedUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Benefits used",
         default=None,
     )
-    usedUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for usedUnsignedInt extensions",
-        default=None,
-        alias="_usedUnsignedInt",
-    )
-    usedString: Optional[String] = Field(
+    usedString: Optional[fhir.string] = Field(
         description="Benefits used",
         default=None,
-    )
-    usedString_ext: Optional[Element] = Field(
-        description="Placeholder element for usedString extensions",
-        default=None,
-        alias="_usedString",
     )
     usedMoney: Optional[Money] = Field(
         description="Benefits used",
@@ -102,7 +74,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
     def allowed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[UnsignedInt, String, Money],
+            field_types=[fhir.UnsignedInt, fhir.String, Money],
             field_name_base="allowed",
             required=False,
         )
@@ -111,7 +83,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
     def used_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[UnsignedInt, String, Money],
+            field_types=[fhir.UnsignedInt, fhir.String, Money],
             field_name_base="used",
             required=False,
         )
@@ -138,32 +110,17 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Performing practitioner",
         default=None,
     )
-    excluded: Optional[Boolean] = Field(
+    excluded: Optional[fhir.boolean] = Field(
         description="Excluded from the plan",
         default=None,
     )
-    excluded_ext: Optional[Element] = Field(
-        description="Placeholder element for excluded extensions",
-        default=None,
-        alias="_excluded",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Short name for the benefit",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of the benefit or services covered",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     network: Optional[CodeableConcept] = Field(
         description="In or out of network",
@@ -183,27 +140,17 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
             default=None,
         )
     )
-    authorizationRequired: Optional[Boolean] = Field(
+    authorizationRequired: Optional[fhir.boolean] = Field(
         description="Authorization required flag",
         default=None,
-    )
-    authorizationRequired_ext: Optional[Element] = Field(
-        description="Placeholder element for authorizationRequired extensions",
-        default=None,
-        alias="_authorizationRequired",
     )
     authorizationSupporting: Optional[ListType[CodeableConcept]] = Field(
         description="Type of required supporting materials",
         default=None,
     )
-    authorizationUrl: Optional[Uri] = Field(
+    authorizationUrl: Optional[fhir.uri] = Field(
         description="Preauthorization requirements endpoint",
         default=None,
-    )
-    authorizationUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for authorizationUrl extensions",
-        default=None,
-        alias="_authorizationUrl",
     )
 
 
@@ -216,14 +163,9 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
         description="Insurance information",
         default=None,
     )
-    inforce: Optional[Boolean] = Field(
+    inforce: Optional[fhir.boolean] = Field(
         description="Coverage inforce indicator",
         default=None,
-    )
-    inforce_ext: Optional[Element] = Field(
-        description="Placeholder element for inforce extensions",
-        default=None,
-        alias="_inforce",
     )
     benefitPeriod: Optional[Period] = Field(
         description="When the benefits are applicable",
@@ -273,49 +215,29 @@ class CoverageEligibilityResponse(DomainResource):
         description="Business Identifier for coverage eligiblity request",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    purpose: Optional[ListType[Code]] = Field(
+    purpose: Optional[ListType[fhir.code]] = Field(
         description="auth-requirements | benefits | discovery | validation",
         default=None,
-    )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
     )
     patient: Optional[Reference] = Field(
         description="Intended recipient of products and services",
         default=None,
     )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Estimated date or dates of service",
         default=None,
-    )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Estimated date or dates of service",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Response creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     requestor: Optional[Reference] = Field(
         description="Party responsible for the request",
@@ -325,23 +247,13 @@ class CoverageEligibilityResponse(DomainResource):
         description="Eligibility request reference",
         default=None,
     )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="queued | complete | error | partial",
         default=None,
     )
-    outcome_ext: Optional[Element] = Field(
-        description="Placeholder element for outcome extensions",
-        default=None,
-        alias="_outcome",
-    )
-    disposition: Optional[String] = Field(
+    disposition: Optional[fhir.string] = Field(
         description="Disposition Message",
         default=None,
-    )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
     )
     insurer: Optional[Reference] = Field(
         description="Coverage issuer",
@@ -351,14 +263,9 @@ class CoverageEligibilityResponse(DomainResource):
         description="Patient insurance information",
         default=None,
     )
-    preAuthRef: Optional[String] = Field(
+    preAuthRef: Optional[fhir.string] = Field(
         description="Preauthorization reference",
         default=None,
-    )
-    preAuthRef_ext: Optional[Element] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
     )
     form: Optional[CodeableConcept] = Field(
         description="Printed form identifier",
@@ -380,7 +287,7 @@ class CoverageEligibilityResponse(DomainResource):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )

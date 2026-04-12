@@ -4,20 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    UnsignedInt,
-    Boolean,
-    Decimal,
-    Integer,
-    Date,
-    Time,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -57,32 +45,17 @@ class ContractContentDefinition(BackboneElement):
         description="Publisher Entity",
         default=None,
     )
-    publicationDate: Optional[DateTime] = Field(
+    publicationDate: Optional[fhir.dateTime] = Field(
         description="When published",
         default=None,
     )
-    publicationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for publicationDate extensions",
-        default=None,
-        alias="_publicationDate",
-    )
-    publicationStatus: Optional[Code] = Field(
+    publicationStatus: Optional[fhir.code] = Field(
         description="amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated",
         default=None,
     )
-    publicationStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for publicationStatus extensions",
-        default=None,
-        alias="_publicationStatus",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Publication Ownership",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
 
 
@@ -91,14 +64,9 @@ class ContractTermSecurityLabel(BackboneElement):
     Security labels that protect the handling of information about the term and its elements, which may be specifically identified..
     """
 
-    number: Optional[ListType[UnsignedInt]] = Field(
+    number: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Link to Security Labels",
         default=None,
-    )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
     )
     classification: Optional[Coding] = Field(
         description="Confidentiality Protection",
@@ -134,77 +102,37 @@ class ContractTermOfferAnswer(BackboneElement):
     Response to offer text.
     """
 
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="The actual answer response",
         default=None,
-    )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="The actual answer response",
@@ -235,14 +163,14 @@ class ContractTermOfferAnswer(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
-                Uri,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
+                fhir.Uri,
                 Attachment,
                 Coding,
                 Quantity,
@@ -286,32 +214,17 @@ class ContractTermOffer(BackboneElement):
         description="Response to offer text",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Human readable offer text",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to text",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Offer restriction numbers",
         default=None,
-    )
-    securityLabelNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for securityLabelNumber extensions",
-        default=None,
-        alias="_securityLabelNumber",
     )
 
 
@@ -328,14 +241,9 @@ class ContractTermAssetContext(BackboneElement):
         description="Codeable asset context",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Context description",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
 
 
@@ -344,77 +252,37 @@ class ContractTermAssetAnswer(BackboneElement):
     Response to assets.
     """
 
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="The actual answer response",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="The actual answer response",
         default=None,
-    )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="The actual answer response",
@@ -445,14 +313,14 @@ class ContractTermAssetAnswer(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
-                Uri,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
+                fhir.Uri,
                 Attachment,
                 Coding,
                 Quantity,
@@ -480,14 +348,9 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Contract Valued Item Number",
         default=None,
     )
-    effectiveTime: Optional[DateTime] = Field(
+    effectiveTime: Optional[fhir.dateTime] = Field(
         description="Contract Valued Item Effective Tiem",
         default=None,
-    )
-    effectiveTime_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveTime extensions",
-        default=None,
-        alias="_effectiveTime",
     )
     quantity: Optional[Quantity] = Field(
         description="Count of Contract Valued Items",
@@ -497,45 +360,25 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Contract Valued Item fee, charge, or cost",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Contract Valued Item Price Scaling Factor",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
-    points: Optional[Decimal] = Field(
+    points: Optional[fhir.decimal] = Field(
         description="Contract Valued Item Difficulty Scaling Factor",
         default=None,
-    )
-    points_ext: Optional[Element] = Field(
-        description="Placeholder element for points extensions",
-        default=None,
-        alias="_points",
     )
     net: Optional[Money] = Field(
         description="Total Contract Valued Item Value",
         default=None,
     )
-    payment: Optional[String] = Field(
+    payment: Optional[fhir.string] = Field(
         description="Terms of valuation",
         default=None,
     )
-    payment_ext: Optional[Element] = Field(
-        description="Placeholder element for payment extensions",
-        default=None,
-        alias="_payment",
-    )
-    paymentDate: Optional[DateTime] = Field(
+    paymentDate: Optional[fhir.dateTime] = Field(
         description="When payment is due",
         default=None,
-    )
-    paymentDate_ext: Optional[Element] = Field(
-        description="Placeholder element for paymentDate extensions",
-        default=None,
-        alias="_paymentDate",
     )
     responsible: Optional[Reference] = Field(
         description="Who will make payment",
@@ -545,23 +388,13 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Who will receive payment",
         default=None,
     )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Security Labels that define affected terms",
         default=None,
-    )
-    securityLabelNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for securityLabelNumber extensions",
-        default=None,
-        alias="_securityLabelNumber",
     )
 
     @property
@@ -610,57 +443,37 @@ class ContractTermAsset(BackboneElement):
         description="Circumstance of the asset",
         default=None,
     )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="Quality desctiption of asset",
         default=None,
-    )
-    condition_ext: Optional[Element] = Field(
-        description="Placeholder element for condition extensions",
-        default=None,
-        alias="_condition",
     )
     periodType: Optional[ListType[CodeableConcept]] = Field(
         description="Asset availability types",
         default=None,
     )
     period: Optional[ListType[Period]] = Field(
-        description="Time period of the asset",
+        description="time period of the asset",
         default=None,
     )
     usePeriod: Optional[ListType[Period]] = Field(
-        description="Time period",
+        description="time period",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Asset clause or question text",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to asset text",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     answer: Optional[ListType[ContractTermAssetAnswer]] = Field(
         description="Response to assets",
         default=None,
     )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Asset restriction numbers",
         default=None,
-    )
-    securityLabelNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for securityLabelNumber extensions",
-        default=None,
-        alias="_securityLabelNumber",
     )
     valuedItem: Optional[ListType[ContractTermAssetValuedItem]] = Field(
         description="Contract Valued Item List",
@@ -688,14 +501,9 @@ class ContractTermAction(BackboneElement):
     An actor taking a role in an activity for which it can be assigned some degree of responsibility for the activity taking place.
     """
 
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if the term prohibits the  action",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type or form of the action",
@@ -709,14 +517,9 @@ class ContractTermAction(BackboneElement):
         description="Purpose for the Contract Term Action",
         default=None,
     )
-    linkId: Optional[ListType[String]] = Field(
+    linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
-    )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
     )
     status: Optional[CodeableConcept] = Field(
         description="State of the action",
@@ -726,23 +529,13 @@ class ContractTermAction(BackboneElement):
         description="Episode associated with action",
         default=None,
     )
-    contextLinkId: Optional[ListType[String]] = Field(
+    contextLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    contextLinkId_ext: Optional[Element] = Field(
-        description="Placeholder element for contextLinkId extensions",
-        default=None,
-        alias="_contextLinkId",
-    )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When action happens",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When action happens",
@@ -756,14 +549,9 @@ class ContractTermAction(BackboneElement):
         description="Who asked for action",
         default=None,
     )
-    requesterLinkId: Optional[ListType[String]] = Field(
+    requesterLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
-    )
-    requesterLinkId_ext: Optional[Element] = Field(
-        description="Placeholder element for requesterLinkId extensions",
-        default=None,
-        alias="_requesterLinkId",
     )
     performerType: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of service performer",
@@ -777,14 +565,9 @@ class ContractTermAction(BackboneElement):
         description="Actor that wil execute (or not) the action",
         default=None,
     )
-    performerLinkId: Optional[ListType[String]] = Field(
+    performerLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
-    )
-    performerLinkId_ext: Optional[Element] = Field(
-        description="Placeholder element for performerLinkId extensions",
-        default=None,
-        alias="_performerLinkId",
     )
     reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why is action (not) needed?",
@@ -794,36 +577,21 @@ class ContractTermAction(BackboneElement):
         description="Why is action (not) needed?",
         default=None,
     )
-    reason: Optional[ListType[String]] = Field(
+    reason: Optional[ListType[fhir.string]] = Field(
         description="Why action is to be performed",
         default=None,
     )
-    reason_ext: Optional[Element] = Field(
-        description="Placeholder element for reason extensions",
-        default=None,
-        alias="_reason",
-    )
-    reasonLinkId: Optional[ListType[String]] = Field(
+    reasonLinkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
-    )
-    reasonLinkId_ext: Optional[Element] = Field(
-        description="Placeholder element for reasonLinkId extensions",
-        default=None,
-        alias="_reasonLinkId",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments about the action",
         default=None,
     )
-    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[fhir.unsignedInt]] = Field(
         description="Action restriction numbers",
         default=None,
-    )
-    securityLabelNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for securityLabelNumber extensions",
-        default=None,
-        alias="_securityLabelNumber",
     )
 
     @property
@@ -837,7 +605,7 @@ class ContractTermAction(BackboneElement):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )
@@ -852,17 +620,12 @@ class ContractTerm(BackboneElement):
         description="Contract Term Number",
         default=None,
     )
-    issued: Optional[DateTime] = Field(
-        description="Contract Term Issue Date Time",
+    issued: Optional[fhir.dateTime] = Field(
+        description="Contract Term Issue date time",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     applies: Optional[Period] = Field(
-        description="Contract Term Effective Time",
+        description="Contract Term Effective time",
         default=None,
     )
     topicCodeableConcept: Optional[CodeableConcept] = Field(
@@ -881,14 +644,9 @@ class ContractTerm(BackboneElement):
         description="Contract Term Type specific classification",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Term Statement",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     securityLabel: Optional[ListType[ContractTermSecurityLabel]] = Field(
         description="Protection for the Term",
@@ -1065,32 +823,17 @@ class Contract(DomainResource):
         description="Contract number",
         default=None,
     )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Basal definition",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business edition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     legalState: Optional[CodeableConcept] = Field(
         description="Negotiation status",
@@ -1100,27 +843,17 @@ class Contract(DomainResource):
         description="Source Contract Definition",
         default=None,
     )
-    instantiatesUri: Optional[Uri] = Field(
+    instantiatesUri: Optional[fhir.uri] = Field(
         description="External Contract Definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     contentDerivative: Optional[CodeableConcept] = Field(
         description="Content derived from the basal information",
         default=None,
     )
-    issued: Optional[DateTime] = Field(
+    issued: Optional[fhir.dateTime] = Field(
         description="When this Contract was issued",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     applies: Optional[Period] = Field(
         description="Effective time",
@@ -1146,41 +879,21 @@ class Contract(DomainResource):
         description="Specific Location",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Computer friendly designation",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human Friendly name",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate Friendly name",
         default=None,
     )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
-    )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="Acronym or short name",
         default=None,
-    )
-    alias_ext: Optional[Element] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
     )
     author: Optional[Reference] = Field(
         description="Source of Contract",

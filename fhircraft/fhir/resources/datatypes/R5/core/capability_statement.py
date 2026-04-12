@@ -5,18 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Canonical,
-    Url,
-    UnsignedInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -39,32 +29,17 @@ class CapabilityStatementSoftware(BackboneElement):
     Software that is covered by this capability statement.  It is used when the capability statement describes the capabilities of a particular software version, independent of an installation.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A name the software is known by",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version covered by this statement",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    releaseDate: Optional[DateTime] = Field(
+    releaseDate: Optional[fhir.dateTime] = Field(
         description="Date this version was released",
         default=None,
-    )
-    releaseDate_ext: Optional[Element] = Field(
-        description="Placeholder element for releaseDate extensions",
-        default=None,
-        alias="_releaseDate",
     )
 
 
@@ -73,23 +48,13 @@ class CapabilityStatementImplementation(BackboneElement):
     Identifies a specific implementation instance that is described by the capability statement - i.e. a particular installation, rather than the capabilities of a software program.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Describes this specific instance",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    url: Optional[Url] = Field(
+    url: Optional[fhir.url] = Field(
         description="Base URL for the installation",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     custodian: Optional[Reference] = Field(
         description="Organization that manages the data",
@@ -102,27 +67,17 @@ class CapabilityStatementRestSecurity(BackboneElement):
     Information about security implementation from an interface perspective - what a client needs to know.
     """
 
-    cors: Optional[Boolean] = Field(
+    cors: Optional[fhir.boolean] = Field(
         description="Adds CORS Headers (http://enable-cors.org/)",
         default=None,
-    )
-    cors_ext: Optional[Element] = Field(
-        description="Placeholder element for cors extensions",
-        default=None,
-        alias="_cors",
     )
     service: Optional[ListType[CodeableConcept]] = Field(
         description="OAuth | SMART-on-FHIR | NTLM | Basic | Kerberos | Certificates",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="General description of how security works",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
 
 
@@ -131,23 +86,13 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
     Identifies a restful operation supported by the solution.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="read | vread | update | patch | delete | history-instance | history-type | create | search-type",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Anything special about operation behavior",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -156,41 +101,21 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
     Search parameters for implementations to support and/or make use of - either references to ones defined in the specification, or additional ones defined for/by the implementation.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for parameter in search url",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Source of definition for parameter",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Server-specific usage",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -199,32 +124,17 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
     Definition of an operation or a named query together with its parameters and their meaning and type. Consult the definition of the operation for details about how to invoke the operation, and the parameters.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name by which the operation/query is invoked",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="The defined operation/query",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Specific details about operation behavior",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -233,144 +143,69 @@ class CapabilityStatementRestResource(BackboneElement):
     A specification of the restful capabilities of the solution for a specific resource type.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="A resource type that is supported",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="System-wide profile",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
-    )
-    supportedProfile: Optional[ListType[Canonical]] = Field(
+    supportedProfile: Optional[ListType[fhir.canonical]] = Field(
         description="Use-case specific profiles",
         default=None,
     )
-    supportedProfile_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for supportedProfile extensions",
-        default=None,
-        alias="_supportedProfile",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Additional information about the use of the resource type",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
     interaction: Optional[ListType[CapabilityStatementRestResourceInteraction]] = Field(
         description="What operations are supported?",
         default=None,
     )
-    versioning: Optional[Code] = Field(
+    versioning: Optional[fhir.code] = Field(
         description="no-version | versioned | versioned-update",
         default=None,
     )
-    versioning_ext: Optional[Element] = Field(
-        description="Placeholder element for versioning extensions",
-        default=None,
-        alias="_versioning",
-    )
-    readHistory: Optional[Boolean] = Field(
+    readHistory: Optional[fhir.boolean] = Field(
         description="Whether vRead can return past versions",
         default=None,
     )
-    readHistory_ext: Optional[Element] = Field(
-        description="Placeholder element for readHistory extensions",
-        default=None,
-        alias="_readHistory",
-    )
-    updateCreate: Optional[Boolean] = Field(
+    updateCreate: Optional[fhir.boolean] = Field(
         description="If update can commit to a new identity",
         default=None,
     )
-    updateCreate_ext: Optional[Element] = Field(
-        description="Placeholder element for updateCreate extensions",
-        default=None,
-        alias="_updateCreate",
-    )
-    conditionalCreate: Optional[Boolean] = Field(
+    conditionalCreate: Optional[fhir.boolean] = Field(
         description="If allows/uses conditional create",
         default=None,
     )
-    conditionalCreate_ext: Optional[Element] = Field(
-        description="Placeholder element for conditionalCreate extensions",
-        default=None,
-        alias="_conditionalCreate",
-    )
-    conditionalRead: Optional[Code] = Field(
+    conditionalRead: Optional[fhir.code] = Field(
         description="not-supported | modified-since | not-match | full-support",
         default=None,
     )
-    conditionalRead_ext: Optional[Element] = Field(
-        description="Placeholder element for conditionalRead extensions",
-        default=None,
-        alias="_conditionalRead",
-    )
-    conditionalUpdate: Optional[Boolean] = Field(
+    conditionalUpdate: Optional[fhir.boolean] = Field(
         description="If allows/uses conditional update",
         default=None,
     )
-    conditionalUpdate_ext: Optional[Element] = Field(
-        description="Placeholder element for conditionalUpdate extensions",
-        default=None,
-        alias="_conditionalUpdate",
-    )
-    conditionalPatch: Optional[Boolean] = Field(
+    conditionalPatch: Optional[fhir.boolean] = Field(
         description="If allows/uses conditional patch",
         default=None,
     )
-    conditionalPatch_ext: Optional[Element] = Field(
-        description="Placeholder element for conditionalPatch extensions",
-        default=None,
-        alias="_conditionalPatch",
-    )
-    conditionalDelete: Optional[Code] = Field(
+    conditionalDelete: Optional[fhir.code] = Field(
         description="not-supported | single | multiple - how conditional delete is supported",
         default=None,
     )
-    conditionalDelete_ext: Optional[Element] = Field(
-        description="Placeholder element for conditionalDelete extensions",
-        default=None,
-        alias="_conditionalDelete",
-    )
-    referencePolicy: Optional[ListType[Code]] = Field(
+    referencePolicy: Optional[ListType[fhir.code]] = Field(
         description="literal | logical | resolves | enforced | local",
         default=None,
     )
-    referencePolicy_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for referencePolicy extensions",
-        default=None,
-        alias="_referencePolicy",
-    )
-    searchInclude: Optional[ListType[String]] = Field(
+    searchInclude: Optional[ListType[fhir.string]] = Field(
         description="_include values supported by the server",
         default=None,
     )
-    searchInclude_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for searchInclude extensions",
-        default=None,
-        alias="_searchInclude",
-    )
-    searchRevInclude: Optional[ListType[String]] = Field(
+    searchRevInclude: Optional[ListType[fhir.string]] = Field(
         description="_revinclude values supported by the server",
         default=None,
-    )
-    searchRevInclude_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for searchRevInclude extensions",
-        default=None,
-        alias="_searchRevInclude",
     )
     searchParam: Optional[ListType[CapabilityStatementRestResourceSearchParam]] = Field(
         description="Search parameters supported by implementation",
@@ -387,23 +222,13 @@ class CapabilityStatementRestInteraction(BackboneElement):
     A specification of restful operations supported by the system.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="transaction | batch | search-system | history-system",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Anything special about operation behavior",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -412,41 +237,21 @@ class CapabilityStatementRestSearchParam(BackboneElement):
     Search parameters that are supported for searching all resources for implementations to support and/or make use of - either references to ones defined in the specification, or additional ones defined for/by the implementation. This is only for searches executed against the system-level endpoint.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for parameter in search url",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Source of definition for parameter",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Server-specific usage",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -455,32 +260,17 @@ class CapabilityStatementRestOperation(BackboneElement):
     Definition of an operation or a named query together with its parameters and their meaning and type.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name by which the operation/query is invoked",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="The defined operation/query",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Specific details about operation behavior",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -489,23 +279,13 @@ class CapabilityStatementRest(BackboneElement):
     A definition of the restful capabilities of the solution, if any.
     """
 
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="client | server",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="General description of implementation",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
     security: Optional[CapabilityStatementRestSecurity] = Field(
         description="Information about security of implementation",
@@ -527,14 +307,9 @@ class CapabilityStatementRest(BackboneElement):
         description="Definition of a system level operation",
         default=None,
     )
-    compartment: Optional[ListType[Canonical]] = Field(
+    compartment: Optional[ListType[fhir.canonical]] = Field(
         description="Compartments served/used by system",
         default=None,
-    )
-    compartment_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for compartment extensions",
-        default=None,
-        alias="_compartment",
     )
 
 
@@ -547,14 +322,9 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
         description="http | ftp | mllp +",
         default=None,
     )
-    address: Optional[Url] = Field(
+    address: Optional[fhir.url] = Field(
         description="Network address or identifier of the end-point",
         default=None,
-    )
-    address_ext: Optional[Element] = Field(
-        description="Placeholder element for address extensions",
-        default=None,
-        alias="_address",
     )
 
 
@@ -563,23 +333,13 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
     References to message definitions for messages this system can send or receive.
     """
 
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="sender | receiver",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Message supported by this system",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
 
 
@@ -592,23 +352,13 @@ class CapabilityStatementMessaging(BackboneElement):
         description="Where messages should be sent",
         default=None,
     )
-    reliableCache: Optional[UnsignedInt] = Field(
+    reliableCache: Optional[fhir.unsignedInt] = Field(
         description="Reliable Message Cache Length (min)",
         default=None,
     )
-    reliableCache_ext: Optional[Element] = Field(
-        description="Placeholder element for reliableCache extensions",
-        default=None,
-        alias="_reliableCache",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Messaging interface behavior details",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
     supportedMessage: Optional[
         ListType[CapabilityStatementMessagingSupportedMessage]
@@ -623,32 +373,17 @@ class CapabilityStatementDocument(BackboneElement):
     A document definition.
     """
 
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="producer | consumer",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    documentation: Optional[Markdown] = Field(
+    documentation: Optional[fhir.markdown] = Field(
         description="Description of document support",
         default=None,
     )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
-    )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Constraint on the resources used in the document",
         default=None,
-    )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
 
 
@@ -661,107 +396,57 @@ class CapabilityStatement(DomainResource):
     _type = "CapabilityStatement"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this capability statement, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this capability statement, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the CapabilityStatement (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the capability statement",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this capability statement (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this capability statement (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the capability statement",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -771,59 +456,29 @@ class CapabilityStatement(DomainResource):
         description="Intended jurisdiction for capability statement (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this capability statement is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="instance | capability | requirements",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
-    instantiates: Optional[ListType[Canonical]] = Field(
-        description="Canonical URL of another capability statement this implements",
+    instantiates: Optional[ListType[fhir.canonical]] = Field(
+        description="canonical URL of another capability statement this implements",
         default=None,
     )
-    instantiates_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiates extensions",
+    imports: Optional[ListType[fhir.canonical]] = Field(
+        description="canonical URL of another capability statement this adds to",
         default=None,
-        alias="_instantiates",
-    )
-    imports: Optional[ListType[Canonical]] = Field(
-        description="Canonical URL of another capability statement this adds to",
-        default=None,
-    )
-    imports_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for imports extensions",
-        default=None,
-        alias="_imports",
     )
     software: Optional[CapabilityStatementSoftware] = Field(
         description="Software that is covered by this capability statement",
@@ -833,50 +488,25 @@ class CapabilityStatement(DomainResource):
         description="If this describes a specific instance",
         default=None,
     )
-    fhirVersion: Optional[Code] = Field(
+    fhirVersion: Optional[fhir.code] = Field(
         description="FHIR Version the system supports",
         default=None,
     )
-    fhirVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for fhirVersion extensions",
-        default=None,
-        alias="_fhirVersion",
-    )
-    format: Optional[ListType[Code]] = Field(
+    format: Optional[ListType[fhir.code]] = Field(
         description="formats supported (xml | json | ttl | mime type)",
         default=None,
     )
-    format_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for format extensions",
-        default=None,
-        alias="_format",
-    )
-    patchFormat: Optional[ListType[Code]] = Field(
+    patchFormat: Optional[ListType[fhir.code]] = Field(
         description="Patch formats supported",
         default=None,
     )
-    patchFormat_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for patchFormat extensions",
-        default=None,
-        alias="_patchFormat",
-    )
-    acceptLanguage: Optional[ListType[Code]] = Field(
+    acceptLanguage: Optional[ListType[fhir.code]] = Field(
         description="Languages supported",
         default=None,
     )
-    acceptLanguage_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for acceptLanguage extensions",
-        default=None,
-        alias="_acceptLanguage",
-    )
-    implementationGuide: Optional[ListType[Canonical]] = Field(
+    implementationGuide: Optional[ListType[fhir.canonical]] = Field(
         description="Implementation guides supported",
         default=None,
-    )
-    implementationGuide_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for implementationGuide extensions",
-        default=None,
-        alias="_implementationGuide",
     )
     rest: Optional[ListType[CapabilityStatementRest]] = Field(
         description="If the endpoint is a RESTful one",
@@ -923,7 +553,7 @@ class CapabilityStatement(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

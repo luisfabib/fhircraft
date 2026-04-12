@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationAdministrationPerformer(BackboneElement):
     """
     Indicates who or what performed the medication administration and how they were involved.
@@ -38,20 +37,14 @@ class MedicationAdministrationPerformer(BackboneElement):
         default=None,
     )
 
-
 class MedicationAdministrationDosage(BackboneElement):
     """
     Describes the medication dosage information details e.g. dose, rate, site, route, etc.
     """
 
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     site: Optional[CodeableConcept] = Field(
         description="Body site administered to",
@@ -94,7 +87,6 @@ class MedicationAdministrationDosage(BackboneElement):
             required=False,
         )
 
-
 class MedicationAdministration(DomainResource):
     """
     Describes the event of a patient consuming or otherwise being administered a medication.  This may be as simple as swallowing a tablet or it may be a long running infusion.  Related resources tie this event to the authorizing prescription, and the specific encounter between patient and health care practitioner.
@@ -120,27 +112,17 @@ class MedicationAdministration(DomainResource):
         description="External identifier",
         default=None,
     )
-    instantiates: Optional[ListType[Uri]] = Field(
+    instantiates: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates protocol or definition",
         default=None,
-    )
-    instantiates_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiates extensions",
-        default=None,
-        alias="_instantiates",
     )
     partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason administration not performed",
@@ -170,14 +152,9 @@ class MedicationAdministration(DomainResource):
         description="Additional information to support administration",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="Start and end time of administration",
         default=None,
-    )
-    effectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveDateTime extensions",
-        default=None,
-        alias="_effectiveDateTime",
     )
     effectivePeriod: Optional[Period] = Field(
         description="Start and end time of administration",
@@ -254,7 +231,7 @@ class MedicationAdministration(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="effective",
             required=True,
         )

@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -62,23 +56,13 @@ class CarePlan(DomainResource):
         description="External Ids for this plan",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal or order",
@@ -92,45 +76,25 @@ class CarePlan(DomainResource):
         description="Part of referenced CarePlan",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | order | option | directive",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of plan",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human-friendly name for the care plan",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Summary of nature of plan",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     subject: Optional[Reference] = Field(
         description="Who the care plan is for",
@@ -141,17 +105,12 @@ class CarePlan(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period plan covers",
+        description="time period plan covers",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Date record was first recorded",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     custodian: Optional[Reference] = Field(
         description="Who is the designated responsible party",

@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Integer,
-    Decimal,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -37,23 +30,13 @@ class MolecularSequenceReferenceSeq(BackboneElement):
         description="Chromosome containing genetic finding",
         default=None,
     )
-    genomeBuild: Optional[String] = Field(
+    genomeBuild: Optional[fhir.string] = Field(
         description="The Genome Build used for reference, following GRCh build versions e.g. \u0027GRCh 37\u0027",
         default=None,
     )
-    genomeBuild_ext: Optional[Element] = Field(
-        description="Placeholder element for genomeBuild extensions",
-        default=None,
-        alias="_genomeBuild",
-    )
-    orientation: Optional[Code] = Field(
+    orientation: Optional[fhir.code] = Field(
         description="sense | antisense",
         default=None,
-    )
-    orientation_ext: Optional[Element] = Field(
-        description="Placeholder element for orientation extensions",
-        default=None,
-        alias="_orientation",
     )
     referenceSeqId: Optional[CodeableConcept] = Field(
         description="Reference identifier",
@@ -63,41 +46,21 @@ class MolecularSequenceReferenceSeq(BackboneElement):
         description="A pointer to another MolecularSequence entity as reference sequence",
         default=None,
     )
-    referenceSeqString: Optional[String] = Field(
+    referenceSeqString: Optional[fhir.string] = Field(
         description="A string to represent reference sequence",
         default=None,
     )
-    referenceSeqString_ext: Optional[Element] = Field(
-        description="Placeholder element for referenceSeqString extensions",
-        default=None,
-        alias="_referenceSeqString",
-    )
-    strand: Optional[Code] = Field(
+    strand: Optional[fhir.code] = Field(
         description="watson | crick",
         default=None,
     )
-    strand_ext: Optional[Element] = Field(
-        description="Placeholder element for strand extensions",
-        default=None,
-        alias="_strand",
-    )
-    windowStart: Optional[Integer] = Field(
+    windowStart: Optional[fhir.integer] = Field(
         description="Start position of the window on the  reference sequence",
         default=None,
     )
-    windowStart_ext: Optional[Element] = Field(
-        description="Placeholder element for windowStart extensions",
-        default=None,
-        alias="_windowStart",
-    )
-    windowEnd: Optional[Integer] = Field(
+    windowEnd: Optional[fhir.integer] = Field(
         description="End position of the window on the reference sequence",
         default=None,
-    )
-    windowEnd_ext: Optional[Element] = Field(
-        description="Placeholder element for windowEnd extensions",
-        default=None,
-        alias="_windowEnd",
     )
 
 
@@ -106,50 +69,25 @@ class MolecularSequenceVariant(BackboneElement):
     The definition of variant here originates from Sequence ontology ([variant_of](http://www.sequenceontology.org/browser/current_svn/term/variant_of)). This element can represent amino acid or nucleic sequence change(including insertion,deletion,SNP,etc.)  It can represent some complex mutation or segment variation with the assist of CIGAR string.
     """
 
-    start: Optional[Integer] = Field(
+    start: Optional[fhir.integer] = Field(
         description="Start position of the variant on the  reference sequence",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
-    end: Optional[Integer] = Field(
+    end: Optional[fhir.integer] = Field(
         description="End position of the variant on the reference sequence",
         default=None,
     )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
-    )
-    observedAllele: Optional[String] = Field(
+    observedAllele: Optional[fhir.string] = Field(
         description="Allele that was observed",
         default=None,
     )
-    observedAllele_ext: Optional[Element] = Field(
-        description="Placeholder element for observedAllele extensions",
-        default=None,
-        alias="_observedAllele",
-    )
-    referenceAllele: Optional[String] = Field(
+    referenceAllele: Optional[fhir.string] = Field(
         description="Allele in the reference sequence",
         default=None,
     )
-    referenceAllele_ext: Optional[Element] = Field(
-        description="Placeholder element for referenceAllele extensions",
-        default=None,
-        alias="_referenceAllele",
-    )
-    cigar: Optional[String] = Field(
+    cigar: Optional[fhir.string] = Field(
         description="Extended CIGAR string for aligning the sequence with reference bases",
         default=None,
-    )
-    cigar_ext: Optional[Element] = Field(
-        description="Placeholder element for cigar extensions",
-        default=None,
-        alias="_cigar",
     )
     variantPointer: Optional[Reference] = Field(
         description="Pointer to observed variant information",
@@ -162,68 +100,33 @@ class MolecularSequenceQualityRoc(BackboneElement):
     Receiver Operator Characteristic (ROC) Curve  to give sensitivity/specificity tradeoff.
     """
 
-    score: Optional[ListType[Integer]] = Field(
+    score: Optional[ListType[fhir.integer]] = Field(
         description="Genotype quality score",
         default=None,
     )
-    score_ext: Optional[Element] = Field(
-        description="Placeholder element for score extensions",
-        default=None,
-        alias="_score",
-    )
-    numTP: Optional[ListType[Integer]] = Field(
+    numTP: Optional[ListType[fhir.integer]] = Field(
         description="Roc score true positive numbers",
         default=None,
     )
-    numTP_ext: Optional[Element] = Field(
-        description="Placeholder element for numTP extensions",
-        default=None,
-        alias="_numTP",
-    )
-    numFP: Optional[ListType[Integer]] = Field(
+    numFP: Optional[ListType[fhir.integer]] = Field(
         description="Roc score false positive numbers",
         default=None,
     )
-    numFP_ext: Optional[Element] = Field(
-        description="Placeholder element for numFP extensions",
-        default=None,
-        alias="_numFP",
-    )
-    numFN: Optional[ListType[Integer]] = Field(
+    numFN: Optional[ListType[fhir.integer]] = Field(
         description="Roc score false negative numbers",
         default=None,
     )
-    numFN_ext: Optional[Element] = Field(
-        description="Placeholder element for numFN extensions",
-        default=None,
-        alias="_numFN",
-    )
-    precision: Optional[ListType[Decimal]] = Field(
+    precision: Optional[ListType[fhir.decimal]] = Field(
         description="Precision of the GQ score",
         default=None,
     )
-    precision_ext: Optional[Element] = Field(
-        description="Placeholder element for precision extensions",
-        default=None,
-        alias="_precision",
-    )
-    sensitivity: Optional[ListType[Decimal]] = Field(
+    sensitivity: Optional[ListType[fhir.decimal]] = Field(
         description="Sensitivity of the GQ score",
         default=None,
     )
-    sensitivity_ext: Optional[Element] = Field(
-        description="Placeholder element for sensitivity extensions",
-        default=None,
-        alias="_sensitivity",
-    )
-    fMeasure: Optional[ListType[Decimal]] = Field(
+    fMeasure: Optional[ListType[fhir.decimal]] = Field(
         description="FScore of the GQ score",
         default=None,
-    )
-    fMeasure_ext: Optional[Element] = Field(
-        description="Placeholder element for fMeasure extensions",
-        default=None,
-        alias="_fMeasure",
     )
 
 
@@ -232,36 +135,21 @@ class MolecularSequenceQuality(BackboneElement):
     An experimental feature attribute that defines the quality of the feature in a quantitative way, such as a phred quality score ([SO:0001686](http://www.sequenceontology.org/browser/current_svn/term/SO:0001686)).
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="indel | snp | unknown",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     standardSequence: Optional[CodeableConcept] = Field(
         description="Standard sequence for comparison",
         default=None,
     )
-    start: Optional[Integer] = Field(
+    start: Optional[fhir.integer] = Field(
         description="Start position of the sequence",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
-    end: Optional[Integer] = Field(
+    end: Optional[fhir.integer] = Field(
         description="End position of the sequence",
         default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
     score: Optional[Quantity] = Field(
         description="Quality score for the comparison",
@@ -271,77 +159,37 @@ class MolecularSequenceQuality(BackboneElement):
         description="Method to get quality",
         default=None,
     )
-    truthTP: Optional[Decimal] = Field(
+    truthTP: Optional[fhir.decimal] = Field(
         description="True positives from the perspective of the truth data",
         default=None,
     )
-    truthTP_ext: Optional[Element] = Field(
-        description="Placeholder element for truthTP extensions",
-        default=None,
-        alias="_truthTP",
-    )
-    queryTP: Optional[Decimal] = Field(
+    queryTP: Optional[fhir.decimal] = Field(
         description="True positives from the perspective of the query data",
         default=None,
     )
-    queryTP_ext: Optional[Element] = Field(
-        description="Placeholder element for queryTP extensions",
-        default=None,
-        alias="_queryTP",
-    )
-    truthFN: Optional[Decimal] = Field(
+    truthFN: Optional[fhir.decimal] = Field(
         description="False negatives",
         default=None,
     )
-    truthFN_ext: Optional[Element] = Field(
-        description="Placeholder element for truthFN extensions",
-        default=None,
-        alias="_truthFN",
-    )
-    queryFP: Optional[Decimal] = Field(
+    queryFP: Optional[fhir.decimal] = Field(
         description="False positives",
         default=None,
     )
-    queryFP_ext: Optional[Element] = Field(
-        description="Placeholder element for queryFP extensions",
-        default=None,
-        alias="_queryFP",
-    )
-    gtFP: Optional[Decimal] = Field(
+    gtFP: Optional[fhir.decimal] = Field(
         description="False positives where the non-REF alleles in the Truth and Query Call Sets match",
         default=None,
     )
-    gtFP_ext: Optional[Element] = Field(
-        description="Placeholder element for gtFP extensions",
-        default=None,
-        alias="_gtFP",
-    )
-    precision: Optional[Decimal] = Field(
+    precision: Optional[fhir.decimal] = Field(
         description="Precision of comparison",
         default=None,
     )
-    precision_ext: Optional[Element] = Field(
-        description="Placeholder element for precision extensions",
-        default=None,
-        alias="_precision",
-    )
-    recall: Optional[Decimal] = Field(
+    recall: Optional[fhir.decimal] = Field(
         description="Recall of comparison",
         default=None,
     )
-    recall_ext: Optional[Element] = Field(
-        description="Placeholder element for recall extensions",
-        default=None,
-        alias="_recall",
-    )
-    fScore: Optional[Decimal] = Field(
+    fScore: Optional[fhir.decimal] = Field(
         description="F-score",
         default=None,
-    )
-    fScore_ext: Optional[Element] = Field(
-        description="Placeholder element for fScore extensions",
-        default=None,
-        alias="_fScore",
     )
     roc: Optional[MolecularSequenceQualityRoc] = Field(
         description="Receiver Operator Characteristic (ROC) Curve",
@@ -354,59 +202,29 @@ class MolecularSequenceRepository(BackboneElement):
     Configurations of the external repository. The repository shall store target's observedSeq or records related with target's observedSeq.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="directlink | openapi | login | oauth | other",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="URI of the repository",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Repository\u0027s name",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    datasetId: Optional[String] = Field(
-        description="Id of the dataset that used to call for dataset in repository",
+    datasetId: Optional[fhir.string] = Field(
+        description="id_ of the dataset that used to call for dataset in repository",
         default=None,
     )
-    datasetId_ext: Optional[Element] = Field(
-        description="Placeholder element for datasetId extensions",
-        default=None,
-        alias="_datasetId",
-    )
-    variantsetId: Optional[String] = Field(
-        description="Id of the variantset that used to call for variantset in repository",
+    variantsetId: Optional[fhir.string] = Field(
+        description="id_ of the variantset that used to call for variantset in repository",
         default=None,
     )
-    variantsetId_ext: Optional[Element] = Field(
-        description="Placeholder element for variantsetId extensions",
+    readsetId: Optional[fhir.string] = Field(
+        description="id_ of the read",
         default=None,
-        alias="_variantsetId",
-    )
-    readsetId: Optional[String] = Field(
-        description="Id of the read",
-        default=None,
-    )
-    readsetId_ext: Optional[Element] = Field(
-        description="Placeholder element for readsetId extensions",
-        default=None,
-        alias="_readsetId",
     )
 
 
@@ -415,23 +233,13 @@ class MolecularSequenceStructureVariantOuter(BackboneElement):
     Structural variant outer.
     """
 
-    start: Optional[Integer] = Field(
+    start: Optional[fhir.integer] = Field(
         description="Structural variant outer start",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
-    end: Optional[Integer] = Field(
+    end: Optional[fhir.integer] = Field(
         description="Structural variant outer end",
         default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
 
 
@@ -440,23 +248,13 @@ class MolecularSequenceStructureVariantInner(BackboneElement):
     Structural variant inner.
     """
 
-    start: Optional[Integer] = Field(
+    start: Optional[fhir.integer] = Field(
         description="Structural variant inner start",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
-    end: Optional[Integer] = Field(
+    end: Optional[fhir.integer] = Field(
         description="Structural variant inner end",
         default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
 
 
@@ -469,23 +267,13 @@ class MolecularSequenceStructureVariant(BackboneElement):
         description="Structural variant change type",
         default=None,
     )
-    exact: Optional[Boolean] = Field(
+    exact: Optional[fhir.boolean] = Field(
         description="Does the structural variant have base pair resolution breakpoints?",
         default=None,
     )
-    exact_ext: Optional[Element] = Field(
-        description="Placeholder element for exact extensions",
-        default=None,
-        alias="_exact",
-    )
-    length: Optional[Integer] = Field(
+    length: Optional[fhir.integer] = Field(
         description="Structural variant length",
         default=None,
-    )
-    length_ext: Optional[Element] = Field(
-        description="Placeholder element for length extensions",
-        default=None,
-        alias="_length",
     )
     outer: Optional[MolecularSequenceStructureVariantOuter] = Field(
         description="Structural variant outer",
@@ -522,23 +310,13 @@ class MolecularSequence(DomainResource):
         description="Unique ID for this particular sequence. This is a FHIR-defined id",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="aa | dna | rna",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    coordinateSystem: Optional[Integer] = Field(
+    coordinateSystem: Optional[fhir.integer] = Field(
         description="Base number of coordinate system (0 for 0-based numbering or coordinates, inclusive start, exclusive end, 1 for 1-based numbering, inclusive start, inclusive end)",
         default=None,
-    )
-    coordinateSystem_ext: Optional[Element] = Field(
-        description="Placeholder element for coordinateSystem extensions",
-        default=None,
-        alias="_coordinateSystem",
     )
     patient: Optional[Reference] = Field(
         description="Who and/or what this is about",
@@ -568,27 +346,17 @@ class MolecularSequence(DomainResource):
         description="Variant in sequence",
         default=None,
     )
-    observedSeq: Optional[String] = Field(
+    observedSeq: Optional[fhir.string] = Field(
         description="Sequence that was observed",
         default=None,
-    )
-    observedSeq_ext: Optional[Element] = Field(
-        description="Placeholder element for observedSeq extensions",
-        default=None,
-        alias="_observedSeq",
     )
     quality: Optional[ListType[MolecularSequenceQuality]] = Field(
         description="An set of value as quality of sequence",
         default=None,
     )
-    readCoverage: Optional[Integer] = Field(
+    readCoverage: Optional[fhir.integer] = Field(
         description="Average number of reads representing a given nucleotide in the reconstructed sequence",
         default=None,
-    )
-    readCoverage_ext: Optional[Element] = Field(
-        description="Placeholder element for readCoverage extensions",
-        default=None,
-        alias="_readCoverage",
     )
     repository: Optional[ListType[MolecularSequenceRepository]] = Field(
         description="External repository which contains detailed report related with observedSeq in this resource",

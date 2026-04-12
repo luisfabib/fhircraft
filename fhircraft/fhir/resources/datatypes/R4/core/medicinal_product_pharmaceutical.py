@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -53,14 +53,9 @@ class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawal
         description="A value for the time",
         default=None,
     )
-    supportingInformation: Optional[String] = Field(
+    supportingInformation: Optional[fhir.string] = Field(
         description="Extra information about the withdrawal period",
         default=None,
-    )
-    supportingInformation_ext: Optional[Element] = Field(
-        description="Placeholder element for supportingInformation extensions",
-        default=None,
-        alias="_supportingInformation",
     )
 
 

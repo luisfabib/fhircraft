@@ -216,6 +216,58 @@ def test_index_get_by_path_ignore_slices_excludes_type_choice_nodes():
     assert len(nodes) == 1
 
 
+def test_index_get_by_path_ignore_slices_excludes_slice_child_nodes():
+    index = DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node(
+                "Observation.component",
+                "Observation.component",
+                slicing=MagicMock(),
+            ),
+            make_node(
+                "Observation.component:conclusion-string", "Observation.component"
+            ),
+            make_node("Observation.component.code", "Observation.component.code"),
+            # slice child — same path as the base element above
+            make_node(
+                "Observation.component:conclusion-string.code",
+                "Observation.component.code",
+            ),
+        ]
+    )
+    nodes = index.get_by_path("Observation.component.code", ignore_slices=True)
+    ids = {n.id for n in nodes}
+    assert "Observation.component:conclusion-string.code" not in ids
+    assert "Observation.component.code" in ids
+    assert len(nodes) == 1
+
+
+def test_index_get_single_by_path_does_not_raise_when_slice_children_present():
+    index = DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node(
+                "Observation.component",
+                "Observation.component",
+                slicing=MagicMock(),
+            ),
+            make_node(
+                "Observation.component:conclusion-string", "Observation.component"
+            ),
+            make_node("Observation.component.code", "Observation.component.code"),
+            make_node(
+                "Observation.component:conclusion-string.code",
+                "Observation.component.code",
+            ),
+        ]
+    )
+    node = index.get_single_by_path(
+        "Observation.component.code", ignore_root=True, ignore_slices=True
+    )
+    assert node.id == "Observation.component.code"
+
+
 def test_index_get_by_path_raises_for_missing(simple_index):
     with pytest.raises(DefinitionIndexError):
         simple_index.get_by_path("Observation.missing")

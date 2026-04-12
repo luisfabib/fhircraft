@@ -12,10 +12,8 @@ from fhircraft.fhir.path.engine.core import (
 from fhircraft.fhir.path.engine.core import This
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.subsetting import *
-from fhircraft.fhir.resources.datatypes import get_fhir_type
 
-Coding = get_fhir_type("Coding", "R4")
-CodeableConcept = get_fhir_type("CodeableConcept", "R4")
+from fhircraft.fhir.resources.datatypes.R4 import Coding, CodeableConcept
 
 
 env = dict()
@@ -130,23 +128,27 @@ class TestIndexResources(TestCase):
         result = Index(2).evaluate(self.collection, env, create=False)
         assert len(result) == 1
         assert result[0].value == Coding(code="code-3", system="system-3")
+        assert self.resource.coding
         assert len(self.resource.coding) == 3
 
     def test_index_creates_missing_elements(self):
         result = Index(5).evaluate(self.collection, env, create=True)
         assert len(result) == 1
         assert result[0].value == Coding.model_construct()
+        assert self.resource.coding
         assert len(self.resource.coding) == 6
 
     def test_index_does_not_modify_collection_out_of_bounds(self):
         result = Index(10).evaluate(self.collection, env, create=False)
         assert len(result) == 0
+        assert self.resource.coding
         assert len(self.resource.coding) == 3
 
     def test_index_updates_value(self):
         Index(2).update_values(
             self.collection, value=Coding(code="code-5", system="system-5")
         )
+        assert self.resource.coding
         assert len(self.resource.coding) == 3
         assert self.resource.coding[2] == Coding(code="code-5", system="system-5")
 
@@ -154,6 +156,7 @@ class TestIndexResources(TestCase):
         Index(10).update_values(
             self.collection, value=Coding(code="code-5", system="system-5")
         )
+        assert self.resource.coding
         assert len(self.resource.coding) == 11
         assert self.resource.coding[10] == Coding(code="code-5", system="system-5")
 

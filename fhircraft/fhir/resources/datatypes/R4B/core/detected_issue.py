@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -45,14 +45,9 @@ class DetectedIssueMitigation(BackboneElement):
         description="What mitigation?",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date committed",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     author: Optional[Reference] = Field(
         description="Who is committing?",
@@ -85,40 +80,25 @@ class DetectedIssue(DomainResource):
         description="Unique id for the detected issue",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | preliminary | final | amended +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     code: Optional[CodeableConcept] = Field(
         description="Issue Category, e.g. drug-drug, duplicate therapy, etc.",
         default=None,
     )
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="high | moderate | low",
         default=None,
-    )
-    severity_ext: Optional[Element] = Field(
-        description="Placeholder element for severity extensions",
-        default=None,
-        alias="_severity",
     )
     patient: Optional[Reference] = Field(
         description="Associated patient",
         default=None,
     )
-    identifiedDateTime: Optional[DateTime] = Field(
+    identifiedDateTime: Optional[fhir.dateTime] = Field(
         description="When identified",
         default=None,
-    )
-    identifiedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for identifiedDateTime extensions",
-        default=None,
-        alias="_identifiedDateTime",
     )
     identifiedPeriod: Optional[Period] = Field(
         description="When identified",
@@ -136,23 +116,13 @@ class DetectedIssue(DomainResource):
         description="Supporting evidence",
         default=None,
     )
-    detail: Optional[String] = Field(
+    detail: Optional[fhir.string] = Field(
         description="Description and context",
         default=None,
     )
-    detail_ext: Optional[Element] = Field(
-        description="Placeholder element for detail extensions",
-        default=None,
-        alias="_detail",
-    )
-    reference: Optional[Uri] = Field(
+    reference: Optional[fhir.uri] = Field(
         description="Authority for issue",
         default=None,
-    )
-    reference_ext: Optional[Element] = Field(
-        description="Placeholder element for reference extensions",
-        default=None,
-        alias="_reference",
     )
     mitigation: Optional[ListType[DetectedIssueMitigation]] = Field(
         description="Step taken to address",
@@ -170,7 +140,7 @@ class DetectedIssue(DomainResource):
     def identified_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="identified",
             required=False,
         )

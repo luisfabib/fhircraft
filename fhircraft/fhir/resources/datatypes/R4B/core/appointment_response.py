@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class AppointmentResponse(DomainResource):
     """
@@ -48,23 +47,13 @@ class AppointmentResponse(DomainResource):
         description="Appointment this response relates to",
         default=None,
     )
-    start: Optional[Instant] = Field(
-        description="Time from appointment, or requested new start time",
+    start: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new start time",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
+    end: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new end time",
         default=None,
-        alias="_start",
-    )
-    end: Optional[Instant] = Field(
-        description="Time from appointment, or requested new end time",
-        default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
     participantType: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in the appointment",
@@ -74,23 +63,13 @@ class AppointmentResponse(DomainResource):
         description="Person, Location, HealthcareService, or Device",
         default=None,
     )
-    participantStatus: Optional[Code] = Field(
+    participantStatus: Optional[fhir.code] = Field(
         description="accepted | declined | tentative | needs-action",
         default=None,
     )
-    participantStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for participantStatus extensions",
-        default=None,
-        alias="_participantStatus",
-    )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Additional comments",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
 
     @model_validator(mode="after")

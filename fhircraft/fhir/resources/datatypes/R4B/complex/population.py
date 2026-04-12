@@ -3,13 +3,12 @@ from typing import Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     CodeableConcept,
     Range,
 )
-
 
 class Population(BackboneElement):
     """

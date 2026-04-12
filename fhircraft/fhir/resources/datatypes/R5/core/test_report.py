@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Decimal,
-    DateTime,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -32,32 +24,17 @@ class TestReportParticipant(BackboneElement):
     A participant in the test execution, either the execution engine, a client, or a server.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="test-engine | client | server",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    uri: Optional[Uri] = Field(
+    uri: Optional[fhir.uri] = Field(
         description="The uri of the participant. An absolute URL is preferred",
         default=None,
     )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
-    )
-    display: Optional[String] = Field(
+    display: Optional[fhir.string] = Field(
         description="The display name of the participant",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
 
 
@@ -66,32 +43,17 @@ class TestReportSetupActionOperation(BackboneElement):
     The operation performed.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    result_ext: Optional[Element] = Field(
-        description="Placeholder element for result extensions",
-        default=None,
-        alias="_result",
-    )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    message_ext: Optional[Element] = Field(
-        description="Placeholder element for message extensions",
-        default=None,
-        alias="_message",
-    )
-    detail: Optional[Uri] = Field(
+    detail: Optional[fhir.uri] = Field(
         description="A link to further details on the result",
         default=None,
-    )
-    detail_ext: Optional[Element] = Field(
-        description="Placeholder element for detail extensions",
-        default=None,
-        alias="_detail",
     )
 
 
@@ -100,32 +62,17 @@ class TestReportSetupActionAssert(BackboneElement):
     The results of the assertion performed on the previous operations.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    result_ext: Optional[Element] = Field(
-        description="Placeholder element for result extensions",
-        default=None,
-        alias="_result",
-    )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    message_ext: Optional[Element] = Field(
-        description="Placeholder element for message extensions",
-        default=None,
-        alias="_message",
-    )
-    detail: Optional[String] = Field(
+    detail: Optional[fhir.string] = Field(
         description="A link to further details on the result",
         default=None,
-    )
-    detail_ext: Optional[Element] = Field(
-        description="Placeholder element for detail extensions",
-        default=None,
-        alias="_detail",
     )
     requirement: Optional[ListType["TestReportSetupActionAssertRequirement"]] = Field(
         description="Links or references to the testing requirements",
@@ -165,32 +112,17 @@ class TestReportTestActionOperation(BackboneElement):
     An operation would involve a REST request to a server.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    result_ext: Optional[Element] = Field(
-        description="Placeholder element for result extensions",
-        default=None,
-        alias="_result",
-    )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    message_ext: Optional[Element] = Field(
-        description="Placeholder element for message extensions",
-        default=None,
-        alias="_message",
-    )
-    detail: Optional[Uri] = Field(
+    detail: Optional[fhir.uri] = Field(
         description="A link to further details on the result",
         default=None,
-    )
-    detail_ext: Optional[Element] = Field(
-        description="Placeholder element for detail extensions",
-        default=None,
-        alias="_detail",
     )
 
 
@@ -199,23 +131,13 @@ class TestReportSetupActionAssertRequirement(BackboneElement):
     Links or references providing traceability to the testing requirements for this assert.
     """
 
-    linkUri: Optional[Uri] = Field(
+    linkUri: Optional[fhir.uri] = Field(
         description="Link or reference to the testing requirement",
         default=None,
     )
-    linkUri_ext: Optional[Element] = Field(
-        description="Placeholder element for linkUri extensions",
-        default=None,
-        alias="_linkUri",
-    )
-    linkCanonical: Optional[Canonical] = Field(
+    linkCanonical: Optional[fhir.canonical] = Field(
         description="Link or reference to the testing requirement",
         default=None,
-    )
-    linkCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for linkCanonical extensions",
-        default=None,
-        alias="_linkCanonical",
     )
 
     @property
@@ -229,7 +151,7 @@ class TestReportSetupActionAssertRequirement(BackboneElement):
     def link_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Uri, Canonical],
+            field_types=[fhir.Uri, fhir.Canonical],
             field_name_base="link",
             required=False,
         )
@@ -240,32 +162,17 @@ class TestReportTestActionAssert(BackboneElement):
     The results of the assertion performed on the previous operations.
     """
 
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
     )
-    result_ext: Optional[Element] = Field(
-        description="Placeholder element for result extensions",
-        default=None,
-        alias="_result",
-    )
-    message: Optional[Markdown] = Field(
+    message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
         default=None,
     )
-    message_ext: Optional[Element] = Field(
-        description="Placeholder element for message extensions",
-        default=None,
-        alias="_message",
-    )
-    detail: Optional[String] = Field(
+    detail: Optional[fhir.string] = Field(
         description="A link to further details on the result",
         default=None,
-    )
-    detail_ext: Optional[Element] = Field(
-        description="Placeholder element for detail extensions",
-        default=None,
-        alias="_detail",
     )
     requirement: Optional[ListType[TestReportSetupActionAssertRequirement]] = Field(
         description="Links or references to the testing requirements",
@@ -294,23 +201,13 @@ class TestReportTest(BackboneElement):
     A test executed from the test script.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Tracking/logging name of this test",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Tracking/reporting short description of the test",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     action: Optional[ListType[TestReportTestAction]] = Field(
         description="A test operation or assert that was performed",
@@ -353,68 +250,33 @@ class TestReport(DomainResource):
         description="External identifier",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Informal name of the executed TestReport",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="completed | in-progress | waiting | stopped | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    testScript: Optional[Canonical] = Field(
-        description="Canonical URL to the  version-specific TestScript that was executed to produce this TestReport",
+    testScript: Optional[fhir.canonical] = Field(
+        description="canonical URL to the  version-specific TestScript that was executed to produce this TestReport",
         default=None,
     )
-    testScript_ext: Optional[Element] = Field(
-        description="Placeholder element for testScript extensions",
-        default=None,
-        alias="_testScript",
-    )
-    result: Optional[Code] = Field(
+    result: Optional[fhir.code] = Field(
         description="pass | fail | pending",
         default=None,
     )
-    result_ext: Optional[Element] = Field(
-        description="Placeholder element for result extensions",
-        default=None,
-        alias="_result",
-    )
-    score: Optional[Decimal] = Field(
+    score: Optional[fhir.decimal] = Field(
         description="The final score (percentage of tests passed) resulting from the execution of the TestScript",
         default=None,
     )
-    score_ext: Optional[Element] = Field(
-        description="Placeholder element for score extensions",
-        default=None,
-        alias="_score",
-    )
-    tester: Optional[String] = Field(
+    tester: Optional[fhir.string] = Field(
         description="Name of the tester producing this report (Organization or individual)",
         default=None,
     )
-    tester_ext: Optional[Element] = Field(
-        description="Placeholder element for tester extensions",
-        default=None,
-        alias="_tester",
-    )
-    issued: Optional[DateTime] = Field(
+    issued: Optional[fhir.dateTime] = Field(
         description="When the TestScript was executed and this TestReport was generated",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     participant: Optional[ListType[TestReportParticipant]] = Field(
         description="A participant in the test execution, either the execution engine, a client, or a server",

@@ -3,10 +3,9 @@ from typing import List, Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.datatypes.R4.complex import Element, Reference
-
 
 class Annotation(Element):
     """
@@ -19,34 +18,24 @@ class Annotation(Element):
         description="Individual responsible for the annotation",
         default=None,
     )
-    authorString: Optional[String] = Field(
+    authorString: Optional[fhir.string] = Field(
         description="Individual responsible for the annotation",
         default=None,
     )
-    time: Optional[DateTime] = Field(
+    time: Optional[fhir.dateTime] = Field(
         description="When the annotation was made",
         default=None,
     )
-    time_ext: Optional["Element"] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
-    )
-    text: Optional[Markdown] = Field(
+    text: Optional[fhir.markdown] = Field(
         description="The annotation  - text content (as markdown)",
         default=None,
-    )
-    text_ext: Optional["Element"] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
 
     @model_validator(mode="after")
     def author_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["Reference", String],
+            field_types=["Reference", fhir.String],
             field_name_base="author",
         )
 

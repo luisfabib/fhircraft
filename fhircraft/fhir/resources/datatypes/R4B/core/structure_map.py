@@ -4,28 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Canonical,
-    Id,
-    Integer,
-    Base64Binary,
-    Date,
-    Decimal,
-    Instant,
-    Oid,
-    PositiveInt,
-    Time,
-    UnsignedInt,
-    Url,
-    Uuid,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -72,41 +52,21 @@ class StructureMapStructure(BackboneElement):
     A structure definition used by this map. The structure definition may describe instances that are converted, or the instances that are produced.
     """
 
-    url: Optional[Canonical] = Field(
-        description="Canonical reference to structure definition",
+    url: Optional[fhir.canonical] = Field(
+        description="canonical reference to structure definition",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="source | queried | target | produced",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    alias: Optional[String] = Field(
+    alias: Optional[fhir.string] = Field(
         description="Name for type in this map",
         default=None,
     )
-    alias_ext: Optional[Element] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
-    )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Documentation on use of structure",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -115,41 +75,21 @@ class StructureMapGroupInput(BackboneElement):
     A name assigned to an instance of data. The instance must be provided when the mapping is invoked.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Name for this instance of data",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    type: Optional[String] = Field(
+    type: Optional[fhir.string] = Field(
         description="Type for this instance of data",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="source | target",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Documentation for this instance of data",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -158,212 +98,97 @@ class StructureMapGroupRuleSource(BackboneElement):
     Source inputs to the mapping.
     """
 
-    context: Optional[Id] = Field(
+    context: Optional[fhir.id_] = Field(
         description="Type or variable this rule applies to",
         default=None,
     )
-    context_ext: Optional[Element] = Field(
-        description="Placeholder element for context extensions",
-        default=None,
-        alias="_context",
-    )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Specified minimum cardinality",
         default=None,
     )
-    min_ext: Optional[Element] = Field(
-        description="Placeholder element for min extensions",
-        default=None,
-        alias="_min",
-    )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Specified maximum cardinality (number or *)",
         default=None,
     )
-    max_ext: Optional[Element] = Field(
-        description="Placeholder element for max extensions",
-        default=None,
-        alias="_max",
-    )
-    type: Optional[String] = Field(
+    type: Optional[fhir.string] = Field(
         description="Rule only applies if source has this type",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    defaultValueBase64Binary: Optional[Base64Binary] = Field(
+    defaultValueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueBase64Binary extensions",
-        default=None,
-        alias="_defaultValueBase64Binary",
-    )
-    defaultValueBoolean: Optional[Boolean] = Field(
+    defaultValueBoolean: Optional[fhir.boolean] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueBoolean extensions",
-        default=None,
-        alias="_defaultValueBoolean",
-    )
-    defaultValueCanonical: Optional[Canonical] = Field(
+    defaultValueCanonical: Optional[fhir.canonical] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueCanonical extensions",
-        default=None,
-        alias="_defaultValueCanonical",
-    )
-    defaultValueCode: Optional[Code] = Field(
+    defaultValueCode: Optional[fhir.code] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueCode_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueCode extensions",
-        default=None,
-        alias="_defaultValueCode",
-    )
-    defaultValueDate: Optional[Date] = Field(
+    defaultValueDate: Optional[fhir.date_] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueDate extensions",
-        default=None,
-        alias="_defaultValueDate",
-    )
-    defaultValueDateTime: Optional[DateTime] = Field(
+    defaultValueDateTime: Optional[fhir.dateTime] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueDateTime extensions",
-        default=None,
-        alias="_defaultValueDateTime",
-    )
-    defaultValueDecimal: Optional[Decimal] = Field(
+    defaultValueDecimal: Optional[fhir.decimal] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueDecimal extensions",
-        default=None,
-        alias="_defaultValueDecimal",
-    )
-    defaultValueId: Optional[Id] = Field(
+    defaultValueId: Optional[fhir.id_] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueId_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueId extensions",
-        default=None,
-        alias="_defaultValueId",
-    )
-    defaultValueInstant: Optional[Instant] = Field(
+    defaultValueInstant: Optional[fhir.instant] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueInstant_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueInstant extensions",
-        default=None,
-        alias="_defaultValueInstant",
-    )
-    defaultValueInteger: Optional[Integer] = Field(
+    defaultValueInteger: Optional[fhir.integer] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueInteger extensions",
-        default=None,
-        alias="_defaultValueInteger",
-    )
-    defaultValueMarkdown: Optional[Markdown] = Field(
+    defaultValueMarkdown: Optional[fhir.markdown] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueMarkdown extensions",
-        default=None,
-        alias="_defaultValueMarkdown",
-    )
-    defaultValueOid: Optional[Oid] = Field(
+    defaultValueOid: Optional[fhir.oid] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueOid_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueOid extensions",
-        default=None,
-        alias="_defaultValueOid",
-    )
-    defaultValuePositiveInt: Optional[PositiveInt] = Field(
+    defaultValuePositiveInt: Optional[fhir.positiveInt] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValuePositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValuePositiveInt extensions",
-        default=None,
-        alias="_defaultValuePositiveInt",
-    )
-    defaultValueString: Optional[String] = Field(
+    defaultValueString: Optional[fhir.string] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueString_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueString extensions",
-        default=None,
-        alias="_defaultValueString",
-    )
-    defaultValueTime: Optional[Time] = Field(
+    defaultValueTime: Optional[fhir.time_] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueTime extensions",
-        default=None,
-        alias="_defaultValueTime",
-    )
-    defaultValueUnsignedInt: Optional[UnsignedInt] = Field(
+    defaultValueUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueUnsignedInt extensions",
-        default=None,
-        alias="_defaultValueUnsignedInt",
-    )
-    defaultValueUri: Optional[Uri] = Field(
+    defaultValueUri: Optional[fhir.uri] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueUri extensions",
-        default=None,
-        alias="_defaultValueUri",
-    )
-    defaultValueUrl: Optional[Url] = Field(
+    defaultValueUrl: Optional[fhir.url] = Field(
         description="Default value if no value exists",
         default=None,
     )
-    defaultValueUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueUrl extensions",
-        default=None,
-        alias="_defaultValueUrl",
-    )
-    defaultValueUuid: Optional[Uuid] = Field(
+    defaultValueUuid: Optional[fhir.uuid] = Field(
         description="Default value if no value exists",
         default=None,
-    )
-    defaultValueUuid_ext: Optional[Element] = Field(
-        description="Placeholder element for defaultValueUuid extensions",
-        default=None,
-        alias="_defaultValueUuid",
     )
     defaultValueAddress: Optional[Address] = Field(
         description="Default value if no value exists",
@@ -489,59 +314,29 @@ class StructureMapGroupRuleSource(BackboneElement):
         description="Default value if no value exists",
         default=None,
     )
-    element: Optional[String] = Field(
+    element: Optional[fhir.string] = Field(
         description="Optional field for this source",
         default=None,
     )
-    element_ext: Optional[Element] = Field(
-        description="Placeholder element for element extensions",
-        default=None,
-        alias="_element",
-    )
-    listMode: Optional[Code] = Field(
+    listMode: Optional[fhir.code] = Field(
         description="first | not_first | last | not_last | only_one",
         default=None,
     )
-    listMode_ext: Optional[Element] = Field(
-        description="Placeholder element for listMode extensions",
-        default=None,
-        alias="_listMode",
-    )
-    variable: Optional[Id] = Field(
+    variable: Optional[fhir.id_] = Field(
         description="Named context for field, if a field is specified",
         default=None,
     )
-    variable_ext: Optional[Element] = Field(
-        description="Placeholder element for variable extensions",
-        default=None,
-        alias="_variable",
-    )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="FHIRPath expression  - must be true or the rule does not apply",
         default=None,
     )
-    condition_ext: Optional[Element] = Field(
-        description="Placeholder element for condition extensions",
-        default=None,
-        alias="_condition",
-    )
-    check: Optional[String] = Field(
+    check: Optional[fhir.string] = Field(
         description="FHIRPath expression  - must be true or the mapping engine throws an error instead of completing",
         default=None,
     )
-    check_ext: Optional[Element] = Field(
-        description="Placeholder element for check extensions",
-        default=None,
-        alias="_check",
-    )
-    logMessage: Optional[String] = Field(
+    logMessage: Optional[fhir.string] = Field(
         description="Message to put in log if source exists (FHIRPath)",
         default=None,
-    )
-    logMessage_ext: Optional[Element] = Field(
-        description="Placeholder element for logMessage extensions",
-        default=None,
-        alias="_logMessage",
     )
 
     @property
@@ -556,25 +351,25 @@ class StructureMapGroupRuleSource(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Base64Binary,
-                Boolean,
-                Canonical,
-                Code,
-                Date,
-                DateTime,
-                Decimal,
-                Id,
-                Instant,
-                Integer,
-                Markdown,
-                Oid,
-                PositiveInt,
-                String,
-                Time,
-                UnsignedInt,
-                Uri,
-                Url,
-                Uuid,
+                fhir.Base64Binary,
+                fhir.Boolean,
+                fhir.Canonical,
+                fhir.Code,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Decimal,
+                fhir.Id,
+                fhir.Instant,
+                fhir.Integer,
+                fhir.Markdown,
+                fhir.Oid,
+                fhir.PositiveInt,
+                fhir.String,
+                fhir.Time,
+                fhir.UnsignedInt,
+                fhir.Uri,
+                fhir.Url,
+                fhir.Uuid,
                 Address,
                 Age,
                 Annotation,
@@ -617,50 +412,25 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
     Parameters to the transform.
     """
 
-    valueId: Optional[Id] = Field(
+    valueId: Optional[fhir.id_] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueId_ext: Optional[Element] = Field(
-        description="Placeholder element for valueId extensions",
-        default=None,
-        alias="_valueId",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Parameter value - variable or literal",
         default=None,
-    )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
     )
 
     @property
@@ -674,7 +444,13 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Id, String, Boolean, Integer, Decimal],
+            field_types=[
+                fhir.Id,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
+                fhir.Decimal,
+            ],
             field_name_base="value",
             required=True,
         )
@@ -685,68 +461,33 @@ class StructureMapGroupRuleTarget(BackboneElement):
     Content to create because of this mapping rule.
     """
 
-    context: Optional[Id] = Field(
+    context: Optional[fhir.id_] = Field(
         description="Type or variable this rule applies to",
         default=None,
     )
-    context_ext: Optional[Element] = Field(
-        description="Placeholder element for context extensions",
-        default=None,
-        alias="_context",
-    )
-    contextType: Optional[Code] = Field(
+    contextType: Optional[fhir.code] = Field(
         description="type | variable",
         default=None,
     )
-    contextType_ext: Optional[Element] = Field(
-        description="Placeholder element for contextType extensions",
-        default=None,
-        alias="_contextType",
-    )
-    element: Optional[String] = Field(
+    element: Optional[fhir.string] = Field(
         description="Field to create in the context",
         default=None,
     )
-    element_ext: Optional[Element] = Field(
-        description="Placeholder element for element extensions",
-        default=None,
-        alias="_element",
-    )
-    variable: Optional[Id] = Field(
+    variable: Optional[fhir.id_] = Field(
         description="Named context for field, if desired, and a field is specified",
         default=None,
     )
-    variable_ext: Optional[Element] = Field(
-        description="Placeholder element for variable extensions",
-        default=None,
-        alias="_variable",
-    )
-    listMode: Optional[ListType[Code]] = Field(
+    listMode: Optional[ListType[fhir.code]] = Field(
         description="first | share | last | collate",
         default=None,
     )
-    listMode_ext: Optional[Element] = Field(
-        description="Placeholder element for listMode extensions",
-        default=None,
-        alias="_listMode",
-    )
-    listRuleId: Optional[Id] = Field(
+    listRuleId: Optional[fhir.id_] = Field(
         description="Internal rule reference for shared list items",
         default=None,
     )
-    listRuleId_ext: Optional[Element] = Field(
-        description="Placeholder element for listRuleId extensions",
-        default=None,
-        alias="_listRuleId",
-    )
-    transform: Optional[Code] = Field(
+    transform: Optional[fhir.code] = Field(
         description="create | copy +",
         default=None,
-    )
-    transform_ext: Optional[Element] = Field(
-        description="Placeholder element for transform extensions",
-        default=None,
-        alias="_transform",
     )
     parameter: Optional[ListType[StructureMapGroupRuleTargetParameter]] = Field(
         description="Parameters to the transform",
@@ -759,23 +500,13 @@ class StructureMapGroupRuleDependent(BackboneElement):
     Which other rules to apply in the context of this rule.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Name of a rule or group to apply",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    variable: Optional[ListType[String]] = Field(
+    variable: Optional[ListType[fhir.string]] = Field(
         description="Variable to pass to the rule or group",
         default=None,
-    )
-    variable_ext: Optional[Element] = Field(
-        description="Placeholder element for variable extensions",
-        default=None,
-        alias="_variable",
     )
 
 
@@ -784,14 +515,9 @@ class StructureMapGroupRule(BackboneElement):
     Transform Rule from source to target.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Name of the rule for internal references",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     source: Optional[ListType[StructureMapGroupRuleSource]] = Field(
         description="Source inputs to the mapping",
@@ -809,14 +535,9 @@ class StructureMapGroupRule(BackboneElement):
         description="Which other rules to apply in the context of this rule",
         default=None,
     )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Documentation for this instance of data",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
 
 
@@ -825,41 +546,21 @@ class StructureMapGroup(BackboneElement):
     Organizes the mapping into manageable chunks for human review/ease of maintenance.
     """
 
-    name: Optional[Id] = Field(
+    name: Optional[fhir.id_] = Field(
         description="Human-readable label",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    extends: Optional[Id] = Field(
+    extends: Optional[fhir.id_] = Field(
         description="Another group that this group adds rules to",
         default=None,
     )
-    extends_ext: Optional[Element] = Field(
-        description="Placeholder element for extends extensions",
-        default=None,
-        alias="_extends",
-    )
-    typeMode: Optional[Code] = Field(
+    typeMode: Optional[fhir.code] = Field(
         description="none | types | type-and-types",
         default=None,
     )
-    typeMode_ext: Optional[Element] = Field(
-        description="Placeholder element for typeMode extensions",
-        default=None,
-        alias="_typeMode",
-    )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="Additional description/explanation for group",
         default=None,
-    )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
     )
     input: Optional[ListType[StructureMapGroupInput]] = Field(
         description="Named instance provided when invoking the map",
@@ -892,94 +593,49 @@ class StructureMap(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this structure map, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this structure map, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure map",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the structure map",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this structure map (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this structure map (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the structure map",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -989,37 +645,22 @@ class StructureMap(DomainResource):
         description="Intended jurisdiction for structure map (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this structure map is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
-    )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
     )
     structure: Optional[ListType[StructureMapStructure]] = Field(
         description="Structure Definition used by this map",
         default=None,
     )
-    import_: Optional[ListType[Canonical]] = Field(
+    import_: Optional[ListType[fhir.canonical]] = Field(
         description="Other maps used by this map (canonical URLs)",
         default=None,
         alias="import",
-    )
-    import_ext: Optional[Element] = Field(
-        description="Placeholder element for import extensions",
-        default=None,
-        alias="_import",
     )
     group: Optional[ListType[StructureMapGroup]] = Field(
         description="Named sections for reader convenience",

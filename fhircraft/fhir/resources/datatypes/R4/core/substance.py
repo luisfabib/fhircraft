@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -31,14 +31,9 @@ class SubstanceInstance(BackboneElement):
         description="Identifier of the package/container",
         default=None,
     )
-    expiry: Optional[DateTime] = Field(
+    expiry: Optional[fhir.dateTime] = Field(
         description="When no longer valid to use",
         default=None,
-    )
-    expiry_ext: Optional[Element] = Field(
-        description="Placeholder element for expiry extensions",
-        default=None,
-        alias="_expiry",
     )
     quantity: Optional[Quantity] = Field(
         description="Amount of substance in the package",
@@ -106,14 +101,9 @@ class Substance(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="What class/type of substance this is",
@@ -123,14 +113,9 @@ class Substance(DomainResource):
         description="What substance this is",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the substance, comments",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     instance: Optional[ListType[SubstanceInstance]] = Field(
         description="If this describes a specific package/container of the substance",

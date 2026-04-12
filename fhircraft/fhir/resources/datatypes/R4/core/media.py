@@ -4,16 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Instant,
-    PositiveInt,
-    Decimal,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -63,14 +55,9 @@ class Media(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     type: Optional[CodeableConcept] = Field(
         description="Classification of media as image, video, or audio",
@@ -92,27 +79,17 @@ class Media(DomainResource):
         description="Encounter associated with media",
         default=None,
     )
-    createdDateTime: Optional[DateTime] = Field(
+    createdDateTime: Optional[fhir.dateTime] = Field(
         description="When Media was collected",
         default=None,
-    )
-    createdDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for createdDateTime extensions",
-        default=None,
-        alias="_createdDateTime",
     )
     createdPeriod: Optional[Period] = Field(
         description="When Media was collected",
         default=None,
     )
-    issued: Optional[Instant] = Field(
-        description="Date/Time this version was made available",
+    issued: Optional[fhir.instant] = Field(
+        description="Date/time this version was made available",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     operator: Optional[Reference] = Field(
         description="The person who generated the image",
@@ -126,54 +103,29 @@ class Media(DomainResource):
         description="Observed body part",
         default=None,
     )
-    deviceName: Optional[String] = Field(
+    deviceName: Optional[fhir.string] = Field(
         description="Name of the device/manufacturer",
         default=None,
-    )
-    deviceName_ext: Optional[Element] = Field(
-        description="Placeholder element for deviceName extensions",
-        default=None,
-        alias="_deviceName",
     )
     device: Optional[Reference] = Field(
         description="Observing Device",
         default=None,
     )
-    height: Optional[PositiveInt] = Field(
+    height: Optional[fhir.positiveInt] = Field(
         description="Height of the image in pixels (photo/video)",
         default=None,
     )
-    height_ext: Optional[Element] = Field(
-        description="Placeholder element for height extensions",
-        default=None,
-        alias="_height",
-    )
-    width: Optional[PositiveInt] = Field(
+    width: Optional[fhir.positiveInt] = Field(
         description="Width of the image in pixels (photo/video)",
         default=None,
     )
-    width_ext: Optional[Element] = Field(
-        description="Placeholder element for width extensions",
-        default=None,
-        alias="_width",
-    )
-    frames: Optional[PositiveInt] = Field(
+    frames: Optional[fhir.positiveInt] = Field(
         description="Number of frames if \u003e 1 (photo)",
         default=None,
     )
-    frames_ext: Optional[Element] = Field(
-        description="Placeholder element for frames extensions",
-        default=None,
-        alias="_frames",
-    )
-    duration: Optional[Decimal] = Field(
+    duration: Optional[fhir.decimal] = Field(
         description="Length in seconds (audio / video)",
         default=None,
-    )
-    duration_ext: Optional[Element] = Field(
-        description="Placeholder element for duration extensions",
-        default=None,
-        alias="_duration",
     )
     content: Optional[Attachment] = Field(
         description="Actual Media - reference or data",
@@ -195,7 +147,7 @@ class Media(DomainResource):
     def created_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="created",
             required=False,
         )

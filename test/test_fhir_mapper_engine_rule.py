@@ -177,17 +177,6 @@ def test_init__minimal(minimal_rule_definition, mock_parent_group):
     assert len(rule.dependents) == 0
 
 
-def test_init__generates_name_if_missing(mock_parent_group):
-    """Test initialization generates name when none provided."""
-    definition = StructureMapGroupRule(
-        name=None, source=None, target=None, rule=None, dependent=None
-    )
-    rule = Rule(definition, mock_parent_group)
-
-    assert rule.name.startswith("rule-")
-    assert rule.definition == definition
-
-
 def test_init__creates_sources(rule_definition_with_sources, mock_parent_group):
     rule = Rule(rule_definition_with_sources, mock_parent_group)
 

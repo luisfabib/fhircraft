@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -38,14 +30,9 @@ class TestPlanDependency(BackboneElement):
     The required criteria to execute the test plan - e.g. preconditions, previous tests...
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the dependency criterium",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     predecessor: Optional[Reference] = Field(
         description="Link to predecessor test plans",
@@ -58,14 +45,9 @@ class TestPlanTestCaseDependency(BackboneElement):
     The required criteria to execute the test case - e.g. preconditions, previous tests.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the criteria",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     predecessor: Optional[Reference] = Field(
         description="Link to predecessor test plans",
@@ -82,14 +64,9 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
         description="The language for the test cases e.g. \u0027gherkin\u0027, \u0027testscript\u0027",
         default=None,
     )
-    sourceString: Optional[String] = Field(
+    sourceString: Optional[fhir.string] = Field(
         description="The actual content of the cases - references to TestScripts or externally defined content",
         default=None,
-    )
-    sourceString_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceString extensions",
-        default=None,
-        alias="_sourceString",
     )
     sourceReference: Optional[Reference] = Field(
         description="The actual content of the cases - references to TestScripts or externally defined content",
@@ -107,7 +84,7 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Reference],
+            field_types=[fhir.String, Reference],
             field_name_base="source",
             required=False,
         )
@@ -118,14 +95,9 @@ class TestPlanTestCaseTestRun(BackboneElement):
     The actual test to be executed.
     """
 
-    narrative: Optional[Markdown] = Field(
+    narrative: Optional[fhir.markdown] = Field(
         description="The narrative description of the tests",
         default=None,
-    )
-    narrative_ext: Optional[Element] = Field(
-        description="Placeholder element for narrative extensions",
-        default=None,
-        alias="_narrative",
     )
     script: Optional[TestPlanTestCaseTestRunScript] = Field(
         description="The test cases in a structured language e.g. gherkin, Postman, or FHIR TestScript",
@@ -146,14 +118,9 @@ class TestPlanTestCaseTestData(BackboneElement):
         description="The actual test resources when they exist",
         default=None,
     )
-    sourceString: Optional[String] = Field(
+    sourceString: Optional[fhir.string] = Field(
         description="Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc",
         default=None,
-    )
-    sourceString_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceString extensions",
-        default=None,
-        alias="_sourceString",
     )
     sourceReference: Optional[Reference] = Field(
         description="Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc",
@@ -171,7 +138,7 @@ class TestPlanTestCaseTestData(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Reference],
+            field_types=[fhir.String, Reference],
             field_name_base="source",
             required=False,
         )
@@ -201,14 +168,9 @@ class TestPlanTestCase(BackboneElement):
     The individual test cases that are part of this plan, when they they are made explicit.
     """
 
-    sequence: Optional[Integer] = Field(
+    sequence: Optional[fhir.integer] = Field(
         description="Sequence of test case in the test plan",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     scope: Optional[ListType[Reference]] = Field(
         description="The scope or artifact covered by the case",
@@ -241,107 +203,57 @@ class TestPlan(DomainResource):
     _type = "TestPlan"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestPlan"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this test plan, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this test plan, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier identifier for the test plan",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the test plan",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this test plan (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this test plan (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the test plan",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -351,32 +263,17 @@ class TestPlan(DomainResource):
         description="Intended jurisdiction where the test plan applies (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this test plan is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
-    )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the Test Plan - can be acceptance, unit, performance",
@@ -386,27 +283,17 @@ class TestPlan(DomainResource):
         description="What is being tested with this Test Plan - a conformance resource, or narrative criteria, or an external reference",
         default=None,
     )
-    testTools: Optional[Markdown] = Field(
+    testTools: Optional[fhir.markdown] = Field(
         description="A description of test tools to be used in the test plan - narrative for now",
         default=None,
-    )
-    testTools_ext: Optional[Element] = Field(
-        description="Placeholder element for testTools extensions",
-        default=None,
-        alias="_testTools",
     )
     dependency: Optional[ListType[TestPlanDependency]] = Field(
         description="The required criteria to execute the test plan - e.g. preconditions, previous tests",
         default=None,
     )
-    exitCriteria: Optional[Markdown] = Field(
+    exitCriteria: Optional[fhir.markdown] = Field(
         description="The threshold or criteria for the test plan to be considered successfully executed - narrative",
         default=None,
-    )
-    exitCriteria_ext: Optional[Element] = Field(
-        description="Placeholder element for exitCriteria extensions",
-        default=None,
-        alias="_exitCriteria",
     )
     testCase: Optional[ListType[TestPlanTestCase]] = Field(
         description="The test cases that constitute this plan",
@@ -424,7 +311,7 @@ class TestPlan(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

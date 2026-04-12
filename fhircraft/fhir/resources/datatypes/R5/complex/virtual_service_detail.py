@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     DataType,
     Element,
@@ -11,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Coding,
     ContactPoint,
 )
-
 
 class VirtualServiceDetail(DataType):
     """
@@ -24,11 +23,11 @@ class VirtualServiceDetail(DataType):
         description="Channel Type",
         default=None,
     )
-    addressUrl: Optional[Url] = Field(
+    addressUrl: Optional[fhir.url] = Field(
         description="Contact address/number",
         default=None,
     )
-    addressString: Optional[String] = Field(
+    addressString: Optional[fhir.string] = Field(
         description="Contact address/number",
         default=None,
     )
@@ -40,39 +39,24 @@ class VirtualServiceDetail(DataType):
         description="Contact address/number",
         default=None,
     )
-    additionalInfo: Optional[List[Url]] = Field(
+    additionalInfo: Optional[List[fhir.url]] = Field(
         description="Address to see alternative connection details",
         default=None,
     )
-    additionalInfo_ext: Optional[List[Optional[Element]]] = Field(
-        description="Placeholder element for additionalInfo extensions",
-        default=None,
-        alias="_additionalInfo",
-    )
-    maxParticipants: Optional[PositiveInt] = Field(
+    maxParticipants: Optional[fhir.positiveInt] = Field(
         description="Maximum number of participants supported by the virtual service",
         default=None,
     )
-    maxParticipants_ext: Optional[Element] = Field(
-        description="Placeholder element for maxParticipants extensions",
-        default=None,
-        alias="_maxParticipants",
-    )
-    sessionKey: Optional[String] = Field(
+    sessionKey: Optional[fhir.string] = Field(
         description="Session Key required by the virtual service",
         default=None,
-    )
-    sessionKey_ext: Optional[Element] = Field(
-        description="Placeholder element for sessionKey extensions",
-        default=None,
-        alias="_sessionKey",
     )
 
     @model_validator(mode="after")
     def address_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Url, String, ContactPoint, "ExtendedContactDetail"],
+            field_types=[fhir.Url, fhir.String, ContactPoint, "ExtendedContactDetail"],
             field_name_base="address",
         )
 

@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -47,23 +41,13 @@ class AdministrableProductDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -85,7 +69,13 @@ class AdministrableProductDefinitionProperty(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Quantity, Date, Boolean, Attachment],
+            field_types=[
+                CodeableConcept,
+                Quantity,
+                fhir.Date,
+                fhir.Boolean,
+                Attachment,
+            ],
             field_name_base="value",
             required=False,
         )
@@ -106,14 +96,9 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
         description="A value for the time",
         default=None,
     )
-    supportingInformation: Optional[String] = Field(
+    supportingInformation: Optional[fhir.string] = Field(
         description="Extra information about the withdrawal period",
         default=None,
-    )
-    supportingInformation_ext: Optional[Element] = Field(
-        description="Placeholder element for supportingInformation extensions",
-        default=None,
-        alias="_supportingInformation",
     )
 
 
@@ -200,14 +185,9 @@ class AdministrableProductDefinition(DomainResource):
         description="An identifier for the administrable product",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     formOf: Optional[ListType[Reference]] = Field(
         description="References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product",

@@ -24,10 +24,10 @@ class SimpleFieldBuilder(Builder):
     appends a ``_{name}`` extension placeholder field.
     """
 
-    def can_handle(self, _: ElementNode, __: DefinitionIndex) -> bool:
+    def can_handle(self, node: ElementNode, index: DefinitionIndex) -> bool:
         return True  # always handles as fallback
 
-    def build(self, node: ElementNode, _: DefinitionIndex) -> Build:
+    def build(self, node: ElementNode, index: DefinitionIndex) -> Build:
 
         build = Build()
 
@@ -57,8 +57,4 @@ class SimpleFieldBuilder(Builder):
         )
 
         build.validators = self.build_field_validators(node, safe_name)
-
-        if any(subtype.requires_primitive_extension for subtype in field_types):
-            placeholder = self.build_primitive_extension_placeholder(node)
-            build.fields.append(placeholder)
         return build

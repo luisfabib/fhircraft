@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -38,50 +29,25 @@ class SubscriptionTopicResourceTriggerQueryCriteria(BackboneElement):
     The FHIR query based rules that the server should use to determine when to trigger a notification for this subscription topic.
     """
 
-    previous: Optional[String] = Field(
+    previous: Optional[fhir.string] = Field(
         description="Rule applied to previous resource state",
         default=None,
     )
-    previous_ext: Optional[Element] = Field(
-        description="Placeholder element for previous extensions",
-        default=None,
-        alias="_previous",
-    )
-    resultForCreate: Optional[Code] = Field(
+    resultForCreate: Optional[fhir.code] = Field(
         description="test-passes | test-fails",
         default=None,
     )
-    resultForCreate_ext: Optional[Element] = Field(
-        description="Placeholder element for resultForCreate extensions",
-        default=None,
-        alias="_resultForCreate",
-    )
-    current: Optional[String] = Field(
+    current: Optional[fhir.string] = Field(
         description="Rule applied to current resource state",
         default=None,
     )
-    current_ext: Optional[Element] = Field(
-        description="Placeholder element for current extensions",
-        default=None,
-        alias="_current",
-    )
-    resultForDelete: Optional[Code] = Field(
+    resultForDelete: Optional[fhir.code] = Field(
         description="test-passes | test-fails",
         default=None,
     )
-    resultForDelete_ext: Optional[Element] = Field(
-        description="Placeholder element for resultForDelete extensions",
-        default=None,
-        alias="_resultForDelete",
-    )
-    requireBoth: Optional[Boolean] = Field(
+    requireBoth: Optional[fhir.boolean] = Field(
         description="Both must be true flag",
         default=None,
-    )
-    requireBoth_ext: Optional[Element] = Field(
-        description="Placeholder element for requireBoth extensions",
-        default=None,
-        alias="_requireBoth",
     )
 
 
@@ -90,45 +56,25 @@ class SubscriptionTopicResourceTrigger(BackboneElement):
     A definition of a resource-based event that triggers a notification based on the SubscriptionTopic. The criteria may be just a human readable description and/or a full FHIR search string or FHIRPath expression. Multiple triggers are considered OR joined (e.g., a resource update matching ANY of the definitions will trigger a notification).
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Text representation of the resource trigger",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    resource: Optional[Uri] = Field(
+    resource: Optional[fhir.uri] = Field(
         description="Data Type or Resource (reference to definition) for this trigger definition",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
-    supportedInteraction: Optional[ListType[Code]] = Field(
+    supportedInteraction: Optional[ListType[fhir.code]] = Field(
         description="create | update | delete",
         default=None,
-    )
-    supportedInteraction_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for supportedInteraction extensions",
-        default=None,
-        alias="_supportedInteraction",
     )
     queryCriteria: Optional[SubscriptionTopicResourceTriggerQueryCriteria] = Field(
         description="Query based trigger rule",
         default=None,
     )
-    fhirPathCriteria: Optional[String] = Field(
+    fhirPathCriteria: Optional[fhir.string] = Field(
         description="FHIRPath based trigger rule",
         default=None,
-    )
-    fhirPathCriteria_ext: Optional[Element] = Field(
-        description="Placeholder element for fhirPathCriteria extensions",
-        default=None,
-        alias="_fhirPathCriteria",
     )
 
 
@@ -137,27 +83,17 @@ class SubscriptionTopicEventTrigger(BackboneElement):
     Event definition which can be used to trigger the SubscriptionTopic.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Text representation of the event trigger",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     event: Optional[CodeableConcept] = Field(
         description="Event which can trigger a notification from the SubscriptionTopic",
         default=None,
     )
-    resource: Optional[Uri] = Field(
+    resource: Optional[fhir.uri] = Field(
         description="Data Type or Resource (reference to definition) for this trigger definition",
         default=None,
-    )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
     )
 
 
@@ -166,59 +102,29 @@ class SubscriptionTopicCanFilterBy(BackboneElement):
     List of properties by which Subscriptions on the SubscriptionTopic can be filtered. May be defined Search Parameters (e.g., Encounter.patient) or parameters defined within this SubscriptionTopic context (e.g., hub.event).
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of this filter parameter",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    resource: Optional[Uri] = Field(
+    resource: Optional[fhir.uri] = Field(
         description="URL of the triggering Resource that this filter applies to",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
-    filterParameter: Optional[String] = Field(
+    filterParameter: Optional[fhir.string] = Field(
         description="Human-readable and computation-friendly name for a filter parameter usable by subscriptions on this topic, via Subscription.filterBy.filterParameter",
         default=None,
     )
-    filterParameter_ext: Optional[Element] = Field(
-        description="Placeholder element for filterParameter extensions",
-        default=None,
-        alias="_filterParameter",
-    )
-    filterDefinition: Optional[Uri] = Field(
-        description="Canonical URL for a filterParameter definition",
+    filterDefinition: Optional[fhir.uri] = Field(
+        description="canonical URL for a filterParameter definition",
         default=None,
     )
-    filterDefinition_ext: Optional[Element] = Field(
-        description="Placeholder element for filterDefinition extensions",
-        default=None,
-        alias="_filterDefinition",
-    )
-    comparator: Optional[ListType[Code]] = Field(
+    comparator: Optional[ListType[fhir.code]] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
-    modifier: Optional[ListType[Code]] = Field(
+    modifier: Optional[ListType[fhir.code]] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
-    )
-    modifier_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for modifier extensions",
-        default=None,
-        alias="_modifier",
     )
 
 
@@ -227,32 +133,17 @@ class SubscriptionTopicNotificationShape(BackboneElement):
     List of properties to describe the shape (e.g., resources) included in notifications from this Subscription Topic.
     """
 
-    resource: Optional[Uri] = Field(
+    resource: Optional[fhir.uri] = Field(
         description="URL of the Resource that is the focus (main) resource in a notification shape",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
-        description="Placeholder element for resource extensions",
-        default=None,
-        alias="_resource",
-    )
-    include: Optional[ListType[String]] = Field(
+    include: Optional[ListType[fhir.string]] = Field(
         description="Include directives, rooted in the resource for this shape",
         default=None,
     )
-    include_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for include extensions",
-        default=None,
-        alias="_include",
-    )
-    revInclude: Optional[ListType[String]] = Field(
+    revInclude: Optional[ListType[fhir.string]] = Field(
         description="Reverse include directives, rooted in the resource for this shape",
         default=None,
-    )
-    revInclude_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for revInclude extensions",
-        default=None,
-        alias="_revInclude",
     )
 
 
@@ -265,116 +156,61 @@ class SubscriptionTopic(DomainResource):
     _type = "SubscriptionTopic"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubscriptionTopic"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this subscription topic, represented as an absolute URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this subscription topic, represented as an absolute URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for subscription topic",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the subscription topic",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this subscription topic (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this subscription topic (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    derivedFrom: Optional[ListType[Canonical]] = Field(
+    derivedFrom: Optional[ListType[fhir.canonical]] = Field(
         description="Based on FHIR protocol or definition",
         default=None,
     )
-    derivedFrom_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for derivedFrom extensions",
-        default=None,
-        alias="_derivedFrom",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="If for testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date status first applied",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="The name of the individual or organization that published the SubscriptionTopic",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the SubscriptionTopic",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="Content intends to support these contexts",
@@ -384,50 +220,25 @@ class SubscriptionTopic(DomainResource):
         description="Intended jurisdiction of the SubscriptionTopic (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this SubscriptionTopic is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When SubscriptionTopic is/was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="Date the Subscription Topic was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="The effective date range for the SubscriptionTopic",
@@ -461,7 +272,7 @@ class SubscriptionTopic(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

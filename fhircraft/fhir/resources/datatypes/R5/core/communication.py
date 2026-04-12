@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -28,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class CommunicationPayload(BackboneElement):
     """
@@ -64,7 +57,6 @@ class CommunicationPayload(BackboneElement):
             required=True,
         )
 
-
 class Communication(DomainResource):
     """
     A clinical or business level record of information being transmitted or shared; e.g. an alert that was sent to a responsible provider, a public health agency communication to a provider/reporter in response to a case report for a reportable condition.
@@ -78,23 +70,13 @@ class Communication(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this communication",
@@ -108,14 +90,9 @@ class Communication(DomainResource):
         description="Reply to",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -125,14 +102,9 @@ class Communication(DomainResource):
         description="Message category",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
-    )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
     )
     medium: Optional[ListType[CodeableConcept]] = Field(
         description="A channel of communication",
@@ -154,23 +126,13 @@ class Communication(DomainResource):
         description="The Encounter during which this Communication was created",
         default=None,
     )
-    sent: Optional[DateTime] = Field(
+    sent: Optional[fhir.dateTime] = Field(
         description="When sent",
         default=None,
     )
-    sent_ext: Optional[Element] = Field(
-        description="Placeholder element for sent extensions",
-        default=None,
-        alias="_sent",
-    )
-    received: Optional[DateTime] = Field(
+    received: Optional[fhir.dateTime] = Field(
         description="When received",
         default=None,
-    )
-    received_ext: Optional[Element] = Field(
-        description="Placeholder element for received extensions",
-        default=None,
-        alias="_received",
     )
     recipient: Optional[ListType[Reference]] = Field(
         description="Who the information is shared with",

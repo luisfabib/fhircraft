@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -85,23 +78,13 @@ class Procedure(DomainResource):
         description="External Identifiers for this procedure",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="A request for this procedure",
@@ -111,14 +94,9 @@ class Procedure(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -144,27 +122,17 @@ class Procedure(DomainResource):
         description="The Encounter during which this Procedure was created",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the procedure occurred or is occurring",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When the procedure occurred or is occurring",
         default=None,
     )
-    occurrenceString: Optional[String] = Field(
+    occurrenceString: Optional[fhir.string] = Field(
         description="When the procedure occurred or is occurring",
         default=None,
-    )
-    occurrenceString_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceString extensions",
-        default=None,
-        alias="_occurrenceString",
     )
     occurrenceAge: Optional[Age] = Field(
         description="When the procedure occurred or is occurring",
@@ -178,27 +146,17 @@ class Procedure(DomainResource):
         description="When the procedure occurred or is occurring",
         default=None,
     )
-    recorded: Optional[DateTime] = Field(
+    recorded: Optional[fhir.dateTime] = Field(
         description="When the procedure was first captured in the subject\u0027s record",
         default=None,
-    )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
     )
     recorder: Optional[Reference] = Field(
         description="Who recorded the procedure",
         default=None,
     )
-    reportedBoolean: Optional[Boolean] = Field(
+    reportedBoolean: Optional[fhir.boolean] = Field(
         description="Reported rather than primary record",
         default=None,
-    )
-    reportedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for reportedBoolean extensions",
-        default=None,
-        alias="_reportedBoolean",
     )
     reportedReference: Optional[Reference] = Field(
         description="Reported rather than primary record",
@@ -271,7 +229,7 @@ class Procedure(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, String, Age, Range, Timing],
+            field_types=[fhir.DateTime, Period, fhir.String, Age, Range, Timing],
             field_name_base="occurrence",
             required=False,
         )
@@ -280,7 +238,7 @@ class Procedure(DomainResource):
     def reported_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Reference],
+            field_types=[fhir.Boolean, Reference],
             field_name_base="reported",
             required=False,
         )

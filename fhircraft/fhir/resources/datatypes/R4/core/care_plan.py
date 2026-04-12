@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -36,32 +29,17 @@ class CarePlanActivityDetail(BackboneElement):
     A simple summary of a planned activity suitable for a general care plan system (e.g. form driven) that doesn't know about specific resources such as procedure etc.
     """
 
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="Appointment | CommunicationRequest | DeviceRequest | MedicationRequest | NutritionOrder | Task | ServiceRequest | VisionPrescription",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     code: Optional[CodeableConcept] = Field(
         description="Detail type of activity",
@@ -79,27 +57,17 @@ class CarePlanActivityDetail(BackboneElement):
         description="Goals this activity relates to",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="not-started | scheduled | in-progress | on-hold | completed | cancelled | stopped | unknown | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
     )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="If true, activity is prohibiting action",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     scheduledTiming: Optional[Timing] = Field(
         description="When activity is to occur",
@@ -109,14 +77,9 @@ class CarePlanActivityDetail(BackboneElement):
         description="When activity is to occur",
         default=None,
     )
-    scheduledString: Optional[String] = Field(
+    scheduledString: Optional[fhir.string] = Field(
         description="When activity is to occur",
         default=None,
-    )
-    scheduledString_ext: Optional[Element] = Field(
-        description="Placeholder element for scheduledString extensions",
-        default=None,
-        alias="_scheduledString",
     )
     location: Optional[Reference] = Field(
         description="Where it should happen",
@@ -142,14 +105,9 @@ class CarePlanActivityDetail(BackboneElement):
         description="How much to administer/supply/consume",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Extra info describing activity to perform",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
 
     @property
@@ -170,7 +128,7 @@ class CarePlanActivityDetail(BackboneElement):
     def scheduled_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Period, String],
+            field_types=[Timing, Period, fhir.String],
             field_name_base="scheduled",
             required=False,
         )
@@ -237,23 +195,13 @@ class CarePlan(DomainResource):
         description="External Ids for this plan",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills CarePlan",
@@ -267,45 +215,25 @@ class CarePlan(DomainResource):
         description="Part of referenced CarePlan",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | order | option",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of plan",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human-friendly name for the care plan",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Summary of nature of plan",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     subject: Optional[Reference] = Field(
         description="Who the care plan is for",
@@ -316,17 +244,12 @@ class CarePlan(DomainResource):
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period plan covers",
+        description="time period plan covers",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Date record was first recorded",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     author: Optional[Reference] = Field(
         description="Who is the designated responsible party",

@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    Integer,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -38,38 +31,22 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
     """
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
     """
 
-    deviceIdentifier: Optional[String] = Field(
+    deviceIdentifier: Optional[fhir.string] = Field(
         description="The identifier that is to be associated with every Device that references this DeviceDefintiion for the issuer and jurisdiction provided in the DeviceDefinition.udiDeviceIdentifier",
         default=None,
     )
-    deviceIdentifier_ext: Optional[Element] = Field(
-        description="Placeholder element for deviceIdentifier extensions",
-        default=None,
-        alias="_deviceIdentifier",
-    )
-    issuer: Optional[Uri] = Field(
+    issuer: Optional[fhir.uri] = Field(
         description="The organization that assigns the identifier algorithm",
         default=None,
     )
-    issuer_ext: Optional[Element] = Field(
-        description="Placeholder element for issuer extensions",
-        default=None,
-        alias="_issuer",
-    )
-    jurisdiction: Optional[Uri] = Field(
+    jurisdiction: Optional[fhir.uri] = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
         default=None,
-    )
-    jurisdiction_ext: Optional[Element] = Field(
-        description="Placeholder element for jurisdiction extensions",
-        default=None,
-        alias="_jurisdiction",
     )
     marketDistribution: Optional[
         ListType["DeviceDefinitionUdiDeviceIdentifierMarketDistribution"]
@@ -78,74 +55,41 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
         default=None,
     )
 
-
 class DeviceDefinitionRegulatoryIdentifier(BackboneElement):
     """
     Identifier associated with the regulatory documentation (certificates, technical documentation, post-market surveillance documentation and reports) of a set of device models sharing the same intended purpose, risk class and essential design and manufacturing characteristics. One example is the Basic UDI-DI in Europe.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="basic | master | license",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    deviceIdentifier: Optional[String] = Field(
+    deviceIdentifier: Optional[fhir.string] = Field(
         description="The identifier itself",
         default=None,
     )
-    deviceIdentifier_ext: Optional[Element] = Field(
-        description="Placeholder element for deviceIdentifier extensions",
-        default=None,
-        alias="_deviceIdentifier",
-    )
-    issuer: Optional[Uri] = Field(
+    issuer: Optional[fhir.uri] = Field(
         description="The organization that issued this identifier",
         default=None,
     )
-    issuer_ext: Optional[Element] = Field(
-        description="Placeholder element for issuer extensions",
-        default=None,
-        alias="_issuer",
-    )
-    jurisdiction: Optional[Uri] = Field(
+    jurisdiction: Optional[fhir.uri] = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
         default=None,
     )
-    jurisdiction_ext: Optional[Element] = Field(
-        description="Placeholder element for jurisdiction extensions",
-        default=None,
-        alias="_jurisdiction",
-    )
-
 
 class DeviceDefinitionDeviceName(BackboneElement):
     """
     The name or names of the device as given by the manufacturer.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A name that is used to refer to the device",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="registered-name | user-friendly-name | patient-reported-name",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-
 
 class DeviceDefinitionClassification(BackboneElement):
     """
@@ -161,7 +105,6 @@ class DeviceDefinitionClassification(BackboneElement):
         default=None,
     )
 
-
 class DeviceDefinitionConformsTo(BackboneElement):
     """
     Identifies the standards, specifications, or formal guidances for the capabilities supported by the device. The device may be certified as conformant to these specifications e.g., communication, performance, process, measurement, or specialization standards.
@@ -175,20 +118,14 @@ class DeviceDefinitionConformsTo(BackboneElement):
         description="Identifies the standard, specification, or formal guidance that the device adheres to the Device Specification type",
         default=None,
     )
-    version: Optional[ListType[String]] = Field(
+    version: Optional[ListType[fhir.string]] = Field(
         description="The specific form or variant of the standard, specification or formal guidance",
         default=None,
-    )
-    version_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     source: Optional[ListType[RelatedArtifact]] = Field(
         description="Standard, regulation, certification, or guidance website, document, or other publication, or similar, supporting the conformance",
         default=None,
     )
-
 
 class DeviceDefinitionHasPart(BackboneElement):
     """
@@ -199,36 +136,24 @@ class DeviceDefinitionHasPart(BackboneElement):
         description="Reference to the part",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Number of occurrences of the part",
         default=None,
     )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
-    )
-
 
 class DeviceDefinitionPackagingDistributor(BackboneElement):
     """
     An organization that distributes the packaged device.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Distributor\u0027s human-readable name",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     organizationReference: Optional[ListType[Reference]] = Field(
         description="Distributor as an Organization resource",
         default=None,
     )
-
 
 class DeviceDefinitionUdiDeviceIdentifierMarketDistribution(BackboneElement):
     """
@@ -239,48 +164,27 @@ class DeviceDefinitionUdiDeviceIdentifierMarketDistribution(BackboneElement):
         description="Begin and end dates for the commercial distribution of the device",
         default=None,
     )
-    subJurisdiction: Optional[Uri] = Field(
+    subJurisdiction: Optional[fhir.uri] = Field(
         description="National state or territory where the device is commercialized",
         default=None,
     )
-    subJurisdiction_ext: Optional[Element] = Field(
-        description="Placeholder element for subJurisdiction extensions",
-        default=None,
-        alias="_subJurisdiction",
-    )
-
 
 class DeviceDefinitionPackagingUdiDeviceIdentifier(BackboneElement):
     """
     Unique Device Identifier (UDI) Barcode string on the packaging.
     """
 
-    deviceIdentifier: Optional[String] = Field(
+    deviceIdentifier: Optional[fhir.string] = Field(
         description="The identifier that is to be associated with every Device that references this DeviceDefintiion for the issuer and jurisdiction provided in the DeviceDefinition.udiDeviceIdentifier",
         default=None,
     )
-    deviceIdentifier_ext: Optional[Element] = Field(
-        description="Placeholder element for deviceIdentifier extensions",
-        default=None,
-        alias="_deviceIdentifier",
-    )
-    issuer: Optional[Uri] = Field(
+    issuer: Optional[fhir.uri] = Field(
         description="The organization that assigns the identifier algorithm",
         default=None,
     )
-    issuer_ext: Optional[Element] = Field(
-        description="Placeholder element for issuer extensions",
-        default=None,
-        alias="_issuer",
-    )
-    jurisdiction: Optional[Uri] = Field(
+    jurisdiction: Optional[fhir.uri] = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
         default=None,
-    )
-    jurisdiction_ext: Optional[Element] = Field(
-        description="Placeholder element for jurisdiction extensions",
-        default=None,
-        alias="_jurisdiction",
     )
     marketDistribution: Optional[
         ListType[DeviceDefinitionUdiDeviceIdentifierMarketDistribution]
@@ -288,7 +192,6 @@ class DeviceDefinitionPackagingUdiDeviceIdentifier(BackboneElement):
         description="Indicates whether and when the device is available on the market",
         default=None,
     )
-
 
 class DeviceDefinitionPackaging(BackboneElement):
     """
@@ -303,14 +206,9 @@ class DeviceDefinitionPackaging(BackboneElement):
         description="A code that defines the specific type of packaging",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="The number of items contained in the package (devices or sub-packages)",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     distributor: Optional[ListType[DeviceDefinitionPackagingDistributor]] = Field(
         description="An organization that distributes the packaged device",
@@ -327,7 +225,6 @@ class DeviceDefinitionPackaging(BackboneElement):
         default=None,
     )
 
-
 class DeviceDefinitionVersion(BackboneElement):
     """
     The version of the device or software.
@@ -341,16 +238,10 @@ class DeviceDefinitionVersion(BackboneElement):
         description="The hardware or software module of the device to which the version applies",
         default=None,
     )
-    value: Optional[String] = Field(
+    value: Optional[fhir.string] = Field(
         description="The version text",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
 
 class DeviceDefinitionProperty(BackboneElement):
     """
@@ -358,7 +249,7 @@ class DeviceDefinitionProperty(BackboneElement):
     """
 
     type: Optional[CodeableConcept] = Field(
-        description="Code that specifies the property being represented",
+        description="code that specifies the property being represented",
         default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
@@ -369,32 +260,17 @@ class DeviceDefinitionProperty(BackboneElement):
         description="Value of the property",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Value of the property",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value of the property",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Value of the property",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Value of the property",
@@ -419,16 +295,15 @@ class DeviceDefinitionProperty(BackboneElement):
             field_types=[
                 Quantity,
                 CodeableConcept,
-                String,
-                Boolean,
-                Integer,
+                fhir.String,
+                fhir.Boolean,
+                fhir.Integer,
                 Range,
                 Attachment,
             ],
             field_name_base="value",
             required=True,
         )
-
 
 class DeviceDefinitionLink(BackboneElement):
     """
@@ -444,7 +319,6 @@ class DeviceDefinitionLink(BackboneElement):
         default=None,
     )
 
-
 class DeviceDefinitionMaterial(BackboneElement):
     """
     A substance used to create the material(s) of which the device is made.
@@ -454,25 +328,14 @@ class DeviceDefinitionMaterial(BackboneElement):
         description="A relevant substance that the device contains, may contain, or is made of",
         default=None,
     )
-    alternate: Optional[Boolean] = Field(
+    alternate: Optional[fhir.boolean] = Field(
         description="Indicates an alternative material of the device",
         default=None,
     )
-    alternate_ext: Optional[Element] = Field(
-        description="Placeholder element for alternate extensions",
-        default=None,
-        alias="_alternate",
-    )
-    allergenicIndicator: Optional[Boolean] = Field(
+    allergenicIndicator: Optional[fhir.boolean] = Field(
         description="Whether the substance is a known or suspected allergen",
         default=None,
     )
-    allergenicIndicator_ext: Optional[Element] = Field(
-        description="Placeholder element for allergenicIndicator extensions",
-        default=None,
-        alias="_allergenicIndicator",
-    )
-
 
 class DeviceDefinitionGuideline(BackboneElement):
     """
@@ -483,14 +346,9 @@ class DeviceDefinitionGuideline(BackboneElement):
         description="The circumstances that form the setting for using the device",
         default=None,
     )
-    usageInstruction: Optional[Markdown] = Field(
+    usageInstruction: Optional[fhir.markdown] = Field(
         description="Detailed written and visual directions for the user on how to use the device",
         default=None,
-    )
-    usageInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for usageInstruction extensions",
-        default=None,
-        alias="_usageInstruction",
     )
     relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="A source of information or reference for this guideline",
@@ -508,45 +366,28 @@ class DeviceDefinitionGuideline(BackboneElement):
         description="Specific hazard alert information that a user needs to know before using the device",
         default=None,
     )
-    intendedUse: Optional[String] = Field(
+    intendedUse: Optional[fhir.string] = Field(
         description="A description of the general purpose or medical use of the device or its function",
         default=None,
     )
-    intendedUse_ext: Optional[Element] = Field(
-        description="Placeholder element for intendedUse extensions",
-        default=None,
-        alias="_intendedUse",
-    )
-
 
 class DeviceDefinitionCorrectiveAction(BackboneElement):
     """
     Tracking of latest field safety corrective action.
     """
 
-    recall: Optional[Boolean] = Field(
+    recall: Optional[fhir.boolean] = Field(
         description="Whether the corrective action was a recall",
         default=None,
     )
-    recall_ext: Optional[Element] = Field(
-        description="Placeholder element for recall extensions",
-        default=None,
-        alias="_recall",
-    )
-    scope: Optional[Code] = Field(
+    scope: Optional[fhir.code] = Field(
         description="model | lot-numbers | serial-numbers",
         default=None,
-    )
-    scope_ext: Optional[Element] = Field(
-        description="Placeholder element for scope extensions",
-        default=None,
-        alias="_scope",
     )
     period: Optional[Period] = Field(
         description="Start and end dates of the  corrective action",
         default=None,
     )
-
 
 class DeviceDefinitionChargeItem(BackboneElement):
     """
@@ -570,7 +411,6 @@ class DeviceDefinitionChargeItem(BackboneElement):
         default=None,
     )
 
-
 class DeviceDefinition(DomainResource):
     """
     This is a specialized resource that defines the characteristics and capabilities of a device.
@@ -580,14 +420,9 @@ class DeviceDefinition(DomainResource):
     _type = "DeviceDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceDefinition"
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Additional information to describe the device",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
@@ -605,14 +440,9 @@ class DeviceDefinition(DomainResource):
             default=None,
         )
     )
-    partNumber: Optional[String] = Field(
+    partNumber: Optional[fhir.string] = Field(
         description="The part number or catalog number of the device",
         default=None,
-    )
-    partNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for partNumber extensions",
-        default=None,
-        alias="_partNumber",
     )
     manufacturer: Optional[Reference] = Field(
         description="Name of device manufacturer",
@@ -622,14 +452,9 @@ class DeviceDefinition(DomainResource):
         description="The name or names of the device as given by the manufacturer",
         default=None,
     )
-    modelNumber: Optional[String] = Field(
+    modelNumber: Optional[fhir.string] = Field(
         description="The catalog or model number for the device for example as defined by the manufacturer",
         default=None,
-    )
-    modelNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for modelNumber extensions",
-        default=None,
-        alias="_modelNumber",
     )
     classification: Optional[ListType[DeviceDefinitionClassification]] = Field(
         description="What kind of device or device system this is",
@@ -688,14 +513,9 @@ class DeviceDefinition(DomainResource):
         description="A substance used to create the material(s) of which the device is made",
         default=None,
     )
-    productionIdentifierInUDI: Optional[ListType[Code]] = Field(
+    productionIdentifierInUDI: Optional[ListType[fhir.code]] = Field(
         description="lot-number | manufactured-date | serial-number | expiration-date | biological-source | software-version",
         default=None,
-    )
-    productionIdentifierInUDI_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for productionIdentifierInUDI extensions",
-        default=None,
-        alias="_productionIdentifierInUDI",
     )
     guideline: Optional[DeviceDefinitionGuideline] = Field(
         description="Information aimed at providing directions for the usage of this model of device",

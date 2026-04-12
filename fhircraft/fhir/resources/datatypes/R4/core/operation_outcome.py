@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,54 +23,29 @@ class OperationOutcomeIssue(BackboneElement):
     An error, warning, or information message that results from a system action.
     """
 
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="fatal | error | warning | information",
         default=None,
     )
-    severity_ext: Optional[Element] = Field(
-        description="Placeholder element for severity extensions",
-        default=None,
-        alias="_severity",
-    )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Error or warning code",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     details: Optional[CodeableConcept] = Field(
         description="Additional details about the error",
         default=None,
     )
-    diagnostics: Optional[String] = Field(
+    diagnostics: Optional[fhir.string] = Field(
         description="Additional diagnostic information about the issue",
         default=None,
     )
-    diagnostics_ext: Optional[Element] = Field(
-        description="Placeholder element for diagnostics extensions",
-        default=None,
-        alias="_diagnostics",
-    )
-    location: Optional[ListType[String]] = Field(
+    location: Optional[ListType[fhir.string]] = Field(
         description="Deprecated: Path of element(s) related to issue",
         default=None,
     )
-    location_ext: Optional[Element] = Field(
-        description="Placeholder element for location extensions",
-        default=None,
-        alias="_location",
-    )
-    expression: Optional[ListType[String]] = Field(
+    expression: Optional[ListType[fhir.string]] = Field(
         description="FHIRPath of element(s) related to issue",
         default=None,
-    )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
     )
 
 

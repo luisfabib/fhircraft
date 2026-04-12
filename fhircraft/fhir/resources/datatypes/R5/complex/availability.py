@@ -3,55 +3,47 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     BackboneElement,
     Period,
 )
 
-
 class AvailabilityAvailableTime(BackboneElement):
     """
     Times the {item} is available
     """
 
-    daysOfWeek: Optional[List[Code]] = Field(
+    daysOfWeek: Optional[List[fhir.code]] = Field(
         description="Days of the week when the {item} is available",
         default=None,
     )
-    allDay: Optional[Boolean] = Field(
+    allDay: Optional[fhir.boolean] = Field(
         description="Is this always available? e.g. 24 hour service",
         default=None,
     )
-    availableStartTime: Optional[Time] = Field(
+    availableStartTime: Optional[fhir.time_] = Field(
         description="Opening time of day (ignored if allDay = true)",
         default=None,
     )
-    availableEndTime: Optional[Time] = Field(
+    availableEndTime: Optional[fhir.time_] = Field(
         description="Closing time of day (ignored if allDay = true)",
         default=None,
     )
-
 
 class AvailabilityNotAvailableTime(BackboneElement):
     """
     Not available during this time due to provided reason
     """
 
-    description: String = Field(
+    description: fhir.string = Field(
         description="Reason presented to the user explaining why time not available",
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     during: Optional[Period] = Field(
         description="Service not available from this date",
         default=None,
     )
-
 
 class Availability(Element):
     """

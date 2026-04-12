@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    UnsignedInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -42,14 +36,9 @@ class GroupCharacteristic(BackboneElement):
         description="Value held by characteristic",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Value held by characteristic",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Value held by characteristic",
@@ -63,14 +52,9 @@ class GroupCharacteristic(BackboneElement):
         description="Value held by characteristic",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Group includes or excludes",
         default=None,
-    )
-    exclude_ext: Optional[Element] = Field(
-        description="Placeholder element for exclude extensions",
-        default=None,
-        alias="_exclude",
     )
     period: Optional[Period] = Field(
         description="Period over which characteristic is tested",
@@ -88,7 +72,7 @@ class GroupCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Boolean, Quantity, Range, Reference],
+            field_types=[CodeableConcept, fhir.Boolean, Quantity, Range, Reference],
             field_name_base="value",
             required=True,
         )
@@ -107,14 +91,9 @@ class GroupMember(BackboneElement):
         description="Period member belonged to the group",
         default=None,
     )
-    inactive: Optional[Boolean] = Field(
+    inactive: Optional[fhir.boolean] = Field(
         description="If member is no longer in group",
         default=None,
-    )
-    inactive_ext: Optional[Element] = Field(
-        description="Placeholder element for inactive extensions",
-        default=None,
-        alias="_inactive",
     )
 
 
@@ -143,54 +122,29 @@ class Group(DomainResource):
         description="Unique id",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this group\u0027s record is in active use",
         default=None,
     )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="person | animal | practitioner | device | medication | substance",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    actual: Optional[Boolean] = Field(
+    actual: Optional[fhir.boolean] = Field(
         description="Descriptive or actual",
         default=None,
-    )
-    actual_ext: Optional[Element] = Field(
-        description="Placeholder element for actual extensions",
-        default=None,
-        alias="_actual",
     )
     code: Optional[CodeableConcept] = Field(
         description="Kind of Group members",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for Group",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    quantity: Optional[UnsignedInt] = Field(
+    quantity: Optional[fhir.unsignedInt] = Field(
         description="Number of members",
         default=None,
-    )
-    quantity_ext: Optional[Element] = Field(
-        description="Placeholder element for quantity extensions",
-        default=None,
-        alias="_quantity",
     )
     managingEntity: Optional[Reference] = Field(
         description="Entity that is the custodian of the Group\u0027s definition",

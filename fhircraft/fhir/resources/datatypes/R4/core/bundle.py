@@ -1,20 +1,12 @@
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
 
 from typing import List as ListType, Optional
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    Code,
-    Decimal,
-    Instant,
-    String,
-    UnsignedInt,
-    Uri,
-)
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     Element,
@@ -30,23 +22,13 @@ class BundleLink(BackboneElement):
     A series of links that provide context to this bundle.
     """
 
-    relation: Optional[String] = Field(
+    relation: Optional[fhir.string] = Field(
         description="See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1",
         default=None,
     )
-    relation_ext: Optional[Element] = Field(
-        description="Placeholder element for relation extensions",
-        default=None,
-        alias="_relation",
-    )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Reference details for the link",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
 
 
@@ -55,23 +37,13 @@ class BundleEntryLink(BackboneElement):
     A series of links that provide context to this entry.
     """
 
-    relation: Optional[String] = Field(
+    relation: Optional[fhir.string] = Field(
         description="See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1",
         default=None,
     )
-    relation_ext: Optional[Element] = Field(
-        description="Placeholder element for relation extensions",
-        default=None,
-        alias="_relation",
-    )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Reference details for the link",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
 
 
@@ -80,23 +52,13 @@ class BundleEntrySearch(BackboneElement):
     Information about the search process that lead to the creation of this entry.
     """
 
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="match | include | outcome - why this is in the result set",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    score: Optional[Decimal] = Field(
+    score: Optional[fhir.decimal] = Field(
         description="Search ranking (between 0 and 1)",
         default=None,
-    )
-    score_ext: Optional[Element] = Field(
-        description="Placeholder element for score extensions",
-        default=None,
-        alias="_score",
     )
 
 
@@ -105,59 +67,29 @@ class BundleEntryRequest(BackboneElement):
     Additional information about how this entry should be processed as part of a transaction or batch.  For history, it shows how the entry was processed to create the version contained in the entry.
     """
 
-    method: Optional[Code] = Field(
+    method: Optional[fhir.code] = Field(
         description="GET | HEAD | POST | PUT | DELETE | PATCH",
         default=None,
     )
-    method_ext: Optional[Element] = Field(
-        description="Placeholder element for method extensions",
-        default=None,
-        alias="_method",
-    )
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="URL for HTTP equivalent of this entry",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-    ifNoneMatch: Optional[String] = Field(
+    ifNoneMatch: Optional[fhir.string] = Field(
         description="For managing cache currency",
         default=None,
     )
-    ifNoneMatch_ext: Optional[Element] = Field(
-        description="Placeholder element for ifNoneMatch extensions",
-        default=None,
-        alias="_ifNoneMatch",
-    )
-    ifModifiedSince: Optional[Instant] = Field(
+    ifModifiedSince: Optional[fhir.instant] = Field(
         description="For managing cache currency",
         default=None,
     )
-    ifModifiedSince_ext: Optional[Element] = Field(
-        description="Placeholder element for ifModifiedSince extensions",
-        default=None,
-        alias="_ifModifiedSince",
-    )
-    ifMatch: Optional[String] = Field(
+    ifMatch: Optional[fhir.string] = Field(
         description="For managing update contention",
         default=None,
     )
-    ifMatch_ext: Optional[Element] = Field(
-        description="Placeholder element for ifMatch extensions",
-        default=None,
-        alias="_ifMatch",
-    )
-    ifNoneExist: Optional[String] = Field(
+    ifNoneExist: Optional[fhir.string] = Field(
         description="For conditional creates",
         default=None,
-    )
-    ifNoneExist_ext: Optional[Element] = Field(
-        description="Placeholder element for ifNoneExist extensions",
-        default=None,
-        alias="_ifNoneExist",
     )
 
 
@@ -166,41 +98,21 @@ class BundleEntryResponse(BackboneElement):
     Indicates the results of processing the corresponding 'request' entry in the batch or transaction being responded to or what the results of an operation where when returning history.
     """
 
-    status: Optional[String] = Field(
+    status: Optional[fhir.string] = Field(
         description="Status response code (text optional)",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    location: Optional[Uri] = Field(
+    location: Optional[fhir.uri] = Field(
         description="The location (if the operation returns a location)",
         default=None,
     )
-    location_ext: Optional[Element] = Field(
-        description="Placeholder element for location extensions",
-        default=None,
-        alias="_location",
-    )
-    etag: Optional[String] = Field(
+    etag: Optional[fhir.string] = Field(
         description="The Etag for the resource (if relevant)",
         default=None,
     )
-    etag_ext: Optional[Element] = Field(
-        description="Placeholder element for etag extensions",
-        default=None,
-        alias="_etag",
-    )
-    lastModified: Optional[Instant] = Field(
+    lastModified: Optional[fhir.instant] = Field(
         description="Server\u0027s date time modified",
         default=None,
-    )
-    lastModified_ext: Optional[Element] = Field(
-        description="Placeholder element for lastModified extensions",
-        default=None,
-        alias="_lastModified",
     )
     outcome: Optional[Resource] = Field(
         description="OperationOutcome with hints and warnings (for batch/transaction)",
@@ -217,14 +129,9 @@ class BundleEntry(BackboneElement):
         description="Links related to this entry",
         default=None,
     )
-    fullUrl: Optional[Uri] = Field(
+    fullUrl: Optional[fhir.uri] = Field(
         description="URI for resource (Absolute URL server address or URI for UUID/OID)",
         default=None,
-    )
-    fullUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for fullUrl extensions",
-        default=None,
-        alias="_fullUrl",
     )
     resource: Optional[Resource] = Field(
         description="A resource in the bundle",
@@ -257,32 +164,17 @@ class Bundle(Resource):
         description="Persistent identifier for the bundle",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="document | message | transaction | transaction-response | batch | batch-response | history | searchset | collection",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    timestamp: Optional[Instant] = Field(
+    timestamp: Optional[fhir.instant] = Field(
         description="When the bundle was assembled",
         default=None,
     )
-    timestamp_ext: Optional[Element] = Field(
-        description="Placeholder element for timestamp extensions",
-        default=None,
-        alias="_timestamp",
-    )
-    total: Optional[UnsignedInt] = Field(
+    total: Optional[fhir.unsignedInt] = Field(
         description="If search, the total number of matches",
         default=None,
-    )
-    total_ext: Optional[Element] = Field(
-        description="Placeholder element for total extensions",
-        default=None,
-        alias="_total",
     )
     link: Optional[ListType[BundleLink]] = Field(
         description="Links related to this Bundle",

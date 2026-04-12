@@ -5,8 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PermissionJustification(BackboneElement):
     """
     The asserted justification for using the data.
@@ -37,26 +36,19 @@ class PermissionJustification(BackboneElement):
         default=None,
     )
 
-
 class PermissionRuleDataResource(BackboneElement):
     """
     Explicit FHIR Resource references.
     """
 
-    meaning: Optional[Code] = Field(
+    meaning: Optional[fhir.code] = Field(
         description="instance | related | dependents | authoredby",
         default=None,
-    )
-    meaning_ext: Optional[Element] = Field(
-        description="Placeholder element for meaning extensions",
-        default=None,
-        alias="_meaning",
     )
     reference: Optional[Reference] = Field(
         description="The actual data reference",
         default=None,
     )
-
 
 class PermissionRuleData(BackboneElement):
     """
@@ -80,7 +72,6 @@ class PermissionRuleData(BackboneElement):
         default=None,
     )
 
-
 class PermissionRuleActivity(BackboneElement):
     """
     A description or definition of which activities are allowed to be done on the data.
@@ -99,20 +90,14 @@ class PermissionRuleActivity(BackboneElement):
         default=None,
     )
 
-
 class PermissionRule(BackboneElement):
     """
     A set of rules.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="deny | permit",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     data: Optional[ListType[PermissionRuleData]] = Field(
         description="The selection criteria to identify data that is within scope of this provision",
@@ -127,7 +112,6 @@ class PermissionRule(BackboneElement):
         default=None,
     )
 
-
 class Permission(DomainResource):
     """
     Permission resource holds access rules for a given data and context.
@@ -137,27 +121,17 @@ class Permission(DomainResource):
     _type = "Permission"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Permission"
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | entered-in-error | draft | rejected",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     asserter: Optional[Reference] = Field(
         description="The person or entity that asserts the permission",
         default=None,
     )
-    date: Optional[ListType[DateTime]] = Field(
+    date: Optional[ListType[fhir.dateTime]] = Field(
         description="The date that permission was asserted",
         default=None,
-    )
-    date_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     validity: Optional[Period] = Field(
         description="The period in which the permission is active",
@@ -167,14 +141,9 @@ class Permission(DomainResource):
         description="The asserted justification for using the data",
         default=None,
     )
-    combining: Optional[Code] = Field(
+    combining: Optional[fhir.code] = Field(
         description="deny-overrides | permit-overrides | ordered-deny-overrides | ordered-permit-overrides | deny-unless-permit | permit-unless-deny",
         default=None,
-    )
-    combining_ext: Optional[Element] = Field(
-        description="Placeholder element for combining extensions",
-        default=None,
-        alias="_combining",
     )
     rule: Optional[ListType[PermissionRule]] = Field(
         description="Constraints to the Permission",

@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Url,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -34,27 +28,17 @@ class MessageHeaderDestination(BackboneElement):
     The destination application which the message is intended for.
     """
 
-    endpointUrl: Optional[Url] = Field(
+    endpointUrl: Optional[fhir.url] = Field(
         description="Actual destination address or Endpoint resource",
         default=None,
-    )
-    endpointUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for endpointUrl extensions",
-        default=None,
-        alias="_endpointUrl",
     )
     endpointReference: Optional[Reference] = Field(
         description="Actual destination address or Endpoint resource",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     target: Optional[Reference] = Field(
         description="Particular delivery destination within the destination",
@@ -76,7 +60,7 @@ class MessageHeaderDestination(BackboneElement):
     def endpoint_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Url, Reference],
+            field_types=[fhir.Url, Reference],
             field_name_base="endpoint",
             required=False,
         )
@@ -87,45 +71,25 @@ class MessageHeaderSource(BackboneElement):
     The source application from which this message originated.
     """
 
-    endpointUrl: Optional[Url] = Field(
+    endpointUrl: Optional[fhir.url] = Field(
         description="Actual source address or Endpoint resource",
         default=None,
-    )
-    endpointUrl_ext: Optional[Element] = Field(
-        description="Placeholder element for endpointUrl extensions",
-        default=None,
-        alias="_endpointUrl",
     )
     endpointReference: Optional[Reference] = Field(
         description="Actual source address or Endpoint resource",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    software: Optional[String] = Field(
+    software: Optional[fhir.string] = Field(
         description="Name of software running the system",
         default=None,
     )
-    software_ext: Optional[Element] = Field(
-        description="Placeholder element for software extensions",
-        default=None,
-        alias="_software",
-    )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version of software running",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     contact: Optional[ContactPoint] = Field(
         description="Human contact for problems",
@@ -143,7 +107,7 @@ class MessageHeaderSource(BackboneElement):
     def endpoint_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Url, Reference],
+            field_types=[fhir.Url, Reference],
             field_name_base="endpoint",
             required=False,
         )
@@ -158,14 +122,9 @@ class MessageHeaderResponse(BackboneElement):
         description="Bundle.identifier of original message",
         default=None,
     )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="ok | transient-error | fatal-error",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     details: Optional[Reference] = Field(
         description="Specific list of hints/warnings/errors",
@@ -186,14 +145,9 @@ class MessageHeader(DomainResource):
         description="Event code or link to EventDefinition",
         default=None,
     )
-    eventCanonical: Optional[Canonical] = Field(
+    eventCanonical: Optional[fhir.canonical] = Field(
         description="Event code or link to EventDefinition",
         default=None,
-    )
-    eventCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for eventCanonical extensions",
-        default=None,
-        alias="_eventCanonical",
     )
     destination: Optional[ListType[MessageHeaderDestination]] = Field(
         description="Message destination application(s)",
@@ -227,14 +181,9 @@ class MessageHeader(DomainResource):
         description="The actual content of the message",
         default=None,
     )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Link to the definition for this message",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
 
     @property
@@ -248,7 +197,7 @@ class MessageHeader(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, Canonical],
+            field_types=[Coding, fhir.Canonical],
             field_name_base="event",
             required=True,
         )

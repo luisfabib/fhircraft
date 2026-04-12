@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ResearchSubject(DomainResource):
     """
@@ -44,14 +43,9 @@ class ResearchSubject(DomainResource):
         description="Business Identifier for research subject in a study",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     period: Optional[Period] = Field(
         description="Start and end of participation",
@@ -65,23 +59,13 @@ class ResearchSubject(DomainResource):
         description="Who is part of study",
         default=None,
     )
-    assignedArm: Optional[String] = Field(
+    assignedArm: Optional[fhir.string] = Field(
         description="What path should be followed",
         default=None,
     )
-    assignedArm_ext: Optional[Element] = Field(
-        description="Placeholder element for assignedArm extensions",
-        default=None,
-        alias="_assignedArm",
-    )
-    actualArm: Optional[String] = Field(
+    actualArm: Optional[fhir.string] = Field(
         description="What path was followed",
         default=None,
-    )
-    actualArm_ext: Optional[Element] = Field(
-        description="Placeholder element for actualArm extensions",
-        default=None,
-        alias="_actualArm",
     )
     consent: Optional[Reference] = Field(
         description="Agreement to participate in study",

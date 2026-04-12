@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -26,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class VerificationResultPrimarySource(BackboneElement):
     """
@@ -49,14 +42,9 @@ class VerificationResultPrimarySource(BackboneElement):
         description="successful | failed | unknown",
         default=None,
     )
-    validationDate: Optional[DateTime] = Field(
+    validationDate: Optional[fhir.dateTime] = Field(
         description="When the target was validated against the primary source",
         default=None,
-    )
-    validationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for validationDate extensions",
-        default=None,
-        alias="_validationDate",
     )
     canPushUpdates: Optional[CodeableConcept] = Field(
         description="yes | no | undetermined",
@@ -66,7 +54,6 @@ class VerificationResultPrimarySource(BackboneElement):
         description="specific | any | source",
         default=None,
     )
-
 
 class VerificationResultAttestation(BackboneElement):
     """
@@ -85,32 +72,17 @@ class VerificationResultAttestation(BackboneElement):
         description="The method by which attested information was submitted/retrieved",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="The date the information was attested to",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    sourceIdentityCertificate: Optional[String] = Field(
+    sourceIdentityCertificate: Optional[fhir.string] = Field(
         description="A digital identity certificate associated with the attestation source",
         default=None,
     )
-    sourceIdentityCertificate_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceIdentityCertificate extensions",
-        default=None,
-        alias="_sourceIdentityCertificate",
-    )
-    proxyIdentityCertificate: Optional[String] = Field(
+    proxyIdentityCertificate: Optional[fhir.string] = Field(
         description="A digital identity certificate associated with the proxy entity submitting attested information on behalf of the attestation source",
         default=None,
-    )
-    proxyIdentityCertificate_ext: Optional[Element] = Field(
-        description="Placeholder element for proxyIdentityCertificate extensions",
-        default=None,
-        alias="_proxyIdentityCertificate",
     )
     proxySignature: Optional[Signature] = Field(
         description="Proxy signature (digital or image)",
@@ -121,7 +93,6 @@ class VerificationResultAttestation(BackboneElement):
         default=None,
     )
 
-
 class VerificationResultValidator(BackboneElement):
     """
     Information about the entity validating information.
@@ -131,20 +102,14 @@ class VerificationResultValidator(BackboneElement):
         description="Reference to the organization validating information",
         default=None,
     )
-    identityCertificate: Optional[String] = Field(
+    identityCertificate: Optional[fhir.string] = Field(
         description="A digital identity certificate associated with the validator",
         default=None,
-    )
-    identityCertificate_ext: Optional[Element] = Field(
-        description="Placeholder element for identityCertificate extensions",
-        default=None,
-        alias="_identityCertificate",
     )
     attestationSignature: Optional[Signature] = Field(
         description="Validator signature (digital or image)",
         default=None,
     )
-
 
 class VerificationResult(DomainResource):
     """
@@ -159,36 +124,21 @@ class VerificationResult(DomainResource):
         description="A resource that was validated",
         default=None,
     )
-    targetLocation: Optional[ListType[String]] = Field(
+    targetLocation: Optional[ListType[fhir.string]] = Field(
         description="The fhirpath location(s) within the resource that was validated",
         default=None,
-    )
-    targetLocation_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for targetLocation extensions",
-        default=None,
-        alias="_targetLocation",
     )
     need: Optional[CodeableConcept] = Field(
         description="none | initial | periodic",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="attested | validated | in-process | req-revalid | val-fail | reval-fail | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="When the validation status was updated",
         default=None,
-    )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
     )
     validationType: Optional[CodeableConcept] = Field(
         description="nothing | primary | multiple",
@@ -202,23 +152,13 @@ class VerificationResult(DomainResource):
         description="Frequency of revalidation",
         default=None,
     )
-    lastPerformed: Optional[DateTime] = Field(
+    lastPerformed: Optional[fhir.dateTime] = Field(
         description="The date/time validation was last completed (including failed validations)",
         default=None,
     )
-    lastPerformed_ext: Optional[Element] = Field(
-        description="Placeholder element for lastPerformed extensions",
-        default=None,
-        alias="_lastPerformed",
-    )
-    nextScheduled: Optional[Date] = Field(
+    nextScheduled: Optional[fhir.date_] = Field(
         description="The date when target is next validated, if appropriate",
         default=None,
-    )
-    nextScheduled_ext: Optional[Element] = Field(
-        description="Placeholder element for nextScheduled extensions",
-        default=None,
-        alias="_nextScheduled",
     )
     failureAction: Optional[CodeableConcept] = Field(
         description="fatal | warn | rec-only | none",

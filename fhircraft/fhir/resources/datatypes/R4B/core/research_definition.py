@@ -4,17 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -53,81 +44,41 @@ class ResearchDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this research definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this research definition, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the research definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the research definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this research definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this research definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    shortTitle: Optional[String] = Field(
+    shortTitle: Optional[fhir.string] = Field(
         description="Title for use in informal contexts",
         default=None,
     )
-    shortTitle_ext: Optional[Element] = Field(
-        description="Placeholder element for shortTitle extensions",
-        default=None,
-        alias="_shortTitle",
-    )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the ResearchDefinition",
         default=None,
     )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
@@ -137,45 +88,25 @@ class ResearchDefinition(DomainResource):
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the research definition",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    comment: Optional[ListType[String]] = Field(
+    comment: Optional[ListType[fhir.string]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -185,50 +116,25 @@ class ResearchDefinition(DomainResource):
         description="Intended jurisdiction for research definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this research definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    usage: Optional[String] = Field(
+    usage: Optional[fhir.string] = Field(
         description="Describes the clinical usage of the ResearchDefinition",
         default=None,
     )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the research definition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the research definition was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the research definition is expected to be used",
@@ -258,14 +164,9 @@ class ResearchDefinition(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the ResearchDefinition",
         default=None,
-    )
-    library_ext: Optional[Element] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
     )
     population: Optional[Reference] = Field(
         description="What population?",

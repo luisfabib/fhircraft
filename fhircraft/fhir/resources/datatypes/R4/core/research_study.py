@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Markdown
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -23,55 +23,37 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ResearchStudyArm(BackboneElement):
     """
     Describes an expected sequence of events for one of the participants of a study.  E.g. Exposure to drug A, wash-out, exposure to drug B, wash-out, follow-up.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for study arm",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     type: Optional[CodeableConcept] = Field(
         description="Categorization of study arm",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Short explanation of study path",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-
 
 class ResearchStudyObjective(BackboneElement):
     """
     A goal that the study is aiming to achieve in terms of a scientific question to be answered by the analysis of data collected during the study.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Label for the objective",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     type: Optional[CodeableConcept] = Field(
         description="primary | secondary | exploratory",
         default=None,
     )
-
 
 class ResearchStudy(DomainResource):
     """
@@ -98,14 +80,9 @@ class ResearchStudy(DomainResource):
         description="Business Identifier for study",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this study",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     protocol: Optional[ListType[Reference]] = Field(
         description="Steps followed in executing study",
@@ -115,14 +92,9 @@ class ResearchStudy(DomainResource):
         description="Part of larger study",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | administratively-completed | approved | closed-to-accrual | closed-to-accrual-and-intervention | completed | disapproved | in-review | temporarily-closed-to-accrual | temporarily-closed-to-accrual-and-intervention | withdrawn",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     primaryPurposeType: Optional[CodeableConcept] = Field(
         description="treatment | prevention | diagnostic | supportive-care | screening | health-services-research | basic-science | device-feasibility",
@@ -160,14 +132,9 @@ class ResearchStudy(DomainResource):
         description="Geographic region(s) for study",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="What this is study doing",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     enrollment: Optional[ListType[Reference]] = Field(
         description="Inclusion \u0026 exclusion criteria",

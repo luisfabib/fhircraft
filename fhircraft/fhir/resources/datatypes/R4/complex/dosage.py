@@ -3,8 +3,8 @@ from typing import List, Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
 
 from .codeable_concept import CodeableConcept
 from .element import Element
@@ -13,7 +13,6 @@ from .simple_quantity import SimpleQuantity
 from .range import Range
 from .ratio import Ratio
 from .timing import Timing
-
 
 class DosageDoseAndRate(BackboneElement):
     """
@@ -77,7 +76,6 @@ class DosageDoseAndRate(BackboneElement):
             base="rate",
         )
 
-
 class Dosage(BackboneElement):
     """
     How the medication is/was taken or should be taken
@@ -85,42 +83,27 @@ class Dosage(BackboneElement):
 
     _type = "BackboneElement"
 
-    sequence: Optional[Integer] = Field(
+    sequence: Optional[fhir.integer] = Field(
         description="The order of the dosage instructions",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     additionalInstruction: Optional[List[CodeableConcept]] = Field(
         description='Supplemental instruction or warnings to the patient - e.g. "with meals", "may cause drowsiness"',
         default=None,
     )
-    patientInstruction: Optional[String] = Field(
+    patientInstruction: Optional[fhir.string] = Field(
         description="Patient or consumer oriented instructions",
         default=None,
-    )
-    patientInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for patientInstruction extensions",
-        default=None,
-        alias="_patientInstruction",
     )
     timing: Optional[Timing] = Field(
         description="When medication should be administered",
         default=None,
     )
-    asNeededBoolean: Optional[Boolean] = Field(
+    asNeededBoolean: Optional[fhir.boolean] = Field(
         description='Take "as needed" (for x)',
         default=None,
     )
@@ -161,7 +144,7 @@ class Dosage(BackboneElement):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, "CodeableConcept"],
+            field_types=[fhir.Boolean, "CodeableConcept"],
             field_name_base="asNeeded",
         )
 

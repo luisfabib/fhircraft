@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -57,14 +51,9 @@ class PaymentReconciliationDetail(BackboneElement):
         description="Response committing to a payment",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Date of commitment to pay",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     responsible: Optional[Reference] = Field(
         description="Contact for the response",
@@ -85,23 +74,13 @@ class PaymentReconciliationProcessNote(BackboneElement):
     A note that describes or explains the processing in a human readable form.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="display | print | printoper",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Note explanatory text",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
 
 
@@ -130,27 +109,17 @@ class PaymentReconciliation(DomainResource):
         description="Business Identifier for a payment reconciliation",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     period: Optional[Period] = Field(
         description="Period covered",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     paymentIssuer: Optional[Reference] = Field(
         description="Party generating payment",
@@ -164,32 +133,17 @@ class PaymentReconciliation(DomainResource):
         description="Responsible practitioner",
         default=None,
     )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="queued | complete | error | partial",
         default=None,
     )
-    outcome_ext: Optional[Element] = Field(
-        description="Placeholder element for outcome extensions",
-        default=None,
-        alias="_outcome",
-    )
-    disposition: Optional[String] = Field(
+    disposition: Optional[fhir.string] = Field(
         description="Disposition message",
         default=None,
     )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
-    )
-    paymentDate: Optional[Date] = Field(
+    paymentDate: Optional[fhir.date_] = Field(
         description="When payment issued",
         default=None,
-    )
-    paymentDate_ext: Optional[Element] = Field(
-        description="Placeholder element for paymentDate extensions",
-        default=None,
-        alias="_paymentDate",
     )
     paymentAmount: Optional[Money] = Field(
         description="Total amount of Payment",

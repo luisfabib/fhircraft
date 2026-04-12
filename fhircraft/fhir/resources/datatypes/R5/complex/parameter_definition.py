@@ -3,9 +3,8 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import Element, DataType
-
 
 class ParameterDefinition(DataType):
     """
@@ -14,66 +13,31 @@ class ParameterDefinition(DataType):
 
     _type = "ParameterDefinition"
 
-    name: Optional[Code] = Field(
+    name: Optional[fhir.code] = Field(
         description="Name used to access the parameter value",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="in | out",
         default=None,
     )
-    use_ext: Optional[Element] = Field(
-        description="Placeholder element for use extensions",
-        default=None,
-        alias="_use",
-    )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Minimum cardinality",
         default=None,
     )
-    min_ext: Optional[Element] = Field(
-        description="Placeholder element for min extensions",
-        default=None,
-        alias="_min",
-    )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum cardinality (a number of *)",
         default=None,
     )
-    max_ext: Optional[Element] = Field(
-        description="Placeholder element for max extensions",
-        default=None,
-        alias="_max",
-    )
-    documentation: Optional[String] = Field(
+    documentation: Optional[fhir.string] = Field(
         description="A brief description of the parameter",
         default=None,
     )
-    documentation_ext: Optional[Element] = Field(
-        description="Placeholder element for documentation extensions",
-        default=None,
-        alias="_documentation",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="What type of value",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="What profile the value is expected to be",
         default=None,
-    )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )

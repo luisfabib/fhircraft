@@ -4,16 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-    Decimal,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -50,27 +42,17 @@ class InvoiceLineItemPriceComponent(BackboneElement):
     The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice as to how the prices have been calculated.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     code: Optional[CodeableConcept] = Field(
-        description="Code identifying the specific component",
+        description="code identifying the specific component",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Factor used for calculating this component",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     amount: Optional[Money] = Field(
         description="Monetary amount associated with this component",
@@ -83,14 +65,9 @@ class InvoiceLineItem(BackboneElement):
     Each line item represents one charge for goods and services rendered. Details such as date, code and amount are found in the referenced ChargeItem resource.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Sequence number of line item",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     chargeItemReference: Optional[Reference] = Field(
         description="Reference to ChargeItem containing details of this line item or an inline billing code",
@@ -127,27 +104,17 @@ class InvoiceTotalPriceComponent(BackboneElement):
     The total amount for the Invoice may be calculated as the sum of the line items with surcharges/deductions that apply in certain conditions.  The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the total price was calculated.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     code: Optional[CodeableConcept] = Field(
-        description="Code identifying the specific component",
+        description="code identifying the specific component",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Factor used for calculating this component",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     amount: Optional[Money] = Field(
         description="Monetary amount associated with this component",
@@ -180,23 +147,13 @@ class Invoice(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | issued | balanced | cancelled | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    cancelledReason: Optional[String] = Field(
+    cancelledReason: Optional[fhir.string] = Field(
         description="Reason for cancellation of this Invoice",
         default=None,
-    )
-    cancelledReason_ext: Optional[Element] = Field(
-        description="Placeholder element for cancelledReason extensions",
-        default=None,
-        alias="_cancelledReason",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of Invoice",
@@ -210,14 +167,9 @@ class Invoice(DomainResource):
         description="Recipient of this invoice",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Invoice date / posting date",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     participant: Optional[ListType[InvoiceParticipant]] = Field(
         description="Participant in creation of this Invoice",
@@ -247,14 +199,9 @@ class Invoice(DomainResource):
         description="Gross total of this Invoice",
         default=None,
     )
-    paymentTerms: Optional[Markdown] = Field(
+    paymentTerms: Optional[fhir.markdown] = Field(
         description="Payment details",
         default=None,
-    )
-    paymentTerms_ext: Optional[Element] = Field(
-        description="Placeholder element for paymentTerms extensions",
-        default=None,
-        alias="_paymentTerms",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the invoice",

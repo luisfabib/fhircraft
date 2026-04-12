@@ -5,8 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -57,14 +57,9 @@ class DeviceUsage(DomainResource):
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | completed | not-done | entered-in-error +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the statement - classifying how the statement is made",
@@ -90,23 +85,13 @@ class DeviceUsage(DomainResource):
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
-    )
-    dateAsserted: Optional[DateTime] = Field(
+    dateAsserted: Optional[fhir.dateTime] = Field(
         description="When the statement was made (and recorded)",
         default=None,
-    )
-    dateAsserted_ext: Optional[Element] = Field(
-        description="Placeholder element for dateAsserted extensions",
-        default=None,
-        alias="_dateAsserted",
     )
     usageStatus: Optional[CodeableConcept] = Field(
         description="The status of the device usage, for example always, sometimes, never. This is not the same as the status of the statement",
@@ -125,7 +110,7 @@ class DeviceUsage(DomainResource):
         default=None,
     )
     device: Optional[CodeableReference] = Field(
-        description="Code or Reference to device used",
+        description="code or Reference to device used",
         default=None,
     )
     reason: Optional[ListType[CodeableReference]] = Field(
@@ -152,7 +137,7 @@ class DeviceUsage(DomainResource):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Period, DateTime],
+            field_types=[Timing, Period, fhir.DateTime],
             field_name_base="timing",
             required=False,
         )

@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -22,26 +22,19 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class EncounterStatusHistory(BackboneElement):
     """
     The status history permits the encounter resource to contain the status history without needing to read through the historical versions of the resource, or even have the server store them.
     """
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | arrived | triaged | in-progress | onleave | finished | cancelled +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     period: Optional[Period] = Field(
         description="The time that the episode was in the specified status",
         default=None,
     )
-
 
 class EncounterClassHistory(BackboneElement):
     """
@@ -57,7 +50,6 @@ class EncounterClassHistory(BackboneElement):
         description="The time that the episode was in the specified class",
         default=None,
     )
-
 
 class EncounterParticipant(BackboneElement):
     """
@@ -77,7 +69,6 @@ class EncounterParticipant(BackboneElement):
         default=None,
     )
 
-
 class EncounterDiagnosis(BackboneElement):
     """
     The list of diagnosis relevant to this encounter.
@@ -91,16 +82,10 @@ class EncounterDiagnosis(BackboneElement):
         description="Role that this diagnosis has within the encounter (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-    rank: Optional[PositiveInt] = Field(
+    rank: Optional[fhir.positiveInt] = Field(
         description="Ranking of the diagnosis (for each role type)",
         default=None,
     )
-    rank_ext: Optional[Element] = Field(
-        description="Placeholder element for rank extensions",
-        default=None,
-        alias="_rank",
-    )
-
 
 class EncounterHospitalization(BackboneElement):
     """
@@ -144,7 +129,6 @@ class EncounterHospitalization(BackboneElement):
         default=None,
     )
 
-
 class EncounterLocation(BackboneElement):
     """
     List of locations where  the patient has been during this encounter.
@@ -154,24 +138,18 @@ class EncounterLocation(BackboneElement):
         description="Location the encounter takes place",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | active | reserved | completed",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     physicalType: Optional[CodeableConcept] = Field(
         description="The physical type of the location (usually the level in the location hierachy - bed room ward etc.)",
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period during which the patient was present at the location",
+        description="time period during which the patient was present at the location",
         default=None,
     )
-
 
 class Encounter(DomainResource):
     """
@@ -198,14 +176,9 @@ class Encounter(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | arrived | triaged | in-progress | onleave | finished | cancelled +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusHistory: Optional[ListType[EncounterStatusHistory]] = Field(
         description="List of past encounter statuses",

@@ -4,17 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Date,
-    Canonical,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -44,27 +35,17 @@ class EvidenceVariableCharacteristic(BackboneElement):
     A characteristic that defines the members of the evidence element. Multiple characteristics are applied with "and" semantics.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Natural language description of the characteristic",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     definitionReference: Optional[Reference] = Field(
         description="What code or expression defines members?",
         default=None,
     )
-    definitionCanonical: Optional[Canonical] = Field(
+    definitionCanonical: Optional[fhir.canonical] = Field(
         description="What code or expression defines members?",
         default=None,
-    )
-    definitionCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for definitionCanonical extensions",
-        default=None,
-        alias="_definitionCanonical",
     )
     definitionCodeableConcept: Optional[CodeableConcept] = Field(
         description="What code or expression defines members?",
@@ -86,23 +67,13 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="What code/value pairs define members?",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Whether the characteristic includes or excludes members",
         default=None,
     )
-    exclude_ext: Optional[Element] = Field(
-        description="Placeholder element for exclude extensions",
-        default=None,
-        alias="_exclude",
-    )
-    participantEffectiveDateTime: Optional[DateTime] = Field(
+    participantEffectiveDateTime: Optional[fhir.dateTime] = Field(
         description="What time period do participants cover",
         default=None,
-    )
-    participantEffectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for participantEffectiveDateTime extensions",
-        default=None,
-        alias="_participantEffectiveDateTime",
     )
     participantEffectivePeriod: Optional[Period] = Field(
         description="What time period do participants cover",
@@ -120,14 +91,9 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Observation time from study start",
         default=None,
     )
-    groupMeasure: Optional[Code] = Field(
+    groupMeasure: Optional[fhir.code] = Field(
         description="mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median",
         default=None,
-    )
-    groupMeasure_ext: Optional[Element] = Field(
-        description="Placeholder element for groupMeasure extensions",
-        default=None,
-        alias="_groupMeasure",
     )
 
     @property
@@ -150,7 +116,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
             self,
             field_types=[
                 Reference,
-                Canonical,
+                fhir.Canonical,
                 CodeableConcept,
                 Expression,
                 DataRequirement,
@@ -164,7 +130,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
     def participantEffective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Duration, Timing],
+            field_types=[fhir.DateTime, Period, Duration, Timing],
             field_name_base="participantEffective",
             required=False,
         )
@@ -191,103 +157,53 @@ class EvidenceVariable(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this evidence variable, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this evidence variable, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the evidence variable",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the evidence variable",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this evidence variable (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this evidence variable (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    shortTitle: Optional[String] = Field(
+    shortTitle: Optional[fhir.string] = Field(
         description="Title for use in informal contexts",
         default=None,
     )
-    shortTitle_ext: Optional[Element] = Field(
-        description="Placeholder element for shortTitle extensions",
-        default=None,
-        alias="_shortTitle",
-    )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the EvidenceVariable",
         default=None,
     )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the evidence variable",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
@@ -301,32 +217,17 @@ class EvidenceVariable(DomainResource):
         description="Intended jurisdiction for evidence variable (if applicable)",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the evidence variable was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the evidence variable was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the evidence variable is expected to be used",
@@ -356,14 +257,9 @@ class EvidenceVariable(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="dichotomous | continuous | descriptive",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     characteristic: Optional[ListType[EvidenceVariableCharacteristic]] = Field(
         description="What defines the members of the evidence element",

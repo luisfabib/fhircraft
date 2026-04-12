@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SubstanceReferenceInformationGene(BackboneElement):
     """
@@ -40,7 +39,6 @@ class SubstanceReferenceInformationGene(BackboneElement):
         default=None,
     )
 
-
 class SubstanceReferenceInformationGeneElement(BackboneElement):
     """
     Todo.
@@ -58,7 +56,6 @@ class SubstanceReferenceInformationGeneElement(BackboneElement):
         description="Todo",
         default=None,
     )
-
 
 class SubstanceReferenceInformationClassification(BackboneElement):
     """
@@ -81,7 +78,6 @@ class SubstanceReferenceInformationClassification(BackboneElement):
         description="Todo",
         default=None,
     )
-
 
 class SubstanceReferenceInformationTarget(BackboneElement):
     """
@@ -116,14 +112,9 @@ class SubstanceReferenceInformationTarget(BackboneElement):
         description="Todo",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
-    )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
     )
     amountType: Optional[CodeableConcept] = Field(
         description="Todo",
@@ -145,11 +136,10 @@ class SubstanceReferenceInformationTarget(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, Range, String],
+            field_types=[Quantity, Range, fhir.String],
             field_name_base="amount",
             required=False,
         )
-
 
 class SubstanceReferenceInformation(DomainResource):
     """
@@ -174,14 +164,9 @@ class SubstanceReferenceInformation(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     gene: Optional[ListType[SubstanceReferenceInformationGene]] = Field(
         description="Todo",

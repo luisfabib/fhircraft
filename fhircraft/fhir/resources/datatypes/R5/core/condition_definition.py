@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -42,7 +35,7 @@ class ConditionDefinitionObservation(BackboneElement):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code for relevant Observation",
+        description="code for relevant Observation",
         default=None,
     )
 
@@ -57,7 +50,7 @@ class ConditionDefinitionMedication(BackboneElement):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code for relevant Medication",
+        description="code for relevant Medication",
         default=None,
     )
 
@@ -67,17 +60,12 @@ class ConditionDefinitionPrecondition(BackboneElement):
     An observation that suggests that this condition applies.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="sensitive | specific",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
     code: Optional[CodeableConcept] = Field(
-        description="Code for relevant Observation",
+        description="code for relevant Observation",
         default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
@@ -111,14 +99,9 @@ class ConditionDefinitionQuestionnaire(BackboneElement):
     Questionnaire for this condition.
     """
 
-    purpose: Optional[Code] = Field(
+    purpose: Optional[fhir.code] = Field(
         description="preadmit | diff-diagnosis | outcome",
         default=None,
-    )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
     )
     reference: Optional[Reference] = Field(
         description="Specific Questionnaire",
@@ -150,116 +133,61 @@ class ConditionDefinition(DomainResource):
     _type = "ConditionDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ConditionDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this condition definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this condition definition, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the condition definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the condition definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this condition definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this condition definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the event definition",
         default=None,
     )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the condition definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -285,41 +213,21 @@ class ConditionDefinition(DomainResource):
         description="Stage/grade, usually assessed formally",
         default=None,
     )
-    hasSeverity: Optional[Boolean] = Field(
+    hasSeverity: Optional[fhir.boolean] = Field(
         description="Whether Severity is appropriate",
         default=None,
     )
-    hasSeverity_ext: Optional[Element] = Field(
-        description="Placeholder element for hasSeverity extensions",
-        default=None,
-        alias="_hasSeverity",
-    )
-    hasBodySite: Optional[Boolean] = Field(
+    hasBodySite: Optional[fhir.boolean] = Field(
         description="Whether bodySite is appropriate",
         default=None,
     )
-    hasBodySite_ext: Optional[Element] = Field(
-        description="Placeholder element for hasBodySite extensions",
-        default=None,
-        alias="_hasBodySite",
-    )
-    hasStage: Optional[Boolean] = Field(
+    hasStage: Optional[fhir.boolean] = Field(
         description="Whether stage is appropriate",
         default=None,
     )
-    hasStage_ext: Optional[Element] = Field(
-        description="Placeholder element for hasStage extensions",
-        default=None,
-        alias="_hasStage",
-    )
-    definition: Optional[ListType[Uri]] = Field(
+    definition: Optional[ListType[fhir.uri]] = Field(
         description="Formal Definition for the condition",
         default=None,
-    )
-    definition_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
     observation: Optional[ListType[ConditionDefinitionObservation]] = Field(
         description="Observations particularly relevant to this condition",
@@ -357,7 +265,7 @@ class ConditionDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

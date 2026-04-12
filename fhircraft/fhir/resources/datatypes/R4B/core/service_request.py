@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -57,23 +50,13 @@ class ServiceRequest(DomainResource):
         description="Identifiers assigned to this order",
         default=None,
     )
-    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesCanonical extensions",
-        default=None,
-        alias="_instantiatesCanonical",
-    )
-    instantiatesUri: Optional[ListType[Uri]] = Field(
+    instantiatesUri: Optional[ListType[fhir.uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
-    )
-    instantiatesUri_ext: Optional[Element] = Field(
-        description="Placeholder element for instantiatesUri extensions",
-        default=None,
-        alias="_instantiatesUri",
     )
     basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",
@@ -87,45 +70,25 @@ class ServiceRequest(DomainResource):
         description="Composite Request ID",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
-    )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of service",
         default=None,
     )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if service/procedure should not be performed",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     code: Optional[CodeableConcept] = Field(
         description="What is being requested/ordered",
@@ -155,14 +118,9 @@ class ServiceRequest(DomainResource):
         description="Encounter in which the request was created",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When service should occur",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When service should occur",
@@ -172,27 +130,17 @@ class ServiceRequest(DomainResource):
         description="When service should occur",
         default=None,
     )
-    asNeededBoolean: Optional[Boolean] = Field(
+    asNeededBoolean: Optional[fhir.boolean] = Field(
         description="Preconditions for service",
         default=None,
-    )
-    asNeededBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeededBoolean extensions",
-        default=None,
-        alias="_asNeededBoolean",
     )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",
         default=None,
     )
-    authoredOn: Optional[DateTime] = Field(
+    authoredOn: Optional[fhir.dateTime] = Field(
         description="Date request signed",
         default=None,
-    )
-    authoredOn_ext: Optional[Element] = Field(
-        description="Placeholder element for authoredOn extensions",
-        default=None,
-        alias="_authoredOn",
     )
     requester: Optional[Reference] = Field(
         description="Who/what is requesting service",
@@ -242,14 +190,9 @@ class ServiceRequest(DomainResource):
         description="Comments",
         default=None,
     )
-    patientInstruction: Optional[String] = Field(
+    patientInstruction: Optional[fhir.string] = Field(
         description="Patient or consumer-oriented instructions",
         default=None,
-    )
-    patientInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for patientInstruction extensions",
-        default=None,
-        alias="_patientInstruction",
     )
     relevantHistory: Optional[ListType[Reference]] = Field(
         description="Request provenance",
@@ -290,7 +233,7 @@ class ServiceRequest(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )
@@ -299,7 +242,7 @@ class ServiceRequest(DomainResource):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, CodeableConcept],
+            field_types=[fhir.Boolean, CodeableConcept],
             field_name_base="asNeeded",
             required=False,
         )

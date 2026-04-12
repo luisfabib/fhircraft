@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -69,14 +62,9 @@ class PractitionerCommunication(BackboneElement):
         description="The language code used to communicate with the practitioner",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
         default=None,
-    )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
     )
 
 
@@ -93,14 +81,9 @@ class Practitioner(DomainResource):
         description="An identifier for the person as this agent",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this practitioner\u0027s record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     name: Optional[ListType[HumanName]] = Field(
         description="The name(s) associated with the practitioner",
@@ -110,41 +93,21 @@ class Practitioner(DomainResource):
         description="A contact detail for the practitioner (that apply to all roles)",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date  on which the practitioner was born",
         default=None,
     )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
-    )
-    deceasedBoolean: Optional[Boolean] = Field(
+    deceasedBoolean: Optional[fhir.boolean] = Field(
         description="Indicates if the practitioner is deceased or not",
         default=None,
     )
-    deceasedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedBoolean extensions",
-        default=None,
-        alias="_deceasedBoolean",
-    )
-    deceasedDateTime: Optional[DateTime] = Field(
+    deceasedDateTime: Optional[fhir.dateTime] = Field(
         description="Indicates if the practitioner is deceased or not",
         default=None,
-    )
-    deceasedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedDateTime extensions",
-        default=None,
-        alias="_deceasedDateTime",
     )
     address: Optional[ListType[Address]] = Field(
         description="Address(es) of the practitioner that are not role specific (typically home address)",
@@ -174,7 +137,7 @@ class Practitioner(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, DateTime],
+            field_types=[fhir.Boolean, fhir.DateTime],
             field_name_base="deceased",
             required=False,
         )

@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -43,14 +37,9 @@ class SubstanceSpecificationMoiety(BackboneElement):
         description="Identifier by which this moiety substance is known",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Textual name for this moiety substance",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     stereochemistry: Optional[CodeableConcept] = Field(
         description="Stereochemistry type",
@@ -60,27 +49,17 @@ class SubstanceSpecificationMoiety(BackboneElement):
         description="Optical activity type",
         default=None,
     )
-    molecularFormula: Optional[String] = Field(
+    molecularFormula: Optional[fhir.string] = Field(
         description="Molecular formula",
         default=None,
-    )
-    molecularFormula_ext: Optional[Element] = Field(
-        description="Placeholder element for molecularFormula extensions",
-        default=None,
-        alias="_molecularFormula",
     )
     amountQuantity: Optional[Quantity] = Field(
         description="Quantitative value for this moiety",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="Quantitative value for this moiety",
         default=None,
-    )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
     )
 
     @property
@@ -94,7 +73,7 @@ class SubstanceSpecificationMoiety(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, String],
+            field_types=[Quantity, fhir.String],
             field_name_base="amount",
             required=False,
         )
@@ -113,14 +92,9 @@ class SubstanceSpecificationProperty(BackboneElement):
         description="Property type e.g. viscosity, pH, isoelectric point",
         default=None,
     )
-    parameters: Optional[String] = Field(
+    parameters: Optional[fhir.string] = Field(
         description="Parameters that were used in the measurement of a property (e.g. for viscosity: measured at 20C with a pH of 7.1)",
         default=None,
-    )
-    parameters_ext: Optional[Element] = Field(
-        description="Placeholder element for parameters extensions",
-        default=None,
-        alias="_parameters",
     )
     definingSubstanceReference: Optional[Reference] = Field(
         description="A substance upon which a defining property depends (e.g. for solubility: in water, in alcohol)",
@@ -134,14 +108,9 @@ class SubstanceSpecificationProperty(BackboneElement):
         description="Quantitative value for this property",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="Quantitative value for this property",
         default=None,
-    )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
     )
 
     @property
@@ -171,7 +140,7 @@ class SubstanceSpecificationProperty(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, String],
+            field_types=[Quantity, fhir.String],
             field_name_base="amount",
             required=False,
         )
@@ -253,14 +222,9 @@ class SubstanceSpecificationStructureRepresentation(BackboneElement):
         description="The type of structure (e.g. Full, Partial, Representative)",
         default=None,
     )
-    representation: Optional[String] = Field(
+    representation: Optional[fhir.string] = Field(
         description="The structural representation as text string in a format e.g. InChI, SMILES, MOLFILE, CDX",
         default=None,
-    )
-    representation_ext: Optional[Element] = Field(
-        description="Placeholder element for representation extensions",
-        default=None,
-        alias="_representation",
     )
     attachment: Optional[Attachment] = Field(
         description="An attached file with the structural representation",
@@ -281,23 +245,13 @@ class SubstanceSpecificationStructure(BackboneElement):
         description="Optical activity type",
         default=None,
     )
-    molecularFormula: Optional[String] = Field(
+    molecularFormula: Optional[fhir.string] = Field(
         description="Molecular formula",
         default=None,
     )
-    molecularFormula_ext: Optional[Element] = Field(
-        description="Placeholder element for molecularFormula extensions",
-        default=None,
-        alias="_molecularFormula",
-    )
-    molecularFormulaByMoiety: Optional[String] = Field(
+    molecularFormulaByMoiety: Optional[fhir.string] = Field(
         description="Specified per moiety according to the Hill system, i.e. first C, then H, then alphabetical, each moiety separated by a dot",
         default=None,
-    )
-    molecularFormulaByMoiety_ext: Optional[Element] = Field(
-        description="Placeholder element for molecularFormulaByMoiety extensions",
-        default=None,
-        alias="_molecularFormulaByMoiety",
     )
     isotope: Optional[ListType[SubstanceSpecificationStructureIsotope]] = Field(
         description="Applicable for single substances that contain a radionuclide or a non-natural isotopic ratio",
@@ -332,23 +286,13 @@ class SubstanceSpecificationCode(BackboneElement):
         description="Status of the code assignment",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="The date at which the code status is changed as part of the terminology maintenance",
         default=None,
     )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
-    )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Any comment can be provided in this field, if necessary",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
@@ -369,14 +313,9 @@ class SubstanceSpecificationNameOfficial(BackboneElement):
         description="The status of the official name",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date of official name change",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
 
 
@@ -385,14 +324,9 @@ class SubstanceSpecificationName(BackboneElement):
     Names applicable to this substance.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="The actual name",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     type: Optional[CodeableConcept] = Field(
         description="Name type",
@@ -402,14 +336,9 @@ class SubstanceSpecificationName(BackboneElement):
         description="The status of the name",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="If this is the preferred name for this substance",
         default=None,
-    )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
     )
     language: Optional[ListType[CodeableConcept]] = Field(
         description="Language of the name",
@@ -458,14 +387,9 @@ class SubstanceSpecificationRelationship(BackboneElement):
         description='For example "salt to parent", "active moiety", "starting material"',
         default=None,
     )
-    isDefining: Optional[Boolean] = Field(
+    isDefining: Optional[fhir.boolean] = Field(
         description="For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships",
         default=None,
-    )
-    isDefining_ext: Optional[Element] = Field(
-        description="Placeholder element for isDefining extensions",
-        default=None,
-        alias="_isDefining",
     )
     amountQuantity: Optional[Quantity] = Field(
         description="A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other",
@@ -479,14 +403,9 @@ class SubstanceSpecificationRelationship(BackboneElement):
         description="A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other",
         default=None,
     )
-    amountString: Optional[String] = Field(
+    amountString: Optional[fhir.string] = Field(
         description="A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other",
         default=None,
-    )
-    amountString_ext: Optional[Element] = Field(
-        description="Placeholder element for amountString extensions",
-        default=None,
-        alias="_amountString",
     )
     amountRatioLowLimit: Optional[Ratio] = Field(
         description="For use when the numeric",
@@ -528,7 +447,7 @@ class SubstanceSpecificationRelationship(BackboneElement):
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, Range, Ratio, String],
+            field_types=[Quantity, Range, Ratio, fhir.String],
             field_name_base="amount",
             required=False,
         )
@@ -571,27 +490,17 @@ class SubstanceSpecification(DomainResource):
         description="If the substance applies to only human or veterinary use",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the substance",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Textual comment about this record of a substance",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     moiety: Optional[ListType[SubstanceSpecificationMoiety]] = Field(
         description="Moiety, for structural modifications",

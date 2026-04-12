@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    Boolean,
-    Base64Binary,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -27,31 +20,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class AuditEventAgentNetwork(BackboneElement):
     """
     Logical network location for application activity, if the activity has a network location.
     """
 
-    address: Optional[String] = Field(
+    address: Optional[fhir.string] = Field(
         description="Identifier for the network access point of the user device",
         default=None,
     )
-    address_ext: Optional[Element] = Field(
-        description="Placeholder element for address extensions",
-        default=None,
-        alias="_address",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="The type of network access point",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-
 
 class AuditEventAgent(BackboneElement):
     """
@@ -70,45 +51,25 @@ class AuditEventAgent(BackboneElement):
         description="Identifier of who",
         default=None,
     )
-    altId: Optional[String] = Field(
+    altId: Optional[fhir.string] = Field(
         description="Alternative User identity",
         default=None,
     )
-    altId_ext: Optional[Element] = Field(
-        description="Placeholder element for altId extensions",
-        default=None,
-        alias="_altId",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human friendly name for the agent",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    requestor: Optional[Boolean] = Field(
+    requestor: Optional[fhir.boolean] = Field(
         description="Whether user is initiator",
         default=None,
-    )
-    requestor_ext: Optional[Element] = Field(
-        description="Placeholder element for requestor extensions",
-        default=None,
-        alias="_requestor",
     )
     location: Optional[Reference] = Field(
         description="Where",
         default=None,
     )
-    policy: Optional[ListType[Uri]] = Field(
+    policy: Optional[ListType[fhir.uri]] = Field(
         description="Policy that authorized event",
         default=None,
-    )
-    policy_ext: Optional[Element] = Field(
-        description="Placeholder element for policy extensions",
-        default=None,
-        alias="_policy",
     )
     media: Optional[Coding] = Field(
         description="Type of media",
@@ -123,20 +84,14 @@ class AuditEventAgent(BackboneElement):
         default=None,
     )
 
-
 class AuditEventSource(BackboneElement):
     """
     The system that is reporting the event.
     """
 
-    site: Optional[String] = Field(
+    site: Optional[fhir.string] = Field(
         description="Logical source location within the enterprise",
         default=None,
-    )
-    site_ext: Optional[Element] = Field(
-        description="Placeholder element for site extensions",
-        default=None,
-        alias="_site",
     )
     observer: Optional[Reference] = Field(
         description="The identity of source detecting the event",
@@ -147,38 +102,22 @@ class AuditEventSource(BackboneElement):
         default=None,
     )
 
-
 class AuditEventEntityDetail(BackboneElement):
     """
     Tagged value pairs for conveying additional information about the entity.
     """
 
-    type: Optional[String] = Field(
+    type: Optional[fhir.string] = Field(
         description="Name of the property",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Property value",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Property value",
         default=None,
-    )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
     )
 
     @property
@@ -192,11 +131,10 @@ class AuditEventEntityDetail(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Base64Binary],
+            field_types=[fhir.String, fhir.Base64Binary],
             field_name_base="value",
             required=True,
         )
-
 
 class AuditEventEntity(BackboneElement):
     """
@@ -223,38 +161,22 @@ class AuditEventEntity(BackboneElement):
         description="Security labels on the entity",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Descriptor for entity",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Descriptive text",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    query: Optional[Base64Binary] = Field(
+    query: Optional[fhir.base64Binary] = Field(
         description="Query parameters",
         default=None,
-    )
-    query_ext: Optional[Element] = Field(
-        description="Placeholder element for query extensions",
-        default=None,
-        alias="_query",
     )
     detail: Optional[ListType[AuditEventEntityDetail]] = Field(
         description="Additional Information about the entity",
         default=None,
     )
-
 
 class AuditEvent(DomainResource):
     """
@@ -285,45 +207,25 @@ class AuditEvent(DomainResource):
         description="More specific type/id for the event",
         default=None,
     )
-    action: Optional[Code] = Field(
+    action: Optional[fhir.code] = Field(
         description="Type of action performed during the event",
         default=None,
-    )
-    action_ext: Optional[Element] = Field(
-        description="Placeholder element for action extensions",
-        default=None,
-        alias="_action",
     )
     period: Optional[Period] = Field(
         description="When the activity occurred",
         default=None,
     )
-    recorded: Optional[Instant] = Field(
-        description="Time when the event was recorded",
+    recorded: Optional[fhir.instant] = Field(
+        description="time when the event was recorded",
         default=None,
     )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
-    )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="Whether the event succeeded or failed",
         default=None,
     )
-    outcome_ext: Optional[Element] = Field(
-        description="Placeholder element for outcome extensions",
-        default=None,
-        alias="_outcome",
-    )
-    outcomeDesc: Optional[String] = Field(
+    outcomeDesc: Optional[fhir.string] = Field(
         description="Description of the event outcome",
         default=None,
-    )
-    outcomeDesc_ext: Optional[Element] = Field(
-        description="Placeholder element for outcomeDesc extensions",
-        default=None,
-        alias="_outcomeDesc",
     )
     purposeOfEvent: Optional[ListType[CodeableConcept]] = Field(
         description="The purposeOfUse of the event",

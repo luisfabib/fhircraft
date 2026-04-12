@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -33,14 +33,9 @@ class SpecimenCollection(BackboneElement):
         description="Who collected the specimen",
         default=None,
     )
-    collectedDateTime: Optional[DateTime] = Field(
+    collectedDateTime: Optional[fhir.dateTime] = Field(
         description="Collection time",
         default=None,
-    )
-    collectedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for collectedDateTime extensions",
-        default=None,
-        alias="_collectedDateTime",
     )
     collectedPeriod: Optional[Period] = Field(
         description="Collection time",
@@ -89,7 +84,7 @@ class SpecimenCollection(BackboneElement):
     def collected_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="collected",
             required=False,
         )
@@ -109,14 +104,9 @@ class SpecimenProcessing(BackboneElement):
     Details concerning processing and processing steps for the specimen.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of procedure",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     procedure: Optional[CodeableConcept] = Field(
         description="Indicates the treatment step  applied to the specimen",
@@ -126,14 +116,9 @@ class SpecimenProcessing(BackboneElement):
         description="Material used in the processing step",
         default=None,
     )
-    timeDateTime: Optional[DateTime] = Field(
+    timeDateTime: Optional[fhir.dateTime] = Field(
         description="Date and time of specimen processing",
         default=None,
-    )
-    timeDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timeDateTime extensions",
-        default=None,
-        alias="_timeDateTime",
     )
     timePeriod: Optional[Period] = Field(
         description="Date and time of specimen processing",
@@ -151,7 +136,7 @@ class SpecimenProcessing(BackboneElement):
     def time_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="time",
             required=False,
         )
@@ -163,17 +148,12 @@ class SpecimenContainer(BackboneElement):
     """
 
     identifier: Optional[ListType[Identifier]] = Field(
-        description="Id for the container",
+        description="id_ for the container",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the container",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of container directly associated with specimen",
@@ -242,14 +222,9 @@ class Specimen(DomainResource):
         description="Identifier assigned by the lab",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="available | unavailable | unsatisfactory | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of material that forms the specimen",
@@ -259,14 +234,9 @@ class Specimen(DomainResource):
         description="Where the specimen came from. This may be from patient(s), from a location (e.g., the source of an environmental sample), or a sampling of a substance or a device",
         default=None,
     )
-    receivedTime: Optional[DateTime] = Field(
+    receivedTime: Optional[fhir.dateTime] = Field(
         description="The time when specimen was received for processing",
         default=None,
-    )
-    receivedTime_ext: Optional[Element] = Field(
-        description="Placeholder element for receivedTime extensions",
-        default=None,
-        alias="_receivedTime",
     )
     parent: Optional[ListType[Reference]] = Field(
         description="Specimen from which this specimen originated",

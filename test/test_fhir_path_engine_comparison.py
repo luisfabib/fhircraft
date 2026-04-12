@@ -2,6 +2,11 @@ import pytest
 from collections import namedtuple
 
 from fhircraft.fhir.resources.datatypes.R4.complex import Quantity, Duration
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    String as FHIRString,
+    Integer as FHIRInteger,
+    Decimal as FHIRDecimal,
+)
 
 from fhircraft.fhir.path.engine.literals import Quantity as FHIRPathQuantity
 from fhircraft.fhir.path.engine.comparison import *
@@ -53,6 +58,11 @@ greater_than_cases = (
     ("@T10:30:00", "@T10:00:00", True),
     ("@T10", "@T10:30", False),
     ("@T10:30:00", "@T10:30:00.0", False),
+    # FHIR primitive class instances
+    (FHIRString(value="abc"), FHIRString(value="ABC"), True),
+    (FHIRInteger(value=10), FHIRInteger(value=5), True),
+    (FHIRDecimal(value=10.5), FHIRDecimal(value=5.0), True),
+    (FHIRInteger(value=5), FHIRInteger(value=10), False),
 )
 
 
@@ -114,6 +124,11 @@ less_than_cases = (
     ("@2018-03-01T10", "@2018-03-01T10:30", True),
     ("@T10:30:00", "@T10:00:00", False),
     ("@T10", "@T10:30", True),
+    # FHIR primitive class instances
+    (FHIRString(value="ABC"), FHIRString(value="abc"), True),
+    (FHIRInteger(value=5), FHIRInteger(value=10), True),
+    (FHIRDecimal(value=2.5), FHIRDecimal(value=5.0), True),
+    (FHIRInteger(value=10), FHIRInteger(value=5), False),
 )
 
 
@@ -200,6 +215,13 @@ less_equal_than_cases = (
     ("@2018-03-01T10:30:00", "@2018-03-01T10:30:00.0", True),
     ("@T10:30:00", "@T10:00:00", False),
     ("@T10:30:00", "@T10:30:00.0", True),
+    # FHIR primitive class instances
+    (FHIRString(value="ABC"), FHIRString(value="abc"), True),
+    (FHIRString(value="abc"), FHIRString(value="abc"), True),
+    (FHIRInteger(value=5), FHIRInteger(value=10), True),
+    (FHIRInteger(value=5), FHIRInteger(value=5), True),
+    (FHIRDecimal(value=2.5), FHIRDecimal(value=5.0), True),
+    (FHIRDecimal(value=5.0), FHIRDecimal(value=5.0), True),
 )
 
 
@@ -284,6 +306,13 @@ greater_equal_than_cases = (
     ("@2018-03-01", "@2018-01-01", True),
     ("@2018-03-01T10:30:00", "@2018-03-01T10:00:00", True),
     ("@T10:30:00", "@T10:00:00", True),
+    # FHIR primitive class instances
+    (FHIRString(value="abc"), FHIRString(value="ABC"), True),
+    (FHIRString(value="abc"), FHIRString(value="abc"), True),
+    (FHIRInteger(value=10), FHIRInteger(value=5), True),
+    (FHIRInteger(value=5), FHIRInteger(value=5), True),
+    (FHIRDecimal(value=10.5), FHIRDecimal(value=5.0), True),
+    (FHIRDecimal(value=5.0), FHIRDecimal(value=5.0), True),
 )
 
 

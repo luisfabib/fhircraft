@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class RegulatedAuthorizationCase(BackboneElement):
     """
@@ -50,14 +43,9 @@ class RegulatedAuthorizationCase(BackboneElement):
         description="Relevant date for this case",
         default=None,
     )
-    dateDateTime: Optional[DateTime] = Field(
+    dateDateTime: Optional[fhir.dateTime] = Field(
         description="Relevant date for this case",
         default=None,
-    )
-    dateDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for dateDateTime extensions",
-        default=None,
-        alias="_dateDateTime",
     )
     application: Optional[ListType["RegulatedAuthorizationCase"]] = Field(
         description="Applications submitted to obtain a regulated authorization. Steps within the longer running case or procedure",
@@ -75,11 +63,10 @@ class RegulatedAuthorizationCase(BackboneElement):
     def date_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Period, DateTime],
+            field_types=[Period, fhir.DateTime],
             field_name_base="date",
             required=False,
         )
-
 
 class RegulatedAuthorization(DomainResource):
     """
@@ -102,14 +89,9 @@ class RegulatedAuthorization(DomainResource):
         description="Overall type of this authorization, for example drug marketing approval, orphan drug designation",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="General textual supporting information",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     region: Optional[ListType[CodeableConcept]] = Field(
         description="The territory in which the authorization has been granted",
@@ -119,14 +101,9 @@ class RegulatedAuthorization(DomainResource):
         description="The status that is authorised e.g. approved. Intermediate states can be tracked with cases and applications",
         default=None,
     )
-    statusDate: Optional[DateTime] = Field(
+    statusDate: Optional[fhir.dateTime] = Field(
         description="The date at which the current status was assigned",
         default=None,
-    )
-    statusDate_ext: Optional[Element] = Field(
-        description="Placeholder element for statusDate extensions",
-        default=None,
-        alias="_statusDate",
     )
     validityPeriod: Optional[Period] = Field(
         description="The time period in which the regulatory approval etc. is in effect, e.g. a Marketing Authorization includes the date of authorization and/or expiration date",

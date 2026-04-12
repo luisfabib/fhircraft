@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -115,14 +115,9 @@ class Condition(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    onsetDateTime: Optional[DateTime] = Field(
+    onsetDateTime: Optional[fhir.dateTime] = Field(
         description="Estimated or actual date,  date-time, or age",
         default=None,
-    )
-    onsetDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for onsetDateTime extensions",
-        default=None,
-        alias="_onsetDateTime",
     )
     onsetAge: Optional[Age] = Field(
         description="Estimated or actual date,  date-time, or age",
@@ -136,23 +131,13 @@ class Condition(DomainResource):
         description="Estimated or actual date,  date-time, or age",
         default=None,
     )
-    onsetString: Optional[String] = Field(
+    onsetString: Optional[fhir.string] = Field(
         description="Estimated or actual date,  date-time, or age",
         default=None,
     )
-    onsetString_ext: Optional[Element] = Field(
-        description="Placeholder element for onsetString extensions",
-        default=None,
-        alias="_onsetString",
-    )
-    abatementDateTime: Optional[DateTime] = Field(
+    abatementDateTime: Optional[fhir.dateTime] = Field(
         description="When in resolution/remission",
         default=None,
-    )
-    abatementDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for abatementDateTime extensions",
-        default=None,
-        alias="_abatementDateTime",
     )
     abatementAge: Optional[Age] = Field(
         description="When in resolution/remission",
@@ -166,23 +151,13 @@ class Condition(DomainResource):
         description="When in resolution/remission",
         default=None,
     )
-    abatementString: Optional[String] = Field(
+    abatementString: Optional[fhir.string] = Field(
         description="When in resolution/remission",
         default=None,
     )
-    abatementString_ext: Optional[Element] = Field(
-        description="Placeholder element for abatementString extensions",
-        default=None,
-        alias="_abatementString",
-    )
-    recordedDate: Optional[DateTime] = Field(
+    recordedDate: Optional[fhir.dateTime] = Field(
         description="Date record was first recorded",
         default=None,
-    )
-    recordedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedDate extensions",
-        default=None,
-        alias="_recordedDate",
     )
     recorder: Optional[Reference] = Field(
         description="Who recorded the condition",
@@ -223,7 +198,7 @@ class Condition(DomainResource):
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Range, String],
+            field_types=[fhir.DateTime, Age, Period, Range, fhir.String],
             field_name_base="onset",
             required=False,
         )
@@ -232,7 +207,7 @@ class Condition(DomainResource):
     def abatement_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Range, String],
+            field_types=[fhir.DateTime, Age, Period, Range, fhir.String],
             field_name_base="abatement",
             required=False,
         )

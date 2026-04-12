@@ -4,20 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-    Decimal,
-    Integer,
-    Time,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -43,86 +31,41 @@ class QuestionnaireItemEnableWhen(BackboneElement):
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
     """
 
-    question: Optional[String] = Field(
+    question: Optional[fhir.string] = Field(
         description="Question that determines whether item is enabled",
         default=None,
     )
-    question_ext: Optional[Element] = Field(
-        description="Placeholder element for question extensions",
-        default=None,
-        alias="_question",
-    )
-    operator: Optional[Code] = Field(
+    operator: Optional[fhir.code] = Field(
         description="exists | = | != | \u003e | \u003c | \u003e= | \u003c=",
         default=None,
     )
-    operator_ext: Optional[Element] = Field(
-        description="Placeholder element for operator extensions",
-        default=None,
-        alias="_operator",
-    )
-    answerBoolean: Optional[Boolean] = Field(
+    answerBoolean: Optional[fhir.boolean] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for answerBoolean extensions",
-        default=None,
-        alias="_answerBoolean",
-    )
-    answerDecimal: Optional[Decimal] = Field(
+    answerDecimal: Optional[fhir.decimal] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for answerDecimal extensions",
-        default=None,
-        alias="_answerDecimal",
-    )
-    answerInteger: Optional[Integer] = Field(
+    answerInteger: Optional[fhir.integer] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for answerInteger extensions",
-        default=None,
-        alias="_answerInteger",
-    )
-    answerDate: Optional[Date] = Field(
+    answerDate: Optional[fhir.date_] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerDate_ext: Optional[Element] = Field(
-        description="Placeholder element for answerDate extensions",
-        default=None,
-        alias="_answerDate",
-    )
-    answerDateTime: Optional[DateTime] = Field(
+    answerDateTime: Optional[fhir.dateTime] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for answerDateTime extensions",
-        default=None,
-        alias="_answerDateTime",
-    )
-    answerTime: Optional[Time] = Field(
+    answerTime: Optional[fhir.time_] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
-    answerTime_ext: Optional[Element] = Field(
-        description="Placeholder element for answerTime extensions",
-        default=None,
-        alias="_answerTime",
-    )
-    answerString: Optional[String] = Field(
+    answerString: Optional[fhir.string] = Field(
         description="Value for question comparison based on operator",
         default=None,
-    )
-    answerString_ext: Optional[Element] = Field(
-        description="Placeholder element for answerString extensions",
-        default=None,
-        alias="_answerString",
     )
     answerCoding: Optional[Coding] = Field(
         description="Value for question comparison based on operator",
@@ -149,13 +92,13 @@ class QuestionnaireItemEnableWhen(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
                 Coding,
                 Quantity,
                 Reference,
@@ -170,41 +113,21 @@ class QuestionnaireItemAnswerOption(BackboneElement):
     One of the permitted answers for a "choice" or "open-choice" question.
     """
 
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Answer value",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Answer value",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Answer value",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Answer value",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueCoding: Optional[Coding] = Field(
         description="Answer value",
@@ -214,14 +137,9 @@ class QuestionnaireItemAnswerOption(BackboneElement):
         description="Answer value",
         default=None,
     )
-    initialSelected: Optional[Boolean] = Field(
+    initialSelected: Optional[fhir.boolean] = Field(
         description="Whether option is selected by default",
         default=None,
-    )
-    initialSelected_ext: Optional[Element] = Field(
-        description="Placeholder element for initialSelected extensions",
-        default=None,
-        alias="_initialSelected",
     )
 
     @property
@@ -235,7 +153,14 @@ class QuestionnaireItemAnswerOption(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Integer, Date, Time, String, Coding, Reference],
+            field_types=[
+                fhir.Integer,
+                fhir.Date,
+                fhir.Time,
+                fhir.String,
+                Coding,
+                Reference,
+            ],
             field_name_base="value",
             required=True,
         )
@@ -246,77 +171,37 @@ class QuestionnaireItemInitial(BackboneElement):
     One or more values that should be pre-populated in the answer when initially rendering the questionnaire for user input.
     """
 
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueDecimal: Optional[Decimal] = Field(
+    valueDecimal: Optional[fhir.decimal] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDecimal extensions",
-        default=None,
-        alias="_valueDecimal",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
-    )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueDateTime: Optional[DateTime] = Field(
+    valueDateTime: Optional[fhir.dateTime] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDateTime extensions",
-        default=None,
-        alias="_valueDateTime",
-    )
-    valueTime: Optional[Time] = Field(
+    valueTime: Optional[fhir.time_] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueTime_ext: Optional[Element] = Field(
-        description="Placeholder element for valueTime extensions",
-        default=None,
-        alias="_valueTime",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
-    )
-    valueUri: Optional[Uri] = Field(
+    valueUri: Optional[fhir.uri] = Field(
         description="Actual value for initializing the question",
         default=None,
-    )
-    valueUri_ext: Optional[Element] = Field(
-        description="Placeholder element for valueUri extensions",
-        default=None,
-        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Actual value for initializing the question",
@@ -347,14 +232,14 @@ class QuestionnaireItemInitial(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Decimal,
-                Integer,
-                Date,
-                DateTime,
-                Time,
-                String,
-                Uri,
+                fhir.Boolean,
+                fhir.Decimal,
+                fhir.Integer,
+                fhir.Date,
+                fhir.DateTime,
+                fhir.Time,
+                fhir.String,
+                fhir.Uri,
                 Attachment,
                 Coding,
                 Quantity,
@@ -370,112 +255,57 @@ class QuestionnaireItem(BackboneElement):
     A particular question, question grouping or display text that is part of the questionnaire.
     """
 
-    linkId: Optional[String] = Field(
+    linkId: Optional[fhir.string] = Field(
         description="Unique id for item in questionnaire",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
-        description="Placeholder element for linkId extensions",
-        default=None,
-        alias="_linkId",
-    )
-    definition: Optional[Uri] = Field(
+    definition: Optional[fhir.uri] = Field(
         description="ElementDefinition - details for the item",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
     code: Optional[ListType[Coding]] = Field(
         description="Corresponding concept for this item in a terminology",
         default=None,
     )
-    prefix: Optional[String] = Field(
+    prefix: Optional[fhir.string] = Field(
         description='E.g. "1(a)", "2.5.3"',
         default=None,
     )
-    prefix_ext: Optional[Element] = Field(
-        description="Placeholder element for prefix extensions",
-        default=None,
-        alias="_prefix",
-    )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Primary text for the item",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="group | display | boolean | decimal | integer | date | dateTime +",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     enableWhen: Optional[ListType[QuestionnaireItemEnableWhen]] = Field(
         description="Only allow data when",
         default=None,
     )
-    enableBehavior: Optional[Code] = Field(
+    enableBehavior: Optional[fhir.code] = Field(
         description="all | any",
         default=None,
     )
-    enableBehavior_ext: Optional[Element] = Field(
-        description="Placeholder element for enableBehavior extensions",
-        default=None,
-        alias="_enableBehavior",
-    )
-    required: Optional[Boolean] = Field(
+    required: Optional[fhir.boolean] = Field(
         description="Whether the item must be included in data results",
         default=None,
     )
-    required_ext: Optional[Element] = Field(
-        description="Placeholder element for required extensions",
-        default=None,
-        alias="_required",
-    )
-    repeats: Optional[Boolean] = Field(
+    repeats: Optional[fhir.boolean] = Field(
         description="Whether the item may repeat",
         default=None,
     )
-    repeats_ext: Optional[Element] = Field(
-        description="Placeholder element for repeats extensions",
-        default=None,
-        alias="_repeats",
-    )
-    readOnly: Optional[Boolean] = Field(
+    readOnly: Optional[fhir.boolean] = Field(
         description="Don\u0027t allow human editing",
         default=None,
     )
-    readOnly_ext: Optional[Element] = Field(
-        description="Placeholder element for readOnly extensions",
-        default=None,
-        alias="_readOnly",
-    )
-    maxLength: Optional[Integer] = Field(
+    maxLength: Optional[fhir.integer] = Field(
         description="No more than this many characters",
         default=None,
     )
-    maxLength_ext: Optional[Element] = Field(
-        description="Placeholder element for maxLength extensions",
-        default=None,
-        alias="_maxLength",
-    )
-    answerValueSet: Optional[Canonical] = Field(
+    answerValueSet: Optional[fhir.canonical] = Field(
         description="Valueset containing permitted answers",
         default=None,
-    )
-    answerValueSet_ext: Optional[Element] = Field(
-        description="Placeholder element for answerValueSet extensions",
-        default=None,
-        alias="_answerValueSet",
     )
     answerOption: Optional[ListType[QuestionnaireItemAnswerOption]] = Field(
         description="Permitted answer",
@@ -512,112 +342,57 @@ class Questionnaire(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this questionnaire, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this questionnaire, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the questionnaire",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the questionnaire",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this questionnaire (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this questionnaire (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    derivedFrom: Optional[ListType[Canonical]] = Field(
+    derivedFrom: Optional[ListType[fhir.canonical]] = Field(
         description="Instantiates protocol or definition",
         default=None,
     )
-    derivedFrom_ext: Optional[Element] = Field(
-        description="Placeholder element for derivedFrom extensions",
-        default=None,
-        alias="_derivedFrom",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    subjectType: Optional[ListType[Code]] = Field(
+    subjectType: Optional[ListType[fhir.code]] = Field(
         description="Resource that can be subject of QuestionnaireResponse",
         default=None,
     )
-    subjectType_ext: Optional[Element] = Field(
-        description="Placeholder element for subjectType extensions",
-        default=None,
-        alias="_subjectType",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the questionnaire",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -627,41 +402,21 @@ class Questionnaire(DomainResource):
         description="Intended jurisdiction for questionnaire (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this questionnaire is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the questionnaire was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the questionnaire was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the questionnaire is expected to be used",

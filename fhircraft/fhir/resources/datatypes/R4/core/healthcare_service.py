@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-    Time,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -39,14 +32,9 @@ class HealthcareServiceEligibility(BackboneElement):
         description="Coded value for the eligibility",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Describes the eligibility conditions for the service",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
 
 
@@ -55,41 +43,21 @@ class HealthcareServiceAvailableTime(BackboneElement):
     A collection of times that the Service Site is available.
     """
 
-    daysOfWeek: Optional[ListType[Code]] = Field(
+    daysOfWeek: Optional[ListType[fhir.code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
-    daysOfWeek_ext: Optional[Element] = Field(
-        description="Placeholder element for daysOfWeek extensions",
-        default=None,
-        alias="_daysOfWeek",
-    )
-    allDay: Optional[Boolean] = Field(
+    allDay: Optional[fhir.boolean] = Field(
         description="Always available? e.g. 24 hour service",
         default=None,
     )
-    allDay_ext: Optional[Element] = Field(
-        description="Placeholder element for allDay extensions",
-        default=None,
-        alias="_allDay",
-    )
-    availableStartTime: Optional[Time] = Field(
+    availableStartTime: Optional[fhir.time_] = Field(
         description="Opening time of day (ignored if allDay = true)",
         default=None,
     )
-    availableStartTime_ext: Optional[Element] = Field(
-        description="Placeholder element for availableStartTime extensions",
-        default=None,
-        alias="_availableStartTime",
-    )
-    availableEndTime: Optional[Time] = Field(
+    availableEndTime: Optional[fhir.time_] = Field(
         description="Closing time of day (ignored if allDay = true)",
         default=None,
-    )
-    availableEndTime_ext: Optional[Element] = Field(
-        description="Placeholder element for availableEndTime extensions",
-        default=None,
-        alias="_availableEndTime",
     )
 
 
@@ -98,14 +66,9 @@ class HealthcareServiceNotAvailable(BackboneElement):
     The HealthcareService is not available during this period of time due to the provided reason.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Reason presented to the user explaining why time not available",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     during: Optional[Period] = Field(
         description="Service not available from this date",
@@ -138,14 +101,9 @@ class HealthcareService(DomainResource):
         description="External identifiers for this item",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this HealthcareService record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     providedBy: Optional[Reference] = Field(
         description="Organization that provides this service",
@@ -167,32 +125,17 @@ class HealthcareService(DomainResource):
         description="Location(s) where service may be provided",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Description of service as presented to a consumer while searching",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Additional description and/or any specific issues not covered elsewhere",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
-    )
-    extraDetails: Optional[Markdown] = Field(
+    extraDetails: Optional[fhir.markdown] = Field(
         description="Extra details about the service that can\u0027t be placed in the other fields",
         default=None,
-    )
-    extraDetails_ext: Optional[Element] = Field(
-        description="Placeholder element for extraDetails extensions",
-        default=None,
-        alias="_extraDetails",
     )
     photo: Optional[Attachment] = Field(
         description="Facilitates quick identification of the service",
@@ -230,14 +173,9 @@ class HealthcareService(DomainResource):
         description="Ways that the service accepts referrals",
         default=None,
     )
-    appointmentRequired: Optional[Boolean] = Field(
+    appointmentRequired: Optional[fhir.boolean] = Field(
         description="If an appointment is required for access to this service",
         default=None,
-    )
-    appointmentRequired_ext: Optional[Element] = Field(
-        description="Placeholder element for appointmentRequired extensions",
-        default=None,
-        alias="_appointmentRequired",
     )
     availableTime: Optional[ListType[HealthcareServiceAvailableTime]] = Field(
         description="Times the Service Site is available",
@@ -247,14 +185,9 @@ class HealthcareService(DomainResource):
         description="Not available during this time due to provided reason",
         default=None,
     )
-    availabilityExceptions: Optional[String] = Field(
+    availabilityExceptions: Optional[fhir.string] = Field(
         description="Description of availability exceptions",
         default=None,
-    )
-    availabilityExceptions_ext: Optional[Element] = Field(
-        description="Placeholder element for availabilityExceptions extensions",
-        default=None,
-        alias="_availabilityExceptions",
     )
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services operated for the healthcare service",

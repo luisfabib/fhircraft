@@ -2,8 +2,6 @@ from pydantic import model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
-
 
 class Base(FHIRBaseModel):
     """
@@ -19,7 +17,7 @@ class Base(FHIRBaseModel):
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
-            elements=(list(self.__class__.model_fields.keys())),
+            elements=(list(type(self).model_fields.keys())),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",

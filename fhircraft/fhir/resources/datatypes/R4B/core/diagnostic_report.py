@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Instant,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -33,14 +27,9 @@ class DiagnosticReportMedia(BackboneElement):
     A list of key images associated with this report. The images are generally created during the diagnostic process, and may be directly of the patient, or of treated specimens (i.e. slides of interest).
     """
 
-    comment: Optional[String] = Field(
+    comment: Optional[fhir.string] = Field(
         description="Comment about the image (e.g. explanation)",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
     link: Optional[Reference] = Field(
         description="Reference to the image source",
@@ -77,21 +66,16 @@ class DiagnosticReport(DomainResource):
         description="What was requested",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | final +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Service category",
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Name/Code for this diagnostic report",
+        description="Name/code for this diagnostic report",
         default=None,
     )
     subject: Optional[Reference] = Field(
@@ -102,27 +86,17 @@ class DiagnosticReport(DomainResource):
         description="Health care event when test ordered",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="Clinically relevant time/time-period for report",
         default=None,
-    )
-    effectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveDateTime extensions",
-        default=None,
-        alias="_effectiveDateTime",
     )
     effectivePeriod: Optional[Period] = Field(
         description="Clinically relevant time/time-period for report",
         default=None,
     )
-    issued: Optional[Instant] = Field(
+    issued: Optional[fhir.instant] = Field(
         description="DateTime this version was made",
         default=None,
-    )
-    issued_ext: Optional[Element] = Field(
-        description="Placeholder element for issued extensions",
-        default=None,
-        alias="_issued",
     )
     performer: Optional[ListType[Reference]] = Field(
         description="Responsible Diagnostic Service",
@@ -148,14 +122,9 @@ class DiagnosticReport(DomainResource):
         description="Key images associated with this report",
         default=None,
     )
-    conclusion: Optional[String] = Field(
+    conclusion: Optional[fhir.string] = Field(
         description="Clinical conclusion (interpretation) of test results",
         default=None,
-    )
-    conclusion_ext: Optional[Element] = Field(
-        description="Placeholder element for conclusion extensions",
-        default=None,
-        alias="_conclusion",
     )
     conclusionCode: Optional[ListType[CodeableConcept]] = Field(
         description="Codes for the clinical conclusion of test results",
@@ -177,7 +146,7 @@ class DiagnosticReport(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="effective",
             required=False,
         )

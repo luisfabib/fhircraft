@@ -4,16 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Date,
-    DateTime,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -31,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class PatientContact(BackboneElement):
     """
@@ -54,14 +45,9 @@ class PatientContact(BackboneElement):
         description="Address for the contact person",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
-    )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
     )
     organization: Optional[Reference] = Field(
         description="Organization that is associated with the contact",
@@ -72,7 +58,6 @@ class PatientContact(BackboneElement):
         default=None,
     )
 
-
 class PatientCommunication(BackboneElement):
     """
     A language which may be used to communicate with the patient about his or her health.
@@ -82,16 +67,10 @@ class PatientCommunication(BackboneElement):
         description="The language which can be used to communicate with the patient about his or her health",
         default=None,
     )
-    preferred: Optional[Boolean] = Field(
+    preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
         default=None,
     )
-    preferred_ext: Optional[Element] = Field(
-        description="Placeholder element for preferred extensions",
-        default=None,
-        alias="_preferred",
-    )
-
 
 class PatientLink(BackboneElement):
     """
@@ -102,16 +81,10 @@ class PatientLink(BackboneElement):
         description="The other patient or related person resource that the link refers to",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="replaced-by | replaces | refer | seealso",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-
 
 class Patient(DomainResource):
     """
@@ -138,14 +111,9 @@ class Patient(DomainResource):
         description="An identifier for this patient",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this patient\u0027s record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     name: Optional[ListType[HumanName]] = Field(
         description="A name associated with the patient",
@@ -155,41 +123,21 @@ class Patient(DomainResource):
         description="A contact detail for the individual",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
     )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
-    )
-    birthDate: Optional[Date] = Field(
+    birthDate: Optional[fhir.date_] = Field(
         description="The date of birth for the individual",
         default=None,
     )
-    birthDate_ext: Optional[Element] = Field(
-        description="Placeholder element for birthDate extensions",
-        default=None,
-        alias="_birthDate",
-    )
-    deceasedBoolean: Optional[Boolean] = Field(
+    deceasedBoolean: Optional[fhir.boolean] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
     )
-    deceasedBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedBoolean extensions",
-        default=None,
-        alias="_deceasedBoolean",
-    )
-    deceasedDateTime: Optional[DateTime] = Field(
+    deceasedDateTime: Optional[fhir.dateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
-    )
-    deceasedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for deceasedDateTime extensions",
-        default=None,
-        alias="_deceasedDateTime",
     )
     address: Optional[ListType[Address]] = Field(
         description="An address for the individual",
@@ -199,23 +147,13 @@ class Patient(DomainResource):
         description="Marital (civil) status of a patient",
         default=None,
     )
-    multipleBirthBoolean: Optional[Boolean] = Field(
+    multipleBirthBoolean: Optional[fhir.boolean] = Field(
         description="Whether patient is part of a multiple birth",
         default=None,
     )
-    multipleBirthBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleBirthBoolean extensions",
-        default=None,
-        alias="_multipleBirthBoolean",
-    )
-    multipleBirthInteger: Optional[Integer] = Field(
+    multipleBirthInteger: Optional[fhir.integer] = Field(
         description="Whether patient is part of a multiple birth",
         default=None,
-    )
-    multipleBirthInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleBirthInteger extensions",
-        default=None,
-        alias="_multipleBirthInteger",
     )
     photo: Optional[ListType[Attachment]] = Field(
         description="Image of the patient",
@@ -260,7 +198,7 @@ class Patient(DomainResource):
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, DateTime],
+            field_types=[fhir.Boolean, fhir.DateTime],
             field_name_base="deceased",
             required=False,
         )
@@ -269,7 +207,7 @@ class Patient(DomainResource):
     def multipleBirth_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Integer],
+            field_types=[fhir.Boolean, fhir.Integer],
             field_name_base="multipleBirth",
             required=False,
         )

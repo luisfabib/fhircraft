@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -66,14 +60,9 @@ class MedicationStatement(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="recorded | entered-in-error | draft",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of medication statement",
@@ -91,14 +80,9 @@ class MedicationStatement(DomainResource):
         description="Encounter associated with MedicationStatement",
         default=None,
     )
-    effectiveDateTime: Optional[DateTime] = Field(
+    effectiveDateTime: Optional[fhir.dateTime] = Field(
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,
-    )
-    effectiveDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for effectiveDateTime extensions",
-        default=None,
-        alias="_effectiveDateTime",
     )
     effectivePeriod: Optional[Period] = Field(
         description="The date/time or interval when the medication is/was/will be taken",
@@ -108,14 +92,9 @@ class MedicationStatement(DomainResource):
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,
     )
-    dateAsserted: Optional[DateTime] = Field(
+    dateAsserted: Optional[fhir.dateTime] = Field(
         description="When the usage was asserted?",
         default=None,
-    )
-    dateAsserted_ext: Optional[Element] = Field(
-        description="Placeholder element for dateAsserted extensions",
-        default=None,
-        alias="_dateAsserted",
     )
     informationSource: Optional[ListType[Reference]] = Field(
         description="Person or organization that provided the information about the taking of this medication",
@@ -137,14 +116,9 @@ class MedicationStatement(DomainResource):
         description="Link to information relevant to the usage of a medication",
         default=None,
     )
-    renderedDosageInstruction: Optional[Markdown] = Field(
+    renderedDosageInstruction: Optional[fhir.markdown] = Field(
         description="Full representation of the dosage instructions",
         default=None,
-    )
-    renderedDosageInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for renderedDosageInstruction extensions",
-        default=None,
-        alias="_renderedDosageInstruction",
     )
     dosage: Optional[ListType[Dosage]] = Field(
         description="Details of how medication is/was taken or should be taken",
@@ -166,7 +140,7 @@ class MedicationStatement(DomainResource):
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="effective",
             required=False,
         )

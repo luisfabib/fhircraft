@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Code,
-    Markdown,
-    Date,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -45,32 +39,17 @@ class AdministrableProductDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -99,9 +78,9 @@ class AdministrableProductDefinitionProperty(BackboneElement):
             field_types=[
                 CodeableConcept,
                 Quantity,
-                Date,
-                Boolean,
-                Markdown,
+                fhir.Date,
+                fhir.Boolean,
+                fhir.Markdown,
                 Attachment,
                 Reference,
             ],
@@ -125,14 +104,9 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
         description="A value for the time",
         default=None,
     )
-    supportingInformation: Optional[String] = Field(
+    supportingInformation: Optional[fhir.string] = Field(
         description="Extra information about the withdrawal period",
         default=None,
-    )
-    supportingInformation_ext: Optional[Element] = Field(
-        description="Placeholder element for supportingInformation extensions",
-        default=None,
-        alias="_supportingInformation",
     )
 
 
@@ -207,14 +181,9 @@ class AdministrableProductDefinition(DomainResource):
         description="An identifier for the administrable product",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     formOf: Optional[ListType[Reference]] = Field(
         description="References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product",
@@ -240,14 +209,9 @@ class AdministrableProductDefinition(DomainResource):
         description='A device that is integral to the medicinal product, in effect being considered as an "ingredient" of the medicinal product',
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A general description of the product, when in its final form, suitable for administration e.g. effervescent blue liquid, to be swallowed",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     property_: Optional[ListType[AdministrableProductDefinitionProperty]] = Field(
         description="Characteristics e.g. a product\u0027s onset of action",

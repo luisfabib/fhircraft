@@ -8,7 +8,7 @@ creating individual StructureDefinition files and a lightweight manifest index.
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 import warnings
 
 import requests
@@ -17,24 +17,22 @@ from pydantic import BaseModel
 from pydantic_core import ValidationError
 from fhircraft.config import override_config
 from fhircraft.fhir.packages.client import FHIRPackageRegistryClient
-from fhircraft.fhir.resources.datatypes.R4.core import (
-    StructureDefinition as StructureDefinitionR4,
-)
-from fhircraft.fhir.resources.datatypes.R4B.core import (
-    StructureDefinition as StructureDefinitionR4B,
-)
-from fhircraft.fhir.resources.datatypes.R5.core import (
-    StructureDefinition as StructureDefinitionR5,
-)
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 from fhircraft.utils import load_env_variables
 
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.datatypes.R4.core import (
+        StructureDefinition as StructureDefinitionR4,
+    )
+    from fhircraft.fhir.resources.datatypes.R4B.core import (
+        StructureDefinition as StructureDefinitionR4B,
+    )
+    from fhircraft.fhir.resources.datatypes.R5.core import (
+        StructureDefinition as StructureDefinitionR5,
+    )
+
 
 DEFINITIONS_DIR = Path(__file__).resolve().parent
-
-StructureDefinitionUnion = Union[
-    StructureDefinitionR4, StructureDefinitionR4B, StructureDefinitionR5
-]
 
 
 class StructureDefinitionNotFoundError(FileNotFoundError):
@@ -162,7 +160,7 @@ class StructureDefinitionRegistry:
                 "StructureDefinition must have a 'url' field to be added to the repository."
             )
 
-        base_url, _ = self.parse_canonical_url(struct_def.url)
+        base_url, _ = self.parse_canonical_url(str(struct_def.url))
         # Check for duplicates
         if base_url in self and fail_if_exists:
             raise ValueError(
@@ -252,10 +250,10 @@ class StructureDefinitionRegistry:
             elif isinstance(data, FHIRBaseModel):
                 with override_config(validation_mode="skip"):
                     data = data.model_dump()
-                    return StructureDefinition.model_validate(data)
+                    return StructureDefinition.model_validate(data)  # type: ignore
             elif isinstance(data, BaseModel):
                 data = data.model_dump()
-            return StructureDefinition.model_validate(data)
+            return StructureDefinition.model_validate(data)  # type: ignore
         except ValidationError as e:
             raise ValueError(
                 f"Data does not conform to expected structure definition for FHIR release {self.fhir_release}: \n\n{str(e)}"

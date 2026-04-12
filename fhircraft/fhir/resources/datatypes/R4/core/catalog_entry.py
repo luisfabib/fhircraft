@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -26,26 +20,19 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CatalogEntryRelatedEntry(BackboneElement):
     """
     Used for example, to point to a substance, or to a device used to administer a medication.
     """
 
-    relationtype: Optional[Code] = Field(
+    relationtype: Optional[fhir.code] = Field(
         description="triggers | is-replaced-by",
         default=None,
-    )
-    relationtype_ext: Optional[Element] = Field(
-        description="Placeholder element for relationtype extensions",
-        default=None,
-        alias="_relationtype",
     )
     item: Optional[Reference] = Field(
         description="The reference to the related item",
         default=None,
     )
-
 
 class CatalogEntry(DomainResource):
     """
@@ -76,14 +63,9 @@ class CatalogEntry(DomainResource):
         description="The type of item - medication, device, service, protocol or other",
         default=None,
     )
-    orderable: Optional[Boolean] = Field(
+    orderable: Optional[fhir.boolean] = Field(
         description="Whether the entry represents an orderable item",
         default=None,
-    )
-    orderable_ext: Optional[Element] = Field(
-        description="Placeholder element for orderable extensions",
-        default=None,
-        alias="_orderable",
     )
     referencedItem: Optional[Reference] = Field(
         description="The item that is being defined",
@@ -97,36 +79,21 @@ class CatalogEntry(DomainResource):
         description="Classification (category or class) of the item entry",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     validityPeriod: Optional[Period] = Field(
         description="The time period in which this catalog entry is expected to be active",
         default=None,
     )
-    validTo: Optional[DateTime] = Field(
+    validTo: Optional[fhir.dateTime] = Field(
         description="The date until which this catalog entry is expected to be active",
         default=None,
     )
-    validTo_ext: Optional[Element] = Field(
-        description="Placeholder element for validTo extensions",
-        default=None,
-        alias="_validTo",
-    )
-    lastUpdated: Optional[DateTime] = Field(
+    lastUpdated: Optional[fhir.dateTime] = Field(
         description="When was this catalog last updated",
         default=None,
-    )
-    lastUpdated_ext: Optional[Element] = Field(
-        description="Placeholder element for lastUpdated extensions",
-        default=None,
-        alias="_lastUpdated",
     )
     additionalCharacteristic: Optional[ListType[CodeableConcept]] = Field(
         description="Additional characteristics of the catalog entry",

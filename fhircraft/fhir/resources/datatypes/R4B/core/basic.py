@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Date
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -52,14 +52,9 @@ class Basic(DomainResource):
         description="Identifies the focus of this resource",
         default=None,
     )
-    created: Optional[Date] = Field(
+    created: Optional[fhir.date_] = Field(
         description="When created",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     author: Optional[Reference] = Field(
         description="Who created",

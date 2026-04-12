@@ -144,11 +144,11 @@ def evaluate_and_prepare_collection_values(
 
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
         from fhircraft.fhir.path.engine.literals import Quantity
+
         return [
             (
                 Quantity.parse_quantity(data)
-                if Quantity.is_quantity(data := item.value)
-                and data.value is not None
+                if Quantity.is_quantity(data := item.value) and data.value is not None
                 else data
             )
             for item in collection

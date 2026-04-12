@@ -14,7 +14,7 @@ from .codeable_concept import CodeableConcept
 from .meta import Meta
 from .identifier import Identifier
 from .reference import Reference
-from .xhtml import xhtml
+from .xhtml import Xhtml
 from .narrative import Narrative
 from .backbone_element import BackboneElement
 from .attachment import Attachment
@@ -123,64 +123,22 @@ __all__ = [
     "TimingRepeat",
     "TriggerDefinition",
     "UsageContext",
-    "xhtml",
+    "Xhtml",
 ]
 
-# Rebuild models to ensure all references are resolved
-Element.model_rebuild()
-Period.model_rebuild()
-Coding.model_rebuild()
-CodeableConcept.model_rebuild()
-Meta.model_rebuild()
-Identifier.model_rebuild()
-Reference.model_rebuild()
-xhtml.model_rebuild()
-Narrative.model_rebuild()
-BackboneElement.model_rebuild()
-Attachment.model_rebuild()
-ContactPoint.model_rebuild()
-ContactDetail.model_rebuild()
-Contributor.model_rebuild()
-Address.model_rebuild()
-Annotation.model_rebuild()
-Quantity.model_rebuild()
-Age.model_rebuild()
-Count.model_rebuild()
-Distance.model_rebuild()
-Duration.model_rebuild()
-DataRequirement.model_rebuild()
-DataRequirementCodeFilter.model_rebuild()
-DataRequirementDateFilter.model_rebuild()
-DataRequirementSort.model_rebuild()
-Dosage.model_rebuild()
-DosageDoseAndRate.model_rebuild()
-Expression.model_rebuild()
-HumanName.model_rebuild()
-MarketingStatus.model_rebuild()
-Money.model_rebuild()
-MoneyQuantity.model_rebuild()
-ParameterDefinition.model_rebuild()
-Population.model_rebuild()
-ProdCharacteristic.model_rebuild()
-ProductShelfLife.model_rebuild()
-Range.model_rebuild()
-Ratio.model_rebuild()
-RelatedArtifact.model_rebuild()
-SampledData.model_rebuild()
-Signature.model_rebuild()
-SimpleQuantity.model_rebuild()
-SubstanceAmount.model_rebuild()
-Timing.model_rebuild()
-TimingRepeat.model_rebuild()
-TriggerDefinition.model_rebuild()
-UsageContext.model_rebuild()
-ElementDefinition.model_rebuild()
-ElementDefinitionType.model_rebuild()
-ElementDefinitionBase.model_rebuild()
-ElementDefinitionBinding.model_rebuild()
-ElementDefinitionConstraint.model_rebuild()
-ElementDefinitionSlicing.model_rebuild()
-ElementDefinitionSlicingDiscriminator.model_rebuild()
-ElementDefinitionExample.model_rebuild()
-ElementDefinitionMapping.model_rebuild()
-Extension.model_rebuild()
+# Ensure all forward references (e.g. "Extension" in Element) are resolved
+# when types are imported directly from this package rather than via the
+# registry (which passes _types_namespace explicitly via its own logic).
+from ..primitive import *
+
+import typing as _typing
+
+_ns = {
+    **vars(_typing),
+    **{k: v for k, v in globals().items() if not k.startswith("__")},
+}
+for _name in __all__:
+    _cls = globals().get(_name)
+    if _cls is not None and not getattr(_cls, "__pydantic_complete__", True):
+        _cls.model_rebuild(_types_namespace=_ns)
+del _name, _cls, _ns, _typing  # type: ignore

@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-    Date,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -85,14 +76,9 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Color of container cap",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="The description of the kind of container",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     capacity: Optional[Quantity] = Field(
         description="The capacity of this kind of container",
@@ -102,27 +88,17 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Minimum volume",
         default=None,
     )
-    minimumVolumeString: Optional[String] = Field(
+    minimumVolumeString: Optional[fhir.string] = Field(
         description="Minimum volume",
         default=None,
-    )
-    minimumVolumeString_ext: Optional[Element] = Field(
-        description="Placeholder element for minimumVolumeString extensions",
-        default=None,
-        alias="_minimumVolumeString",
     )
     additive: Optional[ListType[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,
     )
-    preparation: Optional[Markdown] = Field(
+    preparation: Optional[fhir.markdown] = Field(
         description="Special processing applied to the container for this specimen type",
         default=None,
-    )
-    preparation_ext: Optional[Element] = Field(
-        description="Placeholder element for preparation extensions",
-        default=None,
-        alias="_preparation",
     )
 
     @property
@@ -136,7 +112,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     def minimumVolume_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Quantity, String],
+            field_types=[Quantity, fhir.String],
             field_name_base="minimumVolume",
             required=False,
         )
@@ -159,14 +135,9 @@ class SpecimenDefinitionTypeTestedHandling(BackboneElement):
         description="Maximum preservation time",
         default=None,
     )
-    instruction: Optional[Markdown] = Field(
+    instruction: Optional[fhir.markdown] = Field(
         description="Preservation instruction",
         default=None,
-    )
-    instruction_ext: Optional[Element] = Field(
-        description="Placeholder element for instruction extensions",
-        default=None,
-        alias="_instruction",
     )
 
 
@@ -175,53 +146,33 @@ class SpecimenDefinitionTypeTested(BackboneElement):
     Specimen conditioned in a container as expected by the testing laboratory.
     """
 
-    isDerived: Optional[Boolean] = Field(
+    isDerived: Optional[fhir.boolean] = Field(
         description="Primary or secondary specimen",
         default=None,
-    )
-    isDerived_ext: Optional[Element] = Field(
-        description="Placeholder element for isDerived extensions",
-        default=None,
-        alias="_isDerived",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of intended specimen",
         default=None,
     )
-    preference: Optional[Code] = Field(
+    preference: Optional[fhir.code] = Field(
         description="preferred | alternate",
         default=None,
-    )
-    preference_ext: Optional[Element] = Field(
-        description="Placeholder element for preference extensions",
-        default=None,
-        alias="_preference",
     )
     container: Optional[SpecimenDefinitionTypeTestedContainer] = Field(
         description="The specimen\u0027s container",
         default=None,
     )
-    requirement: Optional[Markdown] = Field(
+    requirement: Optional[fhir.markdown] = Field(
         description="Requirements for specimen delivery and special handling",
         default=None,
-    )
-    requirement_ext: Optional[Element] = Field(
-        description="Placeholder element for requirement extensions",
-        default=None,
-        alias="_requirement",
     )
     retentionTime: Optional[Duration] = Field(
         description="The usual time for retaining this kind of specimen",
         default=None,
     )
-    singleUse: Optional[Boolean] = Field(
+    singleUse: Optional[fhir.boolean] = Field(
         description="Specimen for single use only",
         default=None,
-    )
-    singleUse_ext: Optional[Element] = Field(
-        description="Placeholder element for singleUse extensions",
-        default=None,
-        alias="_singleUse",
     )
     rejectionCriterion: Optional[ListType[CodeableConcept]] = Field(
         description="Criterion specified for specimen rejection",
@@ -246,94 +197,49 @@ class SpecimenDefinition(DomainResource):
     _type = "SpecimenDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SpecimenDefinition"
 
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Logical canonical URL to reference this SpecimenDefinition (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[Identifier] = Field(
         description="Business identifier",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the SpecimenDefinition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this {{title}} (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this SpecimenDefinition (Human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    derivedFromCanonical: Optional[ListType[Canonical]] = Field(
+    derivedFromCanonical: Optional[ListType[fhir.canonical]] = Field(
         description="Based on FHIR definition of another SpecimenDefinition",
         default=None,
     )
-    derivedFromCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for derivedFromCanonical extensions",
-        default=None,
-        alias="_derivedFromCanonical",
-    )
-    derivedFromUri: Optional[ListType[Uri]] = Field(
+    derivedFromUri: Optional[ListType[fhir.uri]] = Field(
         description="Based on external definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for derivedFromUri extensions",
-        default=None,
-        alias="_derivedFromUri",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="If this SpecimenDefinition is not for real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of subject for specimen collection",
@@ -343,36 +249,21 @@ class SpecimenDefinition(DomainResource):
         description="Type of subject for specimen collection",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date status first applied",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="The name of the individual or organization that published the SpecimenDefinition",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the SpecimenDefinition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="Content intends to support these contexts",
@@ -382,50 +273,25 @@ class SpecimenDefinition(DomainResource):
         description="Intended jurisdiction for this SpecimenDefinition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this SpecimenDefinition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When SpecimenDefinition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="The date on which the asset content was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="The effective date range for the SpecimenDefinition",
@@ -439,14 +305,9 @@ class SpecimenDefinition(DomainResource):
         description="Patient preparation for collection",
         default=None,
     )
-    timeAspect: Optional[String] = Field(
-        description="Time aspect for collection",
+    timeAspect: Optional[fhir.string] = Field(
+        description="time aspect for collection",
         default=None,
-    )
-    timeAspect_ext: Optional[Element] = Field(
-        description="Placeholder element for timeAspect extensions",
-        default=None,
-        alias="_timeAspect",
     )
     collection: Optional[ListType[CodeableConcept]] = Field(
         description="Specimen collection procedure",
@@ -475,7 +336,7 @@ class SpecimenDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

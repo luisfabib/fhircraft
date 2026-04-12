@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -29,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class DeviceDispensePerformer(BackboneElement):
     """
     Indicates who or what performed the event.
@@ -43,7 +36,6 @@ class DeviceDispensePerformer(BackboneElement):
         description="Individual who was performing",
         default=None,
     )
-
 
 class DeviceDispense(DomainResource):
     """
@@ -66,14 +58,9 @@ class DeviceDispense(DomainResource):
         description="The bigger event that this dispense is a part of",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableReference] = Field(
         description="Why a dispense was or was not performed",
@@ -119,23 +106,13 @@ class DeviceDispense(DomainResource):
         description="Amount dispensed",
         default=None,
     )
-    preparedDate: Optional[DateTime] = Field(
+    preparedDate: Optional[fhir.dateTime] = Field(
         description="When product was packaged and reviewed",
         default=None,
     )
-    preparedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for preparedDate extensions",
-        default=None,
-        alias="_preparedDate",
-    )
-    whenHandedOver: Optional[DateTime] = Field(
+    whenHandedOver: Optional[fhir.dateTime] = Field(
         description="When product was given out",
         default=None,
-    )
-    whenHandedOver_ext: Optional[Element] = Field(
-        description="Placeholder element for whenHandedOver extensions",
-        default=None,
-        alias="_whenHandedOver",
     )
     destination: Optional[Reference] = Field(
         description="Where the device was sent or should be sent",
@@ -145,14 +122,9 @@ class DeviceDispense(DomainResource):
         description="Information about the dispense",
         default=None,
     )
-    usageInstruction: Optional[Markdown] = Field(
+    usageInstruction: Optional[fhir.markdown] = Field(
         description="Full representation of the usage instructions",
         default=None,
-    )
-    usageInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for usageInstruction extensions",
-        default=None,
-        alias="_usageInstruction",
     )
     eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of relevant lifecycle events",

@@ -1,17 +1,11 @@
 from pydantic import Field, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
 
 NoneType = type(None)
 
 from typing import List as ListType, Optional
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    Boolean,
-    Code,
-    DateTime,
-    String,
-)
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     BackboneElement,
@@ -34,23 +28,13 @@ class ListEntry(BackboneElement):
         description="Status/Workflow information about this item",
         default=None,
     )
-    deleted: Optional[Boolean] = Field(
+    deleted: Optional[fhir.boolean] = Field(
         description="If this item is actually marked as deleted",
         default=None,
     )
-    deleted_ext: Optional[Element] = Field(
-        description="Placeholder element for deleted extensions",
-        default=None,
-        alias="_deleted",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When item added to list",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     item: Optional[Reference] = Field(
         description="Actual entry",
@@ -83,32 +67,17 @@ class List(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="current | retired | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="working | snapshot | changes",
         default=None,
     )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Descriptive name for the list",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     code: Optional[CodeableConcept] = Field(
         description="What the purpose of this list is",
@@ -122,14 +91,9 @@ class List(DomainResource):
         description="Context in which list created",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the list was prepared",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     source: Optional[Reference] = Field(
         description="Who and/or what defined the list contents (aka Author)",

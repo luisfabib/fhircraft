@@ -4,18 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-    Boolean,
-    Date,
-    Decimal,
-    UnsignedInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -75,27 +65,17 @@ class ExplanationOfBenefitCareTeam(BackboneElement):
     The members of the team who provided the products and services.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Order of care team",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     provider: Optional[Reference] = Field(
         description="Practitioner or organization",
         default=None,
     )
-    responsible: Optional[Boolean] = Field(
+    responsible: Optional[fhir.boolean] = Field(
         description="Indicator of the lead practitioner",
         default=None,
-    )
-    responsible_ext: Optional[Element] = Field(
-        description="Placeholder element for responsible extensions",
-        default=None,
-        alias="_responsible",
     )
     role: Optional[CodeableConcept] = Field(
         description="Function within the team",
@@ -112,14 +92,9 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Information instance identifier",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     category: Optional[CodeableConcept] = Field(
         description="Classification of the supplied information",
@@ -129,36 +104,21 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
         description="Type of information",
         default=None,
     )
-    timingDate: Optional[Date] = Field(
+    timingDate: Optional[fhir.date_] = Field(
         description="When it occurred",
         default=None,
-    )
-    timingDate_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDate extensions",
-        default=None,
-        alias="_timingDate",
     )
     timingPeriod: Optional[Period] = Field(
         description="When it occurred",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Data to be provided",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Data to be provided",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Data to be provided",
@@ -195,7 +155,7 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="timing",
             required=False,
         )
@@ -204,7 +164,7 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, String, Quantity, Attachment, Reference],
+            field_types=[fhir.Boolean, fhir.String, Quantity, Attachment, Reference],
             field_name_base="value",
             required=False,
         )
@@ -215,14 +175,9 @@ class ExplanationOfBenefitDiagnosis(BackboneElement):
     Information about diagnoses relevant to the claim items.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Diagnosis instance identifier",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     diagnosisCodeableConcept: Optional[CodeableConcept] = Field(
         description="Nature of illness or problem",
@@ -267,27 +222,17 @@ class ExplanationOfBenefitProcedure(BackboneElement):
     Procedures performed on the patient relevant to the billing items with the claim.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Procedure instance identifier",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the procedure was performed",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     procedureCodeableConcept: Optional[CodeableConcept] = Field(
         description="Specific clinical procedure",
@@ -324,27 +269,17 @@ class ExplanationOfBenefitInsurance(BackboneElement):
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
 
-    focal: Optional[Boolean] = Field(
+    focal: Optional[fhir.boolean] = Field(
         description="Coverage to be used for adjudication",
         default=None,
-    )
-    focal_ext: Optional[Element] = Field(
-        description="Placeholder element for focal extensions",
-        default=None,
-        alias="_focal",
     )
     coverage: Optional[Reference] = Field(
         description="Insurance information",
         default=None,
     )
-    preAuthRef: Optional[ListType[String]] = Field(
+    preAuthRef: Optional[ListType[fhir.string]] = Field(
         description="Prior authorization reference number",
         default=None,
-    )
-    preAuthRef_ext: Optional[Element] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
     )
 
 
@@ -353,14 +288,9 @@ class ExplanationOfBenefitAccident(BackboneElement):
     Details of a accident which resulted in injuries which required the products and services listed in the claim.
     """
 
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="When the incident occurred",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     type: Optional[CodeableConcept] = Field(
         description="The nature of the accident",
@@ -409,14 +339,9 @@ class ExplanationOfBenefitItemAdjudication(BackboneElement):
         description="Monetary amount",
         default=None,
     )
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Non-monitary value",
         default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
     )
 
 
@@ -437,14 +362,9 @@ class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
         description="Monetary amount",
         default=None,
     )
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Non-monitary value",
         default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
     )
 
 
@@ -453,14 +373,9 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
     Third-tier of goods and services.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Product or service provided",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     revenue: Optional[CodeableConcept] = Field(
         description="Revenue or cost center code",
@@ -490,14 +405,9 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     net: Optional[Money] = Field(
         description="Total item cost",
@@ -507,14 +417,9 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Unique device identifier",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Subdetail level adjudication details",
@@ -527,14 +432,9 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
     Second-tier of goods and services.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Product or service provided",
         default=None,
-    )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
     )
     revenue: Optional[CodeableConcept] = Field(
         description="Revenue or cost center code",
@@ -564,14 +464,9 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     net: Optional[Money] = Field(
         description="Total item cost",
@@ -581,14 +476,9 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Unique device identifier",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     adjudication: Optional[ListType[ExplanationOfBenefitItemDetailAdjudication]] = (
         Field(
@@ -607,50 +497,25 @@ class ExplanationOfBenefitItem(BackboneElement):
     A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
     """
 
-    sequence: Optional[PositiveInt] = Field(
+    sequence: Optional[fhir.positiveInt] = Field(
         description="Item instance identifier",
         default=None,
     )
-    sequence_ext: Optional[Element] = Field(
-        description="Placeholder element for sequence extensions",
-        default=None,
-        alias="_sequence",
-    )
-    careTeamSequence: Optional[ListType[PositiveInt]] = Field(
+    careTeamSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable care team members",
         default=None,
     )
-    careTeamSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for careTeamSequence extensions",
-        default=None,
-        alias="_careTeamSequence",
-    )
-    diagnosisSequence: Optional[ListType[PositiveInt]] = Field(
+    diagnosisSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable diagnoses",
         default=None,
     )
-    diagnosisSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for diagnosisSequence extensions",
-        default=None,
-        alias="_diagnosisSequence",
-    )
-    procedureSequence: Optional[ListType[PositiveInt]] = Field(
+    procedureSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable procedures",
         default=None,
     )
-    procedureSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for procedureSequence extensions",
-        default=None,
-        alias="_procedureSequence",
-    )
-    informationSequence: Optional[ListType[PositiveInt]] = Field(
+    informationSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable exception and supporting information",
         default=None,
-    )
-    informationSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for informationSequence extensions",
-        default=None,
-        alias="_informationSequence",
     )
     revenue: Optional[CodeableConcept] = Field(
         description="Revenue or cost center code",
@@ -672,14 +537,9 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Program the product or service is provided under",
         default=None,
     )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Date or dates of service or product delivery",
         default=None,
-    )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",
@@ -705,14 +565,9 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     net: Optional[Money] = Field(
         description="Total item cost",
@@ -734,14 +589,9 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Encounters related to this billed item",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Adjudication details",
@@ -770,7 +620,7 @@ class ExplanationOfBenefitItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -806,27 +656,17 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     net: Optional[Money] = Field(
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
@@ -855,27 +695,17 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     net: Optional[Money] = Field(
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
@@ -892,32 +722,17 @@ class ExplanationOfBenefitAddItem(BackboneElement):
     The first-tier service adjudications for payor added product or service lines.
     """
 
-    itemSequence: Optional[ListType[PositiveInt]] = Field(
+    itemSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Item sequence number",
         default=None,
     )
-    itemSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for itemSequence extensions",
-        default=None,
-        alias="_itemSequence",
-    )
-    detailSequence: Optional[ListType[PositiveInt]] = Field(
+    detailSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Detail sequence number",
         default=None,
     )
-    detailSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for detailSequence extensions",
-        default=None,
-        alias="_detailSequence",
-    )
-    subDetailSequence: Optional[ListType[PositiveInt]] = Field(
+    subDetailSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Subdetail sequence number",
         default=None,
-    )
-    subDetailSequence_ext: Optional[Element] = Field(
-        description="Placeholder element for subDetailSequence extensions",
-        default=None,
-        alias="_subDetailSequence",
     )
     provider: Optional[ListType[Reference]] = Field(
         description="Authorized providers",
@@ -935,14 +750,9 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Program the product or service is provided under",
         default=None,
     )
-    servicedDate: Optional[Date] = Field(
+    servicedDate: Optional[fhir.date_] = Field(
         description="Date or dates of service or product delivery",
         default=None,
-    )
-    servicedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for servicedDate extensions",
-        default=None,
-        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",
@@ -968,14 +778,9 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Fee, charge or cost per item",
         default=None,
     )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Price scaling factor",
         default=None,
-    )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
     )
     net: Optional[Money] = Field(
         description="Total item cost",
@@ -989,14 +794,9 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Anatomical sub-location",
         default=None,
     )
-    noteNumber: Optional[ListType[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
-    )
-    noteNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for noteNumber extensions",
-        default=None,
-        alias="_noteNumber",
     )
     adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
@@ -1025,7 +825,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, Period],
+            field_types=[fhir.Date, Period],
             field_name_base="serviced",
             required=False,
         )
@@ -1072,14 +872,9 @@ class ExplanationOfBenefitPayment(BackboneElement):
         description="Explanation for the variance",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Expected date of payment",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     amount: Optional[Money] = Field(
         description="Payable amount after adjustment",
@@ -1096,32 +891,17 @@ class ExplanationOfBenefitProcessNote(BackboneElement):
     A note that describes or explains adjudication results in a human readable form.
     """
 
-    number: Optional[PositiveInt] = Field(
+    number: Optional[fhir.positiveInt] = Field(
         description="Note instance identifier",
         default=None,
     )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="display | print | printoper",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Note explanatory text",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     language: Optional[CodeableConcept] = Field(
         description="Language of the text",
@@ -1138,36 +918,21 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
         description="Benefit classification",
         default=None,
     )
-    allowedUnsignedInt: Optional[UnsignedInt] = Field(
+    allowedUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Benefits allowed",
         default=None,
     )
-    allowedUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedUnsignedInt extensions",
-        default=None,
-        alias="_allowedUnsignedInt",
-    )
-    allowedString: Optional[String] = Field(
+    allowedString: Optional[fhir.string] = Field(
         description="Benefits allowed",
         default=None,
-    )
-    allowedString_ext: Optional[Element] = Field(
-        description="Placeholder element for allowedString extensions",
-        default=None,
-        alias="_allowedString",
     )
     allowedMoney: Optional[Money] = Field(
         description="Benefits allowed",
         default=None,
     )
-    usedUnsignedInt: Optional[UnsignedInt] = Field(
+    usedUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Benefits used",
         default=None,
-    )
-    usedUnsignedInt_ext: Optional[Element] = Field(
-        description="Placeholder element for usedUnsignedInt extensions",
-        default=None,
-        alias="_usedUnsignedInt",
     )
     usedMoney: Optional[Money] = Field(
         description="Benefits used",
@@ -1192,7 +957,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     def allowed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[UnsignedInt, String, Money],
+            field_types=[fhir.UnsignedInt, fhir.String, Money],
             field_name_base="allowed",
             required=False,
         )
@@ -1201,7 +966,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     def used_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[UnsignedInt, Money],
+            field_types=[fhir.UnsignedInt, Money],
             field_name_base="used",
             required=False,
         )
@@ -1216,32 +981,17 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
         description="Benefit classification",
         default=None,
     )
-    excluded: Optional[Boolean] = Field(
+    excluded: Optional[fhir.boolean] = Field(
         description="Excluded from the plan",
         default=None,
     )
-    excluded_ext: Optional[Element] = Field(
-        description="Placeholder element for excluded extensions",
-        default=None,
-        alias="_excluded",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Short name for the benefit",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of the benefit or services covered",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     network: Optional[CodeableConcept] = Field(
         description="In or out of network",
@@ -1286,14 +1036,9 @@ class ExplanationOfBenefit(DomainResource):
         description="Business Identifier for the resource",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     type: Optional[CodeableConcept] = Field(
         description="Category or discipline",
@@ -1303,14 +1048,9 @@ class ExplanationOfBenefit(DomainResource):
         description="More granular claim type",
         default=None,
     )
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="claim | preauthorization | predetermination",
         default=None,
-    )
-    use_ext: Optional[Element] = Field(
-        description="Placeholder element for use extensions",
-        default=None,
-        alias="_use",
     )
     patient: Optional[Reference] = Field(
         description="The recipient of the products and services",
@@ -1320,14 +1060,9 @@ class ExplanationOfBenefit(DomainResource):
         description="Relevant time frame for the claim",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Response creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     enterer: Optional[Reference] = Field(
         description="Author of the claim",
@@ -1385,32 +1120,17 @@ class ExplanationOfBenefit(DomainResource):
         description="Claim response reference",
         default=None,
     )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="queued | complete | error | partial",
         default=None,
     )
-    outcome_ext: Optional[Element] = Field(
-        description="Placeholder element for outcome extensions",
-        default=None,
-        alias="_outcome",
-    )
-    disposition: Optional[String] = Field(
+    disposition: Optional[fhir.string] = Field(
         description="Disposition Message",
         default=None,
     )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
-    )
-    preAuthRef: Optional[ListType[String]] = Field(
+    preAuthRef: Optional[ListType[fhir.string]] = Field(
         description="Preauthorization reference",
         default=None,
-    )
-    preAuthRef_ext: Optional[Element] = Field(
-        description="Placeholder element for preAuthRef extensions",
-        default=None,
-        alias="_preAuthRef",
     )
     preAuthRefPeriod: Optional[ListType[Period]] = Field(
         description="Preauthorization in-effect period",
@@ -1432,14 +1152,9 @@ class ExplanationOfBenefit(DomainResource):
         description="Clinical procedures performed",
         default=None,
     )
-    precedence: Optional[PositiveInt] = Field(
+    precedence: Optional[fhir.positiveInt] = Field(
         description="Precedence (primary, secondary, etc.)",
         default=None,
-    )
-    precedence_ext: Optional[Element] = Field(
-        description="Placeholder element for precedence extensions",
-        default=None,
-        alias="_precedence",
     )
     insurance: Optional[ListType[ExplanationOfBenefitInsurance]] = Field(
         description="Patient insurance information",

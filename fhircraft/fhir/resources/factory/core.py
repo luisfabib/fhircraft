@@ -275,9 +275,9 @@ class FHIRModelFactory:
     ) -> type[BaseModel]:
         """Internal build method, assumes input is already normalised and validated."""
 
-        sd_url = structure_def.url or ""
-        sd_name = structure_def.name or ""
-        fhir_version = structure_def.fhirVersion or ""
+        sd_url = str(structure_def.url) or ""
+        sd_name = str(structure_def.name) or ""
+        fhir_version = str(structure_def.fhirVersion) or ""
 
         if not sd_name:
             raise ValueError("StructureDefinition must have a valid 'name'.")
@@ -297,7 +297,7 @@ class FHIRModelFactory:
         if base_canonical := structure_def.baseDefinition:
             # Try directly from registry of built-in types first
             resolved = get_fhir_type_by_url(
-                base_canonical, fhir_release, fail_if_not_found=False
+                str(base_canonical), fhir_release, fail_if_not_found=False
             )
             if (
                 resolved is not None
@@ -306,7 +306,7 @@ class FHIRModelFactory:
             ):
                 base_model = resolved
             else:
-                base_model = self.build(canonical_url=base_canonical)
+                base_model = self.build(canonical_url=str(base_canonical))
 
         # ------------------------------------------------------------------
         # Produce the complete DefinitionIndex
@@ -340,13 +340,13 @@ class FHIRModelFactory:
         # ------------------------------------------------------------------
         if issubclass(model, FHIRBaseModel):
             model._fhir_release = fhir_release
-            model._canonical_url = structure_def.url
+            model._canonical_url = str(structure_def.url)
             model._kind = (
-                FhirBaseModelKind(structure_def.kind)
+                FhirBaseModelKind(str(structure_def.kind))
                 if structure_def.kind
                 else FhirBaseModelKind.LOGICAL
             )
-            model._type = structure_def.type or sd_name
+            model._type = str(structure_def.type) if structure_def.type else sd_name
             abstract = structure_def.abstract
             if abstract is not None:
                 model._abstract = bool(abstract)

@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -34,23 +28,13 @@ class ConsentPolicy(BackboneElement):
     The references to the policies that are included in this consent scope. Policies may be organizational, but are often defined jurisdictionally, or in law.
     """
 
-    authority: Optional[Uri] = Field(
+    authority: Optional[fhir.uri] = Field(
         description="Enforcement source for policy",
         default=None,
     )
-    authority_ext: Optional[Element] = Field(
-        description="Placeholder element for authority extensions",
-        default=None,
-        alias="_authority",
-    )
-    uri: Optional[Uri] = Field(
+    uri: Optional[fhir.uri] = Field(
         description="Specific policy covered by this consent",
         default=None,
-    )
-    uri_ext: Optional[Element] = Field(
-        description="Placeholder element for uri extensions",
-        default=None,
-        alias="_uri",
     )
 
 
@@ -59,27 +43,17 @@ class ConsentVerification(BackboneElement):
     Whether a treatment instruction (e.g. artificial respiration yes or no) was verified with the patient, his/her family or another authorized person.
     """
 
-    verified: Optional[Boolean] = Field(
+    verified: Optional[fhir.boolean] = Field(
         description="Has been verified",
         default=None,
-    )
-    verified_ext: Optional[Element] = Field(
-        description="Placeholder element for verified extensions",
-        default=None,
-        alias="_verified",
     )
     verifiedWith: Optional[Reference] = Field(
         description="Person who verified",
         default=None,
     )
-    verificationDate: Optional[DateTime] = Field(
+    verificationDate: Optional[fhir.dateTime] = Field(
         description="When consent verified",
         default=None,
-    )
-    verificationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for verificationDate extensions",
-        default=None,
-        alias="_verificationDate",
     )
 
 
@@ -103,14 +77,9 @@ class ConsentProvisionData(BackboneElement):
     The resources controlled by this rule if specific resources are referenced.
     """
 
-    meaning: Optional[Code] = Field(
+    meaning: Optional[fhir.code] = Field(
         description="instance | related | dependents | authoredby",
         default=None,
-    )
-    meaning_ext: Optional[Element] = Field(
-        description="Placeholder element for meaning extensions",
-        default=None,
-        alias="_meaning",
     )
     reference: Optional[Reference] = Field(
         description="The actual data reference",
@@ -123,14 +92,9 @@ class ConsentProvision(BackboneElement):
     An exception to the base policy of this consent. An exception can be an addition or removal of access permissions.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="deny | permit",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     period: Optional[Period] = Field(
         description="Timeframe for this rule",
@@ -200,14 +164,9 @@ class Consent(DomainResource):
         description="Identifier for this record (external references)",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | proposed | active | rejected | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     scope: Optional[CodeableConcept] = Field(
         description="Which of the four areas this resource covers (extensible)",
@@ -221,14 +180,9 @@ class Consent(DomainResource):
         description="Who the consent applies to",
         default=None,
     )
-    dateTime: Optional[DateTime] = Field(
+    dateTime: Optional[fhir.dateTime] = Field(
         description="When this Consent was created or indexed",
         default=None,
-    )
-    dateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for dateTime extensions",
-        default=None,
-        alias="_dateTime",
     )
     performer: Optional[ListType[Reference]] = Field(
         description="Who is agreeing to the policy and rules",

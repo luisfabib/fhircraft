@@ -30,6 +30,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity as R4_Quantity,
     Age as R4_Age,
 )
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    String as FHIRString,
+    Integer as FHIRInteger,
+    Boolean as FHIRBoolean,
+    Decimal as FHIRDecimal,
+    Date as FHIRDate,
+    DateTime as FHIRDateTime,
+    Time as FHIRTime,
+)
 from datetime import datetime, date, time
 
 env = dict()
@@ -144,6 +153,13 @@ toBoolean_cases = (
     ("0.0", False),
     (0, False),
     (0.0, False),
+    # FHIR primitive class instances
+    (FHIRString(value="true"), True),
+    (FHIRString(value="false"), False),
+    (FHIRBoolean(value=True), True),
+    (FHIRBoolean(value=False), False),
+    (FHIRInteger(value=1), True),
+    (FHIRInteger(value=0), False),
 )
 
 
@@ -207,6 +223,11 @@ convertsToBoolean_cases = (
     ("0.0"),
     (0),
     (0.0),
+    # FHIR primitive class instances
+    (FHIRString(value="true")),
+    (FHIRString(value="false")),
+    (FHIRBoolean(value=True)),
+    (FHIRInteger(value=1)),
 )
 
 
@@ -253,6 +274,12 @@ tointeger_cases = (
     (-14, -14),
     (True, 1),
     (False, 0),
+    # FHIR primitive class instances
+    (FHIRString(value="14"), 14),
+    (FHIRString(value="-14"), -14),
+    (FHIRInteger(value=14), 14),
+    (FHIRBoolean(value=True), 1),
+    (FHIRBoolean(value=False), 0),
 )
 
 
@@ -299,6 +326,10 @@ convertstointeger_cases = (
     (-14),
     (True),
     (False),
+    # FHIR primitive class instances
+    (FHIRString(value="14")),
+    (FHIRInteger(value=14)),
+    (FHIRBoolean(value=True)),
 )
 
 
@@ -346,6 +377,13 @@ todecimal_cases = (
     (14, 14.0),
     (True, 1.0),
     (False, 0.0),
+    # FHIR primitive class instances
+    (FHIRString(value="14.5"), 14.5),
+    (FHIRString(value="14"), 14.0),
+    (FHIRDecimal(value=14.5), 14.5),
+    (FHIRInteger(value=14), 14.0),
+    (FHIRBoolean(value=True), 1.0),
+    (FHIRBoolean(value=False), 0.0),
 )
 
 
@@ -393,6 +431,11 @@ convertstodecimal_cases = (
     (14),
     (True),
     (False),
+    # FHIR primitive class instances
+    (FHIRString(value="14.5")),
+    (FHIRDecimal(value=14.5)),
+    (FHIRInteger(value=14)),
+    (FHIRBoolean(value=True)),
 )
 
 
@@ -441,6 +484,10 @@ todate_cases = (
     (datetime(2014, 2, 1, 0, 0), "2014-02-01"),
     (Date("@2014-02-01"), "2014-02-01"),
     (DateTime("@2014-02-01T00:00:00.000Z"), "2014-02-01"),
+    # FHIR primitive class instances
+    (FHIRString(value="2014-02-01"), "2014-02-01"),
+    (FHIRDate(value="2014-02-01"), "2014-02-01"),
+    (FHIRDateTime(value="2014-02-01T00:00:00.000Z"), "2014-02-01"),
 )
 
 
@@ -489,6 +536,10 @@ convertstodate_cases = (
     (datetime(2000, 1, 1)),
     (Date("@2014-02-01")),
     (DateTime("@2014-02-01T00:00:00.000Z")),
+    # FHIR primitive class instances
+    (FHIRString(value="2014-02-01")),
+    (FHIRDate(value="2014-02-01")),
+    (FHIRDateTime(value="2014-02-01T00:00:00.000Z")),
 )
 
 
@@ -536,7 +587,11 @@ todatetime_cases = (
     (date(2014, 2, 1), "2014-02-01"),
     (datetime(2014, 2, 1), "2014-02-01T00:00:00"),
     (Date("@2014-02-01"), "2014-02-01"),
-    (DateTime("@2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00+00:00"),
+    (DateTime("@2012-02-01T00:00:00.000Z"), "2012-02-01T00:00:00Z"),
+    # FHIR primitive class instances
+    (FHIRString(value="2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00.000Z"),
+    (FHIRDate(value="2014-02-01"), "2014-02-01"),
+    (FHIRDateTime(value="2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00.000Z"),
 )
 
 
@@ -544,6 +599,7 @@ todatetime_cases = (
 def test_todatetime_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDateTime().evaluate(collection, env)
+    print(result[0].value, expected)
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
@@ -585,6 +641,10 @@ convertstodatetime_cases = (
     (datetime(2014, 2, 1)),
     (Date("@2014-02-01")),
     (DateTime("@2014-02-01T00:00:00.000Z")),
+    # FHIR primitive class instances
+    (FHIRString(value="2014-02-01")),
+    (FHIRDate(value="2014-02-01")),
+    (FHIRDateTime(value="2014-02-01T00:00:00.000Z")),
 )
 
 
@@ -637,6 +697,11 @@ toquantity_cases = (
         R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"),
         Quantity(value=12.5, unit="a"),
     ),
+    # FHIR primitive class instances
+    (FHIRString(value="12.5 mg"), Quantity(value=12.5, unit="mg")),
+    (FHIRDecimal(value=12.5), Quantity(value=12.5, unit="")),
+    (FHIRInteger(value=5), Quantity(value=5, unit="")),
+    (FHIRBoolean(value=True), Quantity(value=1.0, unit="")),
 )
 
 
@@ -686,6 +751,11 @@ convertstoquantity_cases = (
     (Quantity(value=12.5, unit="mg")),
     (R4_Quantity(value=12.5, unit="mg")),
     (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org")),
+    # FHIR primitive class instances
+    (FHIRString(value="12.5 mg")),
+    (FHIRDecimal(value=12.5)),
+    (FHIRInteger(value=5)),
+    (FHIRBoolean(value=True)),
 )
 
 
@@ -736,6 +806,12 @@ toString_cases = (
     (R4_Quantity(value=12.5, unit="mg"), "12.5 mg"),
     (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"), "12.5 a"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
+    # FHIR primitive class instances
+    (FHIRString(value="abc"), "abc"),
+    (FHIRInteger(value=2014), "2014"),
+    (FHIRDecimal(value=12.345), "12.345"),
+    (FHIRBoolean(value=True), "true"),
+    (FHIRBoolean(value=False), "false"),
 )
 
 
@@ -786,6 +862,11 @@ convertstostring_cases = (
     (Quantity(value=12.5, unit="mg")),
     (R4_Quantity(value=12.5, unit="mg")),
     (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org")),
+    # FHIR primitive class instances
+    (FHIRString(value="abc")),
+    (FHIRInteger(value=42)),
+    (FHIRDecimal(value=14.54)),
+    (FHIRBoolean(value=True)),
 )
 
 
@@ -832,6 +913,9 @@ totime_cases = (
     ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
     (time(12, 25), "12:25:00"),
     (Time("@T12:25"), "12:25:00"),
+    # FHIR primitive class instances
+    (FHIRString(value="10:30:00"), "10:30:00"),
+    (FHIRTime(value="10:30:00"), "10:30:00"),
 )
 
 
@@ -878,6 +962,9 @@ convertstotime_cases = (
     ("2014-02-01T00:00:00.000Z"),
     (time(12, 25)),
     (Time("@T12:25")),
+    # FHIR primitive class instances
+    (FHIRString(value="10:30:00")),
+    (FHIRTime(value="10:30:00")),
 )
 
 

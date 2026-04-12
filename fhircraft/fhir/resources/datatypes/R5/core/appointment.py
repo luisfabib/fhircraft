@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Instant,
-    PositiveInt,
-    DateTime,
-    Boolean,
-    Date,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -34,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class AppointmentParticipant(BackboneElement):
     """
     List of participants involved in the appointment.
@@ -52,118 +42,61 @@ class AppointmentParticipant(BackboneElement):
         description="The individual, device, location, or service participating in the appointment",
         default=None,
     )
-    required: Optional[Boolean] = Field(
+    required: Optional[fhir.boolean] = Field(
         description="The participant is required to attend (optional when false)",
         default=None,
     )
-    required_ext: Optional[Element] = Field(
-        description="Placeholder element for required extensions",
-        default=None,
-        alias="_required",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="accepted | declined | tentative | needs-action",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-
 
 class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
     """
     Information about weekly recurring appointments.
     """
 
-    monday: Optional[Boolean] = Field(
+    monday: Optional[fhir.boolean] = Field(
         description="Recurs on Mondays",
         default=None,
     )
-    monday_ext: Optional[Element] = Field(
-        description="Placeholder element for monday extensions",
-        default=None,
-        alias="_monday",
-    )
-    tuesday: Optional[Boolean] = Field(
+    tuesday: Optional[fhir.boolean] = Field(
         description="Recurs on Tuesday",
         default=None,
     )
-    tuesday_ext: Optional[Element] = Field(
-        description="Placeholder element for tuesday extensions",
-        default=None,
-        alias="_tuesday",
-    )
-    wednesday: Optional[Boolean] = Field(
+    wednesday: Optional[fhir.boolean] = Field(
         description="Recurs on Wednesday",
         default=None,
     )
-    wednesday_ext: Optional[Element] = Field(
-        description="Placeholder element for wednesday extensions",
-        default=None,
-        alias="_wednesday",
-    )
-    thursday: Optional[Boolean] = Field(
+    thursday: Optional[fhir.boolean] = Field(
         description="Recurs on Thursday",
         default=None,
     )
-    thursday_ext: Optional[Element] = Field(
-        description="Placeholder element for thursday extensions",
-        default=None,
-        alias="_thursday",
-    )
-    friday: Optional[Boolean] = Field(
+    friday: Optional[fhir.boolean] = Field(
         description="Recurs on Friday",
         default=None,
     )
-    friday_ext: Optional[Element] = Field(
-        description="Placeholder element for friday extensions",
-        default=None,
-        alias="_friday",
-    )
-    saturday: Optional[Boolean] = Field(
+    saturday: Optional[fhir.boolean] = Field(
         description="Recurs on Saturday",
         default=None,
     )
-    saturday_ext: Optional[Element] = Field(
-        description="Placeholder element for saturday extensions",
-        default=None,
-        alias="_saturday",
-    )
-    sunday: Optional[Boolean] = Field(
+    sunday: Optional[fhir.boolean] = Field(
         description="Recurs on Sunday",
         default=None,
     )
-    sunday_ext: Optional[Element] = Field(
-        description="Placeholder element for sunday extensions",
-        default=None,
-        alias="_sunday",
-    )
-    weekInterval: Optional[PositiveInt] = Field(
+    weekInterval: Optional[fhir.positiveInt] = Field(
         description="Recurs every nth week",
         default=None,
     )
-    weekInterval_ext: Optional[Element] = Field(
-        description="Placeholder element for weekInterval extensions",
-        default=None,
-        alias="_weekInterval",
-    )
-
 
 class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
     """
     Information about monthly recurring appointments.
     """
 
-    dayOfMonth: Optional[PositiveInt] = Field(
+    dayOfMonth: Optional[fhir.positiveInt] = Field(
         description="Recurs on a specific day of the month",
         default=None,
-    )
-    dayOfMonth_ext: Optional[Element] = Field(
-        description="Placeholder element for dayOfMonth extensions",
-        default=None,
-        alias="_dayOfMonth",
     )
     nthWeekOfMonth: Optional[Coding] = Field(
         description="Indicates which week of the month the appointment should occur",
@@ -173,32 +106,20 @@ class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
         description="Indicates which day of the week the appointment should occur",
         default=None,
     )
-    monthInterval: Optional[PositiveInt] = Field(
+    monthInterval: Optional[fhir.positiveInt] = Field(
         description="Recurs every nth month",
         default=None,
     )
-    monthInterval_ext: Optional[Element] = Field(
-        description="Placeholder element for monthInterval extensions",
-        default=None,
-        alias="_monthInterval",
-    )
-
 
 class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
     """
     Information about yearly recurring appointments.
     """
 
-    yearInterval: Optional[PositiveInt] = Field(
+    yearInterval: Optional[fhir.positiveInt] = Field(
         description="Recurs every nth year",
         default=None,
     )
-    yearInterval_ext: Optional[Element] = Field(
-        description="Placeholder element for yearInterval extensions",
-        default=None,
-        alias="_yearInterval",
-    )
-
 
 class AppointmentRecurrenceTemplate(BackboneElement):
     """
@@ -213,32 +134,17 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="The frequency of the recurrence",
         default=None,
     )
-    lastOccurrenceDate: Optional[Date] = Field(
+    lastOccurrenceDate: Optional[fhir.date_] = Field(
         description="The date when the recurrence should end",
         default=None,
     )
-    lastOccurrenceDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastOccurrenceDate extensions",
-        default=None,
-        alias="_lastOccurrenceDate",
-    )
-    occurrenceCount: Optional[PositiveInt] = Field(
+    occurrenceCount: Optional[fhir.positiveInt] = Field(
         description="The number of planned occurrences",
         default=None,
     )
-    occurrenceCount_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceCount extensions",
-        default=None,
-        alias="_occurrenceCount",
-    )
-    occurrenceDate: Optional[ListType[Date]] = Field(
+    occurrenceDate: Optional[ListType[fhir.date_]] = Field(
         description="Specific dates for a recurring set of appointments (no template)",
         default=None,
-    )
-    occurrenceDate_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for occurrenceDate extensions",
-        default=None,
-        alias="_occurrenceDate",
     )
     weeklyTemplate: Optional[AppointmentRecurrenceTemplateWeeklyTemplate] = Field(
         description="Information about weekly recurring appointments",
@@ -252,25 +158,14 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Information about yearly recurring appointments",
         default=None,
     )
-    excludingDate: Optional[ListType[Date]] = Field(
+    excludingDate: Optional[ListType[fhir.date_]] = Field(
         description="Any dates that should be excluded from the series",
         default=None,
     )
-    excludingDate_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for excludingDate extensions",
-        default=None,
-        alias="_excludingDate",
-    )
-    excludingRecurrenceId: Optional[ListType[PositiveInt]] = Field(
+    excludingRecurrenceId: Optional[ListType[fhir.positiveInt]] = Field(
         description="Any recurrence IDs that should be excluded from the recurrence",
         default=None,
     )
-    excludingRecurrenceId_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for excludingRecurrenceId extensions",
-        default=None,
-        alias="_excludingRecurrenceId",
-    )
-
 
 class Appointment(DomainResource):
     """
@@ -285,14 +180,9 @@ class Appointment(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     cancellationReason: Optional[CodeableConcept] = Field(
         description="The coded reason for the appointment being cancelled",
@@ -327,14 +217,9 @@ class Appointment(DomainResource):
         description="Used to make informed decisions if needing to re-prioritize",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Shown on a subject line in a meeting request, or appointment list",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     replaces: Optional[ListType[Reference]] = Field(
         description="Appointment replaced by this Appointment",
@@ -356,32 +241,17 @@ class Appointment(DomainResource):
         description="The originating appointment in a recurring set of appointments",
         default=None,
     )
-    start: Optional[Instant] = Field(
+    start: Optional[fhir.instant] = Field(
         description="When appointment is to take place",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
-    )
-    end: Optional[Instant] = Field(
+    end: Optional[fhir.instant] = Field(
         description="When appointment is to conclude",
         default=None,
     )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
-    )
-    minutesDuration: Optional[PositiveInt] = Field(
+    minutesDuration: Optional[fhir.positiveInt] = Field(
         description="Can be less than start/end (e.g. estimate)",
         default=None,
-    )
-    minutesDuration_ext: Optional[Element] = Field(
-        description="Placeholder element for minutesDuration extensions",
-        default=None,
-        alias="_minutesDuration",
     )
     requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
@@ -395,23 +265,13 @@ class Appointment(DomainResource):
         description="The set of accounts that may be used for billing for this Appointment",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="The date that this appointment was initially created",
         default=None,
     )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
-    )
-    cancellationDate: Optional[DateTime] = Field(
+    cancellationDate: Optional[fhir.dateTime] = Field(
         description="When the appointment was cancelled",
         default=None,
-    )
-    cancellationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for cancellationDate extensions",
-        default=None,
-        alias="_cancellationDate",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Additional comments",
@@ -433,23 +293,13 @@ class Appointment(DomainResource):
         description="Participants involved in appointment",
         default=None,
     )
-    recurrenceId: Optional[PositiveInt] = Field(
+    recurrenceId: Optional[fhir.positiveInt] = Field(
         description="The sequence number in the recurrence",
         default=None,
     )
-    recurrenceId_ext: Optional[Element] = Field(
-        description="Placeholder element for recurrenceId extensions",
-        default=None,
-        alias="_recurrenceId",
-    )
-    occurrenceChanged: Optional[Boolean] = Field(
+    occurrenceChanged: Optional[fhir.boolean] = Field(
         description="Indicates that this appointment varies from a recurrence pattern",
         default=None,
-    )
-    occurrenceChanged_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceChanged extensions",
-        default=None,
-        alias="_occurrenceChanged",
     )
     recurrenceTemplate: Optional[ListType[AppointmentRecurrenceTemplate]] = Field(
         description="Details of the recurrence pattern/template used to generate occurrences",

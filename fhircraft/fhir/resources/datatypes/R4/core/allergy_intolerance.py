@@ -4,7 +4,7 @@ from typing import Optional, List as ListType
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -36,32 +36,17 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Clinical symptoms/signs associated with the Event",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of the event as a whole",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    onset: Optional[DateTime] = Field(
+    onset: Optional[fhir.dateTime] = Field(
         description="Date(/time) when manifestations showed",
         default=None,
     )
-    onset_ext: Optional[Element] = Field(
-        description="Placeholder element for onset extensions",
-        default=None,
-        alias="_onset",
-    )
-    severity: Optional[Code] = Field(
+    severity: Optional[fhir.code] = Field(
         description="mild | moderate | severe (of event as a whole)",
         default=None,
-    )
-    severity_ext: Optional[Element] = Field(
-        description="Placeholder element for severity extensions",
-        default=None,
-        alias="_severity",
     )
     exposureRoute: Optional[CodeableConcept] = Field(
         description="How the subject was exposed to the substance",
@@ -106,35 +91,20 @@ class AllergyIntolerance(DomainResource):
         description="unconfirmed | confirmed | refuted | entered-in-error",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="allergy | intolerance - Underlying mechanism (if known)",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    category: Optional[ListType[Code]] = Field(
+    category: Optional[ListType[fhir.code]] = Field(
         description="food | medication | environment | biologic",
         default=None,
     )
-    category_ext: Optional[Element] = Field(
-        description="Placeholder element for category extensions",
-        default=None,
-        alias="_category",
-    )
-    criticality: Optional[Code] = Field(
+    criticality: Optional[fhir.code] = Field(
         description="low | high | unable-to-assess",
         default=None,
     )
-    criticality_ext: Optional[Element] = Field(
-        description="Placeholder element for criticality extensions",
-        default=None,
-        alias="_criticality",
-    )
     code: Optional[CodeableConcept] = Field(
-        description="Code that identifies the allergy or intolerance",
+        description="code that identifies the allergy or intolerance",
         default=None,
     )
     patient: Optional[Reference] = Field(
@@ -145,14 +115,9 @@ class AllergyIntolerance(DomainResource):
         description="Encounter when the allergy or intolerance was asserted",
         default=None,
     )
-    onsetDateTime: Optional[DateTime] = Field(
+    onsetDateTime: Optional[fhir.dateTime] = Field(
         description="When allergy or intolerance was identified",
         default=None,
-    )
-    onsetDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for onsetDateTime extensions",
-        default=None,
-        alias="_onsetDateTime",
     )
     onsetAge: Optional[Age] = Field(
         description="When allergy or intolerance was identified",
@@ -166,23 +131,13 @@ class AllergyIntolerance(DomainResource):
         description="When allergy or intolerance was identified",
         default=None,
     )
-    onsetString: Optional[String] = Field(
+    onsetString: Optional[fhir.string] = Field(
         description="When allergy or intolerance was identified",
         default=None,
     )
-    onsetString_ext: Optional[Element] = Field(
-        description="Placeholder element for onsetString extensions",
-        default=None,
-        alias="_onsetString",
-    )
-    recordedDate: Optional[DateTime] = Field(
+    recordedDate: Optional[fhir.dateTime] = Field(
         description="Date first version of the resource instance was recorded",
         default=None,
-    )
-    recordedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedDate extensions",
-        default=None,
-        alias="_recordedDate",
     )
     recorder: Optional[Reference] = Field(
         description="Who recorded the sensitivity",
@@ -192,14 +147,9 @@ class AllergyIntolerance(DomainResource):
         description="Source of the information about the allergy",
         default=None,
     )
-    lastOccurrence: Optional[DateTime] = Field(
+    lastOccurrence: Optional[fhir.dateTime] = Field(
         description="Date(/time) of last known occurrence of a reaction",
         default=None,
-    )
-    lastOccurrence_ext: Optional[Element] = Field(
-        description="Placeholder element for lastOccurrence extensions",
-        default=None,
-        alias="_lastOccurrence",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Additional text not captured in other fields",
@@ -221,7 +171,7 @@ class AllergyIntolerance(DomainResource):
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Age, Period, Range, String],
+            field_types=[fhir.DateTime, Age, Period, Range, fhir.String],
             field_name_base="onset",
             required=False,
         )

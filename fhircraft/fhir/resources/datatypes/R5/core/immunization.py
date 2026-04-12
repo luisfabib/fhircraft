@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -30,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ImmunizationPerformer(BackboneElement):
     """
     Indicates who performed the immunization event.
@@ -44,7 +36,6 @@ class ImmunizationPerformer(BackboneElement):
         description="Individual or organization who was performing",
         default=None,
     )
-
 
 class ImmunizationProgramEligibility(BackboneElement):
     """
@@ -60,49 +51,32 @@ class ImmunizationProgramEligibility(BackboneElement):
         default=None,
     )
 
-
 class ImmunizationReaction(BackboneElement):
     """
     Categorical data indicating that an adverse event is associated in time to an immunization.
     """
 
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When reaction started",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     manifestation: Optional[CodeableReference] = Field(
         description="Additional information on reaction",
         default=None,
     )
-    reported: Optional[Boolean] = Field(
+    reported: Optional[fhir.boolean] = Field(
         description="Indicates self-reported reaction",
         default=None,
     )
-    reported_ext: Optional[Element] = Field(
-        description="Placeholder element for reported extensions",
-        default=None,
-        alias="_reported",
-    )
-
 
 class ImmunizationProtocolApplied(BackboneElement):
     """
     The protocol (set of recommendations) being followed by the provider who administered the dose.
     """
 
-    series: Optional[String] = Field(
+    series: Optional[fhir.string] = Field(
         description="Name of vaccine series",
         default=None,
-    )
-    series_ext: Optional[Element] = Field(
-        description="Placeholder element for series extensions",
-        default=None,
-        alias="_series",
     )
     authority: Optional[Reference] = Field(
         description="Who is responsible for publishing the recommendations",
@@ -112,25 +86,14 @@ class ImmunizationProtocolApplied(BackboneElement):
         description="Vaccine preventatable disease being targeted",
         default=None,
     )
-    doseNumber: Optional[String] = Field(
+    doseNumber: Optional[fhir.string] = Field(
         description="Dose number within series",
         default=None,
     )
-    doseNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumber extensions",
-        default=None,
-        alias="_doseNumber",
-    )
-    seriesDoses: Optional[String] = Field(
+    seriesDoses: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
-    seriesDoses_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDoses extensions",
-        default=None,
-        alias="_seriesDoses",
-    )
-
 
 class Immunization(DomainResource):
     """
@@ -149,14 +112,9 @@ class Immunization(DomainResource):
         description="Authority that the immunization event is based on",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="completed | entered-in-error | not-done",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -174,23 +132,13 @@ class Immunization(DomainResource):
         description="Vaccine manufacturer",
         default=None,
     )
-    lotNumber: Optional[String] = Field(
+    lotNumber: Optional[fhir.string] = Field(
         description="Vaccine lot number",
         default=None,
     )
-    lotNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for lotNumber extensions",
-        default=None,
-        alias="_lotNumber",
-    )
-    expirationDate: Optional[Date] = Field(
+    expirationDate: Optional[fhir.date_] = Field(
         description="Vaccine expiration date",
         default=None,
-    )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
     )
     patient: Optional[Reference] = Field(
         description="Who was immunized",
@@ -204,32 +152,17 @@ class Immunization(DomainResource):
         description="Additional information in support of the immunization",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="Vaccine administration date",
         default=None,
     )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
-    )
-    occurrenceString: Optional[String] = Field(
+    occurrenceString: Optional[fhir.string] = Field(
         description="Vaccine administration date",
         default=None,
     )
-    occurrenceString_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceString extensions",
-        default=None,
-        alias="_occurrenceString",
-    )
-    primarySource: Optional[Boolean] = Field(
+    primarySource: Optional[fhir.boolean] = Field(
         description="Indicates context the data was captured in",
         default=None,
-    )
-    primarySource_ext: Optional[Element] = Field(
-        description="Placeholder element for primarySource extensions",
-        default=None,
-        alias="_primarySource",
     )
     informationSource: Optional[CodeableReference] = Field(
         description="Indicates the source of a  reported record",
@@ -263,14 +196,9 @@ class Immunization(DomainResource):
         description="Why immunization occurred",
         default=None,
     )
-    isSubpotent: Optional[Boolean] = Field(
+    isSubpotent: Optional[fhir.boolean] = Field(
         description="Dose potency",
         default=None,
-    )
-    isSubpotent_ext: Optional[Element] = Field(
-        description="Placeholder element for isSubpotent extensions",
-        default=None,
-        alias="_isSubpotent",
     )
     subpotentReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for being subpotent",
@@ -304,7 +232,7 @@ class Immunization(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, String],
+            field_types=[fhir.DateTime, fhir.String],
             field_name_base="occurrence",
             required=True,
         )

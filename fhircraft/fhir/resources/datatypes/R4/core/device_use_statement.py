@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class DeviceUseStatement(DomainResource):
     """
@@ -51,14 +50,9 @@ class DeviceUseStatement(DomainResource):
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | completed | entered-in-error +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     subject: Optional[Reference] = Field(
         description="Patient using device",
@@ -76,23 +70,13 @@ class DeviceUseStatement(DomainResource):
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="How often  the device was used",
         default=None,
     )
-    timingDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for timingDateTime extensions",
-        default=None,
-        alias="_timingDateTime",
-    )
-    recordedOn: Optional[DateTime] = Field(
+    recordedOn: Optional[fhir.dateTime] = Field(
         description="When statement was recorded",
         default=None,
-    )
-    recordedOn_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedOn extensions",
-        default=None,
-        alias="_recordedOn",
     )
     source: Optional[Reference] = Field(
         description="Who made the statement",
@@ -130,7 +114,7 @@ class DeviceUseStatement(DomainResource):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Period, DateTime],
+            field_types=[Timing, Period, fhir.DateTime],
             field_name_base="timing",
             required=False,
         )

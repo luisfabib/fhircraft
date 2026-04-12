@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -47,17 +40,12 @@ class BiologicallyDerivedProductCollection(BackboneElement):
         description="The patient who underwent the medical procedure to collect the product or the organization that facilitated the collection",
         default=None,
     )
-    collectedDateTime: Optional[DateTime] = Field(
-        description="Time of product collection",
+    collectedDateTime: Optional[fhir.dateTime] = Field(
+        description="time of product collection",
         default=None,
-    )
-    collectedDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for collectedDateTime extensions",
-        default=None,
-        alias="_collectedDateTime",
     )
     collectedPeriod: Optional[Period] = Field(
-        description="Time of product collection",
+        description="time of product collection",
         default=None,
     )
 
@@ -72,7 +60,7 @@ class BiologicallyDerivedProductCollection(BackboneElement):
     def collected_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="collected",
             required=False,
         )
@@ -84,26 +72,16 @@ class BiologicallyDerivedProductProperty(BackboneElement):
     """
 
     type: Optional[CodeableConcept] = Field(
-        description="Code that specifies the property",
+        description="code that specifies the property",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Property values",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueInteger: Optional[Integer] = Field(
+    valueInteger: Optional[fhir.integer] = Field(
         description="Property values",
         default=None,
-    )
-    valueInteger_ext: Optional[Element] = Field(
-        description="Placeholder element for valueInteger extensions",
-        default=None,
-        alias="_valueInteger",
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Property values",
@@ -125,14 +103,9 @@ class BiologicallyDerivedProductProperty(BackboneElement):
         description="Property values",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Property values",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Property values",
@@ -151,14 +124,14 @@ class BiologicallyDerivedProductProperty(BackboneElement):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Boolean,
-                Integer,
+                fhir.Boolean,
+                fhir.Integer,
                 CodeableConcept,
                 Period,
                 Quantity,
                 Range,
                 Ratio,
-                String,
+                fhir.String,
                 Attachment,
             ],
             field_name_base="value",
@@ -205,27 +178,17 @@ class BiologicallyDerivedProduct(DomainResource):
         description="Processing facilities responsible for the labeling and distribution of this biologically derived product",
         default=None,
     )
-    division: Optional[String] = Field(
+    division: Optional[fhir.string] = Field(
         description="A unique identifier for an aliquot of a product",
         default=None,
-    )
-    division_ext: Optional[Element] = Field(
-        description="Placeholder element for division extensions",
-        default=None,
-        alias="_division",
     )
     productStatus: Optional[Coding] = Field(
         description="available | unavailable",
         default=None,
     )
-    expirationDate: Optional[DateTime] = Field(
+    expirationDate: Optional[fhir.dateTime] = Field(
         description="Date, and where relevant time, of expiration",
         default=None,
-    )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
     )
     collection: Optional[BiologicallyDerivedProductCollection] = Field(
         description="How this product was collected",

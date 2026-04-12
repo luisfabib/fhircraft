@@ -4,6 +4,8 @@ from fhircraft.config import configure, reset_config
 from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinition,
 )
+from fhircraft.fhir.resources.datatypes.R4.primitive.string import String
+from fhircraft.fhir.resources.datatypes.R4.primitive.integer import Integer
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 
 
@@ -85,7 +87,7 @@ def test_element_node_id_segments(element, id, expected):
 )
 def test_element_node_id_ancestry(element, id, expected):
     element.id = id
-    element.path = id
+    element.path = String(value=id)
     node = ElementNode(definition=element)
     assert node.id_ancestry == expected
 
@@ -102,7 +104,7 @@ def test_element_node_id_ancestry(element, id, expected):
     ],
 )
 def test_element_node_path(element, path):
-    element.path = path
+    element.path = String(value=path)
     node = ElementNode(definition=element)
     assert node.path == path
 
@@ -116,7 +118,7 @@ def test_element_node_path(element, path):
     ],
 )
 def test_element_node_path_segments(element, path):
-    element.path = path
+    element.path = String(value=path)
     node = ElementNode(definition=element)
     assert node.path_segments == [seg.split(":")[0] for seg in path.split(".")]
 
@@ -137,7 +139,7 @@ def test_element_node_path_segments(element, path):
     ],
 )
 def test_element_node_path_ancestry(element, path, expected):
-    element.path = path
+    element.path = String(value=path)
     node = ElementNode(definition=element)
     assert node.path_ancestry == expected
 
@@ -153,7 +155,7 @@ def test_element_node_path_ancestry(element, path, expected):
     ],
 )
 def test_element_node_depth(element, path, expected):
-    element.path = path
+    element.path = String(value=path)
     node = ElementNode(definition=element)
     assert node.depth == expected
 
@@ -171,7 +173,7 @@ def test_element_node_depth(element, path, expected):
     ],
 )
 def test_element_node_element_name(element, path, expected):
-    element.path = path
+    element.path = String(value=path)
     node = ElementNode(definition=element)
     assert node.name == expected
 
@@ -190,7 +192,7 @@ def test_element_node_element_name(element, path, expected):
 )
 def test_element_node_local_and_parent_id(element, id, expected_parent, expected_local):
     element.id = id
-    element.path = id
+    element.path = String(value=id)
     node = ElementNode(definition=element)
     assert node.parent_id == expected_parent
     assert node.local_id == expected_local
@@ -210,7 +212,7 @@ def test_element_node_local_and_parent_id(element, id, expected_parent, expected
     ],
 )
 def test_element_node_is_root(element, path, expected):
-    element.path = path
+    element.path = String(value=path)
     node = ElementNode(definition=element)
     assert node.is_root == expected
 
@@ -364,10 +366,10 @@ def test_element_node_slicing_rules(element, slicing, expected):
 @pytest.mark.parametrize(
     "element, expected_min, expected_max",
     [
-        (MagicMock(min=0, max="0"), 0, 0),
-        (MagicMock(min=0, max="1"), 0, 1),
-        (MagicMock(min=1, max="2"), 1, 2),
-        (MagicMock(min=0, max="*"), 0, None),
+        (MagicMock(min=Integer(value=0), max="0"), 0, 0),
+        (MagicMock(min=Integer(value=0), max="1"), 0, 1),
+        (MagicMock(min=Integer(value=1), max="2"), 1, 2),
+        (MagicMock(min=Integer(value=0), max="*"), 0, None),
     ],
 )
 def test_cardinality_constraints(element, expected_min, expected_max):
@@ -379,9 +381,9 @@ def test_cardinality_constraints(element, expected_min, expected_max):
 @pytest.mark.parametrize(
     "element, expected",
     [
-        (MagicMock(min=0), False),
-        (MagicMock(min=1), True),
-        (MagicMock(min=2), True),
+        (MagicMock(min=Integer(value=0)), False),
+        (MagicMock(min=Integer(value=1)), True),
+        (MagicMock(min=Integer(value=2)), True),
     ],
 )
 def test_cardinality_is_required(element, expected):
@@ -392,9 +394,9 @@ def test_cardinality_is_required(element, expected):
 @pytest.mark.parametrize(
     "element, expected",
     [
-        (MagicMock(max=0), True),
-        (MagicMock(max=1), False),
-        (MagicMock(max=2), False),
+        (MagicMock(max=Integer(value=0)), True),
+        (MagicMock(max=Integer(value=1)), False),
+        (MagicMock(max=Integer(value=2)), False),
     ],
 )
 def test_cardinality_is_prohibited(element, expected):
@@ -405,10 +407,10 @@ def test_cardinality_is_prohibited(element, expected):
 @pytest.mark.parametrize(
     "element, expected",
     [
-        (MagicMock(max="0"), False),
-        (MagicMock(max="1"), False),
-        (MagicMock(max="2"), True),
-        (MagicMock(max="*"), True),
+        (MagicMock(max=String(value="0")), False),
+        (MagicMock(max=String(value="1")), False),
+        (MagicMock(max=String(value="2")), True),
+        (MagicMock(max=String(value="*")), True),
     ],
 )
 def test_cardinality_is_array(element, expected):
@@ -419,10 +421,10 @@ def test_cardinality_is_array(element, expected):
 @pytest.mark.parametrize(
     "base, expected_min, expected_max",
     [
-        (MagicMock(min=0, max="0"), 0, 0),
-        (MagicMock(min=0, max="1"), 0, 1),
-        (MagicMock(min=1, max="2"), 1, 2),
-        (MagicMock(min=0, max="*"), 0, None),
+        (MagicMock(min=Integer(value=0), max=String(value="0")), 0, 0),
+        (MagicMock(min=Integer(value=0), max=String(value="1")), 0, 1),
+        (MagicMock(min=Integer(value=1), max=String(value="2")), 1, 2),
+        (MagicMock(min=Integer(value=0), max=String(value="*")), 0, None),
     ],
 )
 def test_cardinality_base(base, expected_min, expected_max):
@@ -434,10 +436,10 @@ def test_cardinality_base(base, expected_min, expected_max):
 @pytest.mark.parametrize(
     "base, expected",
     [
-        (MagicMock(max="0"), False),
-        (MagicMock(max="1"), False),
-        (MagicMock(max="2"), True),
-        (MagicMock(max="*"), True),
+        (MagicMock(max=String(value="0")), False),
+        (MagicMock(max=String(value="1")), False),
+        (MagicMock(max=String(value="2")), True),
+        (MagicMock(max=String(value="*")), True),
     ],
 )
 def test_cardinality_base_is_array(base, expected):
@@ -483,7 +485,7 @@ def test_element_node_is_polymorphic_type_false_for_type_choice_slice(
     element, id, path, expected
 ):
     element.id = id
-    element.path = path
+    element.path = String(value=path)
     node = ElementNode(definition=element)
     assert node.is_polymorphic_type == expected
 
@@ -494,9 +496,9 @@ def test_element_node_is_polymorphic_type_false_for_type_choice_slice(
 
 
 def test_documentation__returns_definition_when_it_has_content(element):
-    element.definition = "A real definition."
-    element.short = "Short text"
-    element.comment = "A comment"
+    element.definition = String(value="A real definition.")
+    element.short = String(value="Short text")
+    element.comment = String(value="A comment")
     node = ElementNode(definition=element)
     assert node.documentation == "A real definition."
 
@@ -504,9 +506,9 @@ def test_documentation__returns_definition_when_it_has_content(element):
 def test_documentation__falls_back_to_short_when_definition_has_no_alphanumeric(
     element,
 ):
-    element.definition = r"\-"
-    element.short = "Short text"
-    element.comment = "A comment"
+    element.definition = String(value=r"\-")
+    element.short = String(value="Short text")
+    element.comment = String(value="A comment")
     node = ElementNode(definition=element)
     assert node.documentation == "Short text"
 
@@ -514,17 +516,17 @@ def test_documentation__falls_back_to_short_when_definition_has_no_alphanumeric(
 def test_documentation__falls_back_to_comment_when_definition_and_short_are_placeholders(
     element,
 ):
-    element.definition = r"\-"
-    element.short = "---"
+    element.definition = String(value=r"\-")
+    element.short = String(value="---")
     element.comment = "Useful comment"
     node = ElementNode(definition=element)
     assert node.documentation == "Useful comment"
 
 
 def test_documentation__returns_empty_string_when_all_fields_are_placeholders(element):
-    element.definition = r"\-"
-    element.short = "---"
-    element.comment = "***"
+    element.definition = String(value=r"\-")
+    element.short = String(value="---")
+    element.comment = String(value="***")
     node = ElementNode(definition=element)
     assert node.documentation == ""
 
@@ -539,8 +541,8 @@ def test_documentation__returns_empty_string_when_all_fields_are_none(element):
 
 def test_documentation__returns_short_when_definition_is_none(element):
     element.definition = None
-    element.short = "Short text"
-    element.comment = "A comment"
+    element.short = String(value="Short text")
+    element.comment = String(value="A comment")
     node = ElementNode(definition=element)
     assert node.documentation == "Short text"
 
@@ -548,6 +550,6 @@ def test_documentation__returns_short_when_definition_is_none(element):
 def test_documentation__returns_comment_when_definition_and_short_are_none(element):
     element.definition = None
     element.short = None
-    element.comment = "A comment"
+    element.comment = String(value="A comment")
     node = ElementNode(definition=element)
     assert node.documentation == "A comment"

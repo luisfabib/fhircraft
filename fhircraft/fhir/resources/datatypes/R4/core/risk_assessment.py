@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Decimal,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .resource import Resource
 from .domain_resource import DomainResource
 
@@ -41,14 +35,9 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Possible outcome for the subject",
         default=None,
     )
-    probabilityDecimal: Optional[Decimal] = Field(
+    probabilityDecimal: Optional[fhir.decimal] = Field(
         description="Likelihood of specified outcome",
         default=None,
-    )
-    probabilityDecimal_ext: Optional[Element] = Field(
-        description="Placeholder element for probabilityDecimal extensions",
-        default=None,
-        alias="_probabilityDecimal",
     )
     probabilityRange: Optional[Range] = Field(
         description="Likelihood of specified outcome",
@@ -58,14 +47,9 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Likelihood of specified outcome as a qualitative value",
         default=None,
     )
-    relativeRisk: Optional[Decimal] = Field(
+    relativeRisk: Optional[fhir.decimal] = Field(
         description="Relative likelihood",
         default=None,
-    )
-    relativeRisk_ext: Optional[Element] = Field(
-        description="Placeholder element for relativeRisk extensions",
-        default=None,
-        alias="_relativeRisk",
     )
     whenPeriod: Optional[Period] = Field(
         description="Timeframe or age range",
@@ -75,14 +59,9 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Timeframe or age range",
         default=None,
     )
-    rationale: Optional[String] = Field(
+    rationale: Optional[fhir.string] = Field(
         description="Explanation of prediction",
         default=None,
-    )
-    rationale_ext: Optional[Element] = Field(
-        description="Placeholder element for rationale extensions",
-        default=None,
-        alias="_rationale",
     )
 
     @property
@@ -103,7 +82,7 @@ class RiskAssessmentPrediction(BackboneElement):
     def probability_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Decimal, Range],
+            field_types=[fhir.Decimal, Range],
             field_name_base="probability",
             required=False,
         )
@@ -151,14 +130,9 @@ class RiskAssessment(DomainResource):
         description="Part of this occurrence",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | preliminary | final | amended +",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     method: Optional[CodeableConcept] = Field(
         description="Evaluation mechanism",
@@ -176,14 +150,9 @@ class RiskAssessment(DomainResource):
         description="Where was assessment performed?",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When was assessment made?",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When was assessment made?",
@@ -213,14 +182,9 @@ class RiskAssessment(DomainResource):
         description="Outcome predicted",
         default=None,
     )
-    mitigation: Optional[String] = Field(
+    mitigation: Optional[fhir.string] = Field(
         description="How to reduce risk",
         default=None,
-    )
-    mitigation_ext: Optional[Element] = Field(
-        description="Placeholder element for mitigation extensions",
-        default=None,
-        alias="_mitigation",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments on the risk assessment",
@@ -249,7 +213,7 @@ class RiskAssessment(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period],
+            field_types=[fhir.DateTime, Period],
             field_name_base="occurrence",
             required=False,
         )

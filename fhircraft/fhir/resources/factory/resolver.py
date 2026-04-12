@@ -118,7 +118,7 @@ class SnapshotResolver:
                     f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition, which is required for differential resolution."
                 )
             # Obtain the base snapshot for differential resolution
-            base_definition = self._registry.get(base_canonical)
+            base_definition = self._registry.get(str(base_canonical))
             partial_base_index = self.resolve(base_definition, mode="auto")
             if base_definition.snapshot and base_definition.snapshot.element:
                 base_index = DefinitionIndex.from_elements(
@@ -294,11 +294,7 @@ class SnapshotResolver:
             return node
         else:
             return None
-        new_path = (
-            ".".join(filter(None, [root_name, *base_node.path_segments[1:]]))
-            if root_name
-            else base_node.path
-        )
+        new_path = path if root_name else base_node.path
         merge_fields = base_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS))
         # For type-choice type-slices (e.g. value[x]:valueQuantity) narrow the
         # inherited type list to the single concrete type indicated by the suffix.
@@ -383,8 +379,6 @@ class SnapshotResolver:
                     f"{FHIR_TYPE_PREFIX}{datatype}"
                 )
             except FileNotFoundError:
-                continue
-            if type_structure_definition.kind != "complex-type":
                 continue
             snapshot = type_structure_definition.snapshot
             if not snapshot or not snapshot.element:
@@ -483,7 +477,7 @@ class SnapshotResolver:
                 resolved_nodes.append(node)
                 continue
 
-            reference: str = node.definition.contentReference  # type: ignore[union-attr]
+            reference: str = str(node.definition.contentReference)  # type: ignore[union-attr]
             resource_url, ref_path = (
                 reference.split("#") if "#" in reference else ("", reference)
             )

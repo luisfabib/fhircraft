@@ -55,7 +55,9 @@ class Rule(FHIRMappingEngineComponent):
             SourceProcessingError: If required fields are missing.
         """
         self.definition = definition
-        self.name = definition.name or f"rule-{id(definition)}"
+        self.name = (
+            str(definition.name) if definition.name else f"rule-{id(definition)}"
+        )
         self.parent_group = parent_group
         self.sources: List[RuleSource] = []
         self.targets: List[RuleTarget] = []
@@ -176,14 +178,18 @@ class Rule(FHIRMappingEngineComponent):
         # R5-specific logic
         if _parameters := getattr(dependent, "parameter", None):
             parameters = [
-                iteration_scope.resolve_fhirpath(param.value)
+                iteration_scope.resolve_fhirpath(str(param.value))
                 for param in _parameters or []
             ]
         # R4 and R4B-specific logic
         elif _variables := getattr(dependent, "variable", None):
             parameters = [
-                iteration_scope.resolve_fhirpath(var) for var in _variables or []
+                iteration_scope.resolve_fhirpath(str(var)) for var in _variables or []
             ]
+        else:
+            raise RuleProcessingError(
+                f"Dependent '{dependent.name}' has no parameters or variables defined"
+            )
         dependent_group.process(
             iteration_scope,
             parameters,

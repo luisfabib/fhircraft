@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Decimal,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -41,23 +34,13 @@ class ObservationDefinitionQuantitativeDetails(BackboneElement):
         description="SI unit for quantitative results",
         default=None,
     )
-    conversionFactor: Optional[Decimal] = Field(
+    conversionFactor: Optional[fhir.decimal] = Field(
         description="SI to Customary unit conversion factor",
         default=None,
     )
-    conversionFactor_ext: Optional[Element] = Field(
-        description="Placeholder element for conversionFactor extensions",
+    decimalPrecision: Optional[fhir.integer] = Field(
+        description="decimal precision of observation quantitative results",
         default=None,
-        alias="_conversionFactor",
-    )
-    decimalPrecision: Optional[Integer] = Field(
-        description="Decimal precision of observation quantitative results",
-        default=None,
-    )
-    decimalPrecision_ext: Optional[Element] = Field(
-        description="Placeholder element for decimalPrecision extensions",
-        default=None,
-        alias="_decimalPrecision",
     )
 
 
@@ -66,14 +49,9 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
     Multiple  ranges of results qualified by different contexts for ordinal or continuous observations conforming to this ObservationDefinition.
     """
 
-    category: Optional[Code] = Field(
+    category: Optional[fhir.code] = Field(
         description="reference | critical | absolute",
         default=None,
-    )
-    category_ext: Optional[Element] = Field(
-        description="Placeholder element for category extensions",
-        default=None,
-        alias="_category",
     )
     range: Optional[Range] = Field(
         description="The interval itself, for continuous or ordinal observations",
@@ -87,14 +65,9 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         description="Targetted population of the range",
         default=None,
     )
-    gender: Optional[Code] = Field(
+    gender: Optional[fhir.code] = Field(
         description="male | female | other | unknown",
         default=None,
-    )
-    gender_ext: Optional[Element] = Field(
-        description="Placeholder element for gender extensions",
-        default=None,
-        alias="_gender",
     )
     age: Optional[Range] = Field(
         description="Applicable age range, if relevant",
@@ -104,14 +77,9 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         description="Applicable gestational age range, if relevant",
         default=None,
     )
-    condition: Optional[String] = Field(
+    condition: Optional[fhir.string] = Field(
         description="Condition associated with the reference range",
         default=None,
-    )
-    condition_ext: Optional[Element] = Field(
-        description="Placeholder element for condition extensions",
-        default=None,
-        alias="_condition",
     )
 
 
@@ -148,36 +116,21 @@ class ObservationDefinition(DomainResource):
         description="Business identifier for this ObservationDefinition instance",
         default=None,
     )
-    permittedDataType: Optional[ListType[Code]] = Field(
+    permittedDataType: Optional[ListType[fhir.code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
-    permittedDataType_ext: Optional[Element] = Field(
-        description="Placeholder element for permittedDataType extensions",
-        default=None,
-        alias="_permittedDataType",
-    )
-    multipleResultsAllowed: Optional[Boolean] = Field(
+    multipleResultsAllowed: Optional[fhir.boolean] = Field(
         description="Multiple results allowed",
         default=None,
-    )
-    multipleResultsAllowed_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleResultsAllowed extensions",
-        default=None,
-        alias="_multipleResultsAllowed",
     )
     method: Optional[CodeableConcept] = Field(
         description="Method used to produce the observation",
         default=None,
     )
-    preferredReportName: Optional[String] = Field(
+    preferredReportName: Optional[fhir.string] = Field(
         description="Preferred report name",
         default=None,
-    )
-    preferredReportName_ext: Optional[Element] = Field(
-        description="Placeholder element for preferredReportName extensions",
-        default=None,
-        alias="_preferredReportName",
     )
     quantitativeDetails: Optional[ObservationDefinitionQuantitativeDetails] = Field(
         description="Characteristics of quantitative results",

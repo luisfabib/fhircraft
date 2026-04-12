@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -32,7 +26,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationAdministrationPerformer(BackboneElement):
     """
     The performer of the medication treatment.  For devices this is the device that performed the administration of the medication.  An IV Pump would be an example of a device that is performing the administration. Both the IV Pump and the practitioner that set the rate or bolus on the pump can be listed as performers.
@@ -47,20 +40,14 @@ class MedicationAdministrationPerformer(BackboneElement):
         default=None,
     )
 
-
 class MedicationAdministrationDosage(BackboneElement):
     """
     Describes the medication dosage information details e.g. dose, rate, site, route, etc.
     """
 
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Free text dosage instructions e.g. SIG",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
     site: Optional[CodeableConcept] = Field(
         description="Body site administered to",
@@ -103,7 +90,6 @@ class MedicationAdministrationDosage(BackboneElement):
             required=False,
         )
 
-
 class MedicationAdministration(DomainResource):
     """
     Describes the event of a patient consuming or otherwise being administered a medication.  This may be as simple as swallowing a tablet or it may be a long running infusion. Related resources tie this event to the authorizing prescription, and the specific encounter between patient and health care practitioner. This event can also be used to record waste using a status of not-done and the appropriate statusReason.
@@ -125,14 +111,9 @@ class MedicationAdministration(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason administration not performed",
@@ -158,14 +139,9 @@ class MedicationAdministration(DomainResource):
         description="Additional information to support administration",
         default=None,
     )
-    occurenceDateTime: Optional[DateTime] = Field(
+    occurenceDateTime: Optional[fhir.dateTime] = Field(
         description="Specific date/time or interval of time during which the administration took place (or did not take place)",
         default=None,
-    )
-    occurenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurenceDateTime extensions",
-        default=None,
-        alias="_occurenceDateTime",
     )
     occurencePeriod: Optional[Period] = Field(
         description="Specific date/time or interval of time during which the administration took place (or did not take place)",
@@ -175,23 +151,13 @@ class MedicationAdministration(DomainResource):
         description="Specific date/time or interval of time during which the administration took place (or did not take place)",
         default=None,
     )
-    recorded: Optional[DateTime] = Field(
+    recorded: Optional[fhir.dateTime] = Field(
         description="When the MedicationAdministration was first captured in the subject\u0027s record",
         default=None,
     )
-    recorded_ext: Optional[Element] = Field(
-        description="Placeholder element for recorded extensions",
-        default=None,
-        alias="_recorded",
-    )
-    isSubPotent: Optional[Boolean] = Field(
+    isSubPotent: Optional[fhir.boolean] = Field(
         description="Full dose was not administered",
         default=None,
-    )
-    isSubPotent_ext: Optional[Element] = Field(
-        description="Placeholder element for isSubPotent extensions",
-        default=None,
-        alias="_isSubPotent",
     )
     subPotentReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason full dose was not administered",
@@ -237,7 +203,7 @@ class MedicationAdministration(DomainResource):
     def occurence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="occurence",
             required=True,
         )

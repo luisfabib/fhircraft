@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Date,
-    Boolean,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -30,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ManufacturedItemDefinitionProperty(BackboneElement):
     """
@@ -49,32 +41,17 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -99,16 +76,15 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
             field_types=[
                 CodeableConcept,
                 Quantity,
-                Date,
-                Boolean,
-                Markdown,
+                fhir.Date,
+                fhir.Boolean,
+                fhir.Markdown,
                 Attachment,
                 Reference,
             ],
             field_name_base="value",
             required=False,
         )
-
 
 class ManufacturedItemDefinitionComponentConstituent(BackboneElement):
     """
@@ -132,7 +108,6 @@ class ManufacturedItemDefinitionComponentConstituent(BackboneElement):
         default=None,
     )
 
-
 class ManufacturedItemDefinitionComponentProperty(BackboneElement):
     """
     General characteristics of this component.
@@ -150,32 +125,17 @@ class ManufacturedItemDefinitionComponentProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
-    valueDate: Optional[Date] = Field(
+    valueDate: Optional[fhir.date_] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueDate_ext: Optional[Element] = Field(
-        description="Placeholder element for valueDate extensions",
-        default=None,
-        alias="_valueDate",
-    )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="A value for the characteristic",
         default=None,
     )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
-    )
-    valueMarkdown: Optional[Markdown] = Field(
+    valueMarkdown: Optional[fhir.markdown] = Field(
         description="A value for the characteristic",
         default=None,
-    )
-    valueMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for valueMarkdown extensions",
-        default=None,
-        alias="_valueMarkdown",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",
@@ -200,16 +160,15 @@ class ManufacturedItemDefinitionComponentProperty(BackboneElement):
             field_types=[
                 CodeableConcept,
                 Quantity,
-                Date,
-                Boolean,
-                Markdown,
+                fhir.Date,
+                fhir.Boolean,
+                fhir.Markdown,
                 Attachment,
                 Reference,
             ],
             field_name_base="value",
             required=False,
         )
-
 
 class ManufacturedItemDefinitionComponent(BackboneElement):
     """
@@ -244,7 +203,6 @@ class ManufacturedItemDefinitionComponent(BackboneElement):
         default=None,
     )
 
-
 class ManufacturedItemDefinition(DomainResource):
     """
     The definition and characteristics of a medicinal manufactured item, such as a tablet or capsule, as contained in a packaged medicinal product.
@@ -260,23 +218,13 @@ class ManufacturedItemDefinition(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="A descriptive name applied to this item",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     manufacturedDoseForm: Optional[CodeableConcept] = Field(
         description="Dose form as manufactured (before any necessary transformation)",

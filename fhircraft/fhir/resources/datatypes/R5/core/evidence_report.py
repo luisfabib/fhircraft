@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -51,14 +45,9 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         description="Characteristic value",
         default=None,
     )
-    valueBoolean: Optional[Boolean] = Field(
+    valueBoolean: Optional[fhir.boolean] = Field(
         description="Characteristic value",
         default=None,
-    )
-    valueBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBoolean extensions",
-        default=None,
-        alias="_valueBoolean",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Characteristic value",
@@ -68,14 +57,9 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         description="Characteristic value",
         default=None,
     )
-    exclude: Optional[Boolean] = Field(
+    exclude: Optional[fhir.boolean] = Field(
         description="Is used to express not the characteristic",
         default=None,
-    )
-    exclude_ext: Optional[Element] = Field(
-        description="Placeholder element for exclude extensions",
-        default=None,
-        alias="_exclude",
     )
     period: Optional[Period] = Field(
         description="Timeframe for the characteristic",
@@ -93,7 +77,7 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, CodeableConcept, Boolean, Quantity, Range],
+            field_types=[Reference, CodeableConcept, fhir.Boolean, Quantity, Range],
             field_name_base="value",
             required=True,
         )
@@ -119,27 +103,17 @@ class EvidenceReportRelatesToTarget(BackboneElement):
     The target composition/document of this relationship.
     """
 
-    url: Optional[Uri] = Field(
+    url: Optional[fhir.uri] = Field(
         description="Target of the relationship URL",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[Identifier] = Field(
         description="Target of the relationship Identifier",
         default=None,
     )
-    display: Optional[Markdown] = Field(
+    display: Optional[fhir.markdown] = Field(
         description="Target of the relationship Display",
         default=None,
-    )
-    display_ext: Optional[Element] = Field(
-        description="Placeholder element for display extensions",
-        default=None,
-        alias="_display",
     )
     resource: Optional[Reference] = Field(
         description="Target of the relationship Resource reference",
@@ -152,14 +126,9 @@ class EvidenceReportRelatesTo(BackboneElement):
     Relationships that this composition has with other compositions or documents that already exist.
     """
 
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="replaces | amends | appends | transforms | replacedWith | amendedWith | appendedWith | transformedWith",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     target: Optional[EvidenceReportRelatesToTarget] = Field(
         description="Target of the relationship",
@@ -172,14 +141,9 @@ class EvidenceReportSection(BackboneElement):
     The root of the sections that make up the composition.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     focus: Optional[CodeableConcept] = Field(
         description="Classification of section (recommended)",
@@ -197,14 +161,9 @@ class EvidenceReportSection(BackboneElement):
         description="Text summary of the section, for human interpretation",
         default=None,
     )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="working | snapshot | changes",
         default=None,
-    )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
     )
     orderedBy: Optional[CodeableConcept] = Field(
         description="Order of section entries",
@@ -241,23 +200,13 @@ class EvidenceReport(DomainResource):
     _type = "EvidenceReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceReport"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this EvidenceReport, represented as a globally unique URI",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this EvidenceReport, represented as a globally unique URI",
         default=None,
     )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -275,14 +224,9 @@ class EvidenceReport(DomainResource):
         description="Citation for this report",
         default=None,
     )
-    citeAsMarkdown: Optional[Markdown] = Field(
+    citeAsMarkdown: Optional[fhir.markdown] = Field(
         description="Citation for this report",
         default=None,
-    )
-    citeAsMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for citeAsMarkdown extensions",
-        default=None,
-        alias="_citeAsMarkdown",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of report",
@@ -300,14 +244,9 @@ class EvidenceReport(DomainResource):
         description="Focus of the report",
         default=None,
     )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -349,7 +288,7 @@ class EvidenceReport(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Markdown],
+            field_types=[Reference, fhir.Markdown],
             field_name_base="citeAs",
             required=False,
         )

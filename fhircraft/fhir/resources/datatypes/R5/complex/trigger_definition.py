@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     DataType,
     Element,
@@ -22,36 +22,21 @@ class TriggerDefinition(DataType):
 
     _type = "TriggerDefinition"
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name or URI that identifies the event",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     code: Optional[CodeableConcept] = Field(
         description="Coded definition of the event",
         default=None,
     )
-    subscriptionTopic: Optional[Canonical] = Field(
+    subscriptionTopic: Optional[fhir.canonical] = Field(
         description="What event",
         default=None,
-    )
-    subscriptionTopic_ext: Optional[Element] = Field(
-        description="Placeholder element for subscriptionTopic extensions",
-        default=None,
-        alias="_subscriptionTopic",
     )
     timingTiming: Optional[Timing] = Field(
         description="Timing of the event",
@@ -61,11 +46,11 @@ class TriggerDefinition(DataType):
         description="Timing of the event",
         default=None,
     )
-    timingDate: Optional[Date] = Field(
+    timingDate: Optional[fhir.date_] = Field(
         description="Timing of the event",
         default=None,
     )
-    timingDateTime: Optional[DateTime] = Field(
+    timingDateTime: Optional[fhir.dateTime] = Field(
         description="Timing of the event",
         default=None,
     )
@@ -82,7 +67,7 @@ class TriggerDefinition(DataType):
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Timing, Reference, Date, DateTime],
+            field_types=[Timing, Reference, fhir.Date, fhir.DateTime],
             field_name_base="timing",
         )
 

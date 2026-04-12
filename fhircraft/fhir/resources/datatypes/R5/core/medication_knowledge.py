@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    Boolean,
-    Base64Binary,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -81,14 +74,9 @@ class MedicationKnowledgeCost(BackboneElement):
         description="The category of the cost information",
         default=None,
     )
-    source: Optional[String] = Field(
+    source: Optional[fhir.string] = Field(
         description="The source or owner for the price information",
         default=None,
-    )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
     )
     costMoney: Optional[Money] = Field(
         description="The price or category of the cost of the medication",
@@ -125,14 +113,9 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         description="Type of program under which the medication is monitored",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of the reviewing program",
         default=None,
-    )
-    name_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
 
 
@@ -247,23 +230,13 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         description="The type of category for the medication (for example, therapeutic classification, therapeutic sub-classification)",
         default=None,
     )
-    sourceString: Optional[String] = Field(
+    sourceString: Optional[fhir.string] = Field(
         description="The source of the classification",
         default=None,
     )
-    sourceString_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceString extensions",
-        default=None,
-        alias="_sourceString",
-    )
-    sourceUri: Optional[Uri] = Field(
+    sourceUri: Optional[fhir.uri] = Field(
         description="The source of the classification",
         default=None,
-    )
-    sourceUri_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceUri extensions",
-        default=None,
-        alias="_sourceUri",
     )
     classification: Optional[ListType[CodeableConcept]] = Field(
         description="Specific category assigned to the medication",
@@ -281,7 +254,7 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Uri],
+            field_types=[fhir.String, fhir.Uri],
             field_name_base="source",
             required=False,
         )
@@ -300,14 +273,9 @@ class MedicationKnowledgePackagingCost(BackboneElement):
         description="The category of the cost information",
         default=None,
     )
-    source: Optional[String] = Field(
+    source: Optional[fhir.string] = Field(
         description="The source or owner for the price information",
         default=None,
-    )
-    source_ext: Optional[Element] = Field(
-        description="Placeholder element for source extensions",
-        default=None,
-        alias="_source",
     )
     costMoney: Optional[Money] = Field(
         description="The price or category of the cost of the medication",
@@ -394,14 +362,9 @@ class MedicationKnowledgeStorageGuideline(BackboneElement):
     Information on how the medication should be stored, for example, refrigeration temperatures and length of stability at a given temperature.
     """
 
-    reference: Optional[Uri] = Field(
+    reference: Optional[fhir.uri] = Field(
         description="Reference to additional information",
         default=None,
-    )
-    reference_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for reference extensions",
-        default=None,
-        alias="_reference",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Additional storage notes",
@@ -428,14 +391,9 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         description="Specifies the type of substitution allowed",
         default=None,
     )
-    allowed: Optional[Boolean] = Field(
+    allowed: Optional[fhir.boolean] = Field(
         description="Specifies if regulation allows for changes in the medication when dispensing",
         default=None,
-    )
-    allowed_ext: Optional[Element] = Field(
-        description="Placeholder element for allowed extensions",
-        default=None,
-        alias="_allowed",
     )
 
 
@@ -526,34 +484,24 @@ class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
     """
 
     type: Optional[CodeableConcept] = Field(
-        description="Code specifying the type of characteristic of medication",
+        description="code specifying the type of characteristic of medication",
         default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Description of the characteristic",
         default=None,
     )
-    valueString: Optional[String] = Field(
+    valueString: Optional[fhir.string] = Field(
         description="Description of the characteristic",
         default=None,
-    )
-    valueString_ext: Optional[Element] = Field(
-        description="Placeholder element for valueString extensions",
-        default=None,
-        alias="_valueString",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Description of the characteristic",
         default=None,
     )
-    valueBase64Binary: Optional[Base64Binary] = Field(
+    valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Description of the characteristic",
         default=None,
-    )
-    valueBase64Binary_ext: Optional[Element] = Field(
-        description="Placeholder element for valueBase64Binary extensions",
-        default=None,
-        alias="_valueBase64Binary",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Description of the characteristic",
@@ -571,7 +519,13 @@ class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, String, Quantity, Base64Binary, Attachment],
+            field_types=[
+                CodeableConcept,
+                fhir.String,
+                Quantity,
+                fhir.Base64Binary,
+                Attachment,
+            ],
             field_name_base="value",
             required=False,
         )
@@ -620,17 +574,12 @@ class MedicationKnowledge(DomainResource):
         default=None,
     )
     code: Optional[CodeableConcept] = Field(
-        description="Code that identifies this medication",
+        description="code that identifies this medication",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | entered-in-error | inactive",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     author: Optional[Reference] = Field(
         description="Creator or owner of the knowledge or information about the medication",
@@ -640,14 +589,9 @@ class MedicationKnowledge(DomainResource):
         description="Codes that identify the different jurisdictions for which the information of this resource was created",
         default=None,
     )
-    name: Optional[ListType[String]] = Field(
+    name: Optional[ListType[fhir.string]] = Field(
         description="A name associated with the medication being described",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     relatedMedicationKnowledge: Optional[
         ListType[MedicationKnowledgeRelatedMedicationKnowledge]
@@ -667,14 +611,9 @@ class MedicationKnowledge(DomainResource):
         description="Associated documentation about the medication",
         default=None,
     )
-    preparationInstruction: Optional[Markdown] = Field(
+    preparationInstruction: Optional[fhir.markdown] = Field(
         description="The instructions for preparing the medication",
         default=None,
-    )
-    preparationInstruction_ext: Optional[Element] = Field(
-        description="Placeholder element for preparationInstruction extensions",
-        default=None,
-        alias="_preparationInstruction",
     )
     cost: Optional[ListType[MedicationKnowledgeCost]] = Field(
         description="The pricing of the medication",

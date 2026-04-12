@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -39,14 +33,9 @@ class HealthcareServiceEligibility(BackboneElement):
         description="Coded value for the eligibility",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Describes the eligibility conditions for the service",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )
 
 
@@ -63,14 +52,9 @@ class HealthcareService(DomainResource):
         description="External identifiers for this item",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this HealthcareService record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     providedBy: Optional[Reference] = Field(
         description="Organization that provides this service",
@@ -96,32 +80,17 @@ class HealthcareService(DomainResource):
         description="Location(s) where service may be provided",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Description of service as presented to a consumer while searching",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Additional description and/or any specific issues not covered elsewhere",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
-    )
-    extraDetails: Optional[Markdown] = Field(
+    extraDetails: Optional[fhir.markdown] = Field(
         description="Extra details about the service that can\u0027t be placed in the other fields",
         default=None,
-    )
-    extraDetails_ext: Optional[Element] = Field(
-        description="Placeholder element for extraDetails extensions",
-        default=None,
-        alias="_extraDetails",
     )
     photo: Optional[Attachment] = Field(
         description="Facilitates quick identification of the service",
@@ -159,14 +128,9 @@ class HealthcareService(DomainResource):
         description="Ways that the service accepts referrals",
         default=None,
     )
-    appointmentRequired: Optional[Boolean] = Field(
+    appointmentRequired: Optional[fhir.boolean] = Field(
         description="If an appointment is required for access to this service",
         default=None,
-    )
-    appointmentRequired_ext: Optional[Element] = Field(
-        description="Placeholder element for appointmentRequired extensions",
-        default=None,
-        alias="_appointmentRequired",
     )
     availability: Optional[ListType[Availability]] = Field(
         description="Times the healthcare service is available (including exceptions)",

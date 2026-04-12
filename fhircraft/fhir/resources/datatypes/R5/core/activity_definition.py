@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Canonical,
-    DateTime,
-    Markdown,
-    Date,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Identifier,
@@ -44,23 +35,13 @@ class ActivityDefinitionParticipant(BackboneElement):
     Indicates who should participate in performing the action described.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="careteam | device | group | healthcareservice | location | organization | patient | practitioner | practitionerrole | relatedperson",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    typeCanonical: Optional[Canonical] = Field(
+    typeCanonical: Optional[fhir.canonical] = Field(
         description="Who or what can participate",
         default=None,
-    )
-    typeCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for typeCanonical extensions",
-        default=None,
-        alias="_typeCanonical",
     )
     typeReference: Optional[Reference] = Field(
         description="Who or what can participate",
@@ -81,14 +62,9 @@ class ActivityDefinitionDynamicValue(BackboneElement):
     Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the request resource that would contain the result.
     """
 
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="The path to the element to be set dynamically",
         default=None,
-    )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
     )
     expression: Optional[Expression] = Field(
         description="An expression that provides the dynamic value for the customization",
@@ -105,85 +81,45 @@ class ActivityDefinition(DomainResource):
     _type = "ActivityDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ActivityDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this activity definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this activity definition, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the activity definition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the activity definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this activity definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this activity definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    subtitle: Optional[String] = Field(
+    subtitle: Optional[fhir.string] = Field(
         description="Subordinate title of the activity definition",
         default=None,
     )
-    subtitle_ext: Optional[Element] = Field(
-        description="Placeholder element for subtitle extensions",
-        default=None,
-        alias="_subtitle",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
-    )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of individual the activity definition is intended for",
@@ -193,45 +129,25 @@ class ActivityDefinition(DomainResource):
         description="Type of individual the activity definition is intended for",
         default=None,
     )
-    subjectCanonical: Optional[Canonical] = Field(
+    subjectCanonical: Optional[fhir.canonical] = Field(
         description="Type of individual the activity definition is intended for",
         default=None,
     )
-    subjectCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for subjectCanonical extensions",
-        default=None,
-        alias="_subjectCanonical",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the activity definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -241,59 +157,29 @@ class ActivityDefinition(DomainResource):
         description="Intended jurisdiction for activity definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this activity definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    usage: Optional[Markdown] = Field(
+    usage: Optional[fhir.markdown] = Field(
         description="Describes the clinical usage of the activity definition",
         default=None,
     )
-    usage_ext: Optional[Element] = Field(
-        description="Placeholder element for usage extensions",
-        default=None,
-        alias="_usage",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the activity definition was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the activity definition was last reviewed by the publisher",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the activity definition is expected to be used",
@@ -323,63 +209,33 @@ class ActivityDefinition(DomainResource):
         description="Additional documentation, citations, etc",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the activity definition",
         default=None,
     )
-    library_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
-    )
-    kind: Optional[Code] = Field(
+    kind: Optional[fhir.code] = Field(
         description="Kind of resource",
         default=None,
     )
-    kind_ext: Optional[Element] = Field(
-        description="Placeholder element for kind extensions",
-        default=None,
-        alias="_kind",
-    )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="What profile the resource needs to conform to",
         default=None,
-    )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
     code: Optional[CodeableConcept] = Field(
         description="Detail type of activity",
         default=None,
     )
-    intent: Optional[Code] = Field(
+    intent: Optional[fhir.code] = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
         default=None,
     )
-    intent_ext: Optional[Element] = Field(
-        description="Placeholder element for intent extensions",
-        default=None,
-        alias="_intent",
-    )
-    priority: Optional[Code] = Field(
+    priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    priority_ext: Optional[Element] = Field(
-        description="Placeholder element for priority extensions",
-        default=None,
-        alias="_priority",
-    )
-    doNotPerform: Optional[Boolean] = Field(
+    doNotPerform: Optional[fhir.boolean] = Field(
         description="True if the activity should not be performed",
         default=None,
-    )
-    doNotPerform_ext: Optional[Element] = Field(
-        description="Placeholder element for doNotPerform extensions",
-        default=None,
-        alias="_doNotPerform",
     )
     timingTiming: Optional[Timing] = Field(
         description="When activity is to occur",
@@ -397,14 +253,9 @@ class ActivityDefinition(DomainResource):
         description="When activity is to occur",
         default=None,
     )
-    asNeededBoolean: Optional[Boolean] = Field(
+    asNeededBoolean: Optional[fhir.boolean] = Field(
         description="Preconditions for service",
         default=None,
-    )
-    asNeededBoolean_ext: Optional[Element] = Field(
-        description="Placeholder element for asNeededBoolean extensions",
-        default=None,
-        alias="_asNeededBoolean",
     )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",
@@ -438,41 +289,21 @@ class ActivityDefinition(DomainResource):
         description="What part of body to perform on",
         default=None,
     )
-    specimenRequirement: Optional[ListType[Canonical]] = Field(
+    specimenRequirement: Optional[ListType[fhir.canonical]] = Field(
         description="What specimens are required to perform this action",
         default=None,
     )
-    specimenRequirement_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for specimenRequirement extensions",
-        default=None,
-        alias="_specimenRequirement",
-    )
-    observationRequirement: Optional[ListType[Canonical]] = Field(
+    observationRequirement: Optional[ListType[fhir.canonical]] = Field(
         description="What observations are required to perform this action",
         default=None,
     )
-    observationRequirement_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for observationRequirement extensions",
-        default=None,
-        alias="_observationRequirement",
-    )
-    observationResultRequirement: Optional[ListType[Canonical]] = Field(
+    observationResultRequirement: Optional[ListType[fhir.canonical]] = Field(
         description="What observations must be produced by this action",
         default=None,
     )
-    observationResultRequirement_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for observationResultRequirement extensions",
-        default=None,
-        alias="_observationResultRequirement",
-    )
-    transform: Optional[Canonical] = Field(
+    transform: Optional[fhir.canonical] = Field(
         description="Transform to apply the template",
         default=None,
-    )
-    transform_ext: Optional[Element] = Field(
-        description="Placeholder element for transform extensions",
-        default=None,
-        alias="_transform",
     )
     dynamicValue: Optional[ListType[ActivityDefinitionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
@@ -518,7 +349,7 @@ class ActivityDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )
@@ -527,7 +358,7 @@ class ActivityDefinition(DomainResource):
     def subject_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[CodeableConcept, Reference, Canonical],
+            field_types=[CodeableConcept, Reference, fhir.Canonical],
             field_name_base="subject",
             required=False,
         )
@@ -545,7 +376,7 @@ class ActivityDefinition(DomainResource):
     def asNeeded_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, CodeableConcept],
+            field_types=[fhir.Boolean, CodeableConcept],
             field_name_base="asNeeded",
             required=False,
         )

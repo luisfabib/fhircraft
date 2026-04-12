@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Canonical,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -37,41 +29,21 @@ class ExampleScenarioActor(BackboneElement):
     A system or person who shares or receives an instance within the scenario.
     """
 
-    key: Optional[String] = Field(
+    key: Optional[fhir.string] = Field(
         description="ID or acronym of the actor",
         default=None,
     )
-    key_ext: Optional[Element] = Field(
-        description="Placeholder element for key extensions",
-        default=None,
-        alias="_key",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="person | system",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for actor when rendering",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Details about actor",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
 
 
@@ -80,32 +52,17 @@ class ExampleScenarioInstanceVersion(BackboneElement):
     Represents the instance as it was at a specific time-point.
     """
 
-    key: Optional[String] = Field(
+    key: Optional[fhir.string] = Field(
         description="ID or acronym of the version",
         default=None,
     )
-    key_ext: Optional[Element] = Field(
-        description="Placeholder element for key extensions",
-        default=None,
-        alias="_key",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for instance version",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Details about version",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     content: Optional[Reference] = Field(
         description="Example instance version data",
@@ -118,23 +75,13 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
     References to other instances that can be found within this instance (e.g. the observations contained in a bundle).
     """
 
-    instanceReference: Optional[String] = Field(
+    instanceReference: Optional[fhir.string] = Field(
         description="Key of contained instance",
         default=None,
     )
-    instanceReference_ext: Optional[Element] = Field(
-        description="Placeholder element for instanceReference extensions",
-        default=None,
-        alias="_instanceReference",
-    )
-    versionReference: Optional[String] = Field(
+    versionReference: Optional[fhir.string] = Field(
         description="Key of contained instance version",
         default=None,
-    )
-    versionReference_ext: Optional[Element] = Field(
-        description="Placeholder element for versionReference extensions",
-        default=None,
-        alias="_versionReference",
     )
 
 
@@ -143,63 +90,33 @@ class ExampleScenarioInstance(BackboneElement):
     A single data collection that is shared as part of the scenario.
     """
 
-    key: Optional[String] = Field(
+    key: Optional[fhir.string] = Field(
         description="ID or acronym of the instance",
         default=None,
-    )
-    key_ext: Optional[Element] = Field(
-        description="Placeholder element for key extensions",
-        default=None,
-        alias="_key",
     )
     structureType: Optional[Coding] = Field(
         description="Data structure for example",
         default=None,
     )
-    structureVersion: Optional[String] = Field(
+    structureVersion: Optional[fhir.string] = Field(
         description="E.g. 4.0.1",
         default=None,
     )
-    structureVersion_ext: Optional[Element] = Field(
-        description="Placeholder element for structureVersion extensions",
-        default=None,
-        alias="_structureVersion",
-    )
-    structureProfileCanonical: Optional[Canonical] = Field(
+    structureProfileCanonical: Optional[fhir.canonical] = Field(
         description="Rules instance adheres to",
         default=None,
     )
-    structureProfileCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for structureProfileCanonical extensions",
-        default=None,
-        alias="_structureProfileCanonical",
-    )
-    structureProfileUri: Optional[Uri] = Field(
+    structureProfileUri: Optional[fhir.uri] = Field(
         description="Rules instance adheres to",
         default=None,
     )
-    structureProfileUri_ext: Optional[Element] = Field(
-        description="Placeholder element for structureProfileUri extensions",
-        default=None,
-        alias="_structureProfileUri",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for instance",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the instance",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     content: Optional[Reference] = Field(
         description="Example instance data",
@@ -227,7 +144,7 @@ class ExampleScenarioInstance(BackboneElement):
     def structureProfile_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Canonical, Uri],
+            field_types=[fhir.Canonical, fhir.Uri],
             field_name_base="structureProfile",
             required=False,
         )
@@ -238,23 +155,13 @@ class ExampleScenarioProcessStepOperationRequest(BackboneElement):
     A reference to the instance that is transmitted from requester to receiver as part of the invocation of the operation.
     """
 
-    instanceReference: Optional[String] = Field(
+    instanceReference: Optional[fhir.string] = Field(
         description="Key of contained instance",
         default=None,
     )
-    instanceReference_ext: Optional[Element] = Field(
-        description="Placeholder element for instanceReference extensions",
-        default=None,
-        alias="_instanceReference",
-    )
-    versionReference: Optional[String] = Field(
+    versionReference: Optional[fhir.string] = Field(
         description="Key of contained instance version",
         default=None,
-    )
-    versionReference_ext: Optional[Element] = Field(
-        description="Placeholder element for versionReference extensions",
-        default=None,
-        alias="_versionReference",
     )
 
 
@@ -267,59 +174,29 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         description="Kind of action",
         default=None,
     )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for step",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    initiator: Optional[String] = Field(
+    initiator: Optional[fhir.string] = Field(
         description="Who starts the operation",
         default=None,
     )
-    initiator_ext: Optional[Element] = Field(
-        description="Placeholder element for initiator extensions",
-        default=None,
-        alias="_initiator",
-    )
-    receiver: Optional[String] = Field(
+    receiver: Optional[fhir.string] = Field(
         description="Who receives the operation",
         default=None,
     )
-    receiver_ext: Optional[Element] = Field(
-        description="Placeholder element for receiver extensions",
-        default=None,
-        alias="_receiver",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the operation",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    initiatorActive: Optional[Boolean] = Field(
+    initiatorActive: Optional[fhir.boolean] = Field(
         description="Initiator stays active?",
         default=None,
     )
-    initiatorActive_ext: Optional[Element] = Field(
-        description="Placeholder element for initiatorActive extensions",
-        default=None,
-        alias="_initiatorActive",
-    )
-    receiverActive: Optional[Boolean] = Field(
+    receiverActive: Optional[fhir.boolean] = Field(
         description="Receiver stays active?",
         default=None,
-    )
-    receiverActive_ext: Optional[Element] = Field(
-        description="Placeholder element for receiverActive extensions",
-        default=None,
-        alias="_receiverActive",
     )
     request: Optional[ExampleScenarioProcessStepOperationRequest] = Field(
         description="Instance transmitted on invocation",
@@ -336,23 +213,13 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
     Indicates an alternative step that can be taken instead of the sub-process, scenario or operation.  E.g. to represent non-happy-path/exceptional/atypical circumstances.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for alternative",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-readable description of option",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     step: Optional[ListType["ExampleScenarioProcessStep"]] = Field(
         description="Alternative action(s)",
@@ -365,27 +232,17 @@ class ExampleScenarioProcessStep(BackboneElement):
     A significant action that occurs as part of the process.
     """
 
-    number: Optional[String] = Field(
+    number: Optional[fhir.string] = Field(
         description="Sequential number of the step",
         default=None,
-    )
-    number_ext: Optional[Element] = Field(
-        description="Placeholder element for number extensions",
-        default=None,
-        alias="_number",
     )
     process: Optional["ExampleScenarioProcess"] = Field(
         description="Step is nested process",
         default=None,
     )
-    workflow: Optional[Canonical] = Field(
+    workflow: Optional[fhir.canonical] = Field(
         description="Step is nested workflow",
         default=None,
-    )
-    workflow_ext: Optional[Element] = Field(
-        description="Placeholder element for workflow extensions",
-        default=None,
-        alias="_workflow",
     )
     operation: Optional[ExampleScenarioProcessStepOperation] = Field(
         description="Step is simple action",
@@ -395,14 +252,9 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Alternate non-typical step action",
         default=None,
     )
-    pause: Optional[Boolean] = Field(
+    pause: Optional[fhir.boolean] = Field(
         description="Pause in the flow?",
         default=None,
-    )
-    pause_ext: Optional[Element] = Field(
-        description="Placeholder element for pause extensions",
-        default=None,
-        alias="_pause",
     )
 
 
@@ -411,41 +263,21 @@ class ExampleScenarioProcess(BackboneElement):
     A group of operations that represents a significant step within a scenario.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for procss",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the process",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    preConditions: Optional[Markdown] = Field(
+    preConditions: Optional[fhir.markdown] = Field(
         description="Status before process starts",
         default=None,
     )
-    preConditions_ext: Optional[Element] = Field(
-        description="Placeholder element for preConditions extensions",
-        default=None,
-        alias="_preConditions",
-    )
-    postConditions: Optional[Markdown] = Field(
+    postConditions: Optional[fhir.markdown] = Field(
         description="Status after successful completion",
         default=None,
-    )
-    postConditions_ext: Optional[Element] = Field(
-        description="Placeholder element for postConditions extensions",
-        default=None,
-        alias="_postConditions",
     )
     step: Optional[ListType[ExampleScenarioProcessStep]] = Field(
         description="Event within of the process",
@@ -462,107 +294,57 @@ class ExampleScenario(DomainResource):
     _type = "ExampleScenario"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExampleScenario"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this example scenario, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this example scenario, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the example scenario",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the example scenario",
         default=None,
     )
-    version_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="To be removed?",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this example scenario (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the ExampleScenario",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -572,32 +354,17 @@ class ExampleScenario(DomainResource):
         description="Intended jurisdiction for example scenario (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="The purpose of the example, e.g. to illustrate a scenario",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
-    )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
     )
     actor: Optional[ListType[ExampleScenarioActor]] = Field(
         description="Individual involved in exchange",
@@ -623,7 +390,7 @@ class ExampleScenario(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

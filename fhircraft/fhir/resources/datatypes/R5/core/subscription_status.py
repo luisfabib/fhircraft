@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Integer64,
-    Instant,
-    Canonical,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -26,29 +19,18 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SubscriptionStatusNotificationEvent(BackboneElement):
     """
     Detailed information about events relevant to this subscription notification.
     """
 
-    eventNumber: Optional[Integer64] = Field(
+    eventNumber: Optional[fhir.integer64] = Field(
         description="Sequencing index of this event",
         default=None,
     )
-    eventNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for eventNumber extensions",
-        default=None,
-        alias="_eventNumber",
-    )
-    timestamp: Optional[Instant] = Field(
+    timestamp: Optional[fhir.instant] = Field(
         description="The instant this event occurred",
         default=None,
-    )
-    timestamp_ext: Optional[Element] = Field(
-        description="Placeholder element for timestamp extensions",
-        default=None,
-        alias="_timestamp",
     )
     focus: Optional[Reference] = Field(
         description="Reference to the primary resource or information of this event",
@@ -59,7 +41,6 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
         default=None,
     )
 
-
 class SubscriptionStatus(DomainResource):
     """
     The SubscriptionStatus resource describes the state of a Subscription during notifications. It is not persisted.
@@ -69,32 +50,17 @@ class SubscriptionStatus(DomainResource):
     _type = "SubscriptionStatus"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubscriptionStatus"
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="requested | active | error | off | entered-in-error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="handshake | heartbeat | event-notification | query-status | query-event",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    eventsSinceSubscriptionStart: Optional[Integer64] = Field(
+    eventsSinceSubscriptionStart: Optional[fhir.integer64] = Field(
         description="Events since the Subscription was created",
         default=None,
-    )
-    eventsSinceSubscriptionStart_ext: Optional[Element] = Field(
-        description="Placeholder element for eventsSinceSubscriptionStart extensions",
-        default=None,
-        alias="_eventsSinceSubscriptionStart",
     )
     notificationEvent: Optional[ListType[SubscriptionStatusNotificationEvent]] = Field(
         description="Detailed information about any events relevant to this notification",
@@ -104,14 +70,9 @@ class SubscriptionStatus(DomainResource):
         description="Reference to the Subscription responsible for this notification",
         default=None,
     )
-    topic: Optional[Canonical] = Field(
+    topic: Optional[fhir.canonical] = Field(
         description="Reference to the SubscriptionTopic this notification relates to",
         default=None,
-    )
-    topic_ext: Optional[Element] = Field(
-        description="Placeholder element for topic extensions",
-        default=None,
-        alias="_topic",
     )
     error: Optional[ListType[CodeableConcept]] = Field(
         description="List of errors on the subscription",

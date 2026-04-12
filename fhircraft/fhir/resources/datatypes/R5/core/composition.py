@@ -5,8 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -35,14 +35,9 @@ class CompositionAttester(BackboneElement):
         description="personal | professional | legal | official",
         default=None,
     )
-    time: Optional[DateTime] = Field(
+    time: Optional[fhir.dateTime] = Field(
         description="When the composition was attested",
         default=None,
-    )
-    time_ext: Optional[Element] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
     )
     party: Optional[Reference] = Field(
         description="Who attested the composition",
@@ -70,14 +65,9 @@ class CompositionSection(BackboneElement):
     The root of the sections that make up the composition.
     """
 
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Label for section (e.g. for ToC)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     code: Optional[CodeableConcept] = Field(
         description="Classification of section (recommended)",
@@ -122,36 +112,21 @@ class Composition(DomainResource):
     _type = "Composition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Composition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this Composition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this Composition, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Version-independent identifier for the Composition",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="An explicitly assigned identifer of a variation of the content in the Composition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of composition (LOINC if possible)",
@@ -169,14 +144,9 @@ class Composition(DomainResource):
         description="Context of the Composition",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Composition editing time",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -186,23 +156,13 @@ class Composition(DomainResource):
         description="Who and/or what authored the composition",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this Composition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Human Readable name/title",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="For any additional notes",

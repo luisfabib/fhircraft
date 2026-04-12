@@ -4,7 +4,7 @@ from typing import Optional, List as ListType
 NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class CareTeamParticipant(BackboneElement):
     """
@@ -66,7 +65,6 @@ class CareTeamParticipant(BackboneElement):
             required=False,
         )
 
-
 class CareTeam(DomainResource):
     """
     The Care Team includes all the people and organizations who plan to participate in the coordination and delivery of care.
@@ -80,34 +78,24 @@ class CareTeam(DomainResource):
         description="External Ids for this team",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="proposed | active | suspended | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of team",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of the team, such as crisis assessment team",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     subject: Optional[Reference] = Field(
         description="Who care team is for",
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period team covers",
+        description="time period team covers",
         default=None,
     )
     participant: Optional[ListType[CareTeamParticipant]] = Field(

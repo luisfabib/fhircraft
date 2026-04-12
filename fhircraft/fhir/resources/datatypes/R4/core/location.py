@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Decimal,
-    Boolean,
-    Time,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -29,83 +22,45 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class LocationPosition(BackboneElement):
     """
     The absolute geographic location of the Location, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
     """
 
-    longitude: Optional[Decimal] = Field(
+    longitude: Optional[fhir.decimal] = Field(
         description="Longitude with WGS84 datum",
         default=None,
     )
-    longitude_ext: Optional[Element] = Field(
-        description="Placeholder element for longitude extensions",
-        default=None,
-        alias="_longitude",
-    )
-    latitude: Optional[Decimal] = Field(
+    latitude: Optional[fhir.decimal] = Field(
         description="Latitude with WGS84 datum",
         default=None,
     )
-    latitude_ext: Optional[Element] = Field(
-        description="Placeholder element for latitude extensions",
-        default=None,
-        alias="_latitude",
-    )
-    altitude: Optional[Decimal] = Field(
+    altitude: Optional[fhir.decimal] = Field(
         description="Altitude with WGS84 datum",
         default=None,
     )
-    altitude_ext: Optional[Element] = Field(
-        description="Placeholder element for altitude extensions",
-        default=None,
-        alias="_altitude",
-    )
-
 
 class LocationHoursOfOperation(BackboneElement):
     """
     What days/times during a week is this location usually open.
     """
 
-    daysOfWeek: Optional[ListType[Code]] = Field(
+    daysOfWeek: Optional[ListType[fhir.code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
-    daysOfWeek_ext: Optional[Element] = Field(
-        description="Placeholder element for daysOfWeek extensions",
-        default=None,
-        alias="_daysOfWeek",
-    )
-    allDay: Optional[Boolean] = Field(
+    allDay: Optional[fhir.boolean] = Field(
         description="The Location is open all day",
         default=None,
     )
-    allDay_ext: Optional[Element] = Field(
-        description="Placeholder element for allDay extensions",
-        default=None,
-        alias="_allDay",
-    )
-    openingTime: Optional[Time] = Field(
-        description="Time that the Location opens",
+    openingTime: Optional[fhir.time_] = Field(
+        description="time that the Location opens",
         default=None,
     )
-    openingTime_ext: Optional[Element] = Field(
-        description="Placeholder element for openingTime extensions",
-        default=None,
-        alias="_openingTime",
-    )
-    closingTime: Optional[Time] = Field(
-        description="Time that the Location closes",
+    closingTime: Optional[fhir.time_] = Field(
+        description="time that the Location closes",
         default=None,
     )
-    closingTime_ext: Optional[Element] = Field(
-        description="Placeholder element for closingTime extensions",
-        default=None,
-        alias="_closingTime",
-    )
-
 
 class Location(DomainResource):
     """
@@ -132,54 +87,29 @@ class Location(DomainResource):
         description="Unique code or number identifying the location to its users",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | suspended | inactive",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     operationalStatus: Optional[Coding] = Field(
         description="The operational status of the location (typically only for a bed/room)",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of the location as used by humans",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="A list of alternate names that the location is known as, or was known as, in the past",
         default=None,
     )
-    alias_ext: Optional[Element] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Additional details about the location that could be displayed as further information to identify the location beyond its name",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    mode: Optional[Code] = Field(
+    mode: Optional[fhir.code] = Field(
         description="instance | kind",
         default=None,
-    )
-    mode_ext: Optional[Element] = Field(
-        description="Placeholder element for mode extensions",
-        default=None,
-        alias="_mode",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of function performed",
@@ -213,14 +143,9 @@ class Location(DomainResource):
         description="What days/times during a week is this location usually open",
         default=None,
     )
-    availabilityExceptions: Optional[String] = Field(
+    availabilityExceptions: Optional[fhir.string] = Field(
         description="Description of availability exceptions",
         default=None,
-    )
-    availabilityExceptions_ext: Optional[Element] = Field(
-        description="Placeholder element for availabilityExceptions extensions",
-        default=None,
-        alias="_availabilityExceptions",
     )
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the location",

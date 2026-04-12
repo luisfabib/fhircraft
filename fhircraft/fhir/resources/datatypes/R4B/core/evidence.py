@@ -4,17 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Markdown,
-    DateTime,
-    Date,
-    UnsignedInt,
-    Decimal,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -40,14 +31,9 @@ class EvidenceVariableDefinition(BackboneElement):
     Evidence variable such as population, exposure, or outcome.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A text description or summary of the variable",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
@@ -76,45 +62,25 @@ class EvidenceStatisticSampleSize(BackboneElement):
     Number of samples in the statistic.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of sample size for statistic",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the sample size",
         default=None,
     )
-    numberOfStudies: Optional[UnsignedInt] = Field(
+    numberOfStudies: Optional[fhir.unsignedInt] = Field(
         description="Number of contributing studies",
         default=None,
     )
-    numberOfStudies_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfStudies extensions",
-        default=None,
-        alias="_numberOfStudies",
-    )
-    numberOfParticipants: Optional[UnsignedInt] = Field(
+    numberOfParticipants: Optional[fhir.unsignedInt] = Field(
         description="Cumulative number of participants",
         default=None,
     )
-    numberOfParticipants_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfParticipants extensions",
-        default=None,
-        alias="_numberOfParticipants",
-    )
-    knownDataCount: Optional[UnsignedInt] = Field(
+    knownDataCount: Optional[fhir.unsignedInt] = Field(
         description="Number of participants with known results for measured variables",
         default=None,
-    )
-    knownDataCount_ext: Optional[Element] = Field(
-        description="Placeholder element for knownDataCount extensions",
-        default=None,
-        alias="_knownDataCount",
     )
 
 
@@ -123,14 +89,9 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
     A statistical attribute of the statistic such as a measure of heterogeneity.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the attribute estimate",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the estimate",
@@ -144,14 +105,9 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         description="The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure",
         default=None,
     )
-    level: Optional[Decimal] = Field(
+    level: Optional[fhir.decimal] = Field(
         description="Level of confidence interval, eg 0.95 for 95% confidence interval",
         default=None,
-    )
-    level_ext: Optional[Element] = Field(
-        description="Placeholder element for level extensions",
-        default=None,
-        alias="_level",
     )
     range: Optional[Range] = Field(
         description="Lower and upper bound values of the attribute estimate",
@@ -172,14 +128,9 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
         description="Description of the variable",
         default=None,
     )
-    handling: Optional[Code] = Field(
+    handling: Optional[fhir.code] = Field(
         description="continuous | dichotomous | ordinal | polychotomous",
         default=None,
-    )
-    handling_ext: Optional[Element] = Field(
-        description="Placeholder element for handling extensions",
-        default=None,
-        alias="_handling",
     )
     valueCategory: Optional[ListType[CodeableConcept]] = Field(
         description="Description for grouping of ordinal or polychotomous variables",
@@ -200,14 +151,9 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
     An attribute of the statistic used as a model characteristic.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of the attribute estimate",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the estimate",
@@ -221,14 +167,9 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         description="The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure",
         default=None,
     )
-    level: Optional[Decimal] = Field(
+    level: Optional[fhir.decimal] = Field(
         description="Level of confidence interval, eg 0.95 for 95% confidence interval",
         default=None,
-    )
-    level_ext: Optional[Element] = Field(
-        description="Placeholder element for level extensions",
-        default=None,
-        alias="_level",
     )
     range: Optional[Range] = Field(
         description="Lower and upper bound values of the attribute estimate",
@@ -270,14 +211,9 @@ class EvidenceStatistic(BackboneElement):
     Values and parameters for a single statistic.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of content",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
@@ -295,23 +231,13 @@ class EvidenceStatistic(BackboneElement):
         description="Statistic value",
         default=None,
     )
-    numberOfEvents: Optional[UnsignedInt] = Field(
+    numberOfEvents: Optional[fhir.unsignedInt] = Field(
         description="The number of events associated with the statistic",
         default=None,
     )
-    numberOfEvents_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfEvents extensions",
-        default=None,
-        alias="_numberOfEvents",
-    )
-    numberAffected: Optional[UnsignedInt] = Field(
+    numberAffected: Optional[fhir.unsignedInt] = Field(
         description="The number of participants affected",
         default=None,
-    )
-    numberAffected_ext: Optional[Element] = Field(
-        description="Placeholder element for numberAffected extensions",
-        default=None,
-        alias="_numberAffected",
     )
     sampleSize: Optional[EvidenceStatisticSampleSize] = Field(
         description="Number of samples in the statistic",
@@ -334,14 +260,9 @@ class EvidenceCertainty(BackboneElement):
     Assessment of certainty, confidence in the estimates, or quality of the evidence.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Textual description of certainty",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
@@ -355,14 +276,9 @@ class EvidenceCertainty(BackboneElement):
         description="Assessment or judgement of the aspect",
         default=None,
     )
-    rater: Optional[String] = Field(
+    rater: Optional[fhir.string] = Field(
         description="Individual or group who did the rating",
         default=None,
-    )
-    rater_ext: Optional[Element] = Field(
-        description="Placeholder element for rater extensions",
-        default=None,
-        alias="_rater",
     )
     subcomponent: Optional[ListType["EvidenceCertainty"]] = Field(
         description="A domain or subdomain of certainty",
@@ -391,98 +307,53 @@ class Evidence(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this evidence, represented as a globally unique URI",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this evidence, represented as a globally unique URI",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the summary",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of this summary",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this summary (human friendly)",
         default=None,
-    )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
     )
     citeAsReference: Optional[Reference] = Field(
         description="Citation for this evidence",
         default=None,
     )
-    citeAsMarkdown: Optional[Markdown] = Field(
+    citeAsMarkdown: Optional[fhir.markdown] = Field(
         description="Citation for this evidence",
         default=None,
     )
-    citeAsMarkdown_ext: Optional[Element] = Field(
-        description="Placeholder element for citeAsMarkdown extensions",
-        default=None,
-        alias="_citeAsMarkdown",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the summary was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the summary was last reviewed",
         default=None,
     )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
@@ -508,23 +379,13 @@ class Evidence(DomainResource):
         description="Link or citation to artifact associated with the summary",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Description of the particular summary",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    assertion: Optional[Markdown] = Field(
+    assertion: Optional[fhir.markdown] = Field(
         description="Declarative description of the Evidence",
         default=None,
-    )
-    assertion_ext: Optional[Element] = Field(
-        description="Placeholder element for assertion extensions",
-        default=None,
-        alias="_assertion",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
@@ -562,7 +423,7 @@ class Evidence(DomainResource):
     def citeAs_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Reference, Markdown],
+            field_types=[Reference, fhir.Markdown],
             field_name_base="citeAs",
             required=False,
         )

@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -25,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class PaymentNotice(DomainResource):
     """
@@ -40,14 +33,9 @@ class PaymentNotice(DomainResource):
         description="Business Identifier for the payment notice",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     request: Optional[Reference] = Field(
         description="Request reference",
@@ -57,14 +45,9 @@ class PaymentNotice(DomainResource):
         description="Response reference",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     reporter: Optional[Reference] = Field(
         description="Responsible practitioner",
@@ -74,14 +57,9 @@ class PaymentNotice(DomainResource):
         description="Payment reference",
         default=None,
     )
-    paymentDate: Optional[Date] = Field(
+    paymentDate: Optional[fhir.date_] = Field(
         description="Payment or clearing date",
         default=None,
-    )
-    paymentDate_ext: Optional[Element] = Field(
-        description="Placeholder element for paymentDate extensions",
-        default=None,
-        alias="_paymentDate",
     )
     payee: Optional[Reference] = Field(
         description="Party being paid",

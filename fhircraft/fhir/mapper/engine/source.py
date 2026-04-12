@@ -51,7 +51,9 @@ class RuleSource(FHIRMappingEngineComponent):
         if self.definition.context is None:
             raise MappingDigestionError("Source context is required")
         self.parent_rule = parent_rule
-        self.variable = source.variable or f"source-{id(source)}"
+        self.variable = (
+            str(source.variable) if source.variable else f"source-{id(source)}"
+        )
         self.resolved_path: Optional[FHIRPath] = None
         self.iteration_count = 0
         self.condition = (

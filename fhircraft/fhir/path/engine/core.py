@@ -1,5 +1,7 @@
+import datetime
 import inspect
 import logging
+import time
 import typing
 import warnings
 from abc import ABC, abstractmethod
@@ -9,6 +11,9 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
+
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
 # Get logger name
 logger = logging.getLogger(__name__)
@@ -638,20 +643,22 @@ class Literal(FHIRPath):
         return [FHIRPathCollectionItem(self.value, parent=None, path=None)]
 
     def __str__(self):
-        from fhircraft.fhir.resources.datatypes.utils import (
-            is_date,
-            is_datetime,
-            is_time,
+        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+        _value = (
+            self.value.value
+            if isinstance(self.value, FHIRPrimitiveModel)
+            else self.value
         )
 
-        if isinstance(self.value, bool):
-            return "true" if self.value else "false"
-        elif isinstance(self.value, str):
-            return f"'{self.value}'"
-        elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):
-            return f"@{self.value}"
+        if isinstance(_value, bool):
+            return "true" if _value else "false"
+        elif isinstance(_value, str):
+            return f"'{_value}'"
+        elif isinstance(_value, (datetime.date, datetime.datetime, datetime.time)):
+            return f"@{_value}"
         else:
-            return str(self.value)
+            return str(_value)
 
     def __repr__(self):
         return "Literal(%r)" % (self.value,)
@@ -671,11 +678,13 @@ class Element(FHIRPath):
         label (str): The name of the element.
     """
 
-    def __init__(self, label: str | Literal):
-        if isinstance(label, Literal):
-            label = label.value
+    def __init__(self, label: "str | Literal | FHIRPrimitiveModel"):
+        if isinstance(label, Literal) or getattr(label, "_type", None) == "string":
+            label = str(label)
         if not isinstance(label, str):
-            raise FHIRPathError("Element() argument must be a string.")
+            raise FHIRPathError(
+                "Element() argument must be a string, got %r" % (type(label).__name__,)
+            )
         self.label = label
 
     def create_element(self, parent: typing.Any) -> typing.Any:

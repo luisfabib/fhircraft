@@ -4,17 +4,8 @@ from typing import Optional, List as ListType
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Markdown,
-    Date,
-    Integer,
-    Decimal,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -39,32 +30,17 @@ class EffectEvidenceSynthesisSampleSize(BackboneElement):
     A description of the size of the sample involved in the synthesis.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of sample size",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    numberOfStudies: Optional[Integer] = Field(
+    numberOfStudies: Optional[fhir.integer] = Field(
         description="How many studies?",
         default=None,
     )
-    numberOfStudies_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfStudies extensions",
-        default=None,
-        alias="_numberOfStudies",
-    )
-    numberOfParticipants: Optional[Integer] = Field(
+    numberOfParticipants: Optional[fhir.integer] = Field(
         description="How many participants?",
         default=None,
-    )
-    numberOfParticipants_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfParticipants extensions",
-        default=None,
-        alias="_numberOfParticipants",
     )
 
 
@@ -73,23 +49,13 @@ class EffectEvidenceSynthesisResultsByExposure(BackboneElement):
     A description of the results for each exposure considered in the effect estimate.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of results by exposure",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    exposureState: Optional[Code] = Field(
+    exposureState: Optional[fhir.code] = Field(
         description="exposure | exposure-alternative",
         default=None,
-    )
-    exposureState_ext: Optional[Element] = Field(
-        description="Placeholder element for exposureState extensions",
-        default=None,
-        alias="_exposureState",
     )
     variantState: Optional[CodeableConcept] = Field(
         description="Variant exposure states",
@@ -110,33 +76,18 @@ class EffectEvidenceSynthesisEffectEstimatePrecisionEstimate(BackboneElement):
         description="Type of precision estimate",
         default=None,
     )
-    level: Optional[Decimal] = Field(
+    level: Optional[fhir.decimal] = Field(
         description="Level of confidence interval",
         default=None,
     )
-    level_ext: Optional[Element] = Field(
-        description="Placeholder element for level extensions",
-        default=None,
-        alias="_level",
-    )
-    from_: Optional[Decimal] = Field(
+    from_: Optional[fhir.decimal] = Field(
         description="Lower bound",
         default=None,
         alias="from",
     )
-    from_ext: Optional[Element] = Field(
-        description="Placeholder element for from extensions",
-        default=None,
-        alias="_from",
-    )
-    to: Optional[Decimal] = Field(
+    to: Optional[fhir.decimal] = Field(
         description="Upper bound",
         default=None,
-    )
-    to_ext: Optional[Element] = Field(
-        description="Placeholder element for to extensions",
-        default=None,
-        alias="_to",
     )
 
 
@@ -145,14 +96,9 @@ class EffectEvidenceSynthesisEffectEstimate(BackboneElement):
     The estimated effect of the exposure variant.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Description of effect estimate",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of efffect estimate",
@@ -162,14 +108,9 @@ class EffectEvidenceSynthesisEffectEstimate(BackboneElement):
         description="Variant exposure states",
         default=None,
     )
-    value: Optional[Decimal] = Field(
+    value: Optional[fhir.decimal] = Field(
         description="Point estimate",
         default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
     )
     unitOfMeasure: Optional[CodeableConcept] = Field(
         description="What unit is the outcome described in?",
@@ -244,85 +185,45 @@ class EffectEvidenceSynthesis(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this effect evidence synthesis, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this effect evidence synthesis, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the effect evidence synthesis",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the effect evidence synthesis",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this effect evidence synthesis (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this effect evidence synthesis (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the effect evidence synthesis",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
@@ -336,32 +237,17 @@ class EffectEvidenceSynthesis(DomainResource):
         description="Intended jurisdiction for effect evidence synthesis (if applicable)",
         default=None,
     )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    approvalDate: Optional[Date] = Field(
+    approvalDate: Optional[fhir.date_] = Field(
         description="When the effect evidence synthesis was approved by publisher",
         default=None,
     )
-    approvalDate_ext: Optional[Element] = Field(
-        description="Placeholder element for approvalDate extensions",
-        default=None,
-        alias="_approvalDate",
-    )
-    lastReviewDate: Optional[Date] = Field(
+    lastReviewDate: Optional[fhir.date_] = Field(
         description="When the effect evidence synthesis was last reviewed",
         default=None,
-    )
-    lastReviewDate_ext: Optional[Element] = Field(
-        description="Placeholder element for lastReviewDate extensions",
-        default=None,
-        alias="_lastReviewDate",
     )
     effectivePeriod: Optional[Period] = Field(
         description="When the effect evidence synthesis is expected to be used",

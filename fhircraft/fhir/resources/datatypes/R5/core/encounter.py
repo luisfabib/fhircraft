@@ -5,8 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -23,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class EncounterParticipant(BackboneElement):
     """
@@ -43,7 +42,6 @@ class EncounterParticipant(BackboneElement):
         default=None,
     )
 
-
 class EncounterReason(BackboneElement):
     """
     The list of medical reasons that are expected to be addressed during the episode of care.
@@ -58,7 +56,6 @@ class EncounterReason(BackboneElement):
         default=None,
     )
 
-
 class EncounterDiagnosis(BackboneElement):
     """
     The list of diagnosis relevant to this encounter.
@@ -72,7 +69,6 @@ class EncounterDiagnosis(BackboneElement):
         description="Role that this diagnosis has within the encounter (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-
 
 class EncounterAdmission(BackboneElement):
     """
@@ -106,7 +102,6 @@ class EncounterAdmission(BackboneElement):
         default=None,
     )
 
-
 class EncounterLocation(BackboneElement):
     """
     List of locations where  the patient has been during this encounter.
@@ -116,24 +111,18 @@ class EncounterLocation(BackboneElement):
         description="Location the encounter takes place",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | active | reserved | completed",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     form: Optional[CodeableConcept] = Field(
         description="The physical type of the location (usually the level in the location hierarchy - bed, room, ward, virtual etc.)",
         default=None,
     )
     period: Optional[Period] = Field(
-        description="Time period during which the patient was present at the location",
+        description="time period during which the patient was present at the location",
         default=None,
     )
-
 
 class Encounter(DomainResource):
     """
@@ -148,14 +137,9 @@ class Encounter(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | in-progress | on-hold | discharged | completed | cancelled | discontinued | entered-in-error | unknown",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     class_: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of patient encounter context - e.g. Inpatient, outpatient",
@@ -218,23 +202,13 @@ class Encounter(DomainResource):
         description="The actual start and end time of the encounter",
         default=None,
     )
-    plannedStartDate: Optional[DateTime] = Field(
+    plannedStartDate: Optional[fhir.dateTime] = Field(
         description="The planned start date/time (or admission date) of the encounter",
         default=None,
     )
-    plannedStartDate_ext: Optional[Element] = Field(
-        description="Placeholder element for plannedStartDate extensions",
-        default=None,
-        alias="_plannedStartDate",
-    )
-    plannedEndDate: Optional[DateTime] = Field(
+    plannedEndDate: Optional[fhir.dateTime] = Field(
         description="The planned end date/time (or discharge date) of the encounter",
         default=None,
-    )
-    plannedEndDate_ext: Optional[Element] = Field(
-        description="Placeholder element for plannedEndDate extensions",
-        default=None,
-        alias="_plannedEndDate",
     )
     length: Optional[Duration] = Field(
         description="Actual quantity of time the encounter lasted (less time absent)",

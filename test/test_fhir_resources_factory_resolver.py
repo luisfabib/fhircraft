@@ -12,6 +12,13 @@ from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinitionSlicingDiscriminator,
 )
 
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    String,
+    Url,
+    Integer,
+    Uri,
+)
+
 from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import (
@@ -30,7 +37,7 @@ def make_element(id: str, path: str | None = None, **kwargs) -> ElementDefinitio
     """Return an ElementDefinition built with model_construct (no validation)."""
     return ElementDefinition.model_construct(
         id=id,
-        path=path if path is not None else id,
+        path=String(value=path) if path is not None else String(value=id),
         **kwargs,
     )
 
@@ -49,8 +56,8 @@ def make_structure_def(
 ):
     """Build a minimal StructureDefinition mock."""
     sd = MagicMock()
-    sd.name = "MockProfile"
-    sd.url = "http://example.org/MockProfile"
+    sd.name = String(value="MockProfile")
+    sd.url = Url(value="http://example.org/MockProfile")
     sd.baseDefinition = base_definition
 
     if snapshot_elements is not None:
@@ -129,7 +136,7 @@ def base_index():
         make_element(
             "BaseResource.component.code",
             "BaseResource.component.code",
-            min=0,
+            min=1,
             max="1",
             short="Component code",
             type=[ElementDefinitionType(code="CodeableConcept")],
@@ -164,12 +171,18 @@ def test_build_type_node__returns_correct_node(base_index, resolver, id):
 
 
 @pytest.mark.parametrize(
-    "type",
+    "primitive_type",
     ["string", "boolean", "integer", "decimal", "uri", "code", "dateTime"],
 )
-def test_build_type_node__ignores_fhir_primitive_type_nodes(base_index, resolver, type):
-    with pytest.raises(DefinitionResolutionError):
-        resolver._build_type_node([type], "Observation.value", base_index)
+def test_build_type_node__resolves_sub_elements_on_primitive_types(
+    base_index, resolver, primitive_type
+):
+    node = resolver._build_type_node(
+        [primitive_type], "Observation.extension", base_index
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "Observation.extension"
+    assert node.path == "Observation.extension"
 
 
 @pytest.mark.parametrize(
@@ -229,11 +242,13 @@ def test_build_type_node__raises_error_for_all_fhirpath_types(base_index, resolv
         )
 
 
-def test_build_type_node__raises_error_for_all_primitive_types(base_index, resolver):
+def test_build_type_node__raises_error_when_local_id_absent_in_all_types(
+    base_index, resolver
+):
     with pytest.raises(DefinitionResolutionError):
         resolver._build_type_node(
             ["string", "integer", "boolean"],
-            "Observation.value.text",
+            "Observation.value.nonExistentField",
             base_index,
         )
 
@@ -259,6 +274,37 @@ def test_build_type_node__preserves_slicing_from_base_type(resolver):
         node.definition.slicing is not None
     ), "_build_type_node stripped slicing from CodeableConcept.extension"
     assert node.is_slice_entry, "Type-expanded extension node should be a slice entry"
+
+
+def test_build_type_node__resolves_extension_element_on_primitive_type(
+    base_index, resolver
+):
+    # BaseResource.status has type 'code' (a primitive); its StructureDefinition
+    # carries a snapshot element 'code.extension' that should be resolvable.
+    node = resolver._build_type_node(
+        ["code"], "BaseResource.status.extension", base_index
+    )
+    assert isinstance(node, ElementNode)
+    assert node.id == "BaseResource.status.extension"
+    assert node.path == "BaseResource.status.extension"
+
+
+def test_build_intermediate_node__resolves_extension_on_primitive_element(resolver):
+    index = make_base_index(
+        make_element("MyProfile", "MyProfile"),
+        make_element(
+            "MyProfile.birthDate",
+            "MyProfile.birthDate",
+            min=0,
+            max="1",
+            type=[ElementDefinitionType(code="date")],
+        ),
+    )
+    node = resolver._build_intermediate_node("MyProfile.birthDate.extension", index)
+    assert node is not None
+    assert isinstance(node, ElementNode)
+    assert node.id == "MyProfile.birthDate.extension"
+    assert node.path == "MyProfile.birthDate.extension"
 
 
 # ------------------------------------------------------------------
@@ -481,9 +527,9 @@ def test_build_intermediate_node__preserves_slicing_from_base(resolver):
         "_build_intermediate_node stripped slicing when expanding "
         "Observation.code.extension from CodeableConcept"
     )
-    assert node.is_slice_entry, (
-        "Synthesised Observation.code.extension node should be a slice entry"
-    )
+    assert (
+        node.is_slice_entry
+    ), "Synthesised Observation.code.extension node should be a slice entry"
 
 
 # ------------------------------------------------------------------
@@ -630,7 +676,7 @@ def test_resolve_differential__intermediate_nodes_filled_from_base(
     assert node.min_cardinality == 0
     assert node.max_cardinality == None
     assert (node := index.get("MyProfile.component.code"))
-    assert node.min_cardinality == 0
+    assert node.min_cardinality == 1
     assert node.max_cardinality == 1
 
 
@@ -668,7 +714,7 @@ def test_resolve_differential__multiple_diff_elements_all_in_result(
     assert node.min_cardinality == 3
     assert node.max_cardinality == None
     assert (node := index.get("MyProfile.component:sliceB.code"))
-    assert node.min_cardinality == 0
+    assert node.min_cardinality == 1
     assert node.max_cardinality == 1
     assert (node := index.get("MyProfile.component:sliceB.code.coding.system"))
     assert node.min_cardinality == 0
@@ -849,6 +895,124 @@ def test_resolve_differential__slicing_preserved_on_intermediate_complex_type_no
         "slicing was stripped when building the intermediate "
         "Observation.code.extension node from CodeableConcept"
     )
+
+
+def test_resolve_differential__base_index_has_slice_and_non_sliced_child(
+    resolver,
+):
+    base_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.component",
+            "Observation.component",
+            min=0,
+            max="*",
+            type=[ElementDefinitionType(code="BackboneElement")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string",
+            "Observation.component",
+            min=0,
+            max="1",
+        ),
+        make_element(
+            "Observation.component.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+        ),
+    ]
+    base_index = make_base_index(*base_snapshot)
+
+    diff = [
+        make_element("MyProfile", "MyProfile"),
+        make_element(
+            "MyProfile.component",
+            "MyProfile.component",
+            min=0,
+            max="*",
+        ),
+        make_element(
+            "MyProfile.component:sliceA",
+            "MyProfile.component",
+            min=1,
+            max="1",
+        ),
+        make_element(
+            "MyProfile.component:sliceA.code",
+            "MyProfile.component.code",
+            min=1,
+            max="1",
+            short="Constrained slice code",
+        ),
+    ]
+
+    result = resolver._resolve_differential(diff, base_index)
+    node = result.get("MyProfile.component:sliceA.code")
+    assert node is not None
+    assert node.min_cardinality == 1
+    assert node.max_cardinality == 1
+
+
+def test_build_intermediate_node__base_has_named_slice_child_with_same_path(
+    resolver,
+):
+    """Regression: _build_intermediate_node must synthesise a node correctly when
+    the base index contains a named-slice child that shares a path with the base
+    element ('Observation.component:conclusion-string.code' has path
+    'Observation.component.code', same as 'Observation.component.code').
+
+    The intermediate id under test is 'MyProfile.component:sliceA.code':
+    its id_segments differ from the base element (contains ':sliceA'), so the
+    id-based lookup fails and the resolver falls back to the path-based lookup.
+    Before the fix, get_single_by_path found TWO nodes for path
+    'Observation.component.code' (the base element plus the conclusion-string
+    slice child) and raised DefinitionIndexError."""
+    base_snapshot = [
+        make_element("Observation", "Observation"),
+        make_element(
+            "Observation.component",
+            "Observation.component",
+            min=0,
+            max="*",
+            type=[ElementDefinitionType(code="BackboneElement")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string",
+            "Observation.component",
+            min=0,
+            max="1",
+        ),
+        make_element(
+            "Observation.component.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+            type=[ElementDefinitionType(code="CodeableConcept")],
+        ),
+        make_element(
+            "Observation.component:conclusion-string.code",
+            "Observation.component.code",
+            min=1,
+            max="1",
+        ),
+    ]
+    base_index = make_base_index(*base_snapshot)
+
+    # :sliceA is not in the base, so id lookup fails and path lookup is used.
+    node = resolver._build_intermediate_node(
+        "MyProfile.component:sliceA.code", base_index
+    )
+    assert node is not None
+    assert node.id == "MyProfile.component:sliceA.code"
+    assert node.path == "MyProfile.component.code"
 
 
 # ==================================================================

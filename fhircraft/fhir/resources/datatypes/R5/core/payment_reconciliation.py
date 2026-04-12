@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    Date,
-    PositiveInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -47,27 +40,17 @@ class PaymentReconciliationAllocation(BackboneElement):
         description="Subject of the payment",
         default=None,
     )
-    targetItemString: Optional[String] = Field(
+    targetItemString: Optional[fhir.string] = Field(
         description="Sub-element of the subject",
         default=None,
-    )
-    targetItemString_ext: Optional[Element] = Field(
-        description="Placeholder element for targetItemString extensions",
-        default=None,
-        alias="_targetItemString",
     )
     targetItemIdentifier: Optional[Identifier] = Field(
         description="Sub-element of the subject",
         default=None,
     )
-    targetItemPositiveInt: Optional[PositiveInt] = Field(
+    targetItemPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Sub-element of the subject",
         default=None,
-    )
-    targetItemPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for targetItemPositiveInt extensions",
-        default=None,
-        alias="_targetItemPositiveInt",
     )
     encounter: Optional[Reference] = Field(
         description="Applied-to encounter",
@@ -89,14 +72,9 @@ class PaymentReconciliationAllocation(BackboneElement):
         description="Response committing to a payment",
         default=None,
     )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="Date of commitment to pay",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     responsible: Optional[Reference] = Field(
         description="Contact for the response",
@@ -122,7 +100,7 @@ class PaymentReconciliationAllocation(BackboneElement):
     def targetItem_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Identifier, PositiveInt],
+            field_types=[fhir.String, Identifier, fhir.PositiveInt],
             field_name_base="targetItem",
             required=False,
         )
@@ -133,23 +111,13 @@ class PaymentReconciliationProcessNote(BackboneElement):
     A note that describes or explains the processing in a human readable form.
     """
 
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="display | print | printoper",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Note explanatory text",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )
 
 
@@ -170,14 +138,9 @@ class PaymentReconciliation(DomainResource):
         description="Category of payment",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | cancelled | draft | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     kind: Optional[CodeableConcept] = Field(
         description="Workflow originating payment",
@@ -187,14 +150,9 @@ class PaymentReconciliation(DomainResource):
         description="Period covered",
         default=None,
     )
-    created: Optional[DateTime] = Field(
+    created: Optional[fhir.dateTime] = Field(
         description="Creation date",
         default=None,
-    )
-    created_ext: Optional[Element] = Field(
-        description="Placeholder element for created extensions",
-        default=None,
-        alias="_created",
     )
     enterer: Optional[Reference] = Field(
         description="Who entered the payment",
@@ -216,32 +174,17 @@ class PaymentReconciliation(DomainResource):
         description="Responsible practitioner",
         default=None,
     )
-    outcome: Optional[Code] = Field(
+    outcome: Optional[fhir.code] = Field(
         description="queued | complete | error | partial",
         default=None,
     )
-    outcome_ext: Optional[Element] = Field(
-        description="Placeholder element for outcome extensions",
-        default=None,
-        alias="_outcome",
-    )
-    disposition: Optional[String] = Field(
+    disposition: Optional[fhir.string] = Field(
         description="Disposition message",
         default=None,
     )
-    disposition_ext: Optional[Element] = Field(
-        description="Placeholder element for disposition extensions",
-        default=None,
-        alias="_disposition",
-    )
-    date: Optional[Date] = Field(
+    date: Optional[fhir.date_] = Field(
         description="When payment issued",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     location: Optional[Reference] = Field(
         description="Where payment collected",
@@ -251,59 +194,29 @@ class PaymentReconciliation(DomainResource):
         description="Payment instrument",
         default=None,
     )
-    cardBrand: Optional[String] = Field(
+    cardBrand: Optional[fhir.string] = Field(
         description="Type of card",
         default=None,
     )
-    cardBrand_ext: Optional[Element] = Field(
-        description="Placeholder element for cardBrand extensions",
-        default=None,
-        alias="_cardBrand",
-    )
-    accountNumber: Optional[String] = Field(
+    accountNumber: Optional[fhir.string] = Field(
         description="Digits for verification",
         default=None,
     )
-    accountNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for accountNumber extensions",
-        default=None,
-        alias="_accountNumber",
-    )
-    expirationDate: Optional[Date] = Field(
+    expirationDate: Optional[fhir.date_] = Field(
         description="Expiration year-month",
         default=None,
     )
-    expirationDate_ext: Optional[Element] = Field(
-        description="Placeholder element for expirationDate extensions",
-        default=None,
-        alias="_expirationDate",
-    )
-    processor: Optional[String] = Field(
+    processor: Optional[fhir.string] = Field(
         description="Processor name",
         default=None,
     )
-    processor_ext: Optional[Element] = Field(
-        description="Placeholder element for processor extensions",
-        default=None,
-        alias="_processor",
-    )
-    referenceNumber: Optional[String] = Field(
+    referenceNumber: Optional[fhir.string] = Field(
         description="Check number or payment reference",
         default=None,
     )
-    referenceNumber_ext: Optional[Element] = Field(
-        description="Placeholder element for referenceNumber extensions",
-        default=None,
-        alias="_referenceNumber",
-    )
-    authorization: Optional[String] = Field(
+    authorization: Optional[fhir.string] = Field(
         description="Authorization number",
         default=None,
-    )
-    authorization_ext: Optional[Element] = Field(
-        description="Placeholder element for authorization extensions",
-        default=None,
-        alias="_authorization",
     )
     tenderedAmount: Optional[Money] = Field(
         description="Amount offered by the issuer",

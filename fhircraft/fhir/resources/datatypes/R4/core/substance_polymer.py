@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -24,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
     """
@@ -39,20 +32,14 @@ class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
         description="Todo",
         default=None,
     )
-    isDefining: Optional[Boolean] = Field(
+    isDefining: Optional[fhir.boolean] = Field(
         description="Todo",
         default=None,
-    )
-    isDefining_ext: Optional[Element] = Field(
-        description="Placeholder element for isDefining extensions",
-        default=None,
-        alias="_isDefining",
     )
     amount: Optional[SubstanceAmount] = Field(
         description="Todo",
         default=None,
     )
-
 
 class SubstancePolymerMonomerSet(BackboneElement):
     """
@@ -70,7 +57,6 @@ class SubstancePolymerMonomerSet(BackboneElement):
         )
     )
 
-
 class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation(BackboneElement):
     """
     Todo.
@@ -85,7 +71,6 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation(BackboneElement):
         default=None,
     )
 
-
 class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
     """
     Todo.
@@ -95,20 +80,14 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
         description="Todo",
         default=None,
     )
-    representation: Optional[String] = Field(
+    representation: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
-    )
-    representation_ext: Optional[Element] = Field(
-        description="Placeholder element for representation extensions",
-        default=None,
-        alias="_representation",
     )
     attachment: Optional[Attachment] = Field(
         description="Todo",
         default=None,
     )
-
 
 class SubstancePolymerRepeatRepeatUnit(BackboneElement):
     """
@@ -119,14 +98,9 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         description="Todo",
         default=None,
     )
-    repeatUnit: Optional[String] = Field(
+    repeatUnit: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
-    )
-    repeatUnit_ext: Optional[Element] = Field(
-        description="Placeholder element for repeatUnit extensions",
-        default=None,
-        alias="_repeatUnit",
     )
     amount: Optional[SubstanceAmount] = Field(
         description="Todo",
@@ -145,29 +119,18 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         default=None,
     )
 
-
 class SubstancePolymerRepeat(BackboneElement):
     """
     Todo.
     """
 
-    numberOfUnits: Optional[Integer] = Field(
+    numberOfUnits: Optional[fhir.integer] = Field(
         description="Todo",
         default=None,
     )
-    numberOfUnits_ext: Optional[Element] = Field(
-        description="Placeholder element for numberOfUnits extensions",
-        default=None,
-        alias="_numberOfUnits",
-    )
-    averageMolecularFormula: Optional[String] = Field(
+    averageMolecularFormula: Optional[fhir.string] = Field(
         description="Todo",
         default=None,
-    )
-    averageMolecularFormula_ext: Optional[Element] = Field(
-        description="Placeholder element for averageMolecularFormula extensions",
-        default=None,
-        alias="_averageMolecularFormula",
     )
     repeatUnitAmountType: Optional[CodeableConcept] = Field(
         description="Todo",
@@ -177,7 +140,6 @@ class SubstancePolymerRepeat(BackboneElement):
         description="Todo",
         default=None,
     )
-
 
 class SubstancePolymer(DomainResource):
     """
@@ -213,14 +175,9 @@ class SubstancePolymer(DomainResource):
         description="Todo",
         default=None,
     )
-    modification: Optional[ListType[String]] = Field(
+    modification: Optional[ListType[fhir.string]] = Field(
         description="Todo",
         default=None,
-    )
-    modification_ext: Optional[Element] = Field(
-        description="Placeholder element for modification extensions",
-        default=None,
-        alias="_modification",
     )
     monomerSet: Optional[ListType[SubstancePolymerMonomerSet]] = Field(
         description="Todo",

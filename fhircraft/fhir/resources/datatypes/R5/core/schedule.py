@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class Schedule(DomainResource):
     """
     A container for slots of time that may be available for booking appointments.
@@ -41,14 +34,9 @@ class Schedule(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this schedule is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="High-level category",
@@ -62,14 +50,9 @@ class Schedule(DomainResource):
         description="Type of specialty needed",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Human-readable label",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     actor: Optional[ListType[Reference]] = Field(
         description="Resource(s) that availability information is being provided for",
@@ -79,12 +62,7 @@ class Schedule(DomainResource):
         description="Period of time covered by schedule",
         default=None,
     )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Comments on availability",
         default=None,
-    )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
     )

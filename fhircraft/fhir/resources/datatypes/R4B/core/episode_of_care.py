@@ -4,8 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -20,26 +20,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class EpisodeOfCareStatusHistory(BackboneElement):
     """
     The history of statuses that the EpisodeOfCare has been through (without requiring processing the history of the resource).
     """
 
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     period: Optional[Period] = Field(
         description="Duration the EpisodeOfCare was in the specified status",
         default=None,
     )
-
 
 class EpisodeOfCareDiagnosis(BackboneElement):
     """
@@ -54,16 +47,10 @@ class EpisodeOfCareDiagnosis(BackboneElement):
         description="Role that this diagnosis has within the episode of care (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-    rank: Optional[PositiveInt] = Field(
+    rank: Optional[fhir.positiveInt] = Field(
         description="Ranking of the diagnosis (for each role type)",
         default=None,
     )
-    rank_ext: Optional[Element] = Field(
-        description="Placeholder element for rank extensions",
-        default=None,
-        alias="_rank",
-    )
-
 
 class EpisodeOfCare(DomainResource):
     """
@@ -90,14 +77,9 @@ class EpisodeOfCare(DomainResource):
         description="Business Identifier(s) relevant for this EpisodeOfCare",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     statusHistory: Optional[ListType[EpisodeOfCareStatusHistory]] = Field(
         description="Past list of status codes (the current status may be included to cover the start date of the status)",

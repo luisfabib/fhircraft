@@ -5,18 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    DateTime,
-    Markdown,
-    Id,
-    Canonical,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -38,41 +28,21 @@ class GraphDefinitionNode(BackboneElement):
     Potential target for the link.
     """
 
-    nodeId: Optional[Id] = Field(
+    nodeId: Optional[fhir.id_] = Field(
         description="Internal ID - target for link references",
         default=None,
     )
-    nodeId_ext: Optional[Element] = Field(
-        description="Placeholder element for nodeId extensions",
-        default=None,
-        alias="_nodeId",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why this node is specified",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="Type of resource this link refers to",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    profile: Optional[Canonical] = Field(
+    profile: Optional[fhir.canonical] = Field(
         description="Profile for the target resource",
         default=None,
-    )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
 
 
@@ -81,50 +51,25 @@ class GraphDefinitionLinkCompartment(BackboneElement):
     Compartment Consistency Rules.
     """
 
-    use: Optional[Code] = Field(
+    use: Optional[fhir.code] = Field(
         description="where | requires",
         default=None,
     )
-    use_ext: Optional[Element] = Field(
-        description="Placeholder element for use extensions",
-        default=None,
-        alias="_use",
-    )
-    rule: Optional[Code] = Field(
+    rule: Optional[fhir.code] = Field(
         description="identical | matching | different | custom",
         default=None,
     )
-    rule_ext: Optional[Element] = Field(
-        description="Placeholder element for rule extensions",
-        default=None,
-        alias="_rule",
-    )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Patient | Encounter | RelatedPerson | Practitioner | Device | EpisodeOfCare",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="Custom rule, as a FHIRPath expression",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Documentation for FHIRPath expression",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
 
 
@@ -133,77 +78,37 @@ class GraphDefinitionLink(BackboneElement):
     Links this graph makes rules about.
     """
 
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Why this link is specified",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    min: Optional[Integer] = Field(
+    min: Optional[fhir.integer] = Field(
         description="Minimum occurrences for this link",
         default=None,
     )
-    min_ext: Optional[Element] = Field(
-        description="Placeholder element for min extensions",
-        default=None,
-        alias="_min",
-    )
-    max: Optional[String] = Field(
+    max: Optional[fhir.string] = Field(
         description="Maximum occurrences for this link",
         default=None,
     )
-    max_ext: Optional[Element] = Field(
-        description="Placeholder element for max extensions",
-        default=None,
-        alias="_max",
-    )
-    sourceId: Optional[Id] = Field(
+    sourceId: Optional[fhir.id_] = Field(
         description="Source Node for this link",
         default=None,
     )
-    sourceId_ext: Optional[Element] = Field(
-        description="Placeholder element for sourceId extensions",
-        default=None,
-        alias="_sourceId",
-    )
-    path: Optional[String] = Field(
+    path: Optional[fhir.string] = Field(
         description="Path in the resource that contains the link",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
-        description="Placeholder element for path extensions",
-        default=None,
-        alias="_path",
-    )
-    sliceName: Optional[String] = Field(
+    sliceName: Optional[fhir.string] = Field(
         description="Which slice (if profiled)",
         default=None,
     )
-    sliceName_ext: Optional[Element] = Field(
-        description="Placeholder element for sliceName extensions",
-        default=None,
-        alias="_sliceName",
-    )
-    targetId: Optional[Id] = Field(
+    targetId: Optional[fhir.id_] = Field(
         description="Target Node for this link",
         default=None,
     )
-    targetId_ext: Optional[Element] = Field(
-        description="Placeholder element for targetId extensions",
-        default=None,
-        alias="_targetId",
-    )
-    params: Optional[String] = Field(
+    params: Optional[fhir.string] = Field(
         description="Criteria for reverse lookup",
         default=None,
-    )
-    params_ext: Optional[Element] = Field(
-        description="Placeholder element for params extensions",
-        default=None,
-        alias="_params",
     )
     compartment: Optional[ListType[GraphDefinitionLinkCompartment]] = Field(
         description="Compartment Consistency Rules",
@@ -220,107 +125,57 @@ class GraphDefinition(DomainResource):
     _type = "GraphDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/GraphDefinition"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this graph definition, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this graph definition, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the GraphDefinition (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the graph definition",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this graph definition (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this graph definition (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the graph definition",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -330,41 +185,21 @@ class GraphDefinition(DomainResource):
         description="Intended jurisdiction for graph definition (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this graph definition is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    start: Optional[Id] = Field(
+    start: Optional[fhir.id_] = Field(
         description="Starting Node",
         default=None,
-    )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
-        default=None,
-        alias="_start",
     )
     node: Optional[ListType[GraphDefinitionNode]] = Field(
         description="Potential target for the link",
@@ -386,7 +221,7 @@ class GraphDefinition(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

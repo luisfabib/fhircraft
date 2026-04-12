@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -118,14 +112,9 @@ class ClinicalUseDefinitionIndication(BackboneElement):
         description="Timing or duration information",
         default=None,
     )
-    durationString: Optional[String] = Field(
+    durationString: Optional[fhir.string] = Field(
         description="Timing or duration information",
         default=None,
-    )
-    durationString_ext: Optional[Element] = Field(
-        description="Placeholder element for durationString extensions",
-        default=None,
-        alias="_durationString",
     )
     undesirableEffect: Optional[ListType[Reference]] = Field(
         description="An unwanted side effect or negative outcome of the subject of this resource when being used for this indication",
@@ -153,7 +142,7 @@ class ClinicalUseDefinitionIndication(BackboneElement):
     def duration_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Range, String],
+            field_types=[Range, fhir.String],
             field_name_base="duration",
             required=False,
         )
@@ -243,14 +232,9 @@ class ClinicalUseDefinitionWarning(BackboneElement):
     A critical piece of information about environmental, health or physical risks or hazards that serve as caution to the user. For example 'Do not operate heavy machinery', 'May cause drowsiness', or 'Get medical advice/attention if you feel unwell'.
     """
 
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="A textual definition of this warning, with formatting",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     code: Optional[CodeableConcept] = Field(
         description="A coded or unformatted textual definition of this warning",
@@ -271,14 +255,9 @@ class ClinicalUseDefinition(DomainResource):
         description="Business identifier for this issue",
         default=None,
     )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="indication | contraindication | interaction | undesirable-effect | warning",
         default=None,
-    )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description='A categorisation of the issue, primarily for dividing warnings into subject heading areas such as "Pregnancy", "Overdose"',
@@ -308,14 +287,9 @@ class ClinicalUseDefinition(DomainResource):
         description="The population group to which this applies",
         default=None,
     )
-    library: Optional[ListType[Canonical]] = Field(
+    library: Optional[ListType[fhir.canonical]] = Field(
         description="Logic used by the clinical use definition",
         default=None,
-    )
-    library_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for library extensions",
-        default=None,
-        alias="_library",
     )
     undesirableEffect: Optional[ClinicalUseDefinitionUndesirableEffect] = Field(
         description="A possible negative outcome from the use of this treatment",

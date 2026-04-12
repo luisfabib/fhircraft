@@ -1,9 +1,27 @@
 from copy import copy
+from datetime import date, datetime, time
 import enum
 from functools import lru_cache
+from itertools import zip_longest
+import operator
+import re
 import threading
 import warnings
-from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args, Literal
+from typing import (
+    Any,
+    ClassVar,
+    Generic,
+    Mapping,
+    Optional,
+    TypeVar,
+    Union,
+    Dict,
+    List,
+    Type,
+    get_origin,
+    get_args,
+    Literal,
+)
 from typing_extensions import Self
 from xml.etree.ElementTree import Element as ET_Element, tostring, SubElement
 from xml.dom import minidom
@@ -12,6 +30,8 @@ from pydantic.config import ExtraValues
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Field,
+    RootModel,
     ValidationError,
     PrivateAttr,
     model_validator,
@@ -34,7 +54,7 @@ class FhirBaseModelKind(str, enum.Enum):
     """Enumeration of StructureMap model modes."""
 
     LOGICAL = "logical"
-    PRIMITIVE = "primitive"
+    PRIMITIVE_TYPE = "primitive-type"
     COMPLEX_TYPE = "complex-type"
     RESOURCE = "resource"
 
@@ -71,7 +91,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     # Structureal metadata
     _abstract: ClassVar[bool] = False
     _kind: ClassVar[
-        FhirBaseModelKind | Literal["primitive", "complex-type", "resource", "logical"]
+        FhirBaseModelKind
+        | Literal["primitive-type", "complex-type", "resource", "logical"]
     ] = "logical"
     _type: ClassVar[str]
     _canonical_url: ClassVar[str | None]
@@ -114,6 +135,60 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         """Initialize model and set up parent tracking."""
         # After construction, propagate context to all nested fields
         self._set_resource_context()
+
+    @model_validator(mode="before")
+    @classmethod
+    def _process_primitive_shadow_fields(cls, data: Any) -> Any:
+        """Process FHIR _fieldname shadow keys, merging id/extension into the corresponding field."""
+        if not isinstance(data, dict):
+            return data
+
+        shadow_keys = [
+            k
+            for k in list(data.keys())
+            if isinstance(k, str) and k.startswith("_") and len(k) > 1
+        ]
+        if not shadow_keys:
+            return data
+
+        data = dict(data)
+        for shadow_key in shadow_keys:
+            field_name = shadow_key[1:]
+            shadow_data = data.pop(shadow_key, None)
+
+            if shadow_data is None:
+                continue
+
+            if not isinstance(shadow_data, (dict, list)):
+                data[shadow_key] = shadow_data
+                continue
+
+            existing = data.get(field_name)
+
+            if isinstance(shadow_data, list):
+                if existing is None:
+                    data[field_name] = list(shadow_data)
+                elif isinstance(existing, list):
+                    merged = []
+                    for val, ext in zip_longest(existing, shadow_data, fillvalue=None):
+                        if ext is None:
+                            merged.append(val)
+                        elif val is None:
+                            merged.append(ext)
+                        elif isinstance(val, dict):
+                            merged.append({**val, **ext})
+                        else:
+                            merged.append({"value": val, **ext})
+                    data[field_name] = merged
+            elif isinstance(shadow_data, dict):
+                if existing is None:
+                    data[field_name] = shadow_data
+                elif isinstance(existing, dict):
+                    data[field_name] = {**existing, **shadow_data}
+                else:
+                    data[field_name] = {"value": existing, **shadow_data}
+
+        return data
 
     @model_validator(mode="before")
     @classmethod
@@ -243,21 +318,37 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 )
                 data = serializer(self)
 
-            # Apply polymorphic serialization to FHIR fields
-            for field_name, field_info in self.__class__.model_fields.items():
+            # Apply polymorphic serialization to FHIR fields and collect primitive shadow data
+            for field_name, field_info in type(self).model_fields.items():
+                value = getattr(self, field_name, None)
+                if value is None:
+                    continue
+
                 if field_name in data:
-                    value = getattr(self, field_name, None)
-                    if value is not None:
-                        base_type = self._get_field_base_type(field_info)
-                        if (
-                            base_type != object
-                            and hasattr(base_type, "__mro__")
-                            and issubclass(base_type, FHIRBaseModel)
-                        ):
-                            # Apply polymorphic serialization to this field
-                            data[field_name] = (
-                                self._serialize_fhir_field_polymorphically(value)
-                            )
+                    base_type = self._get_field_base_type(field_info)
+                    if (
+                        base_type != object
+                        and hasattr(base_type, "__mro__")
+                        and issubclass(base_type, FHIRBaseModel)
+                    ):
+                        data[field_name] = self._serialize_fhir_field_polymorphically(
+                            value
+                        )
+
+                shadow = self._get_primitive_shadow_data(value)
+                if shadow is not None:
+                    data[f"_{field_name}"] = shadow
+                    # Suppress the primitive fieldname key when:
+                    # - scalar: serialized value is None
+                    # - list: ALL serialized values are None (extension-only, no actual values)
+                    serialized = data.get(field_name)
+                    if serialized is None:
+                        data.pop(field_name, None)
+                    elif isinstance(serialized, list) and all(
+                        v is None for v in serialized
+                    ):
+                        data.pop(field_name, None)
+
             if (
                 self._is_resource()
                 and hasattr(self, "_type")
@@ -351,7 +442,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # Propagate _parent / _index to direct children only.
         # Deeper descendants were already wired by their own model_post_init call;
         # they resolve _root_resource / _resource lazily via property traversal.
-        for field_name in self.__class__.model_fields:
+        for field_name in type(self).model_fields:
             value = getattr(self, field_name, None)
             if value is not None:
                 self._propagate_context_to_value(value)
@@ -374,7 +465,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             if not isinstance(value, FHIRList):
                 # Wrap plain list in FHIRList to track future mutations.
                 fhir_list = FHIRList(value, parent=self)
-                for field_name in self.__class__.model_fields:
+                for field_name in type(self).model_fields:
                     if getattr(self, field_name, None) is value:
                         object.__setattr__(self, field_name, fhir_list)
                         break
@@ -426,7 +517,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         if self._is_resource():
             root_name = self._type
         else:
-            root_name = self.__class__.__name__
+            root_name = type(self).__name__
 
         # Get the data as a dictionary with filtering options
         data = self.model_dump(
@@ -549,6 +640,36 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             # Other types - convert to string
             field_elem.set("value", str(value))
 
+    @staticmethod
+    def _get_primitive_shadow_data(value: Any) -> "Any | None":
+        """Return the _fieldname shadow dict/list for a primitive with id/extension, or None."""
+        if isinstance(value, FHIRPrimitiveModel):
+            shadow: dict = {}
+            if getattr(value, "id", None) is not None:
+                shadow["id"] = value.id
+            ext = getattr(value, "extension", None)
+            if ext:
+                shadow["extension"] = [e.model_dump() for e in ext]
+            return shadow if shadow else None
+        elif isinstance(value, list):
+            shadow_list = []
+            has_shadow = False
+            for item in value:
+                if isinstance(item, FHIRPrimitiveModel):
+                    item_shadow: dict = {}
+                    if getattr(item, "id", None) is not None:
+                        item_shadow["id"] = item.id
+                    ext = getattr(item, "extension", None)
+                    if ext:
+                        item_shadow["extension"] = [e.model_dump() for e in ext]
+                    if item_shadow:
+                        has_shadow = True
+                    shadow_list.append(item_shadow if item_shadow else None)
+                else:
+                    shadow_list.append(None)
+            return shadow_list if has_shadow else None
+        return None
+
     def _serialize_fhir_field_polymorphically(self, value: Any) -> Any:
         """Serialize FHIR fields polymorphically to preserve runtime type information."""
         # Handle lists/sequences
@@ -596,10 +717,32 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     @classmethod
     def model_validate(
-        cls, obj, *, strict=None, from_attributes=None, context=None
+        cls,
+        obj,
+        *,
+        strict=None,
+        from_attributes=None,
+        context=None,
+        extra: ExtraValues | None = None,
+        by_alias: bool | None = None,
+        by_name: bool | None = None,
     ) -> Self:
         """Override model_validate to provide default kwargs for FHIR resources."""
-
+        if by_alias is not None:
+            warnings.warn(
+                "Fhircraft model_validate does not support by_alias.  Ignoring argument.",
+                UserWarning,
+            )
+        if extra is not None:
+            warnings.warn(
+                "Fhircraft model_validate does not support extra. Ignoring argument.",
+                UserWarning,
+            )
+        if by_name is not None:
+            warnings.warn(
+                "Fhircraft model_validate does not support by_name. Ignoring argument.",
+                UserWarning,
+            )
         instance = super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
@@ -611,11 +754,13 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     @classmethod
     def model_validate_json(
         cls,
-        json_data: str,
+        json_data: str | bytes | bytearray,
         *,
-        strict: bool = False,
+        strict: bool | None = False,
         context: Any = None,
         extra: ExtraValues | None = None,
+        by_alias: bool | None = None,
+        by_name: bool | None = None,
     ) -> Self:
         """
         Override model_validate_json to provide default kwargs for FHIR resources.
@@ -626,6 +771,21 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             context: Additional context for validation
             extra: Extra parameters
         """
+        if by_alias is not None:
+            warnings.warn(
+                "Fhircraft model_validate does not support by_alias.  Ignoring argument.",
+                UserWarning,
+            )
+        if extra is not None:
+            warnings.warn(
+                "Fhircraft model_validate does not support extra. Ignoring argument.",
+                UserWarning,
+            )
+        if by_name is not None:
+            warnings.warn(
+                "Fhircraft model_validate does not support by_name. Ignoring argument.",
+                UserWarning,
+            )
         instance = super().model_validate_json(
             json_data, strict=strict, context=context
         )
@@ -826,7 +986,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return value
 
     def model_copy(
-        self, *, update: dict[str, Any] | None = None, deep: bool = False
+        self, *, update: Mapping[str, Any] | None = None, deep: bool = False
     ) -> Self:
         """
         Override model_copy to reset parent context on copied instance.
@@ -845,7 +1005,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         copied._set_resource_context()
         return copied
 
-    def __deepcopy__(self, memo: dict) -> Self:
+    def __deepcopy__(self, memo: dict[int, Any] | None = None) -> Self:
         """
         Override deepcopy to handle circular parent references properly.
 
@@ -858,10 +1018,11 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # Simple approach: serialize and deserialize to get a deep copy
         # This avoids recursion issues and properly handles all Pydantic internals
         data = self.model_dump()
-        copied = self.__class__.model_validate(data)
+        copied = type(self).model_validate(data)
 
-        # Register in memo
-        memo[id(self)] = copied
+        if memo is not None:
+            # Register in memo
+            memo[id(self)] = copied
 
         # Context is automatically set during model_validate via __init__
         return copied
@@ -873,7 +1034,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         This prevents infinite recursion when comparing models with circular
         parent references via _parent and _root_resource.
         """
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return False
 
         # Compare only the actual field values, not tracking attributes
@@ -994,7 +1155,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     def _get_repr_args(self) -> list[str]:
         repr_args = []
-        for fieldname in sorted(self.model_fields_set or self.__class__.model_fields):
+        for fieldname in sorted(self.model_fields_set or type(self).model_fields):
             value = getattr(self, fieldname)
             if isinstance(value, BaseModel):
                 value = repr(value)
@@ -1004,7 +1165,392 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return repr_args
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({', '.join(self._get_repr_args())})"
+        return f"{type(self).__name__}({', '.join(self._get_repr_args())})"
+
+
+class FHIRPrimitiveModel(FHIRBaseModel):
+    """
+    Base class for FHIR primitive types.
+
+    FHIR primitives are represented as Pydantic models with a single `value` field that holds the actual primitive value.
+    This design allows us to attach extensions to primitive values while still treating them as simple types in most contexts.
+    """
+
+    _kind = "primitive-type"
+
+    value: Any | None = Field(default=None, description="The actual value")
+
+    @model_serializer
+    def serialize_root_value(self) -> Any:
+        if isinstance(self, FHIRPrimitiveModel):
+            return self.value
+        return self
+
+    @model_validator(mode="before")
+    @classmethod
+    def coerce_root_value(cls, data: Any) -> Any:
+        if data is not None and not isinstance(data, (dict, cls)):
+            return {"value": data}
+        elif isinstance(data, FHIRPrimitiveModel):
+            return {"value": data.value}
+        return data
+
+    def __init__(self, __value: Any | None = None, **data):
+        if __value is not None:
+            data.setdefault("value", __value)
+        super().__init__(**data)
+
+    def __getattr__(self, name: str):
+        v = self.value
+        if v is None:
+            raise AttributeError(f"Cannot access '{name}' because value is None")
+        return getattr(v, name)
+
+    def __getitem__(self, key):
+        v = self.value
+        if v is None:
+            raise TypeError("Cannot index into None value")
+        return v[key]
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, FHIRPrimitiveModel):
+            return self.value == other.value
+        return self.value == other
+
+    def __gt__(self, other):
+        return (
+            self.value > other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value > other
+        )
+
+    def __rgt__(self, other):
+        return (
+            self.value < other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value < other
+        )
+
+    def __lt__(self, other):
+        return (
+            self.value < other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value < other
+        )
+
+    def __rlt__(self, other):
+        return (
+            self.value > other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value > other
+        )
+
+    def __ge__(self, other):
+        return (
+            self.value >= other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value >= other
+        )
+
+    def __rge__(self, other):
+        return (
+            self.value <= other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value <= other
+        )
+
+    def __le__(self, other):
+        return (
+            self.value <= other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value <= other
+        )
+
+    def __rle__(self, other):
+        return (
+            self.value >= other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value >= other
+        )
+
+    def __add__(self, other):
+        return (
+            self.value + other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value + other
+        )
+
+    def __radd__(self, other):
+        return (
+            other.value + self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other + self.value
+        )
+
+    def __sub__(self, other):
+        return (
+            self.value - other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value - other
+        )
+
+    def __rsub__(self, other):
+        return (
+            other.value - self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other - self.value
+        )
+
+    def __mul__(self, other):
+        return (
+            self.value * other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value * other
+        )
+
+    def __rmul__(self, other):
+        return (
+            self.value * other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value * other
+        )
+
+    def __truediv__(self, other):
+        return (
+            self.value / other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value / other
+        )
+
+    def __rtruediv__(self, other):
+        return (
+            other.value / self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other / self.value
+        )
+
+    def __mod__(self, other):
+        return (
+            self.value % other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value % other
+        )
+
+    def __rmod__(self, other):
+        return (
+            other.value % self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other % self.value
+        )
+
+    def __floordiv__(self, other):
+        return (
+            self.value // other.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else self.value // other
+        )
+
+    def __rfloordiv__(self, other):
+        return (
+            other.value // self.value  # type: ignore
+            if isinstance(other, FHIRPrimitiveModel)
+            else other // self.value
+        )
+
+    def __neg__(self):
+        return -self.value  # type: ignore
+
+    def __pos__(self):
+        return +self.value  # type: ignore
+
+    def __abs__(self):
+        return abs(self.value)  # type: ignore
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
+    def __str__(self) -> str:
+        return str(self.value) if self.value is not None else ""
+
+    def __repr__(self) -> str:
+        return repr(self.value)
+
+
+class StringBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR string types
+    """
+
+    _kind = "string"
+    value: str | None = None
+
+
+class BooleanBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR boolean types
+    """
+
+    _kind = "boolean"
+    value: bool | None = None
+
+
+class DecimalBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR decimal types
+    """
+
+    _kind = "decimal"
+    value: float | None = None
+
+
+class DateBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR date types
+    """
+
+    _kind = "date"
+    value: str | None = None
+
+
+class DateTimeBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR dateTime types
+    """
+
+    _kind = "dateTime"
+    value: str | None = None
+
+
+class TimeBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR time types
+    """
+
+    _kind = "time"
+    value: str | None = None
+
+
+class InstantBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR instant types
+    """
+
+    _kind = "instant"
+    value: str | None = None
+
+
+class Base64BinaryBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR base64Binary types
+    """
+
+    _kind = "base64Binary"
+    value: str | None = None
+
+
+class UriBase(StringBase):
+    """
+    A release-independent base metaclass for FHIR uri types
+    """
+
+    _kind = "uri"
+
+
+class UrlBase(UriBase):
+    """
+    A release-independent base metaclass for FHIR url types
+    """
+
+    _kind = "url"
+
+
+class CanonicalBase(UriBase):
+    """
+    A release-independent base metaclass for FHIR canonical types
+    """
+
+    _kind = "canonical"
+
+
+class OidBase(UriBase):
+    """
+    A release-independent base metaclass for FHIR oid types
+    """
+
+    _kind = "oid"
+
+
+class UuidBase(UriBase):
+    """
+    A release-independent base metaclass for FHIR uuid types
+    """
+
+    _kind = "uuid"
+
+
+class CodeBase(StringBase):
+    """
+    A release-independent base metaclass for FHIR code types
+    """
+
+    _kind = "code"
+
+
+class IdBase(StringBase):
+    """
+    A release-independent base metaclass for FHIR id types
+    """
+
+    _kind = "id"
+
+
+class MarkdownBase(StringBase):
+    """
+    A release-independent base metaclass for FHIR markdown types
+    """
+
+    _kind = "markdown"
+
+
+class XhtmlBase(StringBase):
+    """
+    A release-independent base metaclass for FHIR xhtml types
+    """
+
+    _kind = "xhtml"
+
+
+class IntegerBase(FHIRPrimitiveModel):
+    """
+    A release-independent base metaclass for FHIR integer types
+    """
+
+    _kind = "integer"
+    value: int | None = None
+
+
+class PositiveIntBase(IntegerBase):
+    """
+    A release-independent base metaclass for FHIR positiveInt types
+    """
+
+    _kind = "positiveInt"
+
+
+class UnsignedIntBase(IntegerBase):
+    """
+    A release-independent base metaclass for FHIR unsignedInt types
+    """
+
+    _kind = "unsignedInt"
+
+
+class Integer64Base(IntegerBase):
+    """
+    A release-independent base metaclass for FHIR integer64 types (R5)
+    """
+
+    _kind = "integer64"
 
 
 class FHIRSliceModel(FHIRBaseModel):

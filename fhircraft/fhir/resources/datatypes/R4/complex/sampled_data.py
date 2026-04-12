@@ -3,11 +3,10 @@ from typing import Optional, TYPE_CHECKING
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .element import Element
 from .quantity import Quantity
-
 
 class SampledData(Element):
     """
@@ -20,57 +19,27 @@ class SampledData(Element):
         description="Zero value and units",
         default=None,
     )
-    period: Optional[Decimal] = Field(
+    period: Optional[fhir.decimal] = Field(
         description="Number of milliseconds between samples",
         default=None,
     )
-    period_ext: Optional[Element] = Field(
-        description="Placeholder element for period extensions",
-        default=None,
-        alias="_period",
-    )
-    factor: Optional[Decimal] = Field(
+    factor: Optional[fhir.decimal] = Field(
         description="Multiply data by this before adding to origin",
         default=None,
     )
-    factor_ext: Optional[Element] = Field(
-        description="Placeholder element for factor extensions",
-        default=None,
-        alias="_factor",
-    )
-    lowerLimit: Optional[Decimal] = Field(
+    lowerLimit: Optional[fhir.decimal] = Field(
         description="Lower limit of detection",
         default=None,
     )
-    lowerLimit_ext: Optional[Element] = Field(
-        description="Placeholder element for lowerLimit extensions",
-        default=None,
-        alias="_lowerLimit",
-    )
-    upperLimit: Optional[Decimal] = Field(
+    upperLimit: Optional[fhir.decimal] = Field(
         description="Upper limit of detection",
         default=None,
     )
-    upperLimit_ext: Optional[Element] = Field(
-        description="Placeholder element for upperLimit extensions",
-        default=None,
-        alias="_upperLimit",
-    )
-    dimensions: Optional[PositiveInt] = Field(
+    dimensions: Optional[fhir.positiveInt] = Field(
         description="Number of sample points at each time point",
         default=None,
     )
-    dimensions_ext: Optional[Element] = Field(
-        description="Placeholder element for dimensions extensions",
+    data: Optional[fhir.string] = Field(
+        description='decimal values with spaces, or "E" | "U" | "L"',
         default=None,
-        alias="_dimensions",
-    )
-    data: Optional[String] = Field(
-        description='Decimal values with spaces, or "E" | "U" | "L"',
-        default=None,
-    )
-    data_ext: Optional[Element] = Field(
-        description="Placeholder element for data extensions",
-        default=None,
-        alias="_data",
     )

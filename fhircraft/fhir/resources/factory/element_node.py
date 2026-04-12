@@ -77,7 +77,7 @@ class ElementNode:
     @property
     def path(self) -> str:
         """Element path (dot-separated, no slice names)."""
-        return self.definition.path or ""
+        return str(self.definition.path or "")
 
     @property
     def depth(self) -> int:
@@ -207,7 +207,7 @@ class ElementNode:
         """
         if not self.is_slice and not self.is_type_choice_slice:
             raise ValueError("Only slices and type-choice slices have slice names")
-        return self.definition.sliceName or self.local_id.split(":", 1)[1]
+        return str(self.definition.sliceName or self.local_id.split(":", 1)[1])
 
     @property
     def is_slicing_ordered(self) -> bool:
@@ -225,7 +225,9 @@ class ElementNode:
         """
         The slicing rules for this slice entry element, one of ``"openAtEnd"``, ``"open"``, or ``"closed"``.  Defaults to ``"open"`` when not specified.
         """
-        if (slicing := self.definition.slicing) and (rules := slicing.rules):
+        if (slicing := self.definition.slicing) and (
+            rules := str(slicing.rules) if slicing.rules else None
+        ):
             if rules not in (
                 "open",
                 "closed",
@@ -258,7 +260,7 @@ class ElementNode:
         """
         Minimum cardinality of the base element when this node was produced by merging a differential element with its base.  ``None`` means this node was not produced by a merge (snapshot or root element).
         """
-        return self.definition.base.min if self.definition.base else None
+        return int(str(self.definition.base.min)) if self.definition.base else None
 
     @property
     def base_max_cardinality(self) -> int | None:
@@ -297,7 +299,7 @@ class ElementNode:
             raise ValueError(
                 "ElementDefinition.min is required and must be an integer."
             )
-        return int(val)
+        return int(str(val))
 
     @property
     def max_cardinality(self) -> int | None:
@@ -385,16 +387,14 @@ class ElementNode:
         Strings that contain no alphanumeric characters are treated as absent and the next candidate is tried instead.
         """
 
-        def _has_content(value: str | None) -> bool:
-            return bool(value and re.search(r"[A-Za-z0-9]", value))
-
         for candidate in (
             self.definition.definition,
             self.definition.short,
             self.definition.comment,
         ):
-            if _has_content(candidate):
-                return str(candidate)
+            candidate = str(candidate) if candidate is not None else None
+            if candidate and bool(re.search(r"[A-Za-z0-9]", candidate)):
+                return candidate
         return ""
 
     # ------------------------------------------------------------------
@@ -449,11 +449,15 @@ class ElementNode:
     @property
     def max_length(
         self,
-    ):
+    ) -> int | None:
         """
         The maxLength[x] value for this element, if any.  Returns ``None`` if no maxLength is specified.
         """
-        return self.definition.maxLength
+        return (
+            int(str(self.definition.maxLength))
+            if self.definition.maxLength is not None
+            else None
+        )
 
     # ------------------------------------------------------------------
     # Dunder helpers

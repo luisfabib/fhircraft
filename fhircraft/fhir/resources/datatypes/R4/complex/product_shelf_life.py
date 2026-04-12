@@ -3,13 +3,12 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from .backbone_element import BackboneElement
 from .codeable_concept import CodeableConcept
 from .identifier import Identifier
 from .quantity import Quantity
-
 
 class ProductShelfLife(BackboneElement):
     """

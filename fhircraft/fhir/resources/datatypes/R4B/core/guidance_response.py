@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -25,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class GuidanceResponse(DomainResource):
     """
@@ -56,36 +49,21 @@ class GuidanceResponse(DomainResource):
         description="Business identifier",
         default=None,
     )
-    moduleUri: Optional[Uri] = Field(
+    moduleUri: Optional[fhir.uri] = Field(
         description="What guidance was requested",
         default=None,
     )
-    moduleUri_ext: Optional[Element] = Field(
-        description="Placeholder element for moduleUri extensions",
-        default=None,
-        alias="_moduleUri",
-    )
-    moduleCanonical: Optional[Canonical] = Field(
+    moduleCanonical: Optional[fhir.canonical] = Field(
         description="What guidance was requested",
         default=None,
-    )
-    moduleCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for moduleCanonical extensions",
-        default=None,
-        alias="_moduleCanonical",
     )
     moduleCodeableConcept: Optional[CodeableConcept] = Field(
         description="What guidance was requested",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="success | data-requested | data-required | in-progress | failure | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     subject: Optional[Reference] = Field(
         description="Patient the request was performed for",
@@ -95,14 +73,9 @@ class GuidanceResponse(DomainResource):
         description="Encounter during which the response was returned",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the guidance response was processed",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     performer: Optional[Reference] = Field(
         description="Device returning the guidance",
@@ -148,7 +121,7 @@ class GuidanceResponse(DomainResource):
     def module_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Uri, Canonical, CodeableConcept],
+            field_types=[fhir.Uri, fhir.Canonical, CodeableConcept],
             field_name_base="module",
             required=True,
         )

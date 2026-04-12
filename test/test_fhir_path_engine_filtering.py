@@ -6,8 +6,9 @@ from fhircraft.fhir.path.engine.comparison import *
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.filtering import *
 from fhircraft.fhir.path.engine.literals import Date, Quantity
+from fhircraft.fhir.resources.datatypes.R4.primitive import PositiveInt, String
 
-env = {'%fhirRelease': "R4"}
+env = {"%fhirRelease": "R4"}
 
 # -------------
 # Where
@@ -108,9 +109,11 @@ def test_repeat_string_representation():
 
 ofType_cases = (
     ("ABC", "String"),
+    (String(value="ABC"), "String"),
     (12, "Integer"),
     (12, "UnsignedInt"),
     (12, "PositiveInt"),
+    (PositiveInt(value=12), "PositiveInt"),
     (Date("@2024"), "Date"),
     (Quantity(12, "g"), "Quantity"),
 )

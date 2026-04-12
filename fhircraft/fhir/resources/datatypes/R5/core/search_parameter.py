@@ -5,16 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    Boolean,
-    DateTime,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -36,23 +28,13 @@ class SearchParameterComponent(BackboneElement):
     Used to define the parts of a composite search parameter.
     """
 
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Defines how the part works",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
-    )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="Subexpression relative to main expression",
         default=None,
-    )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
     )
 
 
@@ -65,116 +47,61 @@ class SearchParameter(DomainResource):
     _type = "SearchParameter"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SearchParameter"
 
-    url: Optional[Uri] = Field(
-        description="Canonical identifier for this search parameter, represented as a URI (globally unique)",
+    url: Optional[fhir.uri] = Field(
+        description="canonical identifier for this search parameter, represented as a URI (globally unique)",
         default=None,
-    )
-    url_ext: Optional[Element] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the search parameter (business identifier)",
         default=None,
     )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Business version of the search parameter",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
-    )
-    versionAlgorithmString: Optional[String] = Field(
+    versionAlgorithmString: Optional[fhir.string] = Field(
         description="How to compare versions",
         default=None,
-    )
-    versionAlgorithmString_ext: Optional[Element] = Field(
-        description="Placeholder element for versionAlgorithmString extensions",
-        default=None,
-        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name for this search parameter (computer friendly)",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    title: Optional[String] = Field(
+    title: Optional[fhir.string] = Field(
         description="Name for this search parameter (human friendly)",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
-        description="Placeholder element for title extensions",
-        default=None,
-        alias="_title",
-    )
-    derivedFrom: Optional[Canonical] = Field(
+    derivedFrom: Optional[fhir.canonical] = Field(
         description="Original definition for the search parameter",
         default=None,
     )
-    derivedFrom_ext: Optional[Element] = Field(
-        description="Placeholder element for derivedFrom extensions",
-        default=None,
-        alias="_derivedFrom",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="draft | active | retired | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    experimental: Optional[Boolean] = Field(
+    experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    experimental_ext: Optional[Element] = Field(
-        description="Placeholder element for experimental extensions",
-        default=None,
-        alias="_experimental",
-    )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
-    )
-    publisher: Optional[String] = Field(
+    publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
         default=None,
-    )
-    publisher_ext: Optional[Element] = Field(
-        description="Placeholder element for publisher extensions",
-        default=None,
-        alias="_publisher",
     )
     contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Natural language description of the search parameter",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -184,140 +111,65 @@ class SearchParameter(DomainResource):
         description="Intended jurisdiction for search parameter (if applicable)",
         default=None,
     )
-    purpose: Optional[Markdown] = Field(
+    purpose: Optional[fhir.markdown] = Field(
         description="Why this search parameter is defined",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
-        description="Placeholder element for purpose extensions",
-        default=None,
-        alias="_purpose",
-    )
-    copyright: Optional[Markdown] = Field(
+    copyright: Optional[fhir.markdown] = Field(
         description="Use and/or publishing restrictions",
         default=None,
     )
-    copyright_ext: Optional[Element] = Field(
-        description="Placeholder element for copyright extensions",
-        default=None,
-        alias="_copyright",
-    )
-    copyrightLabel: Optional[String] = Field(
+    copyrightLabel: Optional[fhir.string] = Field(
         description="Copyright holder and year(s)",
         default=None,
     )
-    copyrightLabel_ext: Optional[Element] = Field(
-        description="Placeholder element for copyrightLabel extensions",
-        default=None,
-        alias="_copyrightLabel",
-    )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="Recommended name for parameter in search url",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    base: Optional[ListType[Code]] = Field(
+    base: Optional[ListType[fhir.code]] = Field(
         description="The resource type(s) this search parameter applies to",
         default=None,
     )
-    base_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for base extensions",
-        default=None,
-        alias="_base",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    expression: Optional[String] = Field(
+    expression: Optional[fhir.string] = Field(
         description="FHIRPath expression that extracts the values",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
-        description="Placeholder element for expression extensions",
-        default=None,
-        alias="_expression",
-    )
-    processingMode: Optional[Code] = Field(
+    processingMode: Optional[fhir.code] = Field(
         description="normal | phonetic | other",
         default=None,
     )
-    processingMode_ext: Optional[Element] = Field(
-        description="Placeholder element for processingMode extensions",
-        default=None,
-        alias="_processingMode",
-    )
-    constraint: Optional[String] = Field(
+    constraint: Optional[fhir.string] = Field(
         description="FHIRPath expression that constraints the usage of this SearchParamete",
         default=None,
     )
-    constraint_ext: Optional[Element] = Field(
-        description="Placeholder element for constraint extensions",
-        default=None,
-        alias="_constraint",
-    )
-    target: Optional[ListType[Code]] = Field(
+    target: Optional[ListType[fhir.code]] = Field(
         description="Types of resource (if a resource reference)",
         default=None,
     )
-    target_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for target extensions",
-        default=None,
-        alias="_target",
-    )
-    multipleOr: Optional[Boolean] = Field(
+    multipleOr: Optional[fhir.boolean] = Field(
         description="Allow multiple values per parameter (or)",
         default=None,
     )
-    multipleOr_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleOr extensions",
-        default=None,
-        alias="_multipleOr",
-    )
-    multipleAnd: Optional[Boolean] = Field(
+    multipleAnd: Optional[fhir.boolean] = Field(
         description="Allow multiple parameters (and)",
         default=None,
     )
-    multipleAnd_ext: Optional[Element] = Field(
-        description="Placeholder element for multipleAnd extensions",
-        default=None,
-        alias="_multipleAnd",
-    )
-    comparator: Optional[ListType[Code]] = Field(
+    comparator: Optional[ListType[fhir.code]] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
-    modifier: Optional[ListType[Code]] = Field(
+    modifier: Optional[ListType[fhir.code]] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    modifier_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for modifier extensions",
-        default=None,
-        alias="_modifier",
-    )
-    chain: Optional[ListType[String]] = Field(
+    chain: Optional[ListType[fhir.string]] = Field(
         description="Chained names supported",
         default=None,
-    )
-    chain_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for chain extensions",
-        default=None,
-        alias="_chain",
     )
     component: Optional[ListType[SearchParameterComponent]] = Field(
         description="For Composite resources to define the parts",
@@ -335,7 +187,7 @@ class SearchParameter(DomainResource):
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[String, Coding],
+            field_types=[fhir.String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
         )

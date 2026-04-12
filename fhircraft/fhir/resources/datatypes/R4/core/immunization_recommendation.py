@@ -4,14 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    DateTime,
-    PositiveInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -35,14 +29,9 @@ class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
         description="Type of date",
         default=None,
     )
-    value: Optional[DateTime] = Field(
+    value: Optional[fhir.dateTime] = Field(
         description="Recommended date",
         default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
     )
 
 
@@ -77,59 +66,29 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Dates governing proposed immunization",
         default=None,
     )
-    description: Optional[String] = Field(
+    description: Optional[fhir.string] = Field(
         description="Protocol details",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    series: Optional[String] = Field(
+    series: Optional[fhir.string] = Field(
         description="Name of vaccination series",
         default=None,
     )
-    series_ext: Optional[Element] = Field(
-        description="Placeholder element for series extensions",
-        default=None,
-        alias="_series",
-    )
-    doseNumberPositiveInt: Optional[PositiveInt] = Field(
+    doseNumberPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Recommended dose number within series",
         default=None,
     )
-    doseNumberPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberPositiveInt extensions",
-        default=None,
-        alias="_doseNumberPositiveInt",
-    )
-    doseNumberString: Optional[String] = Field(
+    doseNumberString: Optional[fhir.string] = Field(
         description="Recommended dose number within series",
         default=None,
     )
-    doseNumberString_ext: Optional[Element] = Field(
-        description="Placeholder element for doseNumberString extensions",
-        default=None,
-        alias="_doseNumberString",
-    )
-    seriesDosesPositiveInt: Optional[PositiveInt] = Field(
+    seriesDosesPositiveInt: Optional[fhir.positiveInt] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
-    seriesDosesPositiveInt_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesPositiveInt extensions",
-        default=None,
-        alias="_seriesDosesPositiveInt",
-    )
-    seriesDosesString: Optional[String] = Field(
+    seriesDosesString: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
         default=None,
-    )
-    seriesDosesString_ext: Optional[Element] = Field(
-        description="Placeholder element for seriesDosesString extensions",
-        default=None,
-        alias="_seriesDosesString",
     )
     supportingImmunization: Optional[ListType[Reference]] = Field(
         description="Past immunizations supporting recommendation",
@@ -158,7 +117,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
     def doseNumber_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[PositiveInt, String],
+            field_types=[fhir.PositiveInt, fhir.String],
             field_name_base="doseNumber",
             required=False,
         )
@@ -167,7 +126,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
     def seriesDoses_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[PositiveInt, String],
+            field_types=[fhir.PositiveInt, fhir.String],
             field_name_base="seriesDoses",
             required=False,
         )
@@ -204,14 +163,9 @@ class ImmunizationRecommendation(DomainResource):
         description="Who this profile is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="Date recommendation(s) created",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     authority: Optional[Reference] = Field(
         description="Who is responsible for protocol",

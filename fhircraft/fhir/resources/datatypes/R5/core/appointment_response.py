@@ -5,17 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Instant,
-    Markdown,
-    Date,
-    PositiveInt,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -27,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class AppointmentResponse(DomainResource):
     """
@@ -46,32 +36,17 @@ class AppointmentResponse(DomainResource):
         description="Appointment this response relates to",
         default=None,
     )
-    proposedNewTime: Optional[Boolean] = Field(
+    proposedNewTime: Optional[fhir.boolean] = Field(
         description="Indicator for a counter proposal",
         default=None,
     )
-    proposedNewTime_ext: Optional[Element] = Field(
-        description="Placeholder element for proposedNewTime extensions",
-        default=None,
-        alias="_proposedNewTime",
-    )
-    start: Optional[Instant] = Field(
-        description="Time from appointment, or requested new start time",
+    start: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new start time",
         default=None,
     )
-    start_ext: Optional[Element] = Field(
-        description="Placeholder element for start extensions",
+    end: Optional[fhir.instant] = Field(
+        description="time from appointment, or requested new end time",
         default=None,
-        alias="_start",
-    )
-    end: Optional[Instant] = Field(
-        description="Time from appointment, or requested new end time",
-        default=None,
-    )
-    end_ext: Optional[Element] = Field(
-        description="Placeholder element for end extensions",
-        default=None,
-        alias="_end",
     )
     participantType: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in the appointment",
@@ -81,50 +56,25 @@ class AppointmentResponse(DomainResource):
         description="Person(s), Location, HealthcareService, or Device",
         default=None,
     )
-    participantStatus: Optional[Code] = Field(
+    participantStatus: Optional[fhir.code] = Field(
         description="accepted | declined | tentative | needs-action | entered-in-error",
         default=None,
     )
-    participantStatus_ext: Optional[Element] = Field(
-        description="Placeholder element for participantStatus extensions",
-        default=None,
-        alias="_participantStatus",
-    )
-    comment: Optional[Markdown] = Field(
+    comment: Optional[fhir.markdown] = Field(
         description="Additional comments",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
-        description="Placeholder element for comment extensions",
-        default=None,
-        alias="_comment",
-    )
-    recurring: Optional[Boolean] = Field(
+    recurring: Optional[fhir.boolean] = Field(
         description="This response is for all occurrences in a recurring request",
         default=None,
     )
-    recurring_ext: Optional[Element] = Field(
-        description="Placeholder element for recurring extensions",
-        default=None,
-        alias="_recurring",
-    )
-    occurrenceDate: Optional[Date] = Field(
+    occurrenceDate: Optional[fhir.date_] = Field(
         description="Original date within a recurring request",
         default=None,
     )
-    occurrenceDate_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDate extensions",
-        default=None,
-        alias="_occurrenceDate",
-    )
-    recurrenceId: Optional[PositiveInt] = Field(
+    recurrenceId: Optional[fhir.positiveInt] = Field(
         description="The recurrence ID of the specific recurring request",
         default=None,
-    )
-    recurrenceId_ext: Optional[Element] = Field(
-        description="Placeholder element for recurrenceId extensions",
-        default=None,
-        alias="_recurrenceId",
     )
 
     @model_validator(mode="after")

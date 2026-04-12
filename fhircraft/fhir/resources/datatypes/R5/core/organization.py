@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -67,45 +61,25 @@ class Organization(DomainResource):
         description="Identifies this organization  across multiple systems",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether the organization\u0027s record is still in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of organization",
         default=None,
     )
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name used for the organization",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    alias: Optional[ListType[String]] = Field(
+    alias: Optional[ListType[fhir.string]] = Field(
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
     )
-    alias_ext: Optional[ListType[Optional[Element]]] = Field(
-        description="Placeholder element for alias extensions",
-        default=None,
-        alias="_alias",
-    )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Additional details about the Organization that could be displayed as further information to identify the Organization beyond its name",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details for the Organization",

@@ -5,6 +5,7 @@ import pytest
 from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.boolean import *
 from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.resources.datatypes.R4.primitive.boolean import Boolean
 
 env = dict()
 
@@ -22,6 +23,9 @@ and_boolean_logic_cases = (
     ([], True, []),
     ([], False, False),
     ([], [], []),
+    (Boolean(value=True), True, True),
+    (True, Boolean(value=False), False),
+    (Boolean(value=True), Boolean(value=False), False),
 )
 
 
@@ -36,9 +40,11 @@ def test_and_returns_correct_logic_boolean(left, right, expected):
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
+
 def test_and_string_representation():
     expression = And(Element("left"), Element("right"))
     assert str(expression) == "left and right"
+
 
 # -------------
 # Or
@@ -54,6 +60,9 @@ or_boolean_logic_cases = (
     ([], True, True),
     ([], False, []),
     ([], [], []),
+    (Boolean(value=True), True, True),
+    (True, Boolean(value=False), True),
+    (Boolean(value=True), Boolean(value=False), True),
 )
 
 
@@ -68,9 +77,11 @@ def test_or_returns_correct_logic_boolean(left, right, expected):
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
+
 def test_or_string_representation():
     expression = Or(Element("left"), Element("right"))
     assert str(expression) == "left or right"
+
 
 # -------------
 # Xor
@@ -86,6 +97,9 @@ xor_boolean_logic_cases = (
     ([], True, []),
     ([], False, []),
     ([], [], []),
+    (Boolean(value=True), True, False),
+    (True, Boolean(value=False), True),
+    (Boolean(value=True), Boolean(value=False), True),
 )
 
 
@@ -100,9 +114,11 @@ def test_xor_returns_correct_logic_boolean(left, right, expected):
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
+
 def test_xor_string_representation():
     expression = Xor(Element("left"), Element("right"))
     assert str(expression) == "left xor right"
+
 
 # -------------
 # Implies
@@ -118,6 +134,9 @@ implies_boolean_logic_cases = (
     ([], True, True),
     ([], False, []),
     ([], [], []),
+    (Boolean(value=True), True, True),
+    (True, Boolean(value=False), False),
+    (Boolean(value=True), Boolean(value=False), False),
 )
 
 
@@ -132,9 +151,11 @@ def test_implies_returns_correct_logic_boolean(left, right, expected):
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
+
 def test_implies_string_representation():
     expression = Implies(Element("left"), Element("right"))
     assert str(expression) == "left implies right"
+
 
 # -------------
 # Not
@@ -143,6 +164,8 @@ def test_implies_string_representation():
 not_boolean_logic_cases = (
     (True, False),
     (False, True),
+    (Boolean(value=True), False),
+    (Boolean(value=False), True),
 )
 
 
@@ -151,6 +174,7 @@ def test_not_returns_correct_logic_boolean(value, expected):
     result = Not().evaluate([FHIRPathCollectionItem(value=value)], env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
+
 
 def test_not_string_representation():
     expression = Not()

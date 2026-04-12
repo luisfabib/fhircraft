@@ -5,12 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    Code,
-    DateTime,
-    Boolean,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Identifier,
@@ -230,23 +226,13 @@ class AdverseEvent(DomainResource):
         description="Business identifier for the event",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="in-progress | completed | entered-in-error | unknown",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    actuality: Optional[Code] = Field(
+    actuality: Optional[fhir.code] = Field(
         description="actual | potential",
         default=None,
-    )
-    actuality_ext: Optional[Element] = Field(
-        description="Placeholder element for actuality extensions",
-        default=None,
-        alias="_actuality",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="wrong-patient | procedure-mishap | medication-mishap | device | unsafe-physical-environment | hospital-aquired-infection | wrong-body-site",
@@ -264,14 +250,9 @@ class AdverseEvent(DomainResource):
         description="The Encounter associated with the start of the AdverseEvent",
         default=None,
     )
-    occurrenceDateTime: Optional[DateTime] = Field(
+    occurrenceDateTime: Optional[fhir.dateTime] = Field(
         description="When the event occurred",
         default=None,
-    )
-    occurrenceDateTime_ext: Optional[Element] = Field(
-        description="Placeholder element for occurrenceDateTime extensions",
-        default=None,
-        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When the event occurred",
@@ -281,23 +262,13 @@ class AdverseEvent(DomainResource):
         description="When the event occurred",
         default=None,
     )
-    detected: Optional[DateTime] = Field(
+    detected: Optional[fhir.dateTime] = Field(
         description="When the event was detected",
         default=None,
     )
-    detected_ext: Optional[Element] = Field(
-        description="Placeholder element for detected extensions",
-        default=None,
-        alias="_detected",
-    )
-    recordedDate: Optional[DateTime] = Field(
+    recordedDate: Optional[fhir.dateTime] = Field(
         description="When the event was recorded",
         default=None,
-    )
-    recordedDate_ext: Optional[Element] = Field(
-        description="Placeholder element for recordedDate extensions",
-        default=None,
-        alias="_recordedDate",
     )
     resultingEffect: Optional[ListType[Reference]] = Field(
         description="Effect on the subject due to this event",
@@ -327,14 +298,9 @@ class AdverseEvent(DomainResource):
         description="Research study that the subject is enrolled in",
         default=None,
     )
-    expectedInResearchStudy: Optional[Boolean] = Field(
+    expectedInResearchStudy: Optional[fhir.boolean] = Field(
         description="Considered likely or probable or anticipated in the research study",
         default=None,
-    )
-    expectedInResearchStudy_ext: Optional[Element] = Field(
-        description="Placeholder element for expectedInResearchStudy extensions",
-        default=None,
-        alias="_expectedInResearchStudy",
     )
     suspectEntity: Optional[ListType[AdverseEventSuspectEntity]] = Field(
         description="The suspected agent causing the adverse event",
@@ -372,7 +338,7 @@ class AdverseEvent(DomainResource):
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[DateTime, Period, Timing],
+            field_types=[fhir.DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )

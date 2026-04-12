@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Canonical,
-    DateTime,
-    Integer,
-)
 
+import fhircraft.fhir.resources.datatypes.R4.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
@@ -38,14 +31,9 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     subjectResults: Optional[Reference] = Field(
         description="For subject-list reports, the subject results in this population",
@@ -77,14 +65,9 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation",
         default=None,
     )
-    count: Optional[Integer] = Field(
+    count: Optional[fhir.integer] = Field(
         description="Size of the population",
         default=None,
-    )
-    count_ext: Optional[Element] = Field(
-        description="Placeholder element for count extensions",
-        default=None,
-        alias="_count",
     )
     subjectResults: Optional[Reference] = Field(
         description="For subject-list reports, the subject results in this population",
@@ -180,45 +163,25 @@ class MeasureReport(DomainResource):
         description="Additional identifier for the MeasureReport",
         default=None,
     )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="complete | pending | error",
         default=None,
     )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
-    )
-    type: Optional[Code] = Field(
+    type: Optional[fhir.code] = Field(
         description="individual | subject-list | summary | data-collection",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
-        description="Placeholder element for type extensions",
-        default=None,
-        alias="_type",
-    )
-    measure: Optional[Canonical] = Field(
+    measure: Optional[fhir.canonical] = Field(
         description="What measure was calculated",
         default=None,
-    )
-    measure_ext: Optional[Element] = Field(
-        description="Placeholder element for measure extensions",
-        default=None,
-        alias="_measure",
     )
     subject: Optional[Reference] = Field(
         description="What individual(s) the report is for",
         default=None,
     )
-    date: Optional[DateTime] = Field(
+    date: Optional[fhir.dateTime] = Field(
         description="When the report was generated",
         default=None,
-    )
-    date_ext: Optional[Element] = Field(
-        description="Placeholder element for date extensions",
-        default=None,
-        alias="_date",
     )
     reporter: Optional[Reference] = Field(
         description="Who is reporting the data",

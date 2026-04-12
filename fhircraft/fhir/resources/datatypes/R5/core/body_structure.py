@@ -5,14 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -29,18 +23,17 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class BodyStructureIncludedStructure(BackboneElement):
     """
     The anatomical location(s) or region(s) of the specimen, lesion, or body structure.
     """
 
     structure: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure",
+        description="code that represents the included structure",
         default=None,
     )
     laterality: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure laterality",
+        description="code that represents the included structure laterality",
         default=None,
     )
     bodyLandmarkOrientation: Optional[
@@ -54,10 +47,9 @@ class BodyStructureIncludedStructure(BackboneElement):
         default=None,
     )
     qualifier: Optional[ListType[CodeableConcept]] = Field(
-        description="Code that represents the included structure qualifier",
+        description="code that represents the included structure qualifier",
         default=None,
     )
-
 
 class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
     BackboneElement
@@ -74,7 +66,6 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
         description="Measured distance from body landmark",
         default=None,
     )
-
 
 class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
     """
@@ -102,18 +93,17 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
         default=None,
     )
 
-
 class BodyStructureExcludedStructure(BackboneElement):
     """
     The anatomical location(s) or region(s) not occupied or represented by the specimen, lesion, or body structure.
     """
 
     structure: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure",
+        description="code that represents the included structure",
         default=None,
     )
     laterality: Optional[CodeableConcept] = Field(
-        description="Code that represents the included structure laterality",
+        description="code that represents the included structure laterality",
         default=None,
     )
     bodyLandmarkOrientation: Optional[
@@ -127,10 +117,9 @@ class BodyStructureExcludedStructure(BackboneElement):
         default=None,
     )
     qualifier: Optional[ListType[CodeableConcept]] = Field(
-        description="Code that represents the included structure qualifier",
+        description="code that represents the included structure qualifier",
         default=None,
     )
-
 
 class BodyStructure(DomainResource):
     """
@@ -145,14 +134,9 @@ class BodyStructure(DomainResource):
         description="Bodystructure identifier",
         default=None,
     )
-    active: Optional[Boolean] = Field(
+    active: Optional[fhir.boolean] = Field(
         description="Whether this record is in active use",
         default=None,
-    )
-    active_ext: Optional[Element] = Field(
-        description="Placeholder element for active extensions",
-        default=None,
-        alias="_active",
     )
     morphology: Optional[CodeableConcept] = Field(
         description="Kind of Structure",
@@ -166,14 +150,9 @@ class BodyStructure(DomainResource):
         description="Excluded anatomic locations(s)",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Text description",
         default=None,
-    )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
     )
     image: Optional[ListType[Attachment]] = Field(
         description="Attached images",

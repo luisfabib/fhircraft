@@ -6,17 +6,14 @@ and to convert between different types. The core conversion logic is implemented
 and FHIRPath conversion functions use these utilities.
 """
 
-import importlib
 import re
-import warnings
 from datetime import date, datetime, time
-from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Type, Union
+from typing import TYPE_CHECKING, Any, Union
 from typing_extensions import TypeAliasType
 
 from pydantic import TypeAdapter, BaseModel, ValidationError
 
-import fhircraft.fhir.resources.datatypes.primitives as primitives
+import fhircraft.fhir.resources.datatypes as constants
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 
 if TYPE_CHECKING:
@@ -35,54 +32,42 @@ _type_adapter_cache: dict[int, TypeAdapter] = {}
 
 # Type checking functions
 def is_fhir_primitive_type(
-    value: Any, fhir_type: Type | TypeAliasType | str, raise_on_error: bool = True
+    value: Any,
+    fhir_type: "type[FHIRBaseModel] | type | TypeAliasType | str",
+    release: str | None = None,
 ) -> bool:
     """
-    Check if a value conforms to a FHIR primitive type.
+    Check if a value conforms to a primitive FHIR type.
 
     Args:
         value: The value to check
-        fhir_type: The FHIR type to check against (class, TypeAliasType, or string name)
-        raise_on_error: Whether to raise FHIRTypeError on unknown type (default: True)
+        fhir_type: The primitive FHIR type (or name thereof) to check against
 
     Returns:
         bool: `True` if the value conforms to the type, `False` otherwise
 
     Raises:
-        FHIRTypeError: If the fhir_type is a string and does not correspond to a known type
-
-    Examples:
-        >>> is_fhir_primitive_type("123", primitives.Integer)
-        True
-        >>> is_fhir_primitive_type("true", primitives.Boolean)
-        True
-        >>> is_fhir_primitive_type("invalid-date", primitives.Date)
-        False
-        >>> is_fhir_primitive_type(42, "UnsignedInt")
-        True
+        FHIRTypeError: If the fhir_type is a string and does not correspond to a known primitive type
     """
-    # Handle string type names
     if isinstance(fhir_type, str):
-        if hasattr(primitives, fhir_type):
-            fhir_type = getattr(primitives, fhir_type)
-        else:
-            if raise_on_error:
-                raise FHIRTypeError(f"Unknown FHIR type: {fhir_type}")
+        if not release:
+            raise FHIRTypeError(
+                f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
+            )
+        fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
+
+    if isinstance(fhir_type, type) and issubclass(fhir_type, BaseModel):
+        if getattr(fhir_type, "_kind", None) != "primitive-type":
             return False
-
-    # For TypeAliasType, use Pydantic validation
-    if not isinstance(fhir_type, TypeAliasType):
-        raise FHIRTypeError(f"fhir_type must be a TypeAliasType or string name")
-
-    # Use cached TypeAdapter to avoid recreating it on every call
-    type_id = id(fhir_type)
-    if type_id not in _type_adapter_cache:
-        _type_adapter_cache[type_id] = TypeAdapter(fhir_type)
-
-    try:
-        _type_adapter_cache[type_id].validate_python(value)
-        return True
-    except ValidationError:
+        elif isinstance(value, fhir_type):
+            return True
+        else:
+            try:
+                fhir_type.model_validate(value)
+                return True
+            except ValidationError as e:
+                return False
+    else:
         return False
 
 
@@ -167,145 +152,16 @@ def is_fhir_resource_type(
         return False
 
 
-def is_boolean(value: Any) -> bool:
-    """Check if value is a valid FHIR Boolean."""
-    return is_fhir_primitive_type(value, primitives.Boolean)  # type: ignore
-
-
-def is_integer(value: Any) -> bool:
-    """Check if value is a valid FHIR Integer."""
-    return is_fhir_primitive_type(value, primitives.Integer)  # type: ignore
-
-
-def is_integer64(value: Any) -> bool:
-    """Check if value is a valid FHIR Integer64."""
-    return is_fhir_primitive_type(value, primitives.Integer64)  # type: ignore
-
-
-def is_decimal(value: Any) -> bool:
-    """Check if value is a valid FHIR Decimal."""
-    return is_fhir_primitive_type(value, primitives.Decimal)  # type: ignore
-
-
-def is_string(value: Any) -> bool:
-    """Check if value is a valid FHIR String."""
-    return is_fhir_primitive_type(value, primitives.String)  # type: ignore
-
-
-def is_uri(value: Any) -> bool:
-    """Check if value is a valid FHIR Uri."""
-    return is_fhir_primitive_type(value, primitives.Uri)  # type: ignore
-
-
-def is_url(value: Any) -> bool:
-    """Check if value is a valid FHIR Url."""
-    return is_fhir_primitive_type(value, primitives.Url)  # type: ignore
-
-
-def is_canonical(value: Any) -> bool:
-    """Check if value is a valid FHIR Canonical."""
-    return is_fhir_primitive_type(value, primitives.Canonical)  # type: ignore
-
-
-def is_base64binary(value: Any) -> bool:
-    """Check if value is a valid FHIR Base64Binary."""
-    return is_fhir_primitive_type(value, primitives.Base64Binary)  # type: ignore
-
-
-def is_instant(value: Any) -> bool:
-    """Check if value is a valid FHIR Instant."""
-    return (
-        is_fhir_primitive_type(value, primitives.Instant)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, datetime)
-    )
-
-
-def is_date(value: Any) -> bool:
-    """Check if value is a valid FHIR Date."""
-    return (
-        is_fhir_primitive_type(value, primitives.Date)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, date) and not isinstance(value, datetime)
-    )
-
-
-def is_datetime(value: Any) -> bool:
-    """Check if value is a valid FHIR DateTime."""
-    return (
-        is_fhir_primitive_type(value, primitives.DateTime)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, datetime)
-    )
-
-
-def is_time(value: Any) -> bool:
-    """Check if value is a valid FHIR Time."""
-    return (
-        is_fhir_primitive_type(value, primitives.Time)  # type: ignore
-        if isinstance(value, str)
-        else isinstance(value, time)
-    )
-
-
-def is_code(value: Any) -> bool:
-    """Check if value is a valid FHIR Code."""
-    return is_fhir_primitive_type(value, primitives.Code)  # type: ignore
-
-
-def is_oid(value: Any) -> bool:
-    """Check if value is a valid FHIR Oid."""
-    return is_fhir_primitive_type(value, primitives.Oid)  # type: ignore
-
-
-def is_id(value: Any) -> bool:
-    """Check if value is a valid FHIR Id."""
-    return is_fhir_primitive_type(value, primitives.Id)  # type: ignore
-
-
-def is_markdown(value: Any) -> bool:
-    """Check if value is a valid FHIR Markdown."""
-    return is_fhir_primitive_type(value, primitives.Markdown)  # type: ignore
-
-
-def is_unsigned_int(value: Any) -> bool:
-    """Check if value is a valid FHIR UnsignedInt."""
-    return is_fhir_primitive_type(value, primitives.UnsignedInt)  # type: ignore
-
-
-def is_positive_int(value: Any) -> bool:
-    """Check if value is a valid FHIR PositiveInt."""
-    return is_fhir_primitive_type(value, primitives.PositiveInt)  # type: ignore
-
-
-def is_uuid(value: Any) -> bool:
-    """Check if value is a valid FHIR Uuid."""
-    return is_fhir_primitive_type(value, primitives.Uuid)  # type: ignore
-
-
 def is_fhir_primitive(value: Any) -> bool:
     """Check if a value is a FHIR primitive type."""
-    return (
-        is_string(value)
-        or is_boolean(value)
-        or is_integer(value)
-        or is_decimal(value)
-        or is_date(value)
-        or is_datetime(value)
-        or is_time(value)
-        or is_code(value)
-        or is_uri(value)
-        or is_url(value)
-        or is_canonical(value)
-        or is_base64binary(value)
-        or is_instant(value)
-        or is_oid(value)
-        or is_id(value)
-        or is_markdown(value)
-        or is_unsigned_int(value)
-        or is_positive_int(value)
-        or is_uuid(value)
-    )
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel) and value.value is not None:
+        return True
+    if isinstance(value, (str | int | float | bool | date | datetime | time)):
+        return True
+    else:
+        return False
 
 
 # Type conversion functions with core logic
@@ -327,6 +183,10 @@ def to_boolean(value: Any) -> Union[bool, None]:
         >>> to_boolean("invalid")
         None
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, bool):
         return value
     elif isinstance(value, str):
@@ -353,6 +213,10 @@ def to_integer(value: Any) -> Union[int, None]:
     Returns:
         int or None: Converted integer value or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, int):
         return value
     elif isinstance(value, bool):
@@ -379,7 +243,11 @@ def to_decimal(value: Any) -> Union[float, None]:
     Returns:
         float or None: Converted decimal value or None if conversion fails
     """
-    if isinstance(value, (int, float)):
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
+    elif isinstance(value, (int, float)):
         return float(value)
     elif isinstance(value, bool):
         return float(value)
@@ -406,14 +274,18 @@ def to_date(value: Any) -> Union[str, None]:
     Returns:
         str or None: Converted date string or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         # Check if it's already a valid date
-        date_pattern = rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$"
+        date_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?$"
         if re.match(date_pattern, value):
             return value
 
         # Check if it's a datetime that we can extract date from
-        datetime_pattern = rf"^({primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?)(T{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?)?$"
+        datetime_pattern = rf"^({constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?)(T{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?)?$"
         datetime_match = re.match(datetime_pattern, value)
         if datetime_match:
             return datetime_match.group(1)  # Extract date part
@@ -433,14 +305,18 @@ def to_datetime(value: Any) -> Union[str, None]:
     Returns:
         str or None: Converted datetime string or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         # Check if it's already a valid datetime
-        datetime_pattern = rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?(T{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?)?$"
+        datetime_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?(T{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?)?$"
         if re.match(datetime_pattern, value):
             return value
 
         # Check if it's a date that we can convert to datetime
-        date_pattern = rf"^{primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?$"
+        date_pattern = rf"^{constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?$"
         if re.match(date_pattern, value):
             return value  # Date is a valid partial datetime
 
@@ -459,14 +335,18 @@ def to_time(value: Any) -> Union[str, None]:
     Returns:
         str or None: Converted time string or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         # Check if it's already a valid time
-        time_pattern = rf"^{primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?$"
+        time_pattern = rf"^{constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?$"
         if re.match(time_pattern, value):
             return value
 
         # Check if it's a datetime/date that contains time info we can extract
-        datetime_pattern = rf"^({primitives.YEAR_REGEX}(-{primitives.MONTH_REGEX}(-{primitives.DAY_REGEX})?)?)(T({primitives.HOUR_REGEX}(:{primitives.MINUTES_REGEX}(:{primitives.SECONDS_REGEX}({primitives.TIMEZONE_REGEX})?)?)?))$"
+        datetime_pattern = rf"^({constants.YEAR_REGEX}(-{constants.MONTH_REGEX}(-{constants.DAY_REGEX})?)?)(T({constants.HOUR_REGEX}(:{constants.MINUTES_REGEX}(:{constants.SECONDS_REGEX}({constants.TIMEZONE_REGEX})?)?)?))$"
         datetime_match = re.match(datetime_pattern, value)
         if datetime_match:
             return datetime_match.group(4)  # Extract time part
@@ -486,6 +366,10 @@ def to_string(value: Any) -> Union[str, None]:
     Returns:
         str or None: String representation or None if conversion fails
     """
+    from fhircraft.fhir.resources.base import FHIRPrimitiveModel
+
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     if isinstance(value, str):
         return value
     elif isinstance(value, (int, float, bool)):
@@ -497,30 +381,3 @@ def to_string(value: Any) -> Union[str, None]:
             return None
     else:
         return None
-
-
-# Utility functions for working with type aliases
-def get_primitive_type_name(fhir_type: TypeAliasType) -> str:
-    """Get the string name of a FHIR primitive type."""
-    if hasattr(fhir_type, "__name__"):
-        return fhir_type.__name__
-    # Fallback: search primitives module
-    for name in dir(primitives):
-        if getattr(primitives, name) is fhir_type:
-            return name
-    return "Unknown"
-
-
-def get_primitive_type_by_name(type_name: str) -> Union[TypeAliasType, None]:
-    """Get a FHIR primitive type by its string name."""
-    return getattr(primitives, type_name, None)
-
-
-def list_primitive_types() -> list[str]:
-    """List all available FHIR primitive type names."""
-    return [
-        name
-        for name in dir(primitives)
-        if not name.startswith("_")
-        and isinstance(getattr(primitives, name), TypeAliasType)
-    ]

@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.datatypes.primitives import *
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import Element, Coding
 
 
@@ -18,12 +18,7 @@ class CodeableConcept(Element):
         description="Code defined by a terminology system",
         default=None,
     )
-    text: Optional[String] = Field(
+    text: Optional[fhir.string] = Field(
         description="Plain text representation of the concept",
         default=None,
-    )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
-        default=None,
-        alias="_text",
     )

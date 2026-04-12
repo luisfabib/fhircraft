@@ -4,15 +4,8 @@ from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Url,
-    Id,
-    Canonical,
-)
 
+import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
@@ -33,27 +26,17 @@ class MessageHeaderDestination(BackboneElement):
     The destination application which the message is intended for.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
-    )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
     )
     target: Optional[Reference] = Field(
         description="Particular delivery destination within the destination",
         default=None,
     )
-    endpoint: Optional[Url] = Field(
+    endpoint: Optional[fhir.url] = Field(
         description="Actual destination address or id",
         default=None,
-    )
-    endpoint_ext: Optional[Element] = Field(
-        description="Placeholder element for endpoint extensions",
-        default=None,
-        alias="_endpoint",
     )
     receiver: Optional[Reference] = Field(
         description='Intended "real-world" recipient for the data',
@@ -66,45 +49,25 @@ class MessageHeaderSource(BackboneElement):
     The source application from which this message originated.
     """
 
-    name: Optional[String] = Field(
+    name: Optional[fhir.string] = Field(
         description="Name of system",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
-        description="Placeholder element for name extensions",
-        default=None,
-        alias="_name",
-    )
-    software: Optional[String] = Field(
+    software: Optional[fhir.string] = Field(
         description="Name of software running the system",
         default=None,
     )
-    software_ext: Optional[Element] = Field(
-        description="Placeholder element for software extensions",
-        default=None,
-        alias="_software",
-    )
-    version: Optional[String] = Field(
+    version: Optional[fhir.string] = Field(
         description="Version of software running",
         default=None,
-    )
-    version_ext: Optional[Element] = Field(
-        description="Placeholder element for version extensions",
-        default=None,
-        alias="_version",
     )
     contact: Optional[ContactPoint] = Field(
         description="Human contact for problems",
         default=None,
     )
-    endpoint: Optional[Url] = Field(
+    endpoint: Optional[fhir.url] = Field(
         description="Actual message source address or id",
         default=None,
-    )
-    endpoint_ext: Optional[Element] = Field(
-        description="Placeholder element for endpoint extensions",
-        default=None,
-        alias="_endpoint",
     )
 
 
@@ -113,23 +76,13 @@ class MessageHeaderResponse(BackboneElement):
     Information about the message that this message is a response to.  Only present if this message is a response.
     """
 
-    identifier: Optional[Id] = Field(
-        description="Id of original message",
+    identifier: Optional[fhir.id_] = Field(
+        description="id_ of original message",
         default=None,
     )
-    identifier_ext: Optional[Element] = Field(
-        description="Placeholder element for identifier extensions",
-        default=None,
-        alias="_identifier",
-    )
-    code: Optional[Code] = Field(
+    code: Optional[fhir.code] = Field(
         description="ok | transient-error | fatal-error",
         default=None,
-    )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
     )
     details: Optional[Reference] = Field(
         description="Specific list of hints/warnings/errors",
@@ -159,17 +112,12 @@ class MessageHeader(DomainResource):
         default=None,
     )
     eventCoding: Optional[Coding] = Field(
-        description="Code for the event this message represents or link to event definition",
+        description="code for the event this message represents or link to event definition",
         default=None,
     )
-    eventUri: Optional[Uri] = Field(
-        description="Code for the event this message represents or link to event definition",
+    eventUri: Optional[fhir.uri] = Field(
+        description="code for the event this message represents or link to event definition",
         default=None,
-    )
-    eventUri_ext: Optional[Element] = Field(
-        description="Placeholder element for eventUri extensions",
-        default=None,
-        alias="_eventUri",
     )
     destination: Optional[ListType[MessageHeaderDestination]] = Field(
         description="Message destination application(s)",
@@ -207,14 +155,9 @@ class MessageHeader(DomainResource):
         description="The actual content of the message",
         default=None,
     )
-    definition: Optional[Canonical] = Field(
+    definition: Optional[fhir.canonical] = Field(
         description="Link to the definition for this message",
         default=None,
-    )
-    definition_ext: Optional[Element] = Field(
-        description="Placeholder element for definition extensions",
-        default=None,
-        alias="_definition",
     )
 
     @property
@@ -228,7 +171,7 @@ class MessageHeader(DomainResource):
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Coding, Uri],
+            field_types=[Coding, fhir.Uri],
             field_name_base="event",
             required=True,
         )

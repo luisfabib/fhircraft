@@ -5,15 +5,8 @@ NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 
-from fhircraft.fhir.resources.datatypes.primitives import (
-    String,
-    Uri,
-    Code,
-    Boolean,
-    Markdown,
-    DateTime,
-)
 
+import fhircraft.fhir.resources.datatypes.R5.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
@@ -79,23 +72,13 @@ class Substance(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    instance: Optional[Boolean] = Field(
+    instance: Optional[fhir.boolean] = Field(
         description="Is this an instance of a substance or a kind of one",
         default=None,
     )
-    instance_ext: Optional[Element] = Field(
-        description="Placeholder element for instance extensions",
-        default=None,
-        alias="_instance",
-    )
-    status: Optional[Code] = Field(
+    status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
         default=None,
-    )
-    status_ext: Optional[Element] = Field(
-        description="Placeholder element for status extensions",
-        default=None,
-        alias="_status",
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="What class/type of substance this is",
@@ -105,23 +88,13 @@ class Substance(DomainResource):
         description="What substance this is",
         default=None,
     )
-    description: Optional[Markdown] = Field(
+    description: Optional[fhir.markdown] = Field(
         description="Textual description of the substance, comments",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
-        description="Placeholder element for description extensions",
-        default=None,
-        alias="_description",
-    )
-    expiry: Optional[DateTime] = Field(
+    expiry: Optional[fhir.dateTime] = Field(
         description="When no longer valid to use",
         default=None,
-    )
-    expiry_ext: Optional[Element] = Field(
-        description="Placeholder element for expiry extensions",
-        default=None,
-        alias="_expiry",
     )
     quantity: Optional[Quantity] = Field(
         description="Amount of substance in the package",
