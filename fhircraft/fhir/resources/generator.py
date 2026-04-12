@@ -224,12 +224,13 @@ class CodeGenerator:
                 if type_obj not in self._processing_models:
                     self._serialize_model(type_obj)
             else:
-                # For everything else (types, TypeAliasType, etc.), try to import it
-                try:
-                    self._add_import_statement(type_obj)
-                except Exception:
-                    # If import fails, skip it silently
-                    pass
+                # For everything else (types, TypeAliasType, etc.), try to import it.
+                if get_origin(type_obj) is None:
+                    try:
+                        self._add_import_statement(type_obj)
+                    except Exception:
+                        # If import fails, skip it silently
+                        pass
         # Repeat for any nested annotations
         for nested_annotation in get_args(annotation):
             self._recursively_import_annotation_types(nested_annotation)
