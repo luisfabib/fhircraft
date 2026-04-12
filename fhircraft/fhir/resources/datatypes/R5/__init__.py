@@ -1,4 +1,3 @@
-from .core import *
 from .complex import *
 from .primitive import *
 
