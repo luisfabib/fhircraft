@@ -224,8 +224,11 @@ class CodeGenerator:
                 if type_obj not in self._processing_models:
                     self._serialize_model(type_obj)
             else:
-                # For everything else (types, TypeAliasType, etc.), try to import it.
-                if get_origin(type_obj) is None:
+                if get_origin(type_obj) is Annotated:
+                    self._track_typing_import("Annotated")
+                else:
+                    # For everything else (types, TypeAliasType, Optional, List, etc.),
+                    # try to import it via the normal path.
                     try:
                         self._add_import_statement(type_obj)
                     except Exception:
