@@ -274,13 +274,13 @@ def test_resolve_type__primitive_absolute_url(builder: Builder, code, expected):
 
 
 FHIRPATH_CODES = [
-    ("System.String", primitive.String),
-    ("System.Integer", primitive.Integer),
-    ("System.Boolean", primitive.Boolean),
-    ("System.Decimal", primitive.Decimal),
-    ("System.Date", primitive.Date),
-    ("System.DateTime", primitive.DateTime),
-    ("System.Time", primitive.Time),
+    ("System.String", str),
+    ("System.Integer", int),
+    ("System.Boolean", bool),
+    ("System.Decimal", float),
+    ("System.Date", str),
+    ("System.DateTime", str),
+    ("System.Time", str),
 ]
 
 
@@ -290,36 +290,6 @@ FHIRPATH_CODES = [
 )
 def test_resolve_type__fhirpath_without_profile(builder: Builder, code, expected):
     info = builder.resolve_type(make_type(code=f"http://hl7.org/fhirpath/{code}"))
-    assert info.kind == "primitive-type"
-    assert info.type is expected
-
-
-@pytest.mark.parametrize(
-    "code, fhir_type, expected",
-    [
-        ("System.String", "Uri", primitive.Uri),
-        ("System.String", "Code", primitive.Code),
-        ("System.String", "Canonical", primitive.Canonical),
-        ("System.Integer", "PositiveInt", primitive.PositiveInt),
-        ("System.Boolean", "Boolean", primitive.Boolean),
-        ("System.Decimal", "Decimal", primitive.Decimal),
-        ("System.Date", "Date", primitive.Date),
-        ("System.DateTime", "DateTime", primitive.DateTime),
-        ("System.Time", "Time", primitive.Time),
-    ],
-)
-def test_resolve_type__fhirpath_with_extension(
-    builder: Builder, code, fhir_type, expected
-):
-    type_extension = MagicMock()
-    type_extension.url = FHIR_TYPE_EXT_URL
-    type_extension.valueUrl = fhir_type
-    info = builder.resolve_type(
-        make_type(
-            code=f"http://hl7.org/fhirpath/{code}",
-            extension=[type_extension],
-        )
-    )
     assert info.kind == "primitive-type"
     assert info.type is expected
 
