@@ -7,20 +7,24 @@ from fhircraft.fhir.path.engine.additional import *
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime
+from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 from fhircraft.fhir.resources.datatypes import get_fhir_type
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity as R4_Quantity,
     Age as R4_Age,
     Extension as R4_Extension,
 )
+from fhircraft.fhir.resources.datatypes.R4.primitive.boolean import Boolean
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity as R4B_Quantity,
     Reference as R4B_Reference,
 )
+from fhircraft.fhir.resources.datatypes.R4B.primitive.string import String
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity as R5_Quantity,
     Reference as R5_Reference,
 )
+from fhircraft.fhir.resources.datatypes.R5.primitive.integer import Integer
 
 env = dict()
 
@@ -107,10 +111,14 @@ def test_hasvalue_returns_false_for_collection_with_multiple_items():
 
 get_value_cases = (
     "ABC",
+    String(value="ABC"),
     123,
+    Integer(value=123),
     1.23,
     True,
+    Boolean(value=True),
     False,
+    Boolean(value=False),
     Date("@2012"),
     Date("@2012-01"),
     DateTime("@2012-01-01T10:30"),
@@ -129,6 +137,8 @@ def test_getvalue_returns_empty_for_empty_collection():
 def test_getvalue_returns_value_for_singleton_collection_with_primitive_value(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = GetValue().evaluate(collection, env)
+    if isinstance(value, FHIRPrimitiveModel):
+        value = value.value
     assert result[0].value == value
 
 
