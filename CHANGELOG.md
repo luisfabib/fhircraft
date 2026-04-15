@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.8.3 - 2026-04-15
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.3...0.8.2)
+
+
+### Fixed
+
+* Fixed `validate_type_choice_element` to correctly handle FHIR primitive wrapper types by checking for instances of `FHIRPrimitiveModel` and using their `.value` attribute, solving false errors during model validation ([#351](https://github.com/luisfabib/fhircraft/pull/351))
+
+----------------- 
+
 ## v0.8.2 - 2026-04-15
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.8.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.8.1)
 
 
 ### Fixed
@@ -22,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.8.1 - 2026-04-15
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.1...0.8.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.1...0.8.0)
 
 ### Fixed
 
@@ -35,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.8.0 - 2026-04-12
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.0...0.7.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.0...0.7.1)
 
 ### Added
 
