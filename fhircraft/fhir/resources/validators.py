@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 from pydantic import BaseModel
 
 from fhircraft.config import get_config
+from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 from fhircraft.utils import (
     capitalize,
     ensure_list,
@@ -404,13 +405,17 @@ def validate_type_choice_element(
     ]
     types_set_count = sum(
         (
-            getattr(
-                instance,
-                (field_name_base + field_type),
-                None,
+            element is not None
+            if not isinstance(
+                element := getattr(
+                    instance,
+                    (field_name_base + field_type),
+                    None,
+                ),
+                FHIRPrimitiveModel,
             )
+            else element.value is not None
         )
-        is not None
         for field_type in _field_types
     )
 

@@ -5,6 +5,14 @@ from pydantic import BaseModel
 from typing import ClassVar, List, Optional
 
 from fhircraft.config import override_config
+from fhircraft.fhir.resources.datatypes.R4.primitive import (
+    boolean,
+    integer,
+    string,
+    String,
+    Integer,
+    Boolean,
+)
 from fhircraft.fhir.resources.validators import (
     _validate_FHIR_element_constraint,
     validate_element_constraint,
@@ -44,9 +52,9 @@ class MockPatient(BaseModel):
 
 
 class MockTypeChoiceModel(BaseModel):
-    valueString: Optional[str] = None
-    valueInteger: Optional[int] = None
-    valueBoolean: Optional[bool] = None
+    valueString: Optional[string] = None
+    valueInteger: Optional[integer] = None
+    valueBoolean: Optional[boolean] = None
 
 
 @pytest.fixture
@@ -653,14 +661,14 @@ def test_validate_FHIR_model_fixed_value__delegates_to_element_fixed_value(
 
 
 def test_validate_type_choice_element__skip_mode_returns_instance():
-    instance = MockTypeChoiceModel(valueString="hello")
+    instance = MockTypeChoiceModel(valueString=String(value="hello"))
     with override_config(validation_mode="skip"):
         result = validate_type_choice_element(instance, ["String"], "value")
     assert result is instance
 
 
 def test_validate_type_choice_element__single_value_set_is_valid():
-    instance = MockTypeChoiceModel(valueString="hello")
+    instance = MockTypeChoiceModel(valueString=String(value="hello"))
     result = validate_type_choice_element(
         instance, ["String", "Integer", "Boolean"], "value"
     )
@@ -676,7 +684,9 @@ def test_validate_type_choice_element__no_value_set_not_required_is_valid():
 
 
 def test_validate_type_choice_element__multiple_values_set_raises():
-    instance = MockTypeChoiceModel(valueString="hello", valueInteger=42)
+    instance = MockTypeChoiceModel(
+        valueString=String(value="hello"), valueInteger=Integer(value=42)
+    )
     with pytest.raises(AssertionError, match="can only have one value set"):
         validate_type_choice_element(
             instance, ["String", "Integer", "Boolean"], "value"
@@ -692,7 +702,7 @@ def test_validate_type_choice_element__required_and_no_value_raises():
 
 
 def test_validate_type_choice_element__required_and_value_set_is_valid():
-    instance = MockTypeChoiceModel(valueInteger=7)
+    instance = MockTypeChoiceModel(valueInteger=Integer(value=7))
     result = validate_type_choice_element(
         instance, ["String", "Integer", "Boolean"], "value", required=True
     )
@@ -701,13 +711,13 @@ def test_validate_type_choice_element__required_and_value_set_is_valid():
 
 def test_validate_type_choice_element__non_allowed_type_raises():
     # valueBoolean is set but only String and Integer are allowed
-    instance = MockTypeChoiceModel(valueBoolean=True)
+    instance = MockTypeChoiceModel(valueBoolean=Boolean(value=True))
     with pytest.raises(AssertionError, match="cannot use non-allowed type"):
         validate_type_choice_element(instance, ["String", "Integer"], "value")
 
 
 def test_validate_type_choice_element__explicit_non_allowed_type_raises():
-    instance = MockTypeChoiceModel(valueBoolean=True)
+    instance = MockTypeChoiceModel(valueBoolean=Boolean(value=True))
     with pytest.raises(AssertionError, match="cannot use non-allowed type"):
         validate_type_choice_element(
             instance,
@@ -718,7 +728,9 @@ def test_validate_type_choice_element__explicit_non_allowed_type_raises():
 
 
 def test_validate_type_choice_element__lenient_mode_warns_on_multiple_values():
-    instance = MockTypeChoiceModel(valueString="a", valueInteger=1)
+    instance = MockTypeChoiceModel(
+        valueString=String(value="a"), valueInteger=Integer(value=1)
+    )
     with override_config(validation_mode="lenient"):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
@@ -908,12 +920,12 @@ def test_get_type_choice_value_by_base__returns_none_when_all_matching_fields_ar
 
 def test_get_type_choice_value_by_base__returns_first_non_none_value():
     # valueBoolean is set; function should return the first non-None field starting with "value"
-    instance = MockTypeChoiceModel(valueBoolean=True)
+    instance = MockTypeChoiceModel(valueBoolean=Boolean(value=True))
     result = get_type_choice_value_by_base(instance, "value")
-    assert result is True
+    assert result.value is True
 
 
 def test_get_type_choice_value_by_base__integer_value():
-    instance = MockTypeChoiceModel(valueInteger=99)
+    instance = MockTypeChoiceModel(valueInteger=Integer(value=99))
     result = get_type_choice_value_by_base(instance, "value")
-    assert result == 99
+    assert result.value == 99
