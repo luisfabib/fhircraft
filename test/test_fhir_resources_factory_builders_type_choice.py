@@ -353,3 +353,58 @@ def test_build__no_extra_validators_when_nothing_set(builder, index):
     # Only the type-choice validator should be present
     assert len(result.validators) == 1
     assert result.validators[0].name == "value_type_choice_validator"
+
+
+# ===========================================================================
+# TypeChoiceFieldBuilder.build — constrained children sub-model assembly
+# ===========================================================================
+
+
+def test_build__with_constrained_children_builds_per_type_submodels(builder, index):
+    node = make_node("value", type_codes=["string", "Quantity"])
+    ti_string = make_type_info(primitives.String, "primitive")
+    ti_quantity = make_type_info(r4_complex.Quantity, "complex-type")
+
+    index.get_children.return_value = [MagicMock(name="child")]
+    subtree = MagicMock(name="subtree")
+    index.get_subtree.return_value = subtree
+
+    SubValueString = type("SubValueString", (), {})
+    SubValueQuantity = type("SubValueQuantity", (), {})
+
+    with patch.object(builder, "resolve_type", side_effect=[ti_string, ti_quantity]):
+        with patch(
+            "fhircraft.fhir.resources.factory.assembler.ModelAssembler"
+        ) as mock_assembler_cls:
+            assembler_instance = mock_assembler_cls.return_value
+            assembler_instance.assemble.side_effect = [
+                SubValueString,
+                SubValueQuantity,
+            ]
+
+            result = builder.build(node, index)
+
+    # A sub-model is assembled once per resolved type.
+    assert mock_assembler_cls.call_count == 2
+    assert assembler_instance.assemble.call_count == 2
+
+    field_by_name = {f.name: f for f in result.fields}
+    assert field_by_name["valueString"].annotation == Optional[SubValueString]
+    assert field_by_name["valueQuantity"].annotation == Optional[SubValueQuantity]
+
+
+def test_build__without_children_does_not_assemble_submodels(builder, index):
+    node = make_node("value", type_codes=["Quantity"])
+    ti_quantity = make_type_info(r4_complex.Quantity, "complex-type")
+
+    index.get_children.return_value = []
+
+    with patch.object(builder, "resolve_type", return_value=ti_quantity):
+        with patch(
+            "fhircraft.fhir.resources.factory.assembler.ModelAssembler"
+        ) as mock_assembler_cls:
+            result = builder.build(node, index)
+
+    mock_assembler_cls.assert_not_called()
+    assert result.fields[0].name == "valueQuantity"
+    assert result.fields[0].annotation == Optional[r4_complex.Quantity]

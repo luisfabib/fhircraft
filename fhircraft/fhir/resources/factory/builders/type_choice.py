@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.validators import (
     validate_type_choice_element,
     get_type_choice_value_by_base,
 )
+from fhircraft.utils import capitalize
 
 
 class TypeChoiceFieldBuilder(Builder):
@@ -25,6 +26,7 @@ class TypeChoiceFieldBuilder(Builder):
         return node.is_polymorphic_type
 
     def build(self, node: ElementNode, index: DefinitionIndex) -> Build:
+        from fhircraft.fhir.resources.factory.assembler import ModelAssembler
 
         build = Build()
         base_name = node.name
@@ -35,10 +37,42 @@ class TypeChoiceFieldBuilder(Builder):
                 f"Element '{node.path}' is a type choice but has none of its types could be resolved"
             )
 
-        for field_type_info in field_type_infos:
-            field_type = field_type_info.type
+        sub_models: dict[str, type] = {}
+        children = index.get_children(node.id)
+        if isinstance(children, list) and children:
+            subtree = index.get_subtree(node.id)
+            for field_type_info in field_type_infos:
+                original_type = field_type_info.type
+                type_name = (
+                    original_type
+                    if isinstance(original_type, str)
+                    else original_type.__name__
+                )
+                sub_model_name = (
+                    f"{self.context.resource_name}{capitalize(base_name)}{type_name}"
+                )
+                assembler = ModelAssembler(
+                    index=subtree,
+                    ctx=self.context,
+                    resource_name=sub_model_name,
+                )
+                sub_models[type_name] = assembler.assemble(
+                    sub_model_name, base=(original_type,)
+                )
 
-            typed_name = f"{base_name}{field_type if isinstance(field_type, str) else field_type.__name__}"
+        for field_type_info in field_type_infos:
+            original_type = field_type_info.type
+            type_name = (
+                original_type
+                if isinstance(original_type, str)
+                else original_type.__name__
+            )
+            # Use the sub-model as the actual field type when children are present;
+            # the field name always uses the original (base) type name so that the
+            # type-choice validator keeps working.
+            field_type = sub_models.get(type_name, original_type)
+
+            typed_name = f"{base_name}{type_name}"
             safe_name, validation_alias = self.handle_python_keyword(typed_name)
 
             build.fields.append(
