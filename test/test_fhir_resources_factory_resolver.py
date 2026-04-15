@@ -177,12 +177,10 @@ def test_build_type_node__returns_correct_node(base_index, resolver, id):
 def test_build_type_node__resolves_sub_elements_on_primitive_types(
     base_index, resolver, primitive_type
 ):
-    node = resolver._build_type_node(
-        [primitive_type], "Observation.extension", base_index
-    )
+    node = resolver._build_type_node([primitive_type], "value[x].extension", base_index)
     assert isinstance(node, ElementNode)
-    assert node.id == "Observation.extension"
-    assert node.path == "Observation.extension"
+    assert node.id == "value[x].extension"
+    assert node.path == "value[x].extension"
 
 
 @pytest.mark.parametrize(
@@ -287,6 +285,28 @@ def test_build_type_node__resolves_extension_element_on_primitive_type(
     assert isinstance(node, ElementNode)
     assert node.id == "BaseResource.status.extension"
     assert node.path == "BaseResource.status.extension"
+
+
+@pytest.mark.parametrize(
+    "expanded_id, expected_path",
+    [
+        ("Patient.deceased[x].extension", "Patient.deceased[x].extension"),
+        (
+            "Patient.deceased[x]:deceasedBoolean.extension",
+            "Patient.deceased[x].extension",
+        ),
+    ],
+)
+def test_build_type_node__resolves_primitive_extension_on_type_choice_element(
+    resolver, expanded_id, expected_path
+):
+    base_index = make_base_index(make_element("Patient", "Patient"))
+
+    node = resolver._build_type_node(["boolean"], expanded_id, base_index)
+
+    assert isinstance(node, ElementNode)
+    assert node.id == expanded_id
+    assert node.path == expected_path
 
 
 def test_build_intermediate_node__resolves_extension_on_primitive_element(resolver):
