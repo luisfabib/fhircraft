@@ -55,6 +55,7 @@ def mock_factory_build(
     **kwargs,
 ):
     """Mock construct_resource_model"""
+    print(f"Mock build called with canonical_url={canonical_url}, mode={mode}")
     if canonical_url:
         if canonical_url == "http://example.org/StructureDefinition/MyPatient":
             return Patient
@@ -73,8 +74,9 @@ def mock_factory_build(
             == "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient"
         ):
             return Patient
-        elif canonical_url.startswith(
-            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+        elif (
+            canonical_url
+            == "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
         ):
             return Patient
         elif canonical_url.startswith(
@@ -184,6 +186,10 @@ def test_documentation_examples(mock_file, fpath):
     mock_load_package,
 )
 @patch("fhircraft.utils.load_file", mock_load_file)
+@patch(
+    "fhircraft.fhir.resources.factory.FHIRModelFactory.build",
+    mock_factory_build,
+)
 @patch("builtins.open", side_effect=mock_open_func)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.integration

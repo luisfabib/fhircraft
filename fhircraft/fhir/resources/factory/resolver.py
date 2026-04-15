@@ -174,6 +174,28 @@ class SnapshotResolver:
                 # Otherwise prefer the snapshot if available as a complete bridge.
                 if sd.snapshot and sd.snapshot.element:
                     snapshot_index = DefinitionIndex.from_elements(sd.snapshot.element)
+                    parent_root = parent_index.root().id
+                    snap_root = snapshot_index.root().id
+                    for node in snapshot_index.nodes:
+                        if node.is_slice_entry or not node.id.startswith(
+                            snap_root + "."
+                        ):
+                            continue
+                        parent_id = parent_root + node.id[len(snap_root) :]
+                        if parent_id not in parent_index:
+                            continue
+                        parent_node = parent_index.get(parent_id)
+                        if parent_node.is_slice_entry:
+                            snapshot_index.add(
+                                ElementNode(
+                                    definition=node.definition.model_copy(
+                                        update={
+                                            "slicing": parent_node.definition.slicing
+                                        }
+                                    )
+                                ),
+                                replace=True,
+                            )
                     snapshot_index.update(resolved_diff.nodes, replace=True)
                     return snapshot_index
 
@@ -423,11 +445,17 @@ class SnapshotResolver:
             snapshot = type_structure_definition.snapshot
             if not snapshot or not snapshot.element:
                 continue
+            expected_local_id = local_id
+            if (
+                type_structure_definition.kind == "primitive-type"
+                and local_id.lower() == str(datatype).lower()
+            ):
+                expected_local_id = "value"
             matching_node = next(
                 (
                     n
                     for e in snapshot.element
-                    if (n := ElementNode(e)).local_id == local_id
+                    if (n := ElementNode(e)).local_id == expected_local_id
                 ),
                 None,
             )
