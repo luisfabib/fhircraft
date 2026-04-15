@@ -6,7 +6,12 @@ from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 from pydantic import BaseModel
 
 from fhircraft.config import get_config
-from fhircraft.utils import ensure_list, get_all_models_from_field, is_dict_subset
+from fhircraft.utils import (
+    capitalize,
+    ensure_list,
+    get_all_models_from_field,
+    is_dict_subset,
+)
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
@@ -390,7 +395,11 @@ def validate_type_choice_element(
         return instance
 
     _field_types: List[str] = [
-        field_type if isinstance(field_type, str) else str(field_type.__name__)
+        (
+            capitalize(field_type)
+            if isinstance(field_type, str)
+            else capitalize(str(field_type.__name__))
+        )
         for field_type in field_types
     ]
     types_set_count = sum(
@@ -427,9 +436,7 @@ def validate_type_choice_element(
     ]
     # Check that non-allowed types are not set
     non_allowed_types = non_allowed_types or [
-        field_type
-        for field_type in all_types
-        if field_type.replace("_ext", "") not in _field_types
+        field_type for field_type in all_types if field_type not in _field_types
     ]
     if non_allowed_types:
         for non_allowed_type in non_allowed_types:
@@ -441,7 +448,7 @@ def validate_type_choice_element(
             value = getattr(instance, field_name, None)
             _assert(
                 value is None,
-                f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. ",
+                f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. Only the following types are allowed: {', '.join(_field_types)}. Got non-allowed type '{non_allowed_type}' with value '{value}'.",
             )
 
     return instance
