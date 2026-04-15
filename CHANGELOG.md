@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.8.1 - 2026-04-15
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.1...0.8.0)
+
+### Fixed
+
+- Ensured that elements (e.g. `Extension.url`) defined with FHIRPath-typed elements (which should not have extensions or ids) are not built using the new primitive classes (that can hold extensions and ids) but rather using Python native types ([#342](https://github.com/luisfabib/fhircraft/pull/342))
+- Ensured generated FHIR resource models use lowercase primitive type aliases prefixed with a `fhir` module alias (e.g. `fhir.string`, `fhir.integer`) instead of importing and referencing the primitive classes directly (e.g. `String`, `Integer`)  ([#343](https://github.com/luisfabib/fhircraft/pull/343))
+- Ensured primitive type-alias coercion correctly handles primitive model instances (including compatible parent primitive instances), so alias validation behaves consistently for both native Python inputs and class-based primitive values.  ([#344](https://github.com/luisfabib/fhircraft/pull/344), fixed [#341](https://github.com/luisfabib/fhircraft/pull/341))
+- Added a `pyright: reportIncompatibleVariableOverride=false` directive at the top of the generated source code to disable incompatible variable override warnings from Pyright that are commonly raised in v0.8.0 due to narrowing of type annotations in FHIR model elements (a limitation of Python's type system, but compatible with Pydantic) ([#345](https://github.com/luisfabib/fhircraft/pull/345))
+  
+----------------- 
+
 ## v0.8.0 - 2026-04-12
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.0...0.7.1)
