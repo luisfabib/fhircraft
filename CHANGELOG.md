@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.8.2 - 2026-04-15
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.8.1)
+
+
+### Fixed
+- Fixed construction of resources where resolution could miss inherited type information or slicing metadata when an intermediate definition had no complete snapshot ([#347](https://github.com/luisfabib/fhircraft/pull/347))
+- Fixed missing propagation of constrained children (including extension slicing use cases) for type-choice values in generated models ([#348](https://github.com/luisfabib/fhircraft/pull/348))
+- Fixed model assembly path for profiles that constrain children on typed type-choice branches ([#348](https://github.com/luisfabib/fhircraft/pull/348))
+- Fixed the FHIRPath `getValue()` fucntion to correctly unwrap the `value` attribute from FHIR primitive objects before returning, ensuring the function returns the actual primitive value rather than the wrapper object ([#349](https://github.com/luisfabib/fhircraft/pull/349))
+
+----------------- 
+
 ## v0.8.1 - 2026-04-15
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.1...0.8.0)
