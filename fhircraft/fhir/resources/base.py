@@ -746,9 +746,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         instance = super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
-
-        # model_post_init already propagated _parent links bottom-up during
-        # construction; no additional traversal is required here.
         return instance
 
     @classmethod
@@ -1189,10 +1186,10 @@ class FHIRPrimitiveModel(FHIRBaseModel):
     @model_validator(mode="before")
     @classmethod
     def coerce_root_value(cls, data: Any) -> Any:
-        if data is not None and not isinstance(data, (dict, cls)):
-            return {"value": data}
-        elif isinstance(data, FHIRPrimitiveModel):
+        if isinstance(data, FHIRPrimitiveModel):
             return {"value": data.value}
+        elif data is not None and not isinstance(data, (dict, BaseModel)):
+            return {"value": data}
         return data
 
     def __init__(self, __value: Any | None = None, **data):

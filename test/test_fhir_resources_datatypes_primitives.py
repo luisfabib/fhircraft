@@ -1,4 +1,4 @@
-from pydantic import BaseModel, create_model, Field
+from pydantic import BaseModel, TypeAdapter, create_model, Field
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.datatypes.R4.primitive as R4_primitives
 import fhircraft.fhir.resources.datatypes.R4B.primitive as R4B_primitives
@@ -45,6 +45,18 @@ def test_primitives__string_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*STRING_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__string_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].string)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*STRING_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__string_serialization(release, value, expected):
     instance = modules[release].String(value)
     assert instance.model_dump() == expected
@@ -68,6 +80,21 @@ ID_TEST_CASES = [
 def test_primitives__id_deserialization(release, value, expected):
     instance = modules[release].Id(value)
     assert instance == expected
+
+
+# @pytest.mark.parametrize(*ID_TEST_CASES)
+# @pytest.mark.parametrize(*FHIR_RELEASES)
+# def test_primitives__id_type_alias(release, value, expected):
+#     adapter = TypeAdapter(modules[release].id)
+#     # Native string deserialization
+#     instance = adapter.validate_python(value)
+#     assert instance == expected
+#     # Class deserialization
+#     instance = adapter.validate_python(modules[release].Id(value))
+#     assert instance == expected
+#     # Parent class deserialization
+#     instance = adapter.validate_python(modules[release].String(value))
+#     assert instance == expected
 
 
 @pytest.mark.parametrize(*ID_TEST_CASES)
@@ -218,6 +245,21 @@ def test_primitives__uri_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*URI_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__id_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].uri)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Uri(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*URI_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__uri_serialization(release, value, expected):
     instance = modules[release].Uri(value)
     assert instance.model_dump() == expected
@@ -240,6 +282,21 @@ URL_TEST_CASES = [
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__url_deserialization(release, value, expected):
     instance = modules[release].Url(value)
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*URL_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__url_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].url)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Url(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
     assert instance == expected
 
 
@@ -275,6 +332,21 @@ def test_primitives__canonical_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*CANONICAL_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__canonical_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].canonical)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Canonical(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*CANONICAL_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__canonical_serialization(release, value, expected):
     instance = modules[release].Canonical(value)
     assert instance.model_dump() == expected
@@ -298,6 +370,21 @@ CODE_TEST_CASES = [
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__code_deserialization(release, value, expected):
     instance = modules[release].Code(value)
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*CODE_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__code_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].code)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Code(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
     assert instance == expected
 
 
@@ -330,6 +417,21 @@ def test_primitives__markdown_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*MARKDOWN_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__markdown_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].markdown)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Markdown(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*MARKDOWN_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__markdown_serialization(release, value, expected):
     instance = modules[release].Markdown(value)
     assert instance.model_dump() == expected
@@ -352,6 +454,21 @@ OID_TEST_CASES = [
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__oid_deserialization(release, value, expected):
     instance = modules[release].Oid(value)
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*OID_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__oid_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].oid)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Oid(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
     assert instance == expected
 
 
@@ -386,6 +503,21 @@ def test_primitives__uuid_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*UUID_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__uuid_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].uuid)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Uuid(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*UUID_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__uuid_serialization(release, value, expected):
     instance = modules[release].Uuid(value)
     assert instance.model_dump() == expected
@@ -408,6 +540,21 @@ BASE64BINARY_TEST_CASES = [
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__base64binary_deserialization(release, value, expected):
     instance = modules[release].Base64Binary(value)
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*BASE64BINARY_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__base64binary_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].base64Binary)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Base64Binary(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
     assert instance == expected
 
 
@@ -441,6 +588,24 @@ def test_primitives__instant_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*INSTANT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__instant_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].instant)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Instant(value))
+    assert instance == expected
+    # Parent class deserialization
+    if isinstance(value, str):
+        instance = adapter.validate_python(modules[release].String(value))
+    else:
+        instance = adapter.validate_python(modules[release].DateTime(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*INSTANT_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__instant_serialization(release, value, expected):
     instance = modules[release].Instant(value)
     assert instance.model_dump() == expected
@@ -465,6 +630,24 @@ DATE_TEST_CASES = [
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__date_deserialization(release, value, expected):
     instance = modules[release].Date(value)
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*DATE_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__date_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].date_)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Date(value))
+    assert instance == expected
+    # Parent class deserialization
+    if isinstance(value, str):
+        instance = adapter.validate_python(modules[release].String(value))
+    else:
+        instance = adapter.validate_python(modules[release].Date(value))
     assert instance == expected
 
 
@@ -502,6 +685,24 @@ def test_primitives__datetime_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*DATETIME_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__datetime_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].dateTime)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].DateTime(value))
+    assert instance == expected
+    # Parent class deserialization
+    if isinstance(value, str):
+        instance = adapter.validate_python(modules[release].String(value))
+    else:
+        instance = adapter.validate_python(modules[release].DateTime(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*DATETIME_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__datetime_serialization(release, value, expected):
     instance = modules[release].DateTime(value)
     assert instance.model_dump() == expected
@@ -526,6 +727,24 @@ TIME_TEST_CASES = [
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__time_deserialization(release, value, expected):
     instance = modules[release].Time(value)
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*TIME_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__time_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].time_)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Time(value))
+    assert instance == expected
+    # Parent class deserialization
+    if isinstance(value, str):
+        instance = adapter.validate_python(modules[release].String(value))
+    else:
+        instance = adapter.validate_python(modules[release].Time(value))
     assert instance == expected
 
 
@@ -559,6 +778,24 @@ def test_primitives__unsignedint_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*UNSIGNED_INT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__unsignedint_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].unsignedInt)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].UnsignedInt(value))
+    assert instance == expected
+    # Parent class deserialization
+    if isinstance(value, str):
+        instance = adapter.validate_python(modules[release].String(value))
+    else:
+        instance = adapter.validate_python(modules[release].Integer(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*UNSIGNED_INT_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__unsignedint_serialization(release, value, expected):
     instance = modules[release].UnsignedInt(value)
     assert instance.model_dump() == expected
@@ -587,6 +824,24 @@ def test_primitives__positiveint_deserialization(release, value, expected):
 
 @pytest.mark.parametrize(*POSITIVE_INT_TEST_CASES)
 @pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__positiveint_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].positiveInt)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].PositiveInt(value))
+    assert instance == expected
+    # Parent class deserialization
+    if isinstance(value, str):
+        instance = adapter.validate_python(modules[release].String(value))
+    else:
+        instance = adapter.validate_python(modules[release].Integer(value))
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*POSITIVE_INT_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__positiveint_serialization(release, value, expected):
     instance = modules[release].PositiveInt(value)
     assert instance.model_dump() == expected
@@ -609,6 +864,21 @@ XHTML_TEST_CASES = [
 @pytest.mark.parametrize(*FHIR_RELEASES)
 def test_primitives__xhtml_deserialization(release, value, expected):
     instance = modules[release].Xhtml(value)
+    assert instance == expected
+
+
+@pytest.mark.parametrize(*XHTML_TEST_CASES)
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__xhtml_type_alias(release, value, expected):
+    adapter = TypeAdapter(modules[release].xhtml)
+    # Native string deserialization
+    instance = adapter.validate_python(value)
+    assert instance == expected
+    # Class deserialization
+    instance = adapter.validate_python(modules[release].Xhtml(value))
+    assert instance == expected
+    # Parent class deserialization
+    instance = adapter.validate_python(modules[release].String(value))
     assert instance == expected
 
 
