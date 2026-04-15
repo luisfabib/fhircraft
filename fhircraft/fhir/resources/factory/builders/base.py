@@ -65,10 +65,20 @@ CLASS_RESERVED_KEYWORDS: frozenset[str] = frozenset(
     {"property", "classmethod", "field_validator", "model_validator"}
 )
 FHIR_SD_PREFIX = "http://hl7.org/fhir/StructureDefinition/"
-FHIRPATH_TYPE_PREFIX = "http://hl7.org/fhirpath/System."
+FHIRPATH_TYPE_PREFIX = "http://hl7.org/fhirpath/"
 FHIR_TYPE_EXT_URL = (
     "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type"
 )
+FHIRPATH_TYPE_MAPPING: dict[str, type] = {
+    "System.String": str,
+    "System.Boolean": bool,
+    "System.Integer": int,
+    "System.Decimal": float,
+    "System.Date": str,
+    "System.DateTime": str,
+    "System.Time": str,
+    "System.Quantity": str,
+}
 
 _Unset: Any = PydanticUndefined
 
@@ -401,28 +411,18 @@ class Builder(ABC):
         type_code = str(type.code)
         is_fhirpath_system_type = type_code.startswith(FHIRPATH_TYPE_PREFIX)
 
-        # Handle the special case of FHIRPath system types, which are identified by a URL but do not have a profile and are not valid FHIR type names
-        if is_fhirpath_system_type:
-            fhir_type_extension = next(
-                (ext for ext in type.extension or [] if ext.url == FHIR_TYPE_EXT_URL),
-                None,
-            )
-            if not fhir_type_extension or not fhir_type_extension.valueUrl:
-                # Fallback to the raw code if no profile is provided
-                type_code = type_code.removeprefix(FHIRPATH_TYPE_PREFIX)
-            else:
-                # For FHIRPath system types, the profile URL contains the actual FHIR type name
-                type_code = fhir_type_extension.valueUrl
-
         # This is a rare case, only logical models and FHIRPath system types should use this
         if type_code.startswith(FHIR_SD_PREFIX):
             type_code = type_code.removeprefix(FHIR_SD_PREFIX)
-
-        type_code = capitalize(str(type_code))
+            type_code = capitalize(str(type_code))
 
         # If a profile is specified and it's not a FHIRPath system type, resolve and build the profile to get the actual type to use
         if type.profile and not is_fhirpath_system_type:
             fhir_type = self.context.factory.build(canonical_url=str(type.profile[0]))
+        elif is_fhirpath_system_type:
+            fhir_type = FHIRPATH_TYPE_MAPPING[
+                type_code.removeprefix(FHIRPATH_TYPE_PREFIX)
+            ]
         else:
             # Get the Fhircraft type
             fhir_type = get_fhir_type(type_code, fhir_release)
@@ -430,7 +430,7 @@ class Builder(ABC):
         kind = (
             fhir_type._kind
             if inspect.isclass(fhir_type) and issubclass(fhir_type, FHIRBaseModel)
-            else "primitive"
+            else "primitive-type"
         )
         return TypeInformation(
             type=fhir_type,
