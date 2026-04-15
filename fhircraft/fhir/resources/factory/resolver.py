@@ -83,7 +83,7 @@ class SnapshotResolver:
                 "differential"
                 if sd.baseDefinition
                 and sd.differential
-                and len(sd.differential.element or []) > 1
+                and len(sd.differential.element or []) > 0
                 else "snapshot"
             )
         if mode == "snapshot":
@@ -117,22 +117,9 @@ class SnapshotResolver:
                 raise DefinitionResolutionError(
                     f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition, which is required for differential resolution."
                 )
-            # Obtain the base snapshot for differential resolution
+            # Build base index by recursively applying ancestor differentials.
             base_definition = self._registry.get(str(base_canonical))
-            partial_base_index = self.resolve(base_definition, mode="auto")
-            if base_definition.snapshot and base_definition.snapshot.element:
-                base_index = DefinitionIndex.from_elements(
-                    base_definition.snapshot.element
-                )
-                base_index.update(partial_base_index.nodes, replace=True)
-            else:
-
-                ancestor_base_index = self._build_full_ancestor_index(base_definition)
-                if ancestor_base_index.root().id == partial_base_index.root().id:
-                    ancestor_base_index.update(partial_base_index.nodes, replace=True)
-                    base_index = ancestor_base_index
-                else:
-                    base_index = partial_base_index
+            base_index = self._resolve_base_chain(base_definition)
             # Merge differential over base snapshot to produce a synthetic snapshot
             resolved_index = self._resolve_differential(
                 sd.differential.element, base_index
@@ -151,6 +138,59 @@ class SnapshotResolver:
     # ------------------------------------------------------------------
     # Differential resolution
     # ------------------------------------------------------------------
+
+    def _resolve_base_chain(
+        self,
+        sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition",
+    ) -> DefinitionIndex:
+        """
+        Resolve an ancestor StructureDefinition into a usable base index for
+        differential merging.
+
+        Resolution is differential-first: when a definition has a differential,
+        it is merged on top of its own resolved base chain. Snapshot is used when
+        a definition has no baseDefinition (chain anchor), or when a level has no
+        differential but provides a snapshot.
+        """
+        if sd.baseDefinition:
+            parent_sd = self._registry.get(str(sd.baseDefinition))
+            parent_index = self._resolve_base_chain(parent_sd)
+
+            if sd.differential and sd.differential.element:
+                assert all(
+                    [e is not None for e in sd.differential.element]
+                ), f"StructureDefinition {sd.name or sd.url} differential.element contains None"
+                resolved_diff = self._resolve_differential(
+                    sd.differential.element, parent_index
+                )
+                # Keep untouched inherited nodes by overlaying the resolved differential onto the fully resolved parent chain.
+                if resolved_diff.root().id == parent_index.root().id:
+                    merged_parent = DefinitionIndex.from_elements(
+                        [n.definition for n in parent_index.nodes]
+                    )
+                    merged_parent.update(resolved_diff.nodes, replace=True)
+                    return merged_parent
+
+                # Otherwise prefer the snapshot if available as a complete bridge.
+                if sd.snapshot and sd.snapshot.element:
+                    snapshot_index = DefinitionIndex.from_elements(sd.snapshot.element)
+                    snapshot_index.update(resolved_diff.nodes, replace=True)
+                    return snapshot_index
+
+                return resolved_diff
+
+            if sd.snapshot and sd.snapshot.element:
+                return DefinitionIndex.from_elements(sd.snapshot.element)
+
+            return parent_index
+
+        if sd.snapshot and sd.snapshot.element:
+            return DefinitionIndex.from_elements(sd.snapshot.element)
+
+        raise DefinitionResolutionError(
+            f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition and no snapshot; "
+            "cannot anchor differential resolution."
+        )
 
     def _build_full_ancestor_index(
         self,
@@ -182,7 +222,7 @@ class SnapshotResolver:
                     f"StructureDefinition '{getattr(current, 'name', '?')}' has neither a "
                     "snapshot nor a baseDefinition — cannot reconstruct full ancestor index."
                 )
-            ancestor = self._registry.get(current.baseDefinition)
+            ancestor = self._registry.get(str(current.baseDefinition))
             if ancestor.snapshot and ancestor.snapshot.element:
                 return DefinitionIndex.from_elements(ancestor.snapshot.element)
             current = ancestor

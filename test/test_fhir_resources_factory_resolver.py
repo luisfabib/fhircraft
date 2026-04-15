@@ -1650,3 +1650,143 @@ def test_build_full_ancestor_index__raises_when_chain_has_no_snapshot(resolver):
 
     with pytest.raises(DefinitionResolutionError):
         resolver._build_full_ancestor_index(sd_a)
+
+
+# ==================================================================
+# SnapshotResolver._resolve_base_chain
+# ==================================================================
+
+
+def test_resolve_base_chain__anchors_on_snapshot_when_no_base_definition(
+    resolver, base_index
+):
+    sd = make_structure_def(snapshot_elements=[n.definition for n in base_index.nodes])
+
+    result = resolver._resolve_base_chain(sd)
+
+    assert isinstance(result, DefinitionIndex)
+    assert result.root().id == "BaseResource"
+    assert result.get("BaseResource.status") is not None
+
+
+def test_resolve_base_chain__raises_when_no_base_definition_and_no_snapshot(resolver):
+    sd = make_structure_def(snapshot_elements=None, differential_elements=None)
+
+    with pytest.raises(DefinitionResolutionError):
+        resolver._resolve_base_chain(sd)
+
+
+def test_resolve_base_chain__applies_differential_on_parent_chain_and_keeps_untouched(
+    resolver,
+):
+    root_sd = make_structure_def(
+        snapshot_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element(
+                "BaseResource.status",
+                "BaseResource.status",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="code")],
+            ),
+            make_element(
+                "BaseResource.category",
+                "BaseResource.category",
+                min=0,
+                max="*",
+                type=[ElementDefinitionType(code="CodeableConcept")],
+            ),
+        ]
+    )
+
+    # Differential only touches status; category must still be inherited.
+    mid_sd = make_structure_def(
+        differential_elements=[
+            make_element("BaseResource", "BaseResource"),
+            make_element("BaseResource.status", "BaseResource.status", min=1),
+        ],
+        base_definition="http://example.org/BaseResource",
+    )
+
+    resolver._registry.get = MagicMock(return_value=root_sd)
+
+    result = resolver._resolve_base_chain(mid_sd)
+
+    status_node = result.get("BaseResource.status")
+    category_node = result.get("BaseResource.category")
+    assert status_node is not None
+    assert status_node.min_cardinality == 1
+    assert category_node is not None
+    assert any(str(t.code) == "CodeableConcept" for t in category_node.types)
+
+
+def test_resolve_base_chain__uses_snapshot_bridge_when_root_changes(resolver):
+    # Parent root is DomainResource, child differential root is Patient.
+    parent_sd = make_structure_def(
+        snapshot_elements=[
+            make_element("DomainResource", "DomainResource"),
+            make_element(
+                "DomainResource.text",
+                "DomainResource.text",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="Narrative")],
+            ),
+        ]
+    )
+
+    child_sd = make_structure_def(
+        snapshot_elements=[
+            make_element("Patient", "Patient"),
+            make_element(
+                "Patient.id",
+                "Patient.id",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="id")],
+            ),
+            make_element(
+                "Patient.active",
+                "Patient.active",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="boolean")],
+            ),
+        ],
+        differential_elements=[
+            make_element("Patient", "Patient"),
+            make_element("Patient.id", "Patient.id", min=1, max="1"),
+        ],
+        base_definition="http://example.org/DomainResource",
+    )
+
+    resolver._registry.get = MagicMock(return_value=parent_sd)
+
+    result = resolver._resolve_base_chain(child_sd)
+
+    assert result.root().id == "Patient"
+    assert result.get("Patient.active") is not None
+    id_node = result.get("Patient.id")
+    assert id_node is not None
+    assert id_node.min_cardinality == 1
+    assert id_node.max_cardinality == 1
+
+
+def test_resolve_base_chain__returns_parent_index_when_no_snapshot_or_differential(
+    resolver, base_index
+):
+    root_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    child_sd = make_structure_def(
+        snapshot_elements=None,
+        differential_elements=None,
+        base_definition="http://example.org/BaseResource",
+    )
+
+    resolver._registry.get = MagicMock(return_value=root_sd)
+
+    result = resolver._resolve_base_chain(child_sd)
+
+    assert result.root().id == "BaseResource"
+    assert result.get("BaseResource.status") is not None
