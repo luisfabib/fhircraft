@@ -37,6 +37,7 @@ LEFT_TO_RIGHT_SIMPLE = "Field(union_mode='left_to_right')"
 class CodeGenerator:
 
     import_statements: Dict[str, List[str]]
+    alias_import_statements: Dict[str, str]
     template: Template
     data: Dict
 
@@ -54,10 +55,61 @@ class CodeGenerator:
         Clears the import statements and data dictionaries.
         """
         self.import_statements = defaultdict(list)
+        self.alias_import_statements = {}
         self.data = {}
         self._processing_models = (
             set()
         )  # Track models being processed to prevent infinite recursion
+
+    def _track_module_alias_import(self, module: str, alias: str) -> bool:
+        """Track an aliased module import (e.g. `import x.y as z`)."""
+        existing_module_for_alias = next(
+            (m for m, a in self.alias_import_statements.items() if a == alias), None
+        )
+        if existing_module_for_alias and existing_module_for_alias != module:
+            return False
+        self.alias_import_statements[module] = alias
+        return True
+
+    def _get_primitive_package_module(self, module: str) -> Optional[str]:
+        """Return the `...primitive` package module from a primitive submodule path."""
+        parts = module.split(".")
+        try:
+            primitive_index = parts.index("primitive")
+        except ValueError:
+            return None
+        if primitive_index < 1:
+            return None
+        return ".".join(parts[: primitive_index + 1])
+
+    def _resolve_primitive_class_alias(
+        self, annotation: Any
+    ) -> Optional[Tuple[str, str]]:
+        """Resolve primitive classes (e.g. String) to their module alias (e.g. string)."""
+        if not isinstance(annotation, type):
+            return None
+        module_name = getattr(annotation, "__module__", "")
+        if ".primitive." not in module_name:
+            return None
+        module = sys.modules.get(module_name)
+        if module is None:
+            return None
+
+        for name, val in vars(module).items():
+            if name.startswith("_"):
+                continue
+            if get_origin(val) is not Annotated:
+                continue
+            metadata = getattr(val, "__metadata__", ())
+            for meta in metadata:
+                func = getattr(meta, "func", None)
+                klass = getattr(func, "__self__", None)
+                if klass is annotation:
+                    primitive_module = self._get_primitive_package_module(module_name)
+                    if primitive_module is None:
+                        return None
+                    return primitive_module, name
+        return None
 
     def _extract_default_factory_code(self, default_factory: Any) -> str:
         """
@@ -177,6 +229,22 @@ class CodeGenerator:
         Raises:
             ValueError: If the object does not belong to a module.
         """
+        # Primitive aliases are emitted as `fhir.<alias>` and use a module alias import.
+        resolved_primitive = self._resolve_annotated_primitive(annotation)
+        if resolved_primitive is not None:
+            module, _ = resolved_primitive
+            primitive_module = self._get_primitive_package_module(module)
+            if primitive_module:
+                self._track_module_alias_import(primitive_module, "fhir")
+            return
+
+        # Primitive classes are also emitted as `fhir.<alias>`.
+        resolved_primitive_class = self._resolve_primitive_class_alias(annotation)
+        if resolved_primitive_class is not None:
+            primitive_module, _ = resolved_primitive_class
+            self._track_module_alias_import(primitive_module, "fhir")
+            return
+
         # Check if this is a generic type and handle typing imports
         origin = get_origin(annotation)
         if origin is not None:
@@ -299,12 +367,23 @@ class CodeGenerator:
         if annotation is type(None):
             return "None"
 
+        # Primitive class (e.g. String, Integer) -> fhir.string / fhir.integer
+        resolved_class = self._resolve_primitive_class_alias(annotation)
+        if resolved_class is not None:
+            primitive_module, alias_name = resolved_class
+            if self._track_module_alias_import(primitive_module, "fhir"):
+                return f"fhir.{alias_name}"
+            return alias_name
+
         # Direct Annotated primitive alias (e.g. string, boolean, …)
         resolved = self._resolve_annotated_primitive(annotation)
         if resolved is not None:
             module, name = resolved
-            if name not in self.import_statements[module]:
-                self.import_statements[module].append(name)
+            primitive_module = self._get_primitive_package_module(module)
+            if primitive_module and self._track_module_alias_import(
+                primitive_module, "fhir"
+            ):
+                return f"fhir.{name}"
             return name
 
         origin = get_origin(annotation)
@@ -318,13 +397,16 @@ class CodeGenerator:
         if not args:
             return repr(annotation)
 
-        # Fast path: if no arg (recursively) contains an Annotated, use repr as-is
-        def _has_annotated(ann: Any) -> bool:
+        # Fast path: if no arg (recursively) contains an Annotated or a primitive
+        # class (e.g. String, Integer), use repr as-is; otherwise recurse.
+        def _has_annotated_or_primitive(ann: Any) -> bool:
             if get_origin(ann) is Annotated:
                 return True
-            return any(_has_annotated(a) for a in get_args(ann))
+            if self._resolve_primitive_class_alias(ann) is not None:
+                return True
+            return any(_has_annotated_or_primitive(a) for a in get_args(ann))
 
-        if not any(_has_annotated(a) for a in args):
+        if not any(_has_annotated_or_primitive(a) for a in args):
             return repr(annotation)
 
         # Union / Optional (both "X | Y" UnionType and typing.Union[X, Y])
@@ -354,6 +436,14 @@ class CodeGenerator:
             origin, "_name", None
         )
         if origin_name:
+            # Map builtin lowercase names to their typing equivalents
+            typing_name_map = {
+                "list": "List",
+                "dict": "Dict",
+                "tuple": "Tuple",
+                "set": "Set",
+            }
+            origin_name = typing_name_map.get(origin_name, origin_name)
             if origin_name in ("List", "Dict", "Set", "Tuple", "FrozenSet"):
                 if origin_name not in self.import_statements["typing"]:
                     self.import_statements["typing"].append(origin_name)
@@ -761,6 +851,7 @@ class CodeGenerator:
         source_code = self.template.render(
             data=self.data,
             imports=grouped_imports,
+            alias_imports=self.alias_import_statements,
             include_validators=include_validators,
             metadata={
                 "version": version("fhircraft"),

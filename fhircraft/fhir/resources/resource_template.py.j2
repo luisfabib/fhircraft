@@ -3,7 +3,10 @@
 {% for module, objects in imports.items() -%} 
 from {{ module }} import {{ objects|join(', ') }}
 {% endfor -%}
-{% if imports %}
+{% for module, alias in alias_imports.items() -%}
+import {{ module }} as {{ alias }}
+{% endfor -%}
+{% if imports or alias_imports %}
 {% endif -%}
 NoneType = type(None)
 

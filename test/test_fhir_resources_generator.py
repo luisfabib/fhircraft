@@ -58,10 +58,10 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Expected code block
         expected_class = """
         class SimpleModel(BaseModel):
-            id: String = Field(
+            id: fhir.string = Field(
                 description="The unique identifier.",
             )
-            value: Integer = Field(
+            value: fhir.integer = Field(
                 description="A value.",
                 default=42,
             )
@@ -80,7 +80,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Expected code block
         expected_block = """
         class ModelWithAlias(BaseModel):
-            name: String = Field(
+            name: fhir.string = Field(
                 description="The person name.",
                 alias="fullName",
             )
@@ -99,7 +99,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Expected code block
         expected_block = """
         class ModelWithOptional(BaseModel):
-            description: Optional[String] = Field(
+            description: Optional[fhir.string] = Field(
                 description="Optional description.",
                 default=None,
             )
@@ -118,7 +118,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Expected code block
         expected_block = """
         class ModelWithList(BaseModel):
-            items: List[Integer] = Field(
+            items: List[fhir.integer] = Field(
                 description="A list of items.",
                 default_factory=list,
             )
@@ -303,7 +303,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         )
         expected_block = """
         class ModelWithTitle(BaseModel):
-            code: String = Field(
+            code: fhir.string = Field(
                 title="Code Field",
                 description="A code with title.",
             )
@@ -411,7 +411,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             """
             This is a model with a docstring.
             """
-            value: string = Field(
+            value: fhir.string = Field(
                 description="A string field.",
             )
 
@@ -457,13 +457,14 @@ class TestJinjaTemplateRendering(unittest.TestCase):
     def test_model_with_multiple_inheritance_slice(self):
         """Test that slice models with multiple inheritance generate correctly."""
         from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.datatypes.R4B.primitive import string
         from fhircraft.fhir.resources.base import FHIRSliceModel
 
         # Create a model with multiple inheritance (Extension + FHIRSliceModel)
         model = _create_model(
             "ExtensionSlice",
             url=(str, Field(description="Extension URL")),
-            valueString=(str, Field(description="A string value")),
+            valueString=(string, Field(description="A string value")),
             __base__=(Extension, FHIRSliceModel),
         )
         assert issubclass(model, FHIRSliceModel)
@@ -478,7 +479,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             url: str = Field(
                 description="Extension URL",
             )
-            valueString: str = Field(
+            valueString: fhir.string = Field(
                 description="A string value",
             )
         """
@@ -488,8 +489,8 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Create model with a property
         model = create_model(
             "ModelWithProperty",
-            valueString=(primitives.String, Field(description="A value.")),
-            valueInteger=(primitives.Integer, Field(description="A value.")),
+            valueString=(primitives.string, Field(description="A value.")),
+            valueInteger=(primitives.integer, Field(description="A value.")),
         )
         # Add a property method
         setattr(
@@ -502,10 +503,10 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
         expected_block = """
         class ModelWithProperty(BaseModel):
-            valueString: String = Field(
+            valueString: fhir.string = Field(
                 description="A value.",
             )
-            valueInteger: Integer = Field(
+            valueInteger: fhir.integer = Field(
                 description="A value.",
             )
 
@@ -850,7 +851,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # The property SHOULD be in the derived model code since it's different
         expected_block = """
         class DerivedModelWithOverriddenProperty(BaseModelWithOriginalProperty):
-            valueInteger: Integer = Field(
+            valueInteger: fhir.integer = Field(
                 description="Another value.",
             )
 
@@ -867,14 +868,14 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Create a base model without any property
         base_model = _create_model(
             "BaseModelWithoutProperty",
-            valueString=(primitives.String, Field(description="A value.")),
+            valueString=(primitives.string, Field(description="A value.")),
             __base__=(BaseModel,),
         )
 
         # Create a derived model that adds a new property
         derived_model = _create_model(
             "DerivedModelWithNewProperty",
-            valueInteger=(primitives.Integer, Field(description="Another value.")),
+            valueInteger=(primitives.integer, Field(description="Another value.")),
             __base__=(base_model,),
         )
         # Add a new property that doesn't exist in base
@@ -890,7 +891,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # The new property SHOULD be in the derived model code
         expected_block = """
         class DerivedModelWithNewProperty(BaseModelWithoutProperty):
-            valueInteger: Integer = Field(
+            valueInteger: fhir.integer = Field(
                 description="Another value.",
             )
 
@@ -907,7 +908,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Create a grandparent model with a property
         grandparent_model = _create_model(
             "GrandparentWithProperty",
-            value=(primitives.String, Field(description="A value.")),
+            value=(primitives.string, Field(description="A value.")),
             __base__=(BaseModel,),
         )
         setattr(
@@ -921,14 +922,14 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Create a parent model that inherits from grandparent
         parent_model = _create_model(
             "ParentModel",
-            parentField=(primitives.String, Field(description="Parent field.")),
+            parentField=(primitives.string, Field(description="Parent field.")),
             __base__=(grandparent_model,),
         )
 
         # Create a child model that inherits from parent but doesn't override the property
         child_model = _create_model(
             "ChildModel",
-            childField=(primitives.String, Field(description="Child field.")),
+            childField=(primitives.string, Field(description="Child field.")),
             __base__=(parent_model,),
         )
 
@@ -955,7 +956,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         model = create_model(
             "ModelWithProhibitedField",
             active=(
-                primitives.Boolean,
+                primitives.boolean,
                 Field(default=None, description="Active flag."),
             ),
             prohibited=(
