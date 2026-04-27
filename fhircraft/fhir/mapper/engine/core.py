@@ -19,7 +19,10 @@ from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
-from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
+from fhircraft.fhir.resources.definitions.registry import (
+    StructureDefinitionRegistry,
+    StructureDefinitionNotFoundError,
+)
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from .registry import StructureMapRegistry
 
@@ -428,7 +431,12 @@ class FHIRMappingEngine:
                 )
                 model = self.factory.build(structure_def)
                 resolved[s.alias or structure_def.name] = model
-            except (KeyError, ValueError, AttributeError) as e:
+            except (
+                KeyError,
+                ValueError,
+                AttributeError,
+                StructureDefinitionNotFoundError,
+            ) as e:
                 # If StructureDefinition not found, log warning but continue
                 logger.warning(
                     f"Could not resolve structure definition for {canonical_url}: {e}. "
