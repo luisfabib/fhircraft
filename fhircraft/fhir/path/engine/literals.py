@@ -88,16 +88,31 @@ class Quantity(FHIRPathLiteralType):
         else:
             raise TypeError("Input must be a FHIRPath Quantity or FHIR Quantity type.")
 
+    @staticmethod
+    def clean_unit_string(unit_str: str) -> str:
+        # UCUM square brackets not supported by Pint; replace with nothing
+        unit_str = unit_str.replace("[", "").replace("]", "")
+        # UCUM single-quotes not supported by Pint; replace with underscores
+        unit_str = unit_str.replace("'", "_")
+        # UCUM curly braces not supported by Pint; replace with nothing
+        unit_str = re.sub(r"\{.*?\}", "_1", unit_str)
+        return unit_str
+
     @property
     def registry_unit(self) -> PintQuantity:
         _unit = self.unit or ""
-        # UCUM square brackets not supported by Pint; replace with nothing
-        _unit = _unit.replace("[", "").replace("]", "")
-        # UCUM single-quotes not supported by Pint; replace with underscores
-        _unit = _unit.replace("'", "_")
-        # UCUM curly braces not supported by Pint; replace with nothing
-        _unit = re.sub(r"\{.*?\}", "_1", _unit)
+        _unit = self.clean_unit_string(_unit)
         return ureg(_unit)
+
+    def convert_to(self, target_unit: str) -> "Quantity":
+        target_unit_clean = self.clean_unit_string(target_unit)
+        try:
+            converted = (self.value * self.registry_unit).to(target_unit_clean)
+            return Quantity(value=converted.magnitude, unit=target_unit)
+        except Exception as e:
+            raise ValueError(
+                f"Cannot convert from {self.unit} to {target_unit}: {str(e)}"
+            ) from e
 
     def is_compatible_with(self, unit: "Quantity") -> bool:
         return self.registry_unit.is_compatible_with(unit.registry_unit)
@@ -138,14 +153,37 @@ class Quantity(FHIRPathLiteralType):
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
 
+    def __rlt__(self, other):
+        return self.__comparison__(other, operator.lt)
+
     def __le__(self, other):
+        return self.__comparison__(other, operator.le)
+
+    def __rle__(self, other):
         return self.__comparison__(other, operator.le)
 
     def __gt__(self, other):
         return self.__comparison__(other, operator.gt)
 
+    def __rgt__(self, other):
+        return self.__comparison__(other, operator.gt)
+
     def __ge__(self, other):
         return self.__comparison__(other, operator.ge)
+
+    def __rge__(self, other):
+        return self.__comparison__(other, operator.ge)
+
+    def __radd__(self, other):
+        result = self.__math__(other, operator.add)
+        if not self.is_compatible_with(other):
+            raise ValueError(
+                f"Cannot perform additions between incompatible units: {self.unit} and {other.unit}"
+            )
+        return Quantity(
+            value=result.to(self.registry_unit).magnitude,
+            unit=self.unit,
+        )
 
     def __add__(self, other):
         result = self.__math__(other, operator.add)
@@ -169,11 +207,36 @@ class Quantity(FHIRPathLiteralType):
             unit=self.unit,
         )
 
+    def __rsub__(self, other):
+        result = self.__math__(other, operator.sub)
+        if not self.is_compatible_with(other):
+            raise ValueError(
+                f"Cannot perform subtractions between incompatible units: {self.unit} and {other.unit}"
+            )
+        return Quantity(
+            value=result.to(self.registry_unit).magnitude,
+            unit=self.unit,
+        )
+
     def __mul__(self, other):
         result = self.__math__(other, operator.mul)
         return Quantity(
             value=result.magnitude,
             unit=f"{self.unit}*{other.unit}",
+        )
+
+    def __rmul__(self, other):
+        result = self.__math__(other, operator.mul)
+        return Quantity(
+            value=result.magnitude,
+            unit=f"{self.unit}*{other.unit}",
+        )
+
+    def __rfloordiv__(self, other):
+        result = self.__math__(other, operator.floordiv)
+        return Quantity(
+            value=result.magnitude,
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
         )
 
     def __floordiv__(self, other):
@@ -184,6 +247,13 @@ class Quantity(FHIRPathLiteralType):
         )
 
     def __truediv__(self, other):
+        result = self.__math__(other, operator.truediv)
+        return Quantity(
+            value=result.magnitude,
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
+        )
+
+    def __rtruediv__(self, other):
         result = self.__math__(other, operator.truediv)
         return Quantity(
             value=result.magnitude,
