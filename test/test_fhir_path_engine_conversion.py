@@ -712,6 +712,19 @@ def test_toquantity_converts_correctly_for_valid_type(value, expected):
     assert result[0].value == expected
 
 
+@pytest.mark.parametrize(
+    "value, expected",
+    (
+        ("120.5 g", Quantity(value=0.1205, unit="kg")),
+        ("12.5", Quantity(value=12.5, unit="kg")),
+    ),
+)
+def test_toquantity_converts_to_input_unit(value, expected):
+    collection = [FHIRPathCollectionItem(value=value)]
+    result = ToQuantity("kg").evaluate(collection, env)
+    assert result[0].value == expected
+
+
 def test_toQuantity_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     with pytest.raises(FHIRPathRuntimeError):
@@ -764,6 +777,21 @@ def test_convertstoquantity_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToQuantity().evaluate(collection, env)
     assert result == [FHIRPathCollectionItem.wrap(True)]
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    (
+        ("120.5 g", True),
+        ("12.5", True),
+        ("12.5 mL", False),
+        ("12.5 mm[Hg]", False),
+    ),
+)
+def test_convertstoquantity_returns_correct_conversion(value, expected):
+    collection = [FHIRPathCollectionItem(value=value)]
+    result = ConvertsToQuantity("kg").evaluate(collection, env)
+    assert result[0].value == expected
 
 
 def test_convertsToQuantity_raises_error_for_multiple_items():

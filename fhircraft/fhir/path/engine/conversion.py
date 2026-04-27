@@ -20,6 +20,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
+    Literal,
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import get_expression_context
@@ -588,6 +589,12 @@ class ToQuantity(FHIRTypeConversionFunction):
     A representation of the FHIRPath [`toQuantity()`](http://hl7.org/fhirpath/N1/#toquantity-string) function.
     """
 
+    def __init__(self, unit: str | Literal | None = None):
+        if unit is not None:
+            self.unit = unit if isinstance(unit, str) else unit.value
+        else:
+            self.unit = None
+
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
@@ -620,32 +627,40 @@ class ToQuantity(FHIRTypeConversionFunction):
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         if isinstance(value, (bool, int, float)):
-            return [FHIRPathCollectionItem.wrap(Quantity(value=float(value), unit=""))]
+            qty = Quantity(value=float(value), unit="")
         elif isinstance(value, str):
             quantity_match = re.match(
                 r"((\+|-)?\d+(\.\d+)?)\s*(('([^']+)'|([a-zA-Z\[\]]+))?)", value
             )
             if quantity_match:
-                return [
-                    FHIRPathCollectionItem.wrap(
-                        Quantity(
-                            value=float(quantity_match.group(1)),
-                            unit=quantity_match.group(4),
-                        )
-                    )
-                ]
+                qty = Quantity(
+                    value=float(quantity_match.group(1)),
+                    unit=quantity_match.group(4),
+                )
             else:
                 return []
         elif Quantity.is_quantity(value) and value is not None:
-            return [FHIRPathCollectionItem.wrap(Quantity.parse_quantity(value))]
+            qty = Quantity.parse_quantity(value)
         else:
             return []
+        if self.unit is not None:
+            if qty.unit == "":
+                qty.unit = self.unit
+            else:
+                qty = qty.convert_to(self.unit)
+        return [FHIRPathCollectionItem.wrap(qty)]
 
 
 class ConvertsToQuantity(FHIRTypeConversionFunction):
     """
     A representation of the FHIRPath [`convertsToQuantity()`](http://hl7.org/fhirpath/N1/#convertstoquantity-boolean) function.
     """
+
+    def __init__(self, unit: str | Literal | None = None):
+        if unit is not None:
+            self.unit = unit if isinstance(unit, str) else unit.value
+        else:
+            self.unit = None
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -673,11 +688,15 @@ class ConvertsToQuantity(FHIRTypeConversionFunction):
         self.validate_collection(collection)
         if not collection:
             return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToQuantity().evaluate(collection, environment, create) != []
-            )
-        ]
+        try:
+            return [
+                FHIRPathCollectionItem.wrap(
+                    ToQuantity(self.unit).evaluate(collection, environment, create)
+                    != []
+                )
+            ]
+        except ValueError:
+            return [FHIRPathCollectionItem.wrap(False)]
 
 
 class ToString(FHIRTypeConversionFunction):
