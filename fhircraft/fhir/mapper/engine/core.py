@@ -419,7 +419,7 @@ class FHIRMappingEngine:
                     resolved[s.alias or core_type] = get_fhir_type(
                         core_type, self.factory.fhir_release
                     )
-                    return resolved
+                    continue
                 except AttributeError:
                     pass
             try:
