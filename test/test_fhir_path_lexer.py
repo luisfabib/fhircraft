@@ -137,6 +137,7 @@ token_test_cases = (
     # -------------  Root Nodes --------------
     ("Observation", (("Observation", "ROOT_NODE"),)),
     ("Patient", (("Patient", "ROOT_NODE"),)),
+    ("GenomicStudy", (("GenomicStudy", "ROOT_NODE"),)),
 )
 
 
