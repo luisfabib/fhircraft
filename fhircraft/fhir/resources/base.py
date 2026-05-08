@@ -47,6 +47,7 @@ from fhircraft.fhir.path.mixin import FHIRPathMixin
 from fhircraft.utils import get_all_models_from_field
 
 XML_NAMESPACE = "http://hl7.org/fhir"
+xml.register_namespace("", XML_NAMESPACE)  # Register as the default XML namespace
 
 # Thread-local context to track polymorphic operations to prevent recursion
 _polymorphic_context = threading.local()
@@ -520,14 +521,13 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             exclude_none=exclude_none,
             exclude_defaults=exclude_defaults,
         )
-        root.set("xmlns", XML_NAMESPACE)  # Set the FHIR namespace on the root element
         tree = xml.ElementTree(root)
 
         if indent is not None:
             # Optional: Add indentation for readability
             xml.indent(tree, space="  " * indent)
 
-        # Convert to string with encoding option
+        # Convert to string; default_namespace adds xmlns="..." to the root element
         return xml.tostring(
             root,
             encoding="unicode" if ensure_ascii else "unicode",
@@ -536,7 +536,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     def serialize_as_xml(self, name: str, **kwargs) -> xml.Element:
         """Serialize this instance as an XML element (not a string)."""
-        element = xml.Element(name)
+        element = xml.Element(f"{{{XML_NAMESPACE}}}{name}")
         for subelement_name in self.model_dump(**kwargs):
             if subelement := getattr(self, subelement_name, None):
                 if isinstance(subelement, FHIRBaseModel):
@@ -1127,7 +1127,7 @@ class FHIRPrimitiveModel(FHIRBaseModel):
             )
         if getattr(self, "id", None) is not None:
             attributes["id"] = self.id
-        primitive = xml.Element(name, attrib=attributes)
+        primitive = xml.Element(f"{{{XML_NAMESPACE}}}{name}", attrib=attributes)
         for ext in self.extension or []:
             primitive.append(ext.serialize_as_xml("extension", **kwargs))
         return primitive

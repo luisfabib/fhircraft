@@ -9,7 +9,7 @@ from fhircraft.fhir.resources.datatypes.R4 import (
     Integer,
     HumanName,
 )
-from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.base import XML_NAMESPACE, FHIRBaseModel
 
 from typing import Optional, List
 from xml.etree.ElementTree import tostring, fromstring
@@ -24,6 +24,8 @@ class PrimitivesModel(FHIRBaseModel):
     deceased: Boolean
     count: Integer
 
+
+XMLNS = {"": XML_NAMESPACE}
 
 # ===================================================
 # Primitives - JSON Serialization
@@ -172,39 +174,39 @@ def test_serialize_as_json__resource__includes_resource_type():
 def test_serialize_as_xml__primitive__only_value():
     primitive = String(value="Hello world")
     element = primitive.serialize_as_xml("valueString")
-    assert element.tag == "valueString"
+    assert "valueString" in element.tag
     assert element.attrib == {"value": "Hello world"}
 
 
 def test_serialize_as_xml__primitive__only_extension():
     primitive = String(extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore
     element = primitive.serialize_as_xml("valueString")
-    assert element.tag == "valueString"
-    assert (extension := element.find("extension")) is not None
-    assert extension.tag == "extension"
+    assert "valueString" in element.tag
+    assert (extension := element.find("extension", XMLNS)) is not None
+    assert "extension" in extension.tag
     assert extension.attrib == {"url": "http://example.com"}
-    assert (valueString := extension.find("valueString")) is not None
+    assert (valueString := extension.find("valueString", XMLNS)) is not None
     assert valueString.attrib == {"value": "example"}
 
 
 def test_serialize_as_xml__primitive__value_with_id():
     primitive = String(value="Hello world", id="123")
     element = primitive.serialize_as_xml("valueString")
-    assert element.tag == "valueString"
+    assert "valueString" in element.tag
     assert element.attrib == {"value": "Hello world", "id": "123"}
 
 
 def test_serialize_as_xml__primitive__boolean_true():
     primitive = Boolean(value=True)
     element = primitive.serialize_as_xml("valueBoolean")
-    assert element.tag == "valueBoolean"
+    assert "valueBoolean" in element.tag
     assert element.attrib == {"value": "true"}
 
 
 def test_serialize_as_xml__primitive__boolean_false():
     primitive = Boolean(value=False)
     element = primitive.serialize_as_xml("valueBoolean")
-    assert element.tag == "valueBoolean"
+    assert "valueBoolean" in element.tag
     assert element.attrib == {"value": "false"}
 
 
@@ -215,9 +217,9 @@ def test_serialize_as_xml__primitive__value_and_extension():
     )
     element = primitive.serialize_as_xml("valueString")
     assert element.attrib["value"] == "Hello"
-    assert (ext := element.find("extension")) is not None
+    assert (ext := element.find("extension", XMLNS)) is not None
     assert ext.attrib["url"] == "http://example.com"
-    assert (valueString := ext.find("valueString")) is not None
+    assert (valueString := ext.find("valueString", XMLNS)) is not None
     assert valueString.attrib["value"] == "example"
 
 
@@ -229,21 +231,21 @@ def test_serialize_as_xml__primitive__value_and_extension():
 def test_serialize_as_xml__complex__only_values():
     primitive = Coding(code="C123", system="http://example.com", display="Example Code")
     element = primitive.serialize_as_xml("valueCoding")
-    assert element.tag == "valueCoding"
-    assert (code := element.find("code")) is not None
+    assert "valueCoding" in element.tag
+    assert (code := element.find("code", XMLNS)) is not None
     assert code.attrib == {"value": "C123"}
-    assert (system := element.find("system")) is not None
+    assert (system := element.find("system", XMLNS)) is not None
     assert system.attrib == {"value": "http://example.com"}
-    assert (display := element.find("display")) is not None
+    assert (display := element.find("display", XMLNS)) is not None
     assert display.attrib == {"value": "Example Code"}
 
 
 def test_serialize_as_xml__complex__with_id():
     primitive = Coding(display="Example Code", id="123")
     element = primitive.serialize_as_xml("valueCoding")
-    assert element.tag == "valueCoding"
+    assert "valueCoding" in element.tag
     assert element.attrib == {"id": "123"}
-    assert (display := element.find("display")) is not None
+    assert (display := element.find("display", XMLNS)) is not None
     assert display.attrib == {"value": "Example Code"}
 
 
@@ -260,18 +262,18 @@ def test_serialize_as_xml__complex__list_of_complex_types():
         ]
     )
     element = concept.serialize_as_xml("valueCodeableConcept")
-    assert element.tag == "valueCodeableConcept"
-    codings = element.findall("coding")
+    assert "valueCodeableConcept" in element.tag
+    codings = element.findall("coding", XMLNS)
     assert len(codings) == 2
-    assert codings[0].find("code").attrib == {"value": "C123"}  # type: ignore
-    assert codings[1].find("code").attrib == {"value": "C456"}  # type: ignore
+    assert codings[0].find("code", XMLNS).attrib == {"value": "C123"}  # type: ignore
+    assert codings[1].find("code", XMLNS).attrib == {"value": "C456"}  # type: ignore
 
 
 def test_serialize_as_xml__complex__list_of_primitives():
     instance = HumanName(given=[String(value="Alice"), String(value="Marie")])
     element = instance.serialize_as_xml("name")
-    assert element.tag == "name"
-    given_elements = element.findall("given")
+    assert "name" in element.tag
+    given_elements = element.findall("given", XMLNS)
     assert len(given_elements) == 2
     assert given_elements[0].attrib == {"value": "Alice"}
     assert given_elements[1].attrib == {"value": "Marie"}
@@ -287,11 +289,11 @@ def test_serialize_as_xml__complex__nested_complex_type():
         text="Official Identifier",  # type: ignore
     )
     element = concept.serialize_as_xml("type")
-    assert element.tag == "type"
-    codings = element.findall("coding")
+    assert "type" in element.tag
+    codings = element.findall("coding", XMLNS)
     assert len(codings) == 1
-    assert codings[0].find("code").attrib == {"value": "official"}  # type: ignore
-    assert (text_el := element.find("text")) is not None
+    assert codings[0].find("code", XMLNS).attrib == {"value": "official"}  # type: ignore
+    assert (text_el := element.find("text", XMLNS)) is not None
     assert text_el.attrib == {"value": "Official Identifier"}
 
 
@@ -303,8 +305,8 @@ def test_serialize_as_xml__complex__nested_complex_type():
 def test_serialize_as_xml__resource__element_tag_is_type():
     instance = Observation(valueString=String(value="John"))
     element = instance.serialize_as_xml(instance._type)
-    assert element.tag == "Observation"
-    assert (name_el := element.find("valueString")) is not None
+    assert "Observation" in element.tag
+    assert (name_el := element.find("valueString", XMLNS)) is not None
     assert name_el.attrib == {"value": "John"}
 
 
