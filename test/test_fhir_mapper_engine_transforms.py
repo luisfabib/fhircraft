@@ -29,7 +29,7 @@ class MockResource(BaseModel):
 
 
 class MockConceptMap(MagicMock):
-    class Group:
+    class Group1:
         class Element:
             code = "abc"
 
@@ -40,7 +40,18 @@ class MockConceptMap(MagicMock):
 
         element = [Element()]
 
-    group = [Group()]
+    class Group2:
+        class Element:
+            code = "1234"
+
+            class Target:
+                code = "4567"
+
+            target = [Target()]
+
+        element = [Element()]
+
+    group = [Group1(), Group2()]
 
 
 @pytest.fixture
@@ -52,11 +63,12 @@ def scope():
             "vstr": Invocation(Element("src"), Element("baz")),
             "vint": Invocation(Element("src"), Element("foo")),
             "vfull": Element("src"),
+            "id": Invocation(Element("src"), Element("id")),
         },
         concept_maps={
             "map": MockConceptMap(),
         },
-        source_instances={"src": MockResource(baz="abc", foo=123)},
+        source_instances={"src": MockResource(baz="abc", foo=123, id="1234")},
     )
 
 
@@ -238,6 +250,15 @@ def test_translate_transform(scope):
         StructureMapParameter(valueString="code"),
     ]
     assert tf.Translate(param).process(scope) == "def"
+
+
+def test_translate_transform_multiple_groups(scope):
+    param = [
+        StructureMapParameter(valueId="id"),
+        StructureMapParameter(valueString="map"),
+        StructureMapParameter(valueString="code"),
+    ]
+    assert tf.Translate(param).process(scope) == "4567"
 
 
 # =========================
