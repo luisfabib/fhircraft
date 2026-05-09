@@ -11,8 +11,7 @@ from fhircraft.fhir.resources.datatypes.R4 import (
 )
 from fhircraft.fhir.resources.base import XML_NAMESPACE, FHIRBaseModel
 
-from typing import Optional, List
-from xml.etree.ElementTree import tostring, fromstring
+import xml.etree.ElementTree as xml
 import json
 
 from fhircraft.fhir.resources.datatypes.R4.core.observation import Observation
@@ -224,6 +223,68 @@ def test_serialize_as_xml__primitive__value_and_extension():
 
 
 # ===================================================
+# Primitives - XML Deserialization
+# ===================================================
+
+
+def test_parse_xml_to_dict__primitive__only_value():
+    xml_str = '<valueString xmlns="http://hl7.org/fhir" value="Hello world"/>'
+    primitive = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert primitive == {"valueString": "Hello world"}
+
+
+def test_parse_xml_to_dict__primitive__only_extension():
+    xml_str = """
+    <valueString xmlns="http://hl7.org/fhir">
+        <extension url="http://example.com">
+            <valueString value="example"/>
+        </extension>
+    </valueString>
+    """
+    result = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {
+        "_valueString": {
+            "extension": [{"url": "http://example.com", "valueString": "example"}]
+        }
+    }
+
+
+def test_parse_xml_to_dict__primitive__value_with_id():
+    xml_str = '<valueString xmlns="http://hl7.org/fhir" value="Hello world" id="123"/>'
+    result = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {"valueString": "Hello world", "_valueString": {"id": "123"}}
+
+
+def test_parse_xml_to_dict__primitive__boolean_true():
+    xml_str = '<valueBoolean xmlns="http://hl7.org/fhir" value="true"/>'
+    result = Boolean.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {"valueBoolean": True}
+
+
+def test_parse_xml_to_dict__primitive__boolean_false():
+    xml_str = '<valueBoolean xmlns="http://hl7.org/fhir" value="false"/>'
+    result = Boolean.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {"valueBoolean": False}
+
+
+def test_parse_xml_to_dict__primitive__value_and_extension():
+    xml_str = """
+    <valueString xmlns="http://hl7.org/fhir" value="Hello">
+        <extension url="http://example.com">
+            <valueString value="example"/>
+        </extension>
+    </valueString>
+    """
+    result = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {
+        "valueString": "Hello",
+        "_valueString": {
+            "extension": [{"url": "http://example.com", "valueString": "example"}]
+        },
+    }
+
+
+# ===================================================
 # Complex Type - XML Serialization
 # ===================================================
 
@@ -247,11 +308,6 @@ def test_serialize_as_xml__complex__with_id():
     assert element.attrib == {"id": "123"}
     assert (display := element.find("display", XMLNS)) is not None
     assert display.attrib == {"value": "Example Code"}
-
-
-# ===================================================
-# Complex Types - XML Serialization (additional)
-# ===================================================
 
 
 def test_serialize_as_xml__complex__list_of_complex_types():
@@ -295,6 +351,172 @@ def test_serialize_as_xml__complex__nested_complex_type():
     assert codings[0].find("code", XMLNS).attrib == {"value": "official"}  # type: ignore
     assert (text_el := element.find("text", XMLNS)) is not None
     assert text_el.attrib == {"value": "Official Identifier"}
+
+
+# ===================================================
+# Complex Type - XML Deserialization
+# ===================================================
+
+
+def test_parse_xml_to_dict__complex__coding():
+    xml_str = """
+    <valueCoding xmlns="http://hl7.org/fhir">
+        <system value="http://example.org/system"/>
+        <code value="abc"/>
+        <display value="Example Code"/>
+    </valueCoding>
+    """
+    result = Coding.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {
+        "valueCoding": {
+            "system": "http://example.org/system",
+            "code": "abc",
+            "display": "Example Code",
+        }
+    }
+
+
+def test_parse_xml_to_dict__complex__coding__with_id():
+    xml_str = """
+    <valueCoding xmlns="http://hl7.org/fhir" id="c1">
+        <code value="abc"/>
+    </valueCoding>
+    """
+    result = Coding.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {"valueCoding": {"code": "abc", "id": "c1"}}
+
+
+def test_parse_xml_to_dict__complex__codeable_concept__with_text():
+    xml_str = """
+    <type xmlns="http://hl7.org/fhir">
+        <coding>
+            <system value="http://example.com"/>
+            <code value="official"/>
+        </coding>
+        <text value="Official Identifier"/>
+    </type>
+    """
+    result = CodeableConcept.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {
+        "type": {
+            "coding": [{"system": "http://example.com", "code": "official"}],
+            "text": "Official Identifier",
+        }
+    }
+
+
+def test_parse_xml_to_dict__complex__codeable_concept__multiple_codings():
+    xml_str = """
+    <code xmlns="http://hl7.org/fhir">
+        <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="C123"/>
+        </coding>
+        <coding>
+            <system value="http://loinc.org"/>
+            <code value="L456"/>
+        </coding>
+    </code>
+    """
+    result = CodeableConcept.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert len(result["code"]["coding"]) == 2
+    assert result["code"]["coding"][0] == {
+        "system": "http://snomed.info/sct",
+        "code": "C123",
+    }
+    assert result["code"]["coding"][1] == {
+        "system": "http://loinc.org",
+        "code": "L456",
+    }
+
+
+def test_parse_xml_to_dict__complex__human_name__list_of_primitives():
+    xml_str = """
+    <name xmlns="http://hl7.org/fhir">
+        <family value="Smith"/>
+        <given value="Alice"/>
+        <given value="Marie"/>
+    </name>
+    """
+    result = HumanName.parse_xml_to_dict(xml.fromstring(xml_str))
+    assert result == {"name": {"family": "Smith", "given": ["Alice", "Marie"]}}
+
+
+def test_model_validate_xml__complex__coding():
+    xml_str = """
+    <Coding xmlns="http://hl7.org/fhir">
+        <system value="http://example.org/system"/>
+        <code value="abc"/>
+        <display value="Example Code"/>
+    </Coding>
+    """
+    coding = Coding.model_validate_xml(xml_str)
+    assert str(coding.system) == "http://example.org/system"
+    assert str(coding.code) == "abc"
+    assert str(coding.display) == "Example Code"
+
+
+def test_model_validate_xml__complex__codeable_concept():
+    xml_str = """
+    <CodeableConcept xmlns="http://hl7.org/fhir">
+        <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="C123"/>
+            <display value="Finding"/>
+        </coding>
+        <text value="Finding"/>
+    </CodeableConcept>
+    """
+    concept = CodeableConcept.model_validate_xml(xml_str)
+    assert concept.coding is not None
+    assert len(concept.coding) == 1
+    assert str(concept.coding[0].system) == "http://snomed.info/sct"
+    assert str(concept.coding[0].code) == "C123"
+    assert str(concept.text) == "Finding"
+
+
+def test_model_validate_xml__complex__human_name__with_given_list():
+    xml_str = """
+    <HumanName xmlns="http://hl7.org/fhir">
+        <family value="Smith"/>
+        <given value="Alice"/>
+        <given value="Marie"/>
+    </HumanName>
+    """
+    name = HumanName.model_validate_xml(xml_str)
+    assert str(name.family) == "Smith"
+    assert name.given is not None
+    assert len(name.given) == 2
+    assert str(name.given[0]) == "Alice"
+    assert str(name.given[1]) == "Marie"
+
+
+# ===================================================
+# Resources - XML Deserialization
+# ===================================================
+
+
+def test_model_validate_xml__resource__observation():
+    xml_str = """
+    <Observation xmlns="http://hl7.org/fhir">
+        <status value="final"/>
+        <code>
+            <coding>
+                <system value="http://loinc.org"/>
+                <code value="29463-7"/>
+                <display value="Body Weight"/>
+            </coding>
+        </code>
+        <valueString value="72 kg"/>
+    </Observation>
+    """
+    obs = Observation.model_validate_xml(xml_str)
+    assert str(obs.status) == "final"
+    assert obs.code is not None
+    assert obs.code.coding is not None
+    assert len(obs.code.coding) == 1
+    assert str(obs.code.coding[0].code) == "29463-7"
+    assert str(obs.valueString) == "72 kg"
 
 
 # ===================================================

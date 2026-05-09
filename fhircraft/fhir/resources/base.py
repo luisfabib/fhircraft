@@ -44,7 +44,7 @@ from pydantic import (
 from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.path.mixin import FHIRPathMixin
-from fhircraft.utils import get_all_models_from_field
+from fhircraft.utils import get_all_models_from_field, is_list_field
 
 XML_NAMESPACE = "http://hl7.org/fhir"
 xml.register_namespace("", XML_NAMESPACE)  # Register as the default XML namespace
@@ -726,128 +726,64 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         Returns:
             An instance of the model populated from the XML data
         """
-        from xml.etree.ElementTree import fromstring
 
         # Parse the XML
-        root = fromstring(xml_data)
+        root = xml.fromstring(xml_data)
 
         # Convert XML to dictionary, passing model class for type checking
-        data = cls._xml_element_to_dict(root, model_class=cls)
+        data = cls.parse_xml_to_dict(root)
+
+        # parse_xml_to_dict returns {element_name: field_data}; extract the inner dict
+        inner_data = next(iter(data.values()), {})
 
         # Use existing model_validate with the dictionary
-        return cls.model_validate(data, strict=strict, context=context)
+        return cls.model_validate(inner_data, strict=strict, context=context)
 
     @classmethod
-    def _xml_element_to_dict(
-        cls, element: xml.Element, model_class: Type | None = None
-    ) -> Any:
-        """
-        Convert an XML element tree to a dictionary structure.
+    def parse_xml_to_dict(cls, element: xml.Element) -> dict:
+        deserialized_data = {}
+        element_name = element.tag.split("}", 1)[-1]  # Remove namespace
+        for field, field_info in cls.model_fields.items():
+            # Handle attributes that are encoded as XML attributes, not child elements
+            if field == "url" and (url := element.attrib.get("url")):
+                deserialized_data["url"] = url
+                continue
+            elif field == "id" and (_id := element.attrib.get("id")):
+                deserialized_data["id"] = _id
+                continue
+            elif field == "value" and (value := element.attrib.get("value")):
+                deserialized_data["value"] = value
+                continue
 
-        Args:
-            element: The XML element to convert
-            model_class: The model class to use for type checking (optional)
-
-        Returns:
-            A dictionary representation of the XML element
-        """
-        from typing import get_origin, get_args
-
-        # Strip namespace from tag
-        tag = element.tag.split("}")[-1] if "}" in element.tag else element.tag
-
-        # Start with an empty dict
-        result = {}
-
-        # Handle primitive value attribute
-        if "value" in element.attrib:
-            # This is a primitive field, return just the value
-            value = element.attrib["value"]
-            # Convert boolean strings
-            if value == "true":
-                return True
-            elif value == "false":
-                return False
-            # Return as string - let Pydantic handle type conversion
-            return value
-
-        # Process child elements
-        child_dict = {}
-        for child in element:
-            child_tag = child.tag.split("}")[-1] if "}" in child.tag else child.tag
-
-            # Determine the model class for the child if possible
-            child_model_class = None
-            if (
-                model_class
-                and hasattr(model_class, "model_fields")
-                and child_tag in model_class.model_fields
-            ):
-                field_info = model_class.model_fields[child_tag]
-                annotation = field_info.annotation
-                # Try to extract the inner type from List[X] or Optional[List[X]]
-                origin = get_origin(annotation)
-                if origin is list:
-                    args = get_args(annotation)
-                    if args and hasattr(args[0], "model_fields"):
-                        child_model_class = args[0]
-                elif hasattr(annotation, "__args__"):
-                    for arg in getattr(annotation, "__args__", []):
-                        if get_origin(arg) is list:
-                            args = get_args(arg)
-                            if args and hasattr(args[0], "model_fields"):
-                                child_model_class = args[0]
-                            break
-                        elif hasattr(arg, "model_fields"):
-                            child_model_class = arg
-
-            child_value = cls._xml_element_to_dict(child, model_class=child_model_class)
-
-            # Handle repeated elements (lists)
-            if child_tag in child_dict:
-                # Convert to list if not already
-                if not isinstance(child_dict[child_tag], list):
-                    child_dict[child_tag] = [child_dict[child_tag]]
-                child_dict[child_tag].append(child_value)
+            # Resolve the FHIR model class for this field so child elements are
+            # parsed with the correct schema rather than the parent class.
+            field_type = next(get_all_models_from_field(field_info), None)
+            if field_type is not None and not issubclass(field_type, FHIRBaseModel):
+                continue
+            if is_list_field(field_info):
+                children = element.findall(f"{{{XML_NAMESPACE}}}{field}")
+                if children and field_type is not None:
+                    values: list = []
+                    shadows: list = []
+                    has_shadow = False
+                    for child in children:
+                        child_result = field_type.parse_xml_to_dict(child)
+                        item_value = child_result.get(field)
+                        shadow_value = child_result.get(f"_{field}")
+                        values.append(item_value)
+                        if shadow_value is not None:
+                            shadows.append(shadow_value)
+                            has_shadow = True
+                        else:
+                            shadows.append(None)
+                    deserialized_data[field] = values
+                    if has_shadow:
+                        deserialized_data[f"_{field}"] = shadows
             else:
-                child_dict[child_tag] = child_value
-
-        # Merge child elements into result
-        result.update(child_dict)
-
-        # Post-process: Convert single values to lists if the model field expects a list
-        # This handles cases like meta.profile which should always be a list
-        if model_class and hasattr(model_class, "model_fields"):
-            for field_name, field_value in list(result.items()):
-                if field_name == "resourceType":
-                    continue
-
-                # Check if this field exists in the model and should be a list
-                if field_name in model_class.model_fields:
-                    field_info = model_class.model_fields[field_name]
-                    annotation = field_info.annotation
-
-                    # Check if the annotation is a List type
-                    origin = get_origin(annotation)
-                    # Handle Optional[List[...]] or List[...] or list[...]
-                    if origin is list:
-                        # Field expects a list, ensure value is a list
-                        if not isinstance(field_value, list):
-                            result[field_name] = [field_value]
-                    elif hasattr(annotation, "__args__"):
-                        # Handle Union types (Optional is Union[X, None])
-                        for arg in getattr(annotation, "__args__", []):
-                            if get_origin(arg) is list:
-                                # Field expects a list, ensure value is a list
-                                if not isinstance(field_value, list):
-                                    result[field_name] = [field_value]
-                                break
-
-        # If result only contains resourceType and nothing else, just return the dict
-        if len(result) == 1 and "resourceType" in result:
-            return result
-
-        return result if result else None
+                child = element.find(f"{{{XML_NAMESPACE}}}{field}")
+                if child is not None and field_type is not None:
+                    deserialized_data.update(field_type.parse_xml_to_dict(child))
+        return {element_name: deserialized_data}
 
     @classmethod
     def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:
@@ -1131,6 +1067,42 @@ class FHIRPrimitiveModel(FHIRBaseModel):
         for ext in self.extension or []:
             primitive.append(ext.serialize_as_xml("extension", **kwargs))
         return primitive
+
+    @classmethod
+    def parse_xml_to_dict(cls, element: xml.Element) -> dict:
+        element_name = element.tag.split("}", 1)[-1]  # Remove namespace
+        # Collect extensions if present using the correct Extension type from the field
+        extensions = []
+        extension_field = cls.model_fields.get("extension")
+        if extension_field is not None:
+            extension_type = next(get_all_models_from_field(extension_field), None)
+            if extension_type is not None and issubclass(extension_type, FHIRBaseModel):
+                for ext_element in element.findall(f"{{{XML_NAMESPACE}}}extension"):
+                    ext_result = extension_type.parse_xml_to_dict(ext_element)
+                    ext_data = ext_result.get("extension")
+                    if ext_data is not None:
+                        extensions.append(ext_data)
+        # Extract the "id" attribute if present
+        elem_id = element.attrib.get("id")
+        # Extract the "value" attribute if present, converting boolean strings to actual booleans
+        value = element.attrib.get("value")
+        if value is not None:
+            # Convert boolean strings
+            if value == "true":
+                value = True
+            elif value == "false":
+                value = False
+
+        deserialized_data = {}
+        if value is not None:
+            deserialized_data[element_name] = value
+        if elem_id is not None or extensions:
+            deserialized_data[f"_{element_name}"] = {}
+        if elem_id is not None:
+            deserialized_data[f"_{element_name}"]["id"] = elem_id
+        if extensions:
+            deserialized_data[f"_{element_name}"]["extension"] = extensions
+        return deserialized_data
 
     @model_validator(mode="before")
     @classmethod
