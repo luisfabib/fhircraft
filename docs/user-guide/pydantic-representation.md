@@ -290,7 +290,7 @@ Additionally, Fhircraft replaces standard Python lists with context-aware `FHIRL
 
     # List fields use FHIRList instead of standard Python lists
     print(type(patient.name))  # (1)!
-    #> <class 'fhircraft.fhir.resources.base.FHIRList'>
+    #> <class 'fhircraft.fhir.resources.base.list.FHIRList'>
 
     # Add items and context is automatically maintained
     patient.name.append(HumanName(family="Smith", given=["John"]))  # (2)!
