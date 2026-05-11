@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.resources.base import (
     FHIRBaseModel,
+    FHIRModelKind,
     FhirBaseModelKind,
 )
 from fhircraft.fhir.resources.factory.assembler import ModelAssembler
@@ -342,9 +343,9 @@ class FHIRModelFactory:
             model._fhir_release = fhir_release
             model._canonical_url = str(structure_def.url)
             model._kind = (
-                FhirBaseModelKind(str(structure_def.kind))
+                FHIRModelKind(str(structure_def.kind))
                 if structure_def.kind
-                else FhirBaseModelKind.LOGICAL
+                else FHIRModelKind.LOGICAL
             )
             model._type = str(structure_def.type) if structure_def.type else sd_name
             abstract = structure_def.abstract

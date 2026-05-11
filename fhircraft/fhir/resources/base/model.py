@@ -54,8 +54,8 @@ xml.register_namespace("", XML_NAMESPACE)  # Register as the default XML namespa
 _polymorphic_context = threading.local()
 
 
-class FhirBaseModelKind(str, enum.Enum):
-    """Enumeration of StructureMap model modes."""
+class FHIRModelKind(str, enum.Enum):
+    """Enumeration of FHIR StructureDefinition kinds."""
 
     LOGICAL = "logical"
     PRIMITIVE_TYPE = "primitive-type"

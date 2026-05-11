@@ -30,8 +30,8 @@ class {{ model.__name__ }}({% for base in model.__bases__ %}{{ base.__name__ }}{
     _type = "{{ model._type }}"
     {% endif %}
     {% if model._kind and (model.__bases__|selectattr("_kind", "eq", model._kind) | list | length == 0) %}
-    {% if model._kind.__class__.__name__ == "FhirBaseModelKind" %}
-    _kind = FhirBaseModelKind.{{ model._kind.name }}
+    {% if model._kind.__class__.__name__ == "FHIRModelKind" %}
+    _kind = FHIRModelKind.{{ model._kind.name }}
     {% else %}
     _kind = "{{ model._kind }}"
     {% endif %}

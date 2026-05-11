@@ -1,7 +1,4 @@
-from .model import FHIRBaseModel, FHIRSliceModel, FhirBaseModelKind
-
-XML_NAMESPACE = "http://hl7.org/fhir"
-
+from .model import XML_NAMESPACE, FHIRBaseModel, FHIRModelKind, FhirBaseModelKind
 from .list import FHIRList
 from .primitives import (
     FHIRPrimitiveModel,
