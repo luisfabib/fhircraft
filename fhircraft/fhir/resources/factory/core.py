@@ -14,7 +14,6 @@ from pydantic import BaseModel
 from fhircraft.fhir.resources.base import (
     FHIRBaseModel,
     FHIRModelKind,
-    FhirBaseModelKind,
 )
 from fhircraft.fhir.resources.factory.assembler import ModelAssembler
 from fhircraft.fhir.resources.factory.context import BuildContext
