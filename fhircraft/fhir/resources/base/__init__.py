@@ -1,6 +1,10 @@
-from .model import FHIRBaseModel, FHIRModelKind, FhirBaseModelKind
-from .list import FHIRList
-from .slices import FHIRSliceModel
+from .models import (
+    FHIRBaseModel,
+    FHIRModelKind,
+    FhirBaseModelKind,
+    FHIRSliceModel,
+    FHIRList,
+)
 from .primitives import (
     FHIRPrimitiveModel,
     StringBase,

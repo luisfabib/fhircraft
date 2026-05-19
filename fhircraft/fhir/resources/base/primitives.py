@@ -3,7 +3,7 @@ import xml.etree.ElementTree as xml
 
 from pydantic import BaseModel, Field, model_serializer, model_validator
 
-from fhircraft.fhir.resources.base.model import FHIRBaseModel
+from fhircraft.fhir.resources.base.models import FHIRBaseModel
 from fhircraft.fhir.resources.base.mixins.xml import XML_NAMESPACE
 from fhircraft.utils import get_all_models_from_field
 

@@ -5,10 +5,7 @@ Provides the _parent / _index attributes and the lazy properties that
 walk up the parent chain to locate containing resources.
 """
 
-from typing import Any, Union, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from fhircraft.fhir.resources.base.model import FHIRBaseModel
+from typing import Any, Union
 
 
 class FHIRContextMixin:
@@ -21,11 +18,11 @@ class FHIRContextMixin:
     parent chain, avoiding the need to store and update those references.
     """
 
-    _parent: "Union[FHIRBaseModel, None]" = None
+    _parent: "Union[FHIRContextMixin, None]" = None
     _index: "Union[int, None]" = None
 
     @property
-    def _root_resource(self) -> "FHIRBaseModel":
+    def _root_resource(self) -> "FHIRContextMixin":
         """Walk up the _parent chain and return the topmost node."""
         node = self
         while node._parent is not None:
@@ -33,7 +30,7 @@ class FHIRContextMixin:
         return node  # type: ignore[return-value]
 
     @property
-    def _resource(self) -> "Union[FHIRBaseModel, None]":
+    def _resource(self) -> "Union[FHIRContextMixin, None]":
         """Walk up the _parent chain and return the nearest enclosing resource/logical node."""
         node: Any = self
         while node is not None:
@@ -53,7 +50,7 @@ class FHIRContextMixin:
 
     def _set_resource_context(
         self,
-        parent: "Union[FHIRBaseModel, None]" = None,
+        parent: "Union[FHIRContextMixin, None]" = None,
         index: Union[int, None] = None,
     ) -> None:
         """
@@ -63,7 +60,7 @@ class FHIRContextMixin:
         resolved lazily by walking _parent.
 
         Args:
-            parent: The parent FHIRBaseModel instance (if this is a nested field).
+            parent: The parent FHIRContextMixin instance (if this is a nested field).
             index:  The position of this instance within a parent list (if applicable).
         """
         object.__setattr__(self, "_parent", parent)
@@ -85,7 +82,7 @@ class FHIRContextMixin:
         Args:
             value: The field value (FHIRBaseModel, list, or other).
         """
-        from fhircraft.fhir.resources.base.list import FHIRList
+        from fhircraft.fhir.resources.base import FHIRList
 
         if isinstance(value, FHIRContextMixin):
             object.__setattr__(value, "_parent", self)

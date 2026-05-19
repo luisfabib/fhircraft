@@ -13,7 +13,7 @@ from pydantic.main import IncEx
 from fhircraft.utils import get_all_models_from_field, is_list_field
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.resources.base.model import FHIRBaseModel
+    from fhircraft.fhir.resources.base.models import FHIRBaseModel
 
 T = TypeVar("T", bound="FHIRXMLMixin")
 
@@ -111,8 +111,7 @@ class FHIRXMLMixin:
         Returns:
             An ``xml.Element`` representing this model.
         """
-        from fhircraft.fhir.resources.base.list import FHIRList
-        from fhircraft.fhir.resources.base.model import FHIRBaseModel
+        from fhircraft.fhir.resources.base.models import FHIRBaseModel, FHIRList
 
         element = xml.Element(f"{{{XML_NAMESPACE}}}{name}")
 
@@ -153,7 +152,7 @@ class FHIRXMLMixin:
         Returns:
             ``{element_local_name: {field: value, ...}}``
         """
-        from fhircraft.fhir.resources.base.model import FHIRBaseModel
+        from fhircraft.fhir.resources.base.models import FHIRBaseModel
 
         deserialized_data: dict[str, Any] = {}
         element_name = element.tag.split("}", 1)[-1]  # Strip namespace

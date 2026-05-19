@@ -12,7 +12,7 @@ from typing import Any, Union, List, Type, get_origin, get_args, TYPE_CHECKING
 from pydantic import ValidationError
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.resources.base.model import FHIRBaseModel
+    from fhircraft.fhir.resources.base.models import FHIRBaseModel
 
 # ---------------------------------------------------------------------------
 # Async-safe recursion guards
@@ -106,7 +106,7 @@ class FHIRPolymorphicMixin:
         - FHIRBaseModel instances — up-cast parent instances to the correct subtype.
         - Dicts — tried against each subclass in depth-first order, then the base type.
         """
-        from fhircraft.fhir.resources.base.model import FHIRBaseModel
+        from fhircraft.fhir.resources.base.models import FHIRBaseModel
 
         if isinstance(value, list):
             return [cls._deserialize_polymorphically(item, base_type) for item in value]
@@ -137,7 +137,7 @@ class FHIRPolymorphicMixin:
         resources) are serialized with all their fields, not just those of the
         declared base type.
         """
-        from fhircraft.fhir.resources.base.model import FHIRBaseModel
+        from fhircraft.fhir.resources.base.models import FHIRBaseModel
 
         if isinstance(value, (list, tuple)):
             return [self._serialize_fhir_field_polymorphically(item) for item in value]
