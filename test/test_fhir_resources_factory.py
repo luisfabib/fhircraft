@@ -1,28 +1,17 @@
-import json
 import keyword
-import tarfile
 from annotated_types import MaxLen, MinLen
 import pytest
-from typing import Optional, List, Union
-from unittest.mock import MagicMock, patch
+from typing import Optional
 
 from pydantic.aliases import AliasChoices
-from pydantic import ValidationError, Field
+from pydantic import ValidationError
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
 from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
-import fhircraft.fhir.resources.datatypes.R4.primitive as primitives
 from fhircraft.fhir.resources.factory import (
     FHIRModelFactory,
 )
-from fhircraft.fhir.resources.base import FHIRBaseModel, BaseModel
-from fhircraft.fhir.resources.datatypes.R4B.core import StructureDefinition
-from fhircraft.fhir.resources.datatypes.R4B.complex import (
-    Extension,
-    BackboneElement,
-    Element,
-)
-from fhircraft.fhir.resources.base import FHIRSliceModel
+from fhircraft.fhir.resources.base import FHIRBaseModel
 
 
 class MockType:

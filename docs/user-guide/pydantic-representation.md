@@ -290,7 +290,7 @@ Additionally, Fhircraft replaces standard Python lists with context-aware `FHIRL
 
     # List fields use FHIRList instead of standard Python lists
     print(type(patient.name))  # (1)!
-    #> <class 'fhircraft.fhir.resources.base.FHIRList'>
+    #> <class 'fhircraft.fhir.resources.base.models.FHIRList'>
 
     # Add items and context is automatically maintained
     patient.name.append(HumanName(family="Smith", given=["John"]))  # (2)!
@@ -531,12 +531,6 @@ This approach ensures type safety while maintaining the flexibility that slicing
     
     print(observation.component[1].valueInteger)  # (10)!
     #> 72
-
-    # Check available slices programmatically
-    if hasattr(VitalSignsObservation, 'get_sliced_elements'):  # (11)!
-        slices = VitalSignsObservation.get_sliced_elements()
-        print(slices)
-        #> {'component': [StringComponent, IntegerComponent]}
     ```
 
     1. String slice model with constraints specific to text-based components.
@@ -549,7 +543,6 @@ This approach ensures type safety while maintaining the flexibility that slicing
     8. Second component was assigned to the IntegerComponent slice.
     9. Access slice-specific fields directly with full type safety.
     10. Each slice provides its own validated data structure.
-    11. Introspection methods help understand the slice structure at runtime.
 
 ## What's Next?
 

@@ -802,11 +802,11 @@ class CodeGenerator:
             if kind := getattr(model, "_kind", None):
                 if (
                     hasattr(kind, "__class__")
-                    and kind.__class__.__name__ == "FhirBaseModelKind"
+                    and kind.__class__.__name__ == "FHIRModelKind"
                 ):
-                    # Import FhirBaseModelKind from base module
+                    # Import FHIRModelKind from base module
                     from fhircraft.fhir.resources.base import (
-                        FhirBaseModelKind as FBMKind,
+                        FHIRModelKind as FBMKind,
                     )
 
                     self._add_import_statement(FBMKind)

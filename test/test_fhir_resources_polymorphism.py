@@ -118,15 +118,15 @@ class TestPolymorphicSerialization:
         patient = MockModel(anyResource=resource)
 
         # Temporarily disable polymorphic serialization
-        original_setting = MockModel._enable_polymorphic_serialization
+        original_setting = MockModel._polymorphic_serialization_enabled
         try:
-            MockModel._enable_polymorphic_serialization = False
+            MockModel._polymorphic_serialization_enabled = False
             patient_dict = patient.model_dump()
 
             # The valueString field should be lost when polymorphic serialization is disabled
             assert "valueString" not in patient_dict["anyResource"]
         finally:
-            MockModel._enable_polymorphic_serialization = original_setting
+            MockModel._polymorphic_serialization_enabled = original_setting
 
     def test_polymorphic_serialization_with_none_values(self):
         """Test polymorphic serialization handles None values correctly."""
@@ -216,14 +216,15 @@ class TestPolymorphicDeserialization:
         }
 
         # Temporarily disable polymorphic deserialization
-        original_setting = MockModel._enable_polymorphic_deserialization
-        MockModel._enable_polymorphic_deserialization = False
+        original_setting = MockModel._polymorphic_deserialization_enabled
+        MockModel._polymorphic_deserialization_enabled = False
         try:
             MockModel.model_validate(data)
         except ValidationError as e:
             # Should raise validation error because valueString is not a field on base MockResource
             assert "Extra inputs are not permitted" in str(e)
-        MockModel._enable_polymorphic_deserialization = original_setting
+        finally:
+            MockModel._polymorphic_deserialization_enabled = original_setting
 
     def test_profile_accepts_parent_class_instance(self):
         """Test that profile models accept instances of their parent classes.
@@ -898,18 +899,18 @@ class TestPolymorphicEdgeCases:
             customField: Optional[str] = None
 
         # Should inherit polymorphic configuration from parent
-        assert CustomComplexResource._enable_polymorphic_serialization is True
-        assert CustomComplexResource._enable_polymorphic_deserialization is True
+        assert CustomComplexResource._polymorphic_serialization_enabled is True
+        assert CustomComplexResource._polymorphic_deserialization_enabled is True
 
         # Test that disabling on parent affects child
-        original_serialization = ComplexBaseResource._enable_polymorphic_serialization
+        original_serialization = ComplexBaseResource._polymorphic_serialization_enabled
         original_deserialization = (
-            ComplexBaseResource._enable_polymorphic_deserialization
+            ComplexBaseResource._polymorphic_deserialization_enabled
         )
 
         try:
-            ComplexBaseResource._enable_polymorphic_serialization = False
-            ComplexBaseResource._enable_polymorphic_deserialization = False
+            ComplexBaseResource._polymorphic_serialization_enabled = False
+            ComplexBaseResource._polymorphic_deserialization_enabled = False
 
             # Child should inherit the disabled state
             custom_resource = CustomComplexResource(id="custom", customField="test")
@@ -925,10 +926,10 @@ class TestPolymorphicEdgeCases:
 
         finally:
             # Restore original settings
-            ComplexBaseResource._enable_polymorphic_serialization = (
+            ComplexBaseResource._polymorphic_serialization_enabled = (
                 original_serialization
             )
-            ComplexBaseResource._enable_polymorphic_deserialization = (
+            ComplexBaseResource._polymorphic_deserialization_enabled = (
                 original_deserialization
             )
 
