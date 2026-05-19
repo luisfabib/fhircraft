@@ -1,7 +1,6 @@
 from .models import (
     FHIRBaseModel,
     FHIRModelKind,
-    FhirBaseModelKind,
     FHIRSliceModel,
     FHIRList,
 )
@@ -32,7 +31,6 @@ from .primitives import (
 
 __all__ = [
     "FHIRModelKind",
-    "FhirBaseModelKind",
     "FHIRBaseModel",
     "FHIRList",
     "FHIRSliceModel",

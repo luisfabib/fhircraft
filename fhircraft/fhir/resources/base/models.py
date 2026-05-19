@@ -48,11 +48,6 @@ class FHIRModelKind(str, enum.Enum):
     RESOURCE = "resource"
 
 
-# Backward-compatible alias kept for generated source files that still import
-# the old name.  New code should use FHIRModelKind.
-FhirBaseModelKind = FHIRModelKind
-
-
 # ---------------------------------------------------------------------------
 # FHIRBaseModel
 # ---------------------------------------------------------------------------
