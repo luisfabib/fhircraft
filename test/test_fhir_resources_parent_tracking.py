@@ -368,7 +368,7 @@ class TestFHIRListBehavior:
         parent = MockPatient(id="p1")
         items = [MockPractitioner(id="pract1"), MockPractitioner(id="pract2")]
 
-        fhir_list = FHIRList(items, parent=parent, root=parent)
+        fhir_list = FHIRList(items, parent=parent)
 
         # All items should have context
         for item in fhir_list:
@@ -395,7 +395,7 @@ class TestFHIRListBehavior:
         """Test FHIRList __setitem__ for context propagation."""
         parent = MockPatient(id="p1")
         fhir_list = FHIRList(
-            [MockPractitioner(id="pract1")], parent=parent, root=parent
+            [MockPractitioner(id="pract1")], parent=parent
         )
 
         # Replace item

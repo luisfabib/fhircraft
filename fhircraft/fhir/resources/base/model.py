@@ -1,40 +1,19 @@
-from copy import copy
-from datetime import date, datetime, time
+"""
+Core FHIRBaseModel — the abstract Pydantic base class for all FHIR types.
+"""
+
 import enum
-from functools import lru_cache
-from itertools import zip_longest
-import operator
-import re
-import threading
-from unicodedata import name
 import warnings
-from typing import (
-    Any,
-    ClassVar,
-    Generic,
-    Mapping,
-    Optional,
-    TypeVar,
-    Union,
-    Dict,
-    List,
-    Type,
-    get_origin,
-    get_args,
-    Literal,
-)
-from xml.etree.ElementInclude import include
+from abc import ABC
+from copy import copy
+from itertools import zip_longest
+from typing import Any, ClassVar, Mapping, Union, Literal
 from typing_extensions import Self
-import xml.etree.ElementTree as xml
-from xml.dom import minidom
-from pydantic.main import IncEx
+
 from pydantic.config import ExtraValues
 from pydantic import (
     BaseModel,
     ConfigDict,
-    Field,
-    RootModel,
-    ValidationError,
     PrivateAttr,
     model_validator,
     field_validator,
@@ -45,13 +24,20 @@ from pydantic import (
 from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.path.mixin import FHIRPathMixin
-from fhircraft.utils import get_all_models_from_field, is_list_field
+from fhircraft.fhir.resources.base.mixins import (
+    FHIRContextMixin,
+    FHIRXMLMixin,
+    FHIRPolymorphicMixin,
+    FHIRSliceMixin,
+)
+from fhircraft.fhir.resources.base.mixins.polymorphic import (
+    _get_polymorphic_deserialization_stack,
+    _get_polymorphic_serialization_stack,
+)
 
-XML_NAMESPACE = "http://hl7.org/fhir"
-xml.register_namespace("", XML_NAMESPACE)  # Register as the default XML namespace
-
-# Thread-local context to track polymorphic operations to prevent recursion
-_polymorphic_context = threading.local()
+# ---------------------------------------------------------------------------
+# FHIR model kind enumeration
+# ---------------------------------------------------------------------------
 
 
 class FHIRModelKind(str, enum.Enum):
@@ -63,25 +49,37 @@ class FHIRModelKind(str, enum.Enum):
     RESOURCE = "resource"
 
 
-def _get_polymorphic_deserialization_stack():
-    """Get the current polymorphic deserialization stack."""
-    if not hasattr(_polymorphic_context, "deserialization_stack"):
-        _polymorphic_context.deserialization_stack = set()
-    return _polymorphic_context.deserialization_stack
+# Backward-compatible alias kept for generated source files that still import
+# the old name.  New code should use FHIRModelKind.
+FhirBaseModelKind = FHIRModelKind
 
 
-def _get_polymorphic_serialization_stack():
-    """Get the current polymorphic serialization stack."""
-    if not hasattr(_polymorphic_context, "serialization_stack"):
-        _polymorphic_context.serialization_stack = set()
-    return _polymorphic_context.serialization_stack
+# ---------------------------------------------------------------------------
+# FHIRBaseModel
+# ---------------------------------------------------------------------------
 
 
-class FHIRBaseModel(BaseModel, FHIRPathMixin):
+class FHIRBaseModel(
+    BaseModel,
+    ABC,
+    FHIRContextMixin,
+    FHIRXMLMixin,
+    FHIRPolymorphicMixin,
+    FHIRSliceMixin,
+    FHIRPathMixin,
+):
     """
-    Base class for representation of FHIR resources as Pydantic objects.
+    Abstract base class for all FHIR resource and data-type models.
 
-    Expands the Pydantic [BaseModel](https://docs.pydantic.dev/latest/api/base_model/) class with FHIR-specific methods.
+    Extends Pydantic's BaseModel with FHIR-specific behaviour:
+    - Hierarchical parent-context tracking (_parent / _index)
+    - Polymorphic serialization and deserialization
+    - XML serialization and deserialization
+    - Profile-slice construction and introspection
+    - FHIRPath expression evaluation (via FHIRPathMixin)
+
+    **This class is abstract and may not be instantiated directly.**
+    All concrete FHIR types are generated subclasses that define _type.
     """
 
     model_config = ConfigDict(
@@ -90,60 +88,55 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         validate_by_name=True,
         extra="forbid",
     )
-    _fhir_release: ClassVar[str]
 
-    # Structureal metadata
+    # ------------------------------------------------------------------
+    # Structural class-level metadata (set by generator / factory)
+    # ------------------------------------------------------------------
+
+    _fhir_release: ClassVar[str]
     _abstract: ClassVar[bool] = False
     _kind: ClassVar[
-        FhirBaseModelKind
-        | Literal["primitive-type", "complex-type", "resource", "logical"]
+        FHIRModelKind | Literal["primitive-type", "complex-type", "resource", "logical"]
     ] = "logical"
     _type: ClassVar[str]
     _canonical_url: ClassVar[str | None]
 
-    # Configuration for polymorphic behavior
-    _enable_polymorphic_serialization: ClassVar[bool] = True
-    _enable_polymorphic_deserialization: ClassVar[bool] = True
+    # ------------------------------------------------------------------
+    # Polymorphism feature flags — subclasses may override these ClassVars
+    # to opt out of polymorphic behaviour for specific model hierarchies.
+    # ------------------------------------------------------------------
 
-    # Parent tracking attributes (stored – others computed lazily)
+    _polymorphic_serialization_enabled: ClassVar[bool] = True
+    _polymorphic_deserialization_enabled: ClassVar[bool] = True
+
+    # ------------------------------------------------------------------
+    # Parent-tracking private attributes (stored; others computed lazily)
+    # ------------------------------------------------------------------
+
     _parent: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
     _index: Union[int, None] = PrivateAttr(default=None)
 
-    @property
-    def _root_resource(self) -> "FHIRBaseModel":
-        """Walk up the _parent chain to return the topmost node (the document root)."""
-        node = self
-        while node._parent is not None:
-            node = node._parent
-        return node
-
-    @property
-    def _resource(self) -> "Union[FHIRBaseModel, None]":
-        """Walk up the _parent chain to return the nearest enclosing resource/logical node."""
-        node: "Union[FHIRBaseModel, None]" = self
-        while node is not None:
-            if node._is_resource():
-                return node
-            node = node._parent
-        return None
-
     @classmethod
-    def _is_resource(cls) -> bool:
-        """Check if this instance is a FHIR resource."""
-        return (
-            cls._kind == FhirBaseModelKind.RESOURCE
-            or cls._kind == FhirBaseModelKind.LOGICAL
-        )
+    def _get_fhir_type(cls) -> str | None:
+        """Return the FHIR type identifier for this class (e.g. 'Patient')."""
+        return getattr(cls, "_type", None)
+
+    # ------------------------------------------------------------------
+    # Pydantic lifecycle
+    # ------------------------------------------------------------------
 
     def model_post_init(self, context: Any) -> None:
-        """Initialize model and set up parent tracking."""
-        # After construction, propagate context to all nested fields
+        """Wire up parent-context tracking after construction."""
         self._set_resource_context()
+
+    # ------------------------------------------------------------------
+    # Pydantic validators
+    # ------------------------------------------------------------------
 
     @model_validator(mode="before")
     @classmethod
     def _process_primitive_shadow_fields(cls, data: Any) -> Any:
-        """Process FHIR _fieldname shadow keys, merging id/extension into the corresponding field."""
+        """Merge FHIR _fieldname shadow keys into their corresponding fields."""
         if not isinstance(data, dict):
             return data
 
@@ -197,72 +190,60 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     @model_validator(mode="before")
     @classmethod
     def _validate_resource_type(cls, data: Any) -> Any:
-
+        """Reject payloads whose resourceType does not match this class."""
         if cls._is_resource():
-            if not "resourceType" in cls.model_fields:
+            if "resourceType" not in cls.model_fields:
                 if isinstance(data, dict) and "resourceType" in data:
                     data = data.copy()
                     resource_type = data.pop("resourceType")
                     if resource_type != cls._type:
                         raise ValueError(
-                            f"Invalid resourceType '{resource_type}' for model '{cls.__name__}', expected '{cls._type}'."
+                            f"Invalid resourceType '{resource_type}' for model "
+                            f"'{cls.__name__}', expected '{cls._type}'."
                         )
-
                 elif isinstance(data, FHIRBaseModel):
                     if data._type != cls._type:
                         raise ValueError(
-                            f"Invalid resourceType '{data._type}' for model '{cls.__name__}', expected '{cls._type}'."
+                            f"Invalid resourceType '{data._type}' for model "
+                            f"'{cls.__name__}', expected '{cls._type}'."
                         )
         return data
 
     @field_validator("*", mode="before")
     @classmethod
-    def _validate_polymorphic_fields(cls, value: Any, info) -> Any:
+    def _validate_polymorphic_fields(cls, value: Any, info: Any) -> Any:
         """Apply polymorphic deserialization to FHIR fields during validation."""
-        # Check if polymorphic deserialization is enabled
-        if not cls._enable_polymorphic_deserialization:
+        if not cls._polymorphic_deserialization_enabled:
             return value
 
-        # Only process if we have field info
         if not hasattr(info, "field_name") or not info.field_name:
             return value
 
         field_name = info.field_name
-
-        # Get field info from model fields
         if field_name not in cls.model_fields:
             return value
 
         field_info = cls.model_fields[field_name]
         base_type = cls._get_field_base_type(field_info)
 
-        # Check if polymorphic deserialization should apply:
-        # 1. Abstract FHIR base types (always)
-        # 2. Non-abstract FHIR types when receiving an instance of a parent class
-        should_apply_polymorphic = (
-            base_type != object
+        if not (
+            base_type is not object
             and hasattr(base_type, "__mro__")
             and issubclass(base_type, FHIRBaseModel)
-        )
-
-        if not should_apply_polymorphic:
+        ):
             return value
 
-        # Check if this is an abstract type or if we're receiving a parent class instance
         is_abstract = base_type._abstract is True
 
-        # Check if we have a parent class instance
         is_parent_instance = False
         if isinstance(value, FHIRBaseModel):
-            # Single instance: check if it's a parent class
-            is_parent_instance = type(value) != base_type and issubclass(
+            is_parent_instance = type(value) is not base_type and issubclass(
                 base_type, type(value)
             )
         elif isinstance(value, list):
-            # List: check if any items are parent class instances
             is_parent_instance = any(
                 isinstance(item, FHIRBaseModel)
-                and type(item) != base_type
+                and type(item) is not base_type
                 and issubclass(base_type, type(item))
                 for item in value
             )
@@ -270,48 +251,41 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         if not (is_abstract or is_parent_instance):
             return value
 
-        # Create a unique key for this deserialization context
         context_key = (cls, field_name, base_type)
         stack = _get_polymorphic_deserialization_stack()
-
-        # Check if we're already processing this context to prevent recursion
         if context_key in stack:
             return value
 
-        # Add to stack and process
         stack.add(context_key)
         try:
-            result = cls._deserialize_polymorphically(value, base_type)
-            return result
+            return cls._deserialize_polymorphically(value, base_type)
         except Exception:
             return value
         finally:
-            # Always remove from stack when done
             stack.discard(context_key)
+
+    # ------------------------------------------------------------------
+    # Pydantic serializer
+    # ------------------------------------------------------------------
 
     @model_serializer(mode="wrap")
     def _serialize_polymorphic_fields(
         self, serializer: SerializerFunctionWrapHandler, info: SerializationInfo
     ) -> Any:
-        """Apply polymorphic serialization to FHIR fields during serialization."""
-        # Check if polymorphic serialization is enabled
+        """Apply polymorphic serialization and emit FHIR _fieldname shadow data."""
         if (
             not isinstance(self, FHIRBaseModel)
-            or not self._enable_polymorphic_serialization
+            or not self._polymorphic_serialization_enabled
         ):
             return serializer(self)
 
-        # Check if we're already serializing this object to prevent recursion
         object_id = id(self)
         stack = _get_polymorphic_serialization_stack()
         if object_id in stack:
-            # Already serializing this object, use normal serializer to avoid recursion
             return serializer(self)
 
-        # Add to stack
         stack.add(object_id)
         try:
-            # Get the base serialization with warnings suppressed
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore", category=UserWarning)
                 warnings.filterwarnings(
@@ -322,7 +296,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 )
                 data = serializer(self)
 
-            # Apply polymorphic serialization to FHIR fields and collect primitive shadow data
             for field_name, field_info in type(self).model_fields.items():
                 value = getattr(self, field_name, None)
                 if value is None:
@@ -331,7 +304,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 if field_name in data:
                     base_type = self._get_field_base_type(field_info)
                     if (
-                        base_type != object
+                        base_type is not object
                         and hasattr(base_type, "__mro__")
                         and issubclass(base_type, FHIRBaseModel)
                     ):
@@ -342,9 +315,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 shadow = self._get_primitive_shadow_data(value)
                 if shadow is not None:
                     data[f"_{field_name}"] = shadow
-                    # Suppress the primitive fieldname key when:
-                    # - scalar: serialized value is None
-                    # - list: ALL serialized values are None (extension-only, no actual values)
                     serialized = data.get(field_name)
                     if serialized is None:
                         data.pop(field_name, None)
@@ -362,320 +332,73 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
             return data
         finally:
-            # Always remove from stack when done
             stack.discard(object_id)
 
-    @classmethod
-    @lru_cache(maxsize=256)
-    def _get_all_subclasses(cls, base_class: Type) -> List[Type]:
-        """Get all subclasses of a base class recursively, with caching.
+    # ------------------------------------------------------------------
+    # Field mutation hook
+    # ------------------------------------------------------------------
 
-        Returns subclasses in depth-first order, with most specialized classes first.
-        This ensures polymorphic deserialization tries the most specific matches first.
-        """
-        subclasses = []
-        for subclass in base_class.__subclasses__():
-            # Add specialized subclasses first (depth-first)
-            subclasses.extend(cls._get_all_subclasses(subclass))
-            # Then add the current subclass
-            subclasses.append(subclass)
-        return subclasses
-
-    @classmethod
-    def _get_field_base_type(cls, field_info: Any) -> Type:
-        """Extract the base type from a field annotation."""
-        annotation = (
-            field_info.annotation if hasattr(field_info, "annotation") else field_info
-        )
-
-        # Handle Optional[List[SomeType]] -> SomeType
-        origin = get_origin(annotation)
-        if origin is Union:  # Optional case
-            args = get_args(annotation)
-            # Find the non-None type
-            non_none_types = [arg for arg in args if arg is not type(None)]
-            if non_none_types:
-                annotation = non_none_types[0]
-                origin = get_origin(annotation)
-
-        # Handle List[SomeType] -> SomeType
-        if origin in (list, List):
-            args = get_args(annotation)
-            if args:
-                annotation = args[0]
-
-        # Return the final type
-        if isinstance(annotation, type):
-            return annotation
-
-        return object  # Fallback
-
-    def __setattr__(self, name: str, value: Any):
-        """Override to propagate context when fields are assigned after construction."""
-        # Call parent __setattr__ first
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Propagate parent context whenever a field is assigned after construction."""
         super().__setattr__(name, value)
-
-        # Only propagate context for actual fields (not private attributes)
         if not name.startswith("_"):
-            # Propagate context to newly assigned value
             self._propagate_context_to_value(value)
 
-    def _set_resource_context(
-        self,
-        parent: Union["FHIRBaseModel", None] = None,
-        root: Union["FHIRBaseModel", None] = None,
-        resource: Union["FHIRBaseModel", None] = None,
-        index: Union[int, None] = None,
-    ):
-        """
-        Set parent and index context for this instance, then propagate to direct children.
-
-        ``_root_resource`` and ``_resource`` are computed lazily by walking ``_parent``,
-        so only ``_parent`` and ``_index`` need to be stored.  The ``root`` and
-        ``resource`` arguments are accepted for backwards-compatibility but ignored.
-
-        Args:
-            parent: The parent FHIRBaseModel instance (if this is a nested field)
-            root: Ignored – resolved lazily via the ``_root_resource`` property.
-            resource: Ignored – resolved lazily via the ``_resource`` property.
-            index: The index of this instance in a list (if applicable)
-        """
-        object.__setattr__(self, "_parent", parent)
-        object.__setattr__(self, "_index", index)
-
-        # Propagate _parent / _index to direct children only.
-        # Deeper descendants were already wired by their own model_post_init call;
-        # they resolve _root_resource / _resource lazily via property traversal.
-        for field_name in type(self).model_fields:
-            value = getattr(self, field_name, None)
-            if value is not None:
-                self._propagate_context_to_value(value)
-
-    def _propagate_context_to_value(self, value: Any):
-        """
-        Propagate parent context to a direct child field value.
-
-        Only ``_parent`` and ``_index`` are written; ``_root_resource`` and
-        ``_resource`` are resolved lazily by property traversal.
-
-        Args:
-            value: The field value (can be FHIRBaseModel, list, or other)
-        """
-
-        from fhircraft.fhir.resources.base import FHIRList, FHIRPrimitiveModel
-
-        if isinstance(value, FHIRBaseModel):
-            # Set _parent directly – no recursive descent needed.
-            object.__setattr__(value, "_parent", self)
-            object.__setattr__(value, "_index", None)
-        elif isinstance(value, list):
-            if not isinstance(value, FHIRList):
-                # Wrap plain list in FHIRList to track future mutations.
-                fhir_list = FHIRList(value, parent=self)
-                for field_name in type(self).model_fields:
-                    if getattr(self, field_name, None) is value:
-                        object.__setattr__(self, field_name, fhir_list)
-                        break
-            else:
-                # Re-point existing FHIRList at the current parent.
-                value._parent = self
-                value._propagate_context()
-
-    def model_dump_json(self, *args, **kwargs):
-        kwargs.update({"by_alias": True, "exclude_none": True})
-        return super().model_dump_json(*args, **kwargs)
-
-    def model_dump(self, *args, **kwargs):
-        kwargs.update({"by_alias": True, "exclude_none": True})
-        return super().model_dump(*args, **kwargs)
-
-    def model_dump_xml(
-        self,
-        *,
-        indent: int | None = None,
-        ensure_ascii: bool = True,
-        include: IncEx | None = None,
-        exclude: IncEx | None = None,
-        exclude_unset: bool = False,
-        exclude_none: bool = False,
-        exclude_defaults: bool = False,
-    ) -> str:
-        """
-        Serialize the FHIR resource to XML format according to FHIR specification.
-
-        Args:
-            indent: Indentation to use in the XML output. If None is passed, the output will be compact.
-            ensure_ascii: Whether to escape non-ASCII characters.
-            include: Fields to include in the output
-            exclude: Fields to exclude from the output
-            exclude_unset: Whether to exclude fields that were not explicitly set
-            exclude_none: Whether to exclude fields with None values
-            exclude_defaults: Whether to exclude fields with default values
-
-        Returns:
-            A string containing the XML representation of the FHIR resource
-        """
-
-        # Build the XML tree
-        root = self.serialize_as_xml(
-            name=self._type,
-            include=include,
-            exclude=exclude,
-            exclude_unset=exclude_unset,
-            exclude_none=exclude_none,
-            exclude_defaults=exclude_defaults,
-        )
-        tree = xml.ElementTree(root)
-
-        if indent is not None:
-            # Optional: Add indentation for readability
-            xml.indent(tree, space="  " * indent)
-
-        # Convert to string; default_namespace adds xmlns="..." to the root element
-        return xml.tostring(
-            root,
-            encoding="unicode" if ensure_ascii else "unicode",
-            xml_declaration=True,
-        )
-
-    def serialize_as_xml(self, name: str, **kwargs) -> xml.Element:
-        """Serialize this instance as an XML element (not a string)."""
-
-        from fhircraft.fhir.resources.base import FHIRList
-
-        element = xml.Element(f"{{{XML_NAMESPACE}}}{name}")
-        for subelement_name in self.model_dump(**kwargs):
-            if subelement := getattr(self, subelement_name, None):
-                if isinstance(subelement, FHIRBaseModel):
-                    element.append(
-                        subelement.serialize_as_xml(subelement_name, **kwargs)
-                    )
-                elif isinstance(subelement, (list, FHIRList)):
-                    for item in subelement:
-                        if isinstance(item, FHIRBaseModel):
-                            element.append(
-                                item.serialize_as_xml(subelement_name, **kwargs)
-                            )
-
-        # Handle special case for Extension.url which is an attribute, not a child element
-        if self._type == "Extension" and getattr(self, "url", None) is not None:
-            element.attrib["url"] = self.url  # type: ignore
-
-        # Handle resource Id as an attribute, not a child element
-        if getattr(self, "id", None) is not None:
-            element.attrib["id"] = self.id  # type: ignore
-
-        return element
-
-    @staticmethod
-    def _get_primitive_shadow_data(value: Any) -> "Any | None":
-        """Return the _fieldname shadow dict/list for a primitive with id/extension, or None."""
-        from fhircraft.fhir.resources.base import FHIRPrimitiveModel
-
-        if isinstance(value, FHIRPrimitiveModel):
-            shadow: dict = {}
-            if getattr(value, "id", None) is not None:
-                shadow["id"] = value.id
-            ext = getattr(value, "extension", None)
-            if ext:
-                shadow["extension"] = [e.model_dump() for e in ext]
-            return shadow if shadow else None
-        elif isinstance(value, list):
-            shadow_list = []
-            has_shadow = False
-            for item in value:
-                if isinstance(item, FHIRPrimitiveModel):
-                    item_shadow: dict = {}
-                    if getattr(item, "id", None) is not None:
-                        item_shadow["id"] = item.id
-                    ext = getattr(item, "extension", None)
-                    if ext:
-                        item_shadow["extension"] = [e.model_dump() for e in ext]
-                    if item_shadow:
-                        has_shadow = True
-                    shadow_list.append(item_shadow if item_shadow else None)
-                else:
-                    shadow_list.append(None)
-            return shadow_list if has_shadow else None
-        return None
-
-    def _serialize_fhir_field_polymorphically(self, value: Any) -> Any:
-        """Serialize FHIR fields polymorphically to preserve runtime type information."""
-        # Handle lists/sequences
-        if isinstance(value, (list, tuple)):
-            return [self._serialize_fhir_field_polymorphically(item) for item in value]
-
-        # Handle FHIR models - serialize them using their runtime type
-        if isinstance(value, FHIRBaseModel):
-            # Use normal model_dump which includes polymorphic serialization
-            # The polymorphic serialization has built-in recursion protection
-            return value.model_dump()
-
-        return value
+    # ------------------------------------------------------------------
+    # Public serialization API
+    # ------------------------------------------------------------------
 
     @classmethod
-    def model_construct(cls, set_defaults=True, *args, **kwargs) -> Self:
-        """
-        Constructs a model without running validation, with an option to set default values for fields that have them defined.
+    def _fhir_dump_kwargs(cls) -> dict[str, Any]:
+        """Default keyword arguments applied by model_dump and model_dump_json."""
+        return {"by_alias": True, "exclude_none": True}
 
-        Args:
-            set_defaults (bool): Optional, if `True`, sets default values for fields that have them defined (default is `True`).
+    def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        kwargs.update(self._fhir_dump_kwargs())
+        return super().model_dump(*args, **kwargs)
 
-        Returns:
-            instance (Self): An instance of the model.
-        """
-        instance = super().model_construct(*args, **kwargs)
+    def model_dump_json(self, *args: Any, **kwargs: Any) -> str:
+        kwargs.update(self._fhir_dump_kwargs())
+        return super().model_dump_json(*args, **kwargs)
 
-        if not set_defaults:
-            # Still need to set context even if not setting defaults
-            instance._set_resource_context()
-            return instance
-
-        # Set default values for fields that have them defined
-        for field_name, field in cls.model_fields.items():
-            if getattr(instance, field_name, None) is not None:
-                continue
-            if field.default not in (PydanticUndefined, None):
-                setattr(instance, field_name, copy(field.default))
-            elif field.default_factory not in (PydanticUndefined, None):
-                setattr(instance, field_name, field.default_factory)
-
-        # Set context after all fields are set
-        instance._set_resource_context()
-        return instance
+    # ------------------------------------------------------------------
+    # Public deserialization API
+    # ------------------------------------------------------------------
 
     @classmethod
     def model_validate(
         cls,
-        obj,
+        obj: Any,
         *,
-        strict=None,
-        from_attributes=None,
-        context=None,
+        strict: bool | None = None,
+        from_attributes: bool | None = None,
+        context: Any = None,
         extra: ExtraValues | None = None,
         by_alias: bool | None = None,
         by_name: bool | None = None,
     ) -> Self:
-        """Override model_validate to provide default kwargs for FHIR resources."""
+        """Validate *obj* and return a model instance."""
         if by_alias is not None:
             warnings.warn(
-                "Fhircraft model_validate does not support by_alias.  Ignoring argument.",
+                "FHIRBaseModel.model_validate does not support by_alias. Ignoring.",
                 UserWarning,
+                stacklevel=2,
             )
         if extra is not None:
             warnings.warn(
-                "Fhircraft model_validate does not support extra. Ignoring argument.",
+                "FHIRBaseModel.model_validate does not support extra. Ignoring.",
                 UserWarning,
+                stacklevel=2,
             )
         if by_name is not None:
             warnings.warn(
-                "Fhircraft model_validate does not support by_name. Ignoring argument.",
+                "FHIRBaseModel.model_validate does not support by_name. Ignoring.",
                 UserWarning,
+                stacklevel=2,
             )
-        instance = super().model_validate(
+        return super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
-        return instance
 
     @classmethod
     def model_validate_json(
@@ -688,332 +411,106 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         by_alias: bool | None = None,
         by_name: bool | None = None,
     ) -> Self:
-        """
-        Override model_validate_json to provide default kwargs for FHIR resources.
-
-        Args:
-            json_data: JSON string to deserialize
-            strict: Whether to validate strictly
-            context: Additional context for validation
-            extra: Extra parameters
-        """
+        """Deserialize *json_data* and return a validated model instance."""
         if by_alias is not None:
             warnings.warn(
-                "Fhircraft model_validate does not support by_alias.  Ignoring argument.",
+                "FHIRBaseModel.model_validate_json does not support by_alias. Ignoring.",
                 UserWarning,
+                stacklevel=2,
             )
         if extra is not None:
             warnings.warn(
-                "Fhircraft model_validate does not support extra. Ignoring argument.",
+                "FHIRBaseModel.model_validate_json does not support extra. Ignoring.",
                 UserWarning,
+                stacklevel=2,
             )
         if by_name is not None:
             warnings.warn(
-                "Fhircraft model_validate does not support by_name. Ignoring argument.",
+                "FHIRBaseModel.model_validate_json does not support by_name. Ignoring.",
                 UserWarning,
+                stacklevel=2,
             )
-        instance = super().model_validate_json(
-            json_data, strict=strict, context=context
-        )
+        return super().model_validate_json(json_data, strict=strict, context=context)
 
-        # model_post_init already propagated _parent links bottom-up during
-        # construction; no additional traversal is required here.
-        return instance
+    # ------------------------------------------------------------------
+    # Public construction API
+    # ------------------------------------------------------------------
 
     @classmethod
-    def model_validate_xml(
-        cls, xml_data: str, *, strict: bool | None = None, context: Any = None
+    def model_construct(
+        cls, set_defaults: bool = True, *args: Any, **kwargs: Any
     ) -> Self:
         """
-        Deserialize FHIR XML data into a model instance.
+        Construct a model instance without running validation.
 
         Args:
-            xml_data: XML string to deserialize
-            strict: Whether to validate strictly
-            context: Additional context for validation
+            set_defaults: When True (default), fields with a default value or
+                factory are pre-populated.
 
         Returns:
-            An instance of the model populated from the XML data
+            An unvalidated instance of the model.
         """
+        instance = super().model_construct(*args, **kwargs)
+        if not set_defaults:
+            instance._set_resource_context()
+            return instance
 
-        # Parse the XML
-        root = xml.fromstring(xml_data)
-
-        # Convert XML to dictionary, passing model class for type checking
-        data = cls.parse_xml_to_dict(root)
-
-        # parse_xml_to_dict returns {element_name: field_data}; extract the inner dict
-        inner_data = next(iter(data.values()), {})
-
-        # Use existing model_validate with the dictionary
-        return cls.model_validate(inner_data, strict=strict, context=context)
-
-    @classmethod
-    def parse_xml_to_dict(cls, element: xml.Element) -> dict:
-        deserialized_data = {}
-        element_name = element.tag.split("}", 1)[-1]  # Remove namespace
-        for field, field_info in cls.model_fields.items():
-            # Handle attributes that are encoded as XML attributes, not child elements
-            if field == "url" and (url := element.attrib.get("url")):
-                deserialized_data["url"] = url
+        for field_name, field in cls.model_fields.items():
+            if getattr(instance, field_name, None) is not None:
                 continue
-            elif field == "id" and (_id := element.attrib.get("id")):
-                deserialized_data["id"] = _id
-                continue
-            elif field == "value" and (value := element.attrib.get("value")):
-                deserialized_data["value"] = value
-                continue
+            if field.default not in (PydanticUndefined, None):
+                setattr(instance, field_name, copy(field.default))
+            elif field.default_factory not in (PydanticUndefined, None):
+                setattr(instance, field_name, field.default_factory())  # type: ignore[call-arg]
 
-            # Resolve the FHIR model class for this field so child elements are
-            # parsed with the correct schema rather than the parent class.
-            field_type = next(get_all_models_from_field(field_info), None)
-            if field_type is not None and not issubclass(field_type, FHIRBaseModel):
-                continue
-            if is_list_field(field_info):
-                children = element.findall(f"{{{XML_NAMESPACE}}}{field}")
-                if children and field_type is not None:
-                    values: list = []
-                    shadows: list = []
-                    has_shadow = False
-                    for child in children:
-                        child_result = field_type.parse_xml_to_dict(child)
-                        item_value = child_result.get(field)
-                        shadow_value = child_result.get(f"_{field}")
-                        values.append(item_value)
-                        if shadow_value is not None:
-                            shadows.append(shadow_value)
-                            has_shadow = True
-                        else:
-                            shadows.append(None)
-                    deserialized_data[field] = values
-                    if has_shadow:
-                        deserialized_data[f"_{field}"] = shadows
-            else:
-                child = element.find(f"{{{XML_NAMESPACE}}}{field}")
-                if child is not None and field_type is not None:
-                    deserialized_data.update(field_type.parse_xml_to_dict(child))
-        return {element_name: deserialized_data}
-
-    @classmethod
-    def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:
-        """Deserialize a value using the best matching subclass.
-
-        Handles:
-        - Lists of items to deserialize recursively
-        - FHIR instances (parent class instances) by converting to dict for re-validation
-        - Dictionaries (potential FHIR objects) by trying subclasses
-        """
-        # Handle lists
-        if isinstance(value, list):
-            return [cls._deserialize_polymorphically(item, base_type) for item in value]
-
-        # Handle FHIRBaseModel instances (e.g., parent class instances for profile fields)
-        if isinstance(value, FHIRBaseModel):
-            # If the value is already an instance of the target type or a subclass, return as-is
-            if isinstance(value, base_type):
-                return value
-
-            # Convert the parent instance to a dictionary for re-validation against the target type
-            # This allows Pydantic to validate and convert it properly
-            value_dict = value.model_dump()
-            # Recursively deserialize the dictionary
-            return cls._deserialize_polymorphically(value_dict, base_type)
-
-        # Handle dictionaries (potential FHIR objects)
-        if isinstance(value, dict):
-            # Find the best matching subclass
-            subclasses = cls._get_all_subclasses(base_type)
-            for subclass in subclasses:
-                try:
-                    # Try to instantiate with the subclass
-                    # Recursion is now prevented at the field validator level
-                    result = subclass.model_validate(
-                        value,
-                    )
-                    return result
-                except (ValidationError, ValueError, TypeError) as e:
-                    # If specific class fails, continue trying other subclasses
-                    continue
-
-            # If no subclass worked, try the base type as fallback
-            try:
-                result = base_type.model_validate(
-                    value,
-                )
-                return result
-            except (ValidationError, ValueError, TypeError):
-                # If base type also fails, return original value
-                pass
-
-        return value
+        instance._set_resource_context()
+        return instance
 
     def model_copy(
         self, *, update: Mapping[str, Any] | None = None, deep: bool = False
     ) -> Self:
         """
-        Override model_copy to reset parent context on copied instance.
+        Return a copy of this instance with parent context reset.
 
         Args:
-            update: Optional dict of field updates to apply to the copy
-            deep: Whether to perform a deep copy
+            update: Optional field updates to apply to the copy.
+            deep: Whether to perform a deep copy.
 
         Returns:
-            A copied instance with reset parent context
+            A copied instance with no parent context.
         """
-        # Avoid calling __deepcopy__ since model_copy(deep=True) calls it without memo
-        # Instead, let Pydantic do the copy, then reset context
-        copied: Self = BaseModel.model_copy(self, update=update, deep=deep)  # type: ignore
-        # Reset context - copied instance should be a new root
+        copied: Self = BaseModel.model_copy(self, update=update, deep=deep)  # type: ignore[arg-type]
         copied._set_resource_context()
         return copied
 
+    # ------------------------------------------------------------------
+    # Dunder helpers
+    # ------------------------------------------------------------------
+
     def __deepcopy__(self, memo: dict[int, Any] | None = None) -> Self:
         """
-        Override deepcopy to handle circular parent references properly.
+        Deep-copy via serialize → deserialize to avoid circular parent references.
 
         Args:
-            memo: Dictionary for tracking already copied objects
+            memo: Standard deepcopy memo dict.
 
         Returns:
-            A deep copied instance with reset parent context
+            A fully independent copy with fresh parent context.
         """
-        # Simple approach: serialize and deserialize to get a deep copy
-        # This avoids recursion issues and properly handles all Pydantic internals
-        data = self.model_dump()
-        copied = type(self).model_validate(data)
-
+        copied = type(self).model_validate(self.model_dump())
         if memo is not None:
-            # Register in memo
             memo[id(self)] = copied
-
-        # Context is automatically set during model_validate via __init__
         return copied
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
-        Override equality to exclude tracking attributes from comparison.
+        Compare field values only, excluding tracking attributes (_parent, _index).
 
-        This prevents infinite recursion when comparing models with circular
-        parent references via _parent and _root_resource.
+        Avoids infinite recursion through circular _parent chains.
         """
         if not isinstance(other, type(self)):
             return False
-
-        # Compare only the actual field values, not tracking attributes
-        # We use model_dump to get just the field data without private attributes
         return self.model_dump() == other.model_dump()
-
-    @classmethod
-    def model_construct_with_slices(cls, slice_copies: int = 9) -> object:
-        """
-        Constructs a model with sliced elements by creating empty slice instances based on the specified number of slice copies.
-        The method iterates over the sliced elements of the class, generates slice resources, and sets them in the resource collection.
-
-        Args:
-            slice_copies (int): Optional, an integer specifying the number of copies for each slice (default is 9).
-
-        Returns:
-            instance (Self): An instance of the model with the sliced elements constructed.
-        """
-        from fhircraft.fhir.path.parser import fhirpath
-
-        instance = super().model_construct()
-        for element, slices in cls.get_sliced_elements().items():
-            slice_resources = []
-            for slice in slices:
-                # Add empty slice instances
-                slice_resources.extend(
-                    [
-                        slice.model_construct_with_slices()
-                        for _ in range(min(slice.max_cardinality or 9999, slice_copies))
-                    ]
-                )
-            # Set the whole list of slices in the resource
-            collection = fhirpath.parse(element).__evaluate_wrapped(
-                instance, create=True
-            )
-            [item.set_literal(slice_resources) for item in collection]
-        return instance
-
-    @classmethod
-    def get_sliced_elements(cls) -> dict[str, list[type["FHIRSliceModel"]]]:
-        """
-        Get the sliced elements from the model fields and their extension fields.
-        Sliced elements are filtered based on being instances of `FHIRSliceModel`.
-
-        Returns:
-            slices (dict): A dictionary with field names as keys and corresponding sliced elements as values.
-        """
-        # Get model elements' extension fields
-        extensions = {
-            f"{field_name}.extension": next(
-                (
-                    arg.model_fields.get("extension")
-                    for arg in get_all_models_from_field(field)
-                    if arg.model_fields.get("extension")
-                ),
-                None,
-            )
-            for field_name, field in cls.model_fields.items()
-            if field_name != "extension"
-        }
-        fields = {
-            **cls.model_fields,
-            **extensions,
-        }
-        # Compile the sliced elements in the model
-        return {
-            field_name: slices
-            for field_name, field in fields.items()
-            if field
-            and bool(
-                slices := list(
-                    get_all_models_from_field(field, issubclass_of=FHIRSliceModel)
-                )
-            )
-        }
-
-    @classmethod
-    def clean_unusued_slice_instances(cls, resource):
-        """
-        Cleans up unused or incomplete slice instances within the given FHIR resource by iterating through the
-        sliced elements of the class, identifying valid elements, and updating the resource with only the valid slices.
-        """
-        from fhircraft.fhir.path.parser import fhirpath
-
-        # Remove unused/incomplete slices
-        for element, slices in cls.get_sliced_elements().items():
-            valid_elements = [
-                col.value
-                for col in fhirpath.parse(element).__evaluate_wrapped(
-                    resource, create=True
-                )
-                if col.value is not None
-            ]
-            new_valid_elements = []
-            if not valid_elements:
-                continue
-            for slice in slices:
-                # Get all the elements that conform to this slice's definition
-                sliced_entries = [
-                    entry for entry in valid_elements if isinstance(entry, slice)
-                ]
-                for entry in sliced_entries:
-                    if slice.get_sliced_elements():
-                        entry = slice.clean_unusued_slice_instances(entry)
-                    if (entry.is_FHIR_complete and entry.has_been_modified) or (
-                        entry.is_FHIR_complete
-                        and not entry.has_been_modified
-                        and slice.min_cardinality > 0
-                    ):
-                        if entry not in new_valid_elements:
-                            new_valid_elements.append(entry)
-            # Set the new list with only the valid slices
-            collection = fhirpath.parse(element).__evaluate_wrapped(
-                resource, create=True
-            )
-            [col.set_literal(new_valid_elements) for col in collection]
-        return resource
 
     def _get_repr_args(self) -> list[str]:
         repr_args = []
@@ -1028,35 +525,3 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({', '.join(self._get_repr_args())})"
-
-
-class FHIRSliceModel(FHIRBaseModel):
-    """
-    Base class for representation of FHIR profiled slices as Pydantic objects.
-
-    Expands the `FHIRBaseModel` class with slice-specific methods.
-    """
-
-    min_cardinality: ClassVar[int] = 0
-    max_cardinality: ClassVar[int | None] = None
-
-    @property
-    def is_FHIR_complete(self):
-        """
-        Validates if the FHIR model is complete by attempting to validate the model dump.
-        Returns `True` if the model is complete, `False` otherwise.
-        """
-        model = self.__class__
-        try:
-            model.model_validate(self.model_dump())
-            return True
-        except ValidationError:
-            return False
-
-    @property
-    def has_been_modified(self):
-        """
-        Checks if the FHIRSliceModel instance has been modified by comparing it with a new instance constructed with slices.
-        Returns `True` if the instance has been modified, `False` otherwise.
-        """
-        return self != self.__class__.model_construct_with_slices()

@@ -9,11 +9,12 @@ class FHIRList(list):
     to FHIRBaseModel items when they are added via append, extend, insert, or __setitem__.
     """
 
-    def __init__(self, items=None, parent=None, root=None, resource=None):
+    def __init__(self, items=None, parent=None):
         """Initialize FHIRList with items and context.
 
-        ``root`` and ``resource`` are accepted for backwards-compatibility but
-        are no longer stored; they are resolved lazily via ``_parent`` on items.
+        Args:
+            items: Initial items for the list.
+            parent: The parent FHIRBaseModel instance that owns this list.
         """
         super().__init__(items or [])
         self._parent = parent

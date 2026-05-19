@@ -1,5 +1,6 @@
-from .model import XML_NAMESPACE, FHIRBaseModel, FHIRModelKind, FhirBaseModelKind
+from .model import FHIRBaseModel, FHIRModelKind, FhirBaseModelKind
 from .list import FHIRList
+from .slices import FHIRSliceModel
 from .primitives import (
     FHIRPrimitiveModel,
     StringBase,
@@ -24,3 +25,33 @@ from .primitives import (
     XhtmlBase,
     Integer64Base,
 )
+
+__all__ = [
+    "FHIRModelKind",
+    "FhirBaseModelKind",
+    "FHIRBaseModel",
+    "FHIRList",
+    "FHIRSliceModel",
+    "FHIRPrimitiveModel",
+    "StringBase",
+    "BooleanBase",
+    "IntegerBase",
+    "DecimalBase",
+    "DateBase",
+    "DateTimeBase",
+    "TimeBase",
+    "UriBase",
+    "UrlBase",
+    "CodeBase",
+    "IdBase",
+    "OidBase",
+    "CanonicalBase",
+    "UuidBase",
+    "InstantBase",
+    "MarkdownBase",
+    "PositiveIntBase",
+    "UnsignedIntBase",
+    "Base64BinaryBase",
+    "XhtmlBase",
+    "Integer64Base",
+]

@@ -3,7 +3,8 @@ import xml.etree.ElementTree as xml
 
 from pydantic import BaseModel, Field, model_serializer, model_validator
 
-from fhircraft.fhir.resources.base import XML_NAMESPACE, FHIRBaseModel
+from fhircraft.fhir.resources.base.model import FHIRBaseModel
+from fhircraft.fhir.resources.base.mixins.xml import XML_NAMESPACE
 from fhircraft.utils import get_all_models_from_field
 
 
@@ -20,12 +21,12 @@ class FHIRPrimitiveModel(FHIRBaseModel):
     value: Any | None = Field(default=None, description="The actual value")
 
     @model_serializer
-    def serialize_root_value(self) -> Any:
+    def _serialize_root_value(self) -> Any:
         if isinstance(self, FHIRPrimitiveModel):
             return self.value
         return self
 
-    def serialize_as_json(self, name: str) -> dict:
+    def _serialize_as_json(self, name: str) -> dict:
         serialized = dict()
         if self.value:
             serialized[name] = self.value
@@ -39,7 +40,7 @@ class FHIRPrimitiveModel(FHIRBaseModel):
                 ]
         return serialized
 
-    def serialize_as_xml(self, name: str, **kwargs) -> xml.Element:
+    def _serialize_as_xml(self, name: str, **kwargs) -> xml.Element:
         attributes = {}
         if self.value is not None:
             attributes["value"] = (
@@ -51,11 +52,11 @@ class FHIRPrimitiveModel(FHIRBaseModel):
             attributes["id"] = self.id
         primitive = xml.Element(f"{{{XML_NAMESPACE}}}{name}", attrib=attributes)
         for ext in self.extension or []:
-            primitive.append(ext.serialize_as_xml("extension", **kwargs))
+            primitive.append(ext._serialize_as_xml("extension", **kwargs))
         return primitive
 
     @classmethod
-    def parse_xml_to_dict(cls, element: xml.Element) -> dict:
+    def _parse_xml_to_dict(cls, element: xml.Element) -> dict:
         element_name = element.tag.split("}", 1)[-1]  # Remove namespace
         # Collect extensions if present using the correct Extension type from the field
         extensions = []
@@ -64,7 +65,7 @@ class FHIRPrimitiveModel(FHIRBaseModel):
             extension_type = next(get_all_models_from_field(extension_field), None)
             if extension_type is not None and issubclass(extension_type, FHIRBaseModel):
                 for ext_element in element.findall(f"{{{XML_NAMESPACE}}}extension"):
-                    ext_result = extension_type.parse_xml_to_dict(ext_element)
+                    ext_result = extension_type._parse_xml_to_dict(ext_element)
                     ext_data = ext_result.get("extension")
                     if ext_data is not None:
                         extensions.append(ext_data)

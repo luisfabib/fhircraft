@@ -9,7 +9,8 @@ from fhircraft.fhir.resources.datatypes.R4 import (
     Integer,
     HumanName,
 )
-from fhircraft.fhir.resources.base import XML_NAMESPACE, FHIRBaseModel
+from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.base.mixins.xml import XML_NAMESPACE
 
 import xml.etree.ElementTree as xml
 import json
@@ -33,13 +34,13 @@ XMLNS = {"": XML_NAMESPACE}
 
 def test_serialize_as_json__primitive__only_value():
     primitive = String(value="Hello world")
-    data = primitive.serialize_as_json("valueString")
+    data = primitive._serialize_as_json("valueString")
     assert data == {"valueString": "Hello world"}
 
 
 def test_serialize_as_json__primitive__only_extension():
     primitive = String(extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore
-    data = primitive.serialize_as_json("valueString")
+    data = primitive._serialize_as_json("valueString")
     assert data == {
         "_valueString": {
             "extension": [{"url": "http://example.com", "valueString": "example"}]
@@ -49,7 +50,7 @@ def test_serialize_as_json__primitive__only_extension():
 
 def test_serialize_as_json__primitive__value_with_id():
     primitive = String(value="Hello world", id="123")
-    data = primitive.serialize_as_json("valueString")
+    data = primitive._serialize_as_json("valueString")
     assert data == {"valueString": "Hello world", "_valueString": {"id": "123"}}
 
 
@@ -74,7 +75,7 @@ def test_serialize_as_json__primitive__model_dump_json():
 
 def test_serialize_as_json__primitive__value_and_extension():
     primitive = String(value="Hello world", extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore
-    data = primitive.serialize_as_json("valueString")
+    data = primitive._serialize_as_json("valueString")
     assert data == {
         "valueString": "Hello world",
         "_valueString": {
@@ -172,14 +173,14 @@ def test_serialize_as_json__resource__includes_resource_type():
 
 def test_serialize_as_xml__primitive__only_value():
     primitive = String(value="Hello world")
-    element = primitive.serialize_as_xml("valueString")
+    element = primitive._serialize_as_xml("valueString")
     assert "valueString" in element.tag
     assert element.attrib == {"value": "Hello world"}
 
 
 def test_serialize_as_xml__primitive__only_extension():
     primitive = String(extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore
-    element = primitive.serialize_as_xml("valueString")
+    element = primitive._serialize_as_xml("valueString")
     assert "valueString" in element.tag
     assert (extension := element.find("extension", XMLNS)) is not None
     assert "extension" in extension.tag
@@ -190,21 +191,21 @@ def test_serialize_as_xml__primitive__only_extension():
 
 def test_serialize_as_xml__primitive__value_with_id():
     primitive = String(value="Hello world", id="123")
-    element = primitive.serialize_as_xml("valueString")
+    element = primitive._serialize_as_xml("valueString")
     assert "valueString" in element.tag
     assert element.attrib == {"value": "Hello world", "id": "123"}
 
 
 def test_serialize_as_xml__primitive__boolean_true():
     primitive = Boolean(value=True)
-    element = primitive.serialize_as_xml("valueBoolean")
+    element = primitive._serialize_as_xml("valueBoolean")
     assert "valueBoolean" in element.tag
     assert element.attrib == {"value": "true"}
 
 
 def test_serialize_as_xml__primitive__boolean_false():
     primitive = Boolean(value=False)
-    element = primitive.serialize_as_xml("valueBoolean")
+    element = primitive._serialize_as_xml("valueBoolean")
     assert "valueBoolean" in element.tag
     assert element.attrib == {"value": "false"}
 
@@ -214,7 +215,7 @@ def test_serialize_as_xml__primitive__value_and_extension():
         value="Hello",
         extension=[Extension(url="http://example.com", valueString="example")],
     )
-    element = primitive.serialize_as_xml("valueString")
+    element = primitive._serialize_as_xml("valueString")
     assert element.attrib["value"] == "Hello"
     assert (ext := element.find("extension", XMLNS)) is not None
     assert ext.attrib["url"] == "http://example.com"
@@ -229,7 +230,7 @@ def test_serialize_as_xml__primitive__value_and_extension():
 
 def test_parse_xml_to_dict__primitive__only_value():
     xml_str = '<valueString xmlns="http://hl7.org/fhir" value="Hello world"/>'
-    primitive = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    primitive = String._parse_xml_to_dict(xml.fromstring(xml_str))
     assert primitive == {"valueString": "Hello world"}
 
 
@@ -241,7 +242,7 @@ def test_parse_xml_to_dict__primitive__only_extension():
         </extension>
     </valueString>
     """
-    result = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = String._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {
         "_valueString": {
             "extension": [{"url": "http://example.com", "valueString": "example"}]
@@ -251,19 +252,19 @@ def test_parse_xml_to_dict__primitive__only_extension():
 
 def test_parse_xml_to_dict__primitive__value_with_id():
     xml_str = '<valueString xmlns="http://hl7.org/fhir" value="Hello world" id="123"/>'
-    result = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = String._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {"valueString": "Hello world", "_valueString": {"id": "123"}}
 
 
 def test_parse_xml_to_dict__primitive__boolean_true():
     xml_str = '<valueBoolean xmlns="http://hl7.org/fhir" value="true"/>'
-    result = Boolean.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = Boolean._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {"valueBoolean": True}
 
 
 def test_parse_xml_to_dict__primitive__boolean_false():
     xml_str = '<valueBoolean xmlns="http://hl7.org/fhir" value="false"/>'
-    result = Boolean.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = Boolean._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {"valueBoolean": False}
 
 
@@ -275,7 +276,7 @@ def test_parse_xml_to_dict__primitive__value_and_extension():
         </extension>
     </valueString>
     """
-    result = String.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = String._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {
         "valueString": "Hello",
         "_valueString": {
@@ -291,7 +292,7 @@ def test_parse_xml_to_dict__primitive__value_and_extension():
 
 def test_serialize_as_xml__complex__only_values():
     primitive = Coding(code="C123", system="http://example.com", display="Example Code")
-    element = primitive.serialize_as_xml("valueCoding")
+    element = primitive._serialize_as_xml("valueCoding")
     assert "valueCoding" in element.tag
     assert (code := element.find("code", XMLNS)) is not None
     assert code.attrib == {"value": "C123"}
@@ -303,7 +304,7 @@ def test_serialize_as_xml__complex__only_values():
 
 def test_serialize_as_xml__complex__with_id():
     primitive = Coding(display="Example Code", id="123")
-    element = primitive.serialize_as_xml("valueCoding")
+    element = primitive._serialize_as_xml("valueCoding")
     assert "valueCoding" in element.tag
     assert element.attrib == {"id": "123"}
     assert (display := element.find("display", XMLNS)) is not None
@@ -317,7 +318,7 @@ def test_serialize_as_xml__complex__list_of_complex_types():
             Coding(code="C456", system="http://example2.com"),
         ]
     )
-    element = concept.serialize_as_xml("valueCodeableConcept")
+    element = concept._serialize_as_xml("valueCodeableConcept")
     assert "valueCodeableConcept" in element.tag
     codings = element.findall("coding", XMLNS)
     assert len(codings) == 2
@@ -327,7 +328,7 @@ def test_serialize_as_xml__complex__list_of_complex_types():
 
 def test_serialize_as_xml__complex__list_of_primitives():
     instance = HumanName(given=[String(value="Alice"), String(value="Marie")])
-    element = instance.serialize_as_xml("name")
+    element = instance._serialize_as_xml("name")
     assert "name" in element.tag
     given_elements = element.findall("given", XMLNS)
     assert len(given_elements) == 2
@@ -344,7 +345,7 @@ def test_serialize_as_xml__complex__nested_complex_type():
         ],
         text="Official Identifier",  # type: ignore
     )
-    element = concept.serialize_as_xml("type")
+    element = concept._serialize_as_xml("type")
     assert "type" in element.tag
     codings = element.findall("coding", XMLNS)
     assert len(codings) == 1
@@ -366,7 +367,7 @@ def test_parse_xml_to_dict__complex__coding():
         <display value="Example Code"/>
     </valueCoding>
     """
-    result = Coding.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = Coding._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {
         "valueCoding": {
             "system": "http://example.org/system",
@@ -382,7 +383,7 @@ def test_parse_xml_to_dict__complex__coding__with_id():
         <code value="abc"/>
     </valueCoding>
     """
-    result = Coding.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = Coding._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {"valueCoding": {"code": "abc", "id": "c1"}}
 
 
@@ -396,7 +397,7 @@ def test_parse_xml_to_dict__complex__codeable_concept__with_text():
         <text value="Official Identifier"/>
     </type>
     """
-    result = CodeableConcept.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = CodeableConcept._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {
         "type": {
             "coding": [{"system": "http://example.com", "code": "official"}],
@@ -418,7 +419,7 @@ def test_parse_xml_to_dict__complex__codeable_concept__multiple_codings():
         </coding>
     </code>
     """
-    result = CodeableConcept.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = CodeableConcept._parse_xml_to_dict(xml.fromstring(xml_str))
     assert len(result["code"]["coding"]) == 2
     assert result["code"]["coding"][0] == {
         "system": "http://snomed.info/sct",
@@ -438,7 +439,7 @@ def test_parse_xml_to_dict__complex__human_name__list_of_primitives():
         <given value="Marie"/>
     </name>
     """
-    result = HumanName.parse_xml_to_dict(xml.fromstring(xml_str))
+    result = HumanName._parse_xml_to_dict(xml.fromstring(xml_str))
     assert result == {"name": {"family": "Smith", "given": ["Alice", "Marie"]}}
 
 
@@ -451,6 +452,7 @@ def test_model_validate_xml__complex__coding():
     </Coding>
     """
     coding = Coding.model_validate_xml(xml_str)
+    assert coding is not None
     assert str(coding.system) == "http://example.org/system"
     assert str(coding.code) == "abc"
     assert str(coding.display) == "Example Code"
@@ -526,7 +528,7 @@ def test_model_validate_xml__resource__observation():
 
 def test_serialize_as_xml__resource__element_tag_is_type():
     instance = Observation(valueString=String(value="John"))
-    element = instance.serialize_as_xml(instance._type)
+    element = instance._serialize_as_xml(instance._type)
     assert "Observation" in element.tag
     assert (name_el := element.find("valueString", XMLNS)) is not None
     assert name_el.attrib == {"value": "John"}
