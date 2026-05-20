@@ -8,8 +8,8 @@
    version="1.1"
    id="svg16932"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
-   sodipodi:docname="logo-banner.svg"
-   inkscape:export-filename="logo-banner.png"
+   sodipodi:docname="logo-banner-dark.svg"
+   inkscape:export-filename="logo-banner-dark.png"
    inkscape:export-xdpi="600"
    inkscape:export-ydpi="600"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -28,8 +28,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.5499273"
-     inkscape:cx="462.78844"
-     inkscape:cy="-88.193475"
+     inkscape:cx="379.14102"
+     inkscape:cy="-82.738209"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="1912"
@@ -103,35 +103,35 @@
          y="517.67694" />
       <text
          xml:space="preserve"
-         style="font-size:25.4px;line-height:0.85;font-family:sans-serif;letter-spacing:0.765858px;fill:#000000;fill-opacity:0.933333;stroke-width:0.513743"
+         style="font-size:25.4px;line-height:0.85;font-family:sans-serif;letter-spacing:0.765858px;fill:#f2f2f2;fill-opacity:0.933333;stroke-width:0.513743"
          x="-9.4556322"
          y="516.02527"
          id="text12474"><tspan
            sodipodi:role="line"
            id="tspan12472"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.85;font-family:'Fredoka One';-inkscape-font-specification:'Fredoka One';letter-spacing:0.765858px;fill:#000000;fill-opacity:0.933333;stroke-width:0.513743"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:25.4px;line-height:0.85;font-family:'Fredoka One';-inkscape-font-specification:'Fredoka One';letter-spacing:0.765858px;fill:#f2f2f2;fill-opacity:0.933333;stroke-width:0.513743"
            x="-9.4556322"
            y="516.02527">FHIRCRAFT</tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:5.58681px;line-height:1.25;font-family:sans-serif;letter-spacing:-0.0205044px;fill:#666666;fill-opacity:1;stroke-width:0.333457"
+         style="font-size:5.58681px;line-height:1.25;font-family:sans-serif;letter-spacing:-0.0205044px;fill:#b3b3b3;fill-opacity:1;stroke-width:0.333457"
          x="-9.1393576"
          y="526.16425"
          id="text12474-7"><tspan
            sodipodi:role="line"
            id="tspan12472-3"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.58681px;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;letter-spacing:-0.0205044px;fill:#666666;fill-opacity:1;stroke-width:0.333457"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.58681px;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;letter-spacing:-0.0205044px;fill:#b3b3b3;fill-opacity:1;stroke-width:0.333457"
            x="-9.1393576"
            y="526.16425">powered by </tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#e72564;fill-opacity:1;stroke-width:0.463234"
+         style="font-size:7.76111px;line-height:1.25;font-family:sans-serif;fill:#f2f2f2;fill-opacity:1;stroke-width:0.463234"
          x="37.450863"
          y="526.70624"
          id="text12474-7-5"><tspan
            sodipodi:role="line"
            id="tspan12472-3-1"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.76111px;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;fill:#000000;fill-opacity:1;stroke-width:0.463234"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.76111px;font-family:Bahnschrift;-inkscape-font-specification:Bahnschrift;fill:#f2f2f2;fill-opacity:1;stroke-width:0.463234"
            x="37.450863"
            y="526.70624">Pydantic</tspan></text>
     </g>
