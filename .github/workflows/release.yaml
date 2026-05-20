@@ -8,11 +8,16 @@ jobs:
 
   pypi-build-n-publish:
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/fhircraft
+    permissions:
+      id-token: write
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v6
     - name: Set up Python 3.11
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v6
       with:
         python-version: "3.11"
     - name: Install pypa/build
@@ -21,8 +26,5 @@ jobs:
     - name: Build a binary wheel and a source tarball
       run: >-
         python -m build --sdist --wheel --outdir dist/
-    - name: Publish distribution to PyPI
+    - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}s
