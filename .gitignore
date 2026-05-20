@@ -3,6 +3,16 @@
 /ca-certificates/**
 pip-proxy.sh
 
+# secrets / credentials
+.env
+.env.*
+*.key
+*.pem
+secrets/
+credentials/
+.aws/
+.ssh/
+
 .codiumai.toml 
 .vscode/settings.json
 # Byte-compiled / optimized / DLL files
