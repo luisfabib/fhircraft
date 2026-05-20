@@ -44,10 +44,11 @@ In real applications, you'll often receive FHIR data from APIs, databases, or fi
 You can load FHIR data from JSON files, validate it against the FHIR specification, and convert it back to JSON:
 
 ```python
-from fhircraft.utils import load_file
+import json
 
 # Load FHIR JSON
-data = load_file('patient.json')
+with open('patient.json') as f:
+    data = json.load(f)
 
 # Validate against FHIR specification
 patient = Patient.model_validate(data)
