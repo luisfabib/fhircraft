@@ -7,7 +7,7 @@ import warnings
 from abc import ABC
 from copy import copy
 from itertools import zip_longest
-from typing import Any, ClassVar, Mapping, Union, Literal
+from typing import Any, ClassVar, Iterable, Mapping, SupportsIndex, Union, Literal
 from typing_extensions import Self
 
 from pydantic.config import ExtraValues
@@ -537,7 +537,9 @@ class FHIRList(list):
     to FHIRBaseModel items when they are added via append, extend, insert, or __setitem__.
     """
 
-    def __init__(self, items=None, parent=None):
+    def __init__(
+        self, items: Iterable[Any] | None = None, parent: FHIRBaseModel | None = None
+    ):
         """Initialize FHIRList with items and context.
 
         Args:
@@ -558,14 +560,14 @@ class FHIRList(list):
                 object.__setattr__(item, "_parent", self._parent)
                 object.__setattr__(item, "_index", index)
 
-    def append(self, item):
+    def append(self, item: Any):
         """Append item and propagate context."""
         super().append(item)
         if isinstance(item, FHIRBaseModel):
             object.__setattr__(item, "_parent", self._parent)
             object.__setattr__(item, "_index", len(self) - 1)
 
-    def extend(self, items):
+    def extend(self, items: Iterable[Any]):
         """Extend list and propagate context to new items."""
         start_index = len(self)
         super().extend(items)
@@ -574,14 +576,14 @@ class FHIRList(list):
                 object.__setattr__(item, "_parent", self._parent)
                 object.__setattr__(item, "_index", start_index + offset)
 
-    def insert(self, index, item):
+    def insert(self, index: SupportsIndex, item: Any):
         """Insert item and propagate context."""
         super().insert(index, item)
         if isinstance(item, FHIRBaseModel):
             object.__setattr__(item, "_parent", self._parent)
             object.__setattr__(item, "_index", index)
         # Re-index all items after insertion point
-        for i in range(index + 1, len(self)):
+        for i in range(int(index) + 1, len(self)):
             if isinstance(self[i], FHIRBaseModel):
                 object.__setattr__(self[i], "_index", i)
 

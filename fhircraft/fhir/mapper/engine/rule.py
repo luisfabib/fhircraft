@@ -14,7 +14,6 @@ from fhircraft.fhir.mapper.engine.scope import MappingScope
 from fhircraft.fhir.path import engine as fhirpath
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
@@ -31,6 +30,7 @@ if TYPE_CHECKING:
         StructureMapGroupRule as R5_StructureMapGroupRule,
         StructureMapGroupRuleDependent as R5_StructureMapGroupRuleDependent,
     )
+    from fhircraft.fhir.mapper.engine.group import Group
 
 
 class Rule(FHIRMappingEngineComponent):
@@ -44,13 +44,14 @@ class Rule(FHIRMappingEngineComponent):
     def __init__(
         self,
         definition: "R4_StructureMapGroupRule | R4B_StructureMapGroupRule| R5_StructureMapGroupRule",
-        parent_group=None,
+        parent_group: "Group | None" = None,
     ):
         """
         Initializes a Rule instance from a StructureMapGroupRuleTarget.
 
         Args:
-            source: The StructureMapGroupRuleTarget to initialize from.
+            definition: The StructureMapGroupRuleTarget definition to initialize from.
+            parent_group: The parent Group if this rule is nested within a group, or None if it is not.
         Raises:
             SourceProcessingError: If required fields are missing.
         """

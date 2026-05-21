@@ -122,7 +122,7 @@ def is_fhir_resource_type(
     Args:
         value: The value to check
         fhir_type: The complex FHIR type (or name thereof) to check against
-        raise_on_error: Whether to raise FHIRTypeError on unknown type (default: True)
+        release: The FHIR release to use when resolving fhir_type if it is given as a string (e.g., "4.0.1", "4.3.0", "5.0.0"). Required if fhir_type is a string.
 
     Returns:
         bool: `True` if the value conforms to the type, `False` otherwise

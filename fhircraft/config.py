@@ -7,8 +7,7 @@ import os
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from typing import FrozenSet, Literal, Container
-
+from typing import FrozenSet, Generator, Literal, Container
 
 _VALID_MODES = ("strict", "lenient", "skip")
 
@@ -115,7 +114,7 @@ def override_config(
     disable_fhir_errors: bool | None = None,
     disabled_fhir_constraints: Container[str] | None = None,
     validation_mode: Literal["strict", "lenient", "skip"] | None = None,
-):
+) -> Generator[FhircraftConfig, None, None]:
     """Context manager for temporary configuration changes.
 
     All parameters are optional; only the ones provided will be changed within
@@ -130,7 +129,7 @@ def override_config(
         validation_mode: Validation mode - 'strict', 'lenient', or 'skip'.
 
     Yields:
-        FhircraftConfig: The temporary configuration.
+        config (FhircraftConfig): The temporary configuration.
     """
     old_config = get_config()
     new_config = dataclasses.replace(

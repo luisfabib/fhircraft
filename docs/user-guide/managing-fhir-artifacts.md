@@ -16,13 +16,13 @@ Artifacts are needed at resource model build time to resolve all these dependenc
 
 ## Factory Registry
 
-The `factory` repository is a central storage and indexing system within Fhircraft resource model factory that manages all loaded structure definitions and makes them available for resource model construction. Think of it as a library catalog: when you load structure definitions from files, directories, packages, or the internet, they all get registered in this repository. When you later request a model using a canonical URL, the factory searches the repository to find the matching structure definition.
+The `factory` registry is a central storage and indexing system within Fhircraft resource model factory that manages all loaded structure definitions and makes them available for resource model construction. Think of it as a library catalog: when you load structure definitions from files, directories, packages, or the internet, they all get registered in this registry. When you later request a model using a canonical URL, the factory searches the registry to find the matching structure definition.
 
-Understanding the repository helps you make informed decisions about when to load definitions, how to organize your project resources, and how to optimize your application's startup time and memory footprint. The following sections show you specific methods for loading structure definitions into the repository from different sources.
+Understanding the registry helps you make informed decisions about when to load definitions, how to organize your project resources, and how to optimize your application's startup time and memory footprint. The following sections show you specific methods for loading structure definitions into the registry from different sources.
 
 ??? abstract "Technical Documentation"
 
-    [`fhircraft.fhir.resources.repository`](/fhircraft/reference/fhir-resources-repository/)
+    [`fhircraft.fhir.resources.definitions.registry`](../reference/fhir-resources-definitions.md)
 
 
 ## Loading Structure Definitions from Your Computer

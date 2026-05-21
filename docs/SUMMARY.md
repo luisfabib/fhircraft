@@ -20,21 +20,24 @@
   - [Release Notes](changelog.md)
   - Reference
       - FHIR Resources
-          - [Bases](reference/fhir-resources-base.md)
+          - [Base](reference/fhir-resources-base.md)
           - [Factory](reference/fhir-resources-factory.md)
-          - [Repositories](reference/fhir-resources-repository.md)
+          - [Structure Definitions](reference/fhir-resources-definitions.md)
           - [Code Generator](reference/fhir-resources-code-generator.md)
           - Built-in Types
-              - [Primitive Types](reference/fhir-resources-primitives.md)
               - R4
+                  - [Primitive Types](reference/fhir-resources-r4-primitive.md)
                   - [Complex Types](reference/fhir-resources-r4-complex.md)
                   - [Core Resources](reference/fhir-resources-r4-core.md)
               - R4B
+                  - [Primitive Types](reference/fhir-resources-r4b-primitive.md)
                   - [Complex Types](reference/fhir-resources-r4b-complex.md)
                   - [Core Resources](reference/fhir-resources-r4b-core.md)
               - R5
+                  - [Primitive Types](reference/fhir-resources-r5-primitive.md)
                   - [Complex Types](reference/fhir-resources-r5-complex.md)
                   - [Core Resources](reference/fhir-resources-r5-core.md)
+              - [Registries](reference/fhir-resources-type-registries.md)
               - [Type Utilities](reference/fhir-resources-type-utils.md)
       - FHIRPath
           - [Engine](reference/fhir-path-engine.md)

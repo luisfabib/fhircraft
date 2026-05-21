@@ -118,7 +118,9 @@ Fields annotated with a type alias store their values as the corresponding model
 
 ??? abstract "Technical Documentation"
 
-    [`fhircraft.fhir.path.mixin`](/fhircraft/reference/fhir-resources-types-primitives.md/)
+    [`fhircraft.fhir.resources.datatypes.R4.primitive`](../reference/fhir-resources-r4-primitive.md)
+    [`fhircraft.fhir.resources.datatypes.R4B.primitive`](../reference/fhir-resources-r4b-primitive.md)
+    [`fhircraft.fhir.resources.datatypes.R5.primitive`](../reference/fhir-resources-r5-primitive.md)
 
 ### Complex Types
 FHIR complex types represent structured data with multiple fields—such as addresses, names, and codeable concepts. Unlike primitive types that represent single values, complex types bundle related fields into cohesive data structures. Fhircraft provides Pydantic models for all [:material-fire: FHIR complex types](https://hl7.org/fhir/datatypes.html#complex), ensuring built-in validation, type safety, and seamless integration with the rest of the FHIR ecosystem.

@@ -285,7 +285,7 @@ def get_fhir_type_by_url(
 
 
 def get_fhir_type_by_url(
-    url: str, release, fail_if_not_found: bool = True
+    url: str, release: str, fail_if_not_found: bool = True
 ) -> type[FHIRBaseModel] | None:
     """Return the FHIR type (primitive, complex, or resource) for a canonical URL.
 
