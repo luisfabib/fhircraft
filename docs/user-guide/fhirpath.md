@@ -4,7 +4,7 @@ This guide covers how to use [:material-fire: FHIRPath](https://hl7.org/fhirpath
 
 ??? abstract "Technical Documentation"
 
-    [`fhircraft.fhir.path.engine`](/fhircraft/reference/fhir-path-engine/)
+    [`fhircraft.fhir.path.engine`](../reference/fhir-path-engine.md)
 
 ## FHIRPath Basics
 
@@ -88,7 +88,7 @@ The FHIR model methods automatically handle environment setup and provide the si
 
 ??? abstract "Technical Documentation"
 
-    [`fhircraft.fhir.path.mixin`](/fhircraft/reference/fhir-path-mixin/)
+    [`fhircraft.fhir.path.mixin`](../reference/fhir-path-mixin.md)
 
 ## Querying Non-FHIR Data
 

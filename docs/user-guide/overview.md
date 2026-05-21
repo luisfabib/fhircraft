@@ -110,7 +110,7 @@ Welcome to the Fhircraft user guide. This comprehensive documentation shows you 
 
     Detailed technical documentation for all classes and methods.
 
-    [:octicons-arrow-right-24: API Docs](/reference/fhir-resources-base/)
+    [:octicons-arrow-right-24: API Docs](../reference/fhir-resources-base.md)
 
 -   :material-github:{ .lg .middle } __GitHub Repository__
 

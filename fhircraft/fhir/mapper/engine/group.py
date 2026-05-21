@@ -8,7 +8,6 @@ import logging
 
 from fhircraft.fhir.path.engine.core import FHIRPath
 
-
 logger = logging.getLogger(__name__)
 
 from fhircraft.fhir.mapper.engine.scope import MappingScope
@@ -35,13 +34,14 @@ class Group(FHIRMappingEngineComponent):
     def __init__(
         self,
         definition: "R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup",
-        parent_group=None,
+        parent_group: "Group | None" = None,
     ):
         """
         Initializes a Rule instance from a StructureMapGroupRuleTarget.
 
         Args:
-            source: The StructureMapGroupRuleTarget to initialize from.
+            definition: The StructureMapGroupRuleTarget definition to initialize from.
+            parent_group: The parent Group if this group extends another, or None if it does not.
         Raises:
             SourceProcessingError: If required fields are missing.
         """

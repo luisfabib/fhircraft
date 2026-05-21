@@ -277,7 +277,7 @@ class Reference(MappingTransform):
         else:
             raise ValueError("Reference transform parameter must be of type Id")
 
-    def process(self, scope: "MappingScope") -> Any:
+    def process(self, scope: "MappingScope") -> str:
         """
         Transforms a FHIR resource reference by extracting its resource type and ID from the given source.
 
@@ -286,9 +286,6 @@ class Reference(MappingTransform):
 
         Returns:
             str: A string in the format "ResourceType/ResourceId" representing the FHIR reference.
-
-        Raises:
-            Any exception raised by `scope.resolve_fhirpath` or the FHIRPath evaluation methods if the resource type or ID cannot be resolved.
         """
         source_fhirpath = scope.resolve_fhirpath(self.source)
         resource_type = (
