@@ -4,9 +4,13 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/luisfabib/fhircraft">
+
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/luisfabib/fhircraft/blob/main/docs/assets/images/logo-banner-dark.png?raw=true">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/luisfabib/fhircraft/blob/main/docs/assets/images/logo-banner.png?raw=true">
     <img src="https://github.com/luisfabib/fhircraft/blob/main/docs/assets/images/logo-banner.png?raw=true" width="50%">
-  </a>
+  </picture>
+
 
   ![PyPI - Version](https://img.shields.io/pypi/v/fhircraft?style=flat&logo=pypi&label=PyPI%20Release&labelColor=%231e293b)
   ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fhircraft?style=flat-square&logo=python&labelColor=%231e293b)

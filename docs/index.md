@@ -16,10 +16,10 @@ h1:first-of-type {
 img.banner {
     width: 50vw;
     min-width: 300px;
+    margin: auto;
 }
 .hero {
     text-align: center;
-    padding: 2rem 1rem 4rem 1rem;
 }
 .hero.banner {
     max-width: 900px;
@@ -71,12 +71,24 @@ img.banner {
 .md-button {
     margin-bottom: .5rem;
 }
+
+/* Show dark image when system prefers dark mode */
+.light { display: flex; }
+.dark { display: none; } 
+@media screen {
+    [data-md-color-scheme="slate"] {
+        .light { display: none; }
+        .dark { display: flex; } 
+    }
+}
+
 </style>
 
 <div class="hero" markdown>
 
 <!-- PROJECT LOGO -->
-<img src="assets/images/logo-banner.png" class="banner">
+<img src="assets/images/logo-banner.png" class="banner light">
+<img src="assets/images/logo-banner-dark.png" class="banner dark">
 
 
 [![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml?style=flat&labelColor=%231e293b)
