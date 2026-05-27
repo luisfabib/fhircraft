@@ -76,6 +76,9 @@ include = [
     '/test',
 ]
 
+[tool.hatch.build.targets.wheel.force-include]
+"fhircraft/py.typed" = "fhircraft/py.typed"
+
 [project.urls]
 Homepage = "https://github.com/luisfabib/fhircraft"
 Issues = "https://github.com/luisfabib/fhircraft/issues"
