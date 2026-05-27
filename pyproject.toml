@@ -16,7 +16,7 @@ keywords = ["Pydantic", "FHIR", "healthcare", "modelling", "validation"]
 license = 'MIT'
 license-files = ['LICENSE']
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3 :: Only',
@@ -31,9 +31,11 @@ classifiers = [
     'License :: OSI Approved :: MIT License',
     'Operating System :: Unix',
     'Operating System :: POSIX :: Linux',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: OS Independent',
     'Environment :: Console',
-    'Environment :: MacOS X',
     'Framework :: Pydantic',
+    'Framework :: Pydantic :: 2',
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
 requires-python = '>=3.10'
@@ -55,6 +57,7 @@ dependencies = [
 Homepage = "https://github.com/luisfabib/fhircraft"
 Issues = "https://github.com/luisfabib/fhircraft/issues"
 Documentation = "https://luisfabib.github.io/fhircraft/"
+Changelog = "https://github.com/luisfabib/fhircraft/blob/main/CHANGELOG.md"
 
 
 [project.optional-dependencies]
