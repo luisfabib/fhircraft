@@ -4,7 +4,7 @@
 
 Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
 
-Summarize all changes in your PR in changelog format under the corresponding sections (added, changed, fixed, removed). Delete any section that does not apply to your changes
+Summarize all changes in your PR in changelog format under the corresponding sections (added, changed, fixed, removed) using past-tense verbs. Delete any section that does not apply to your changes
 
 Types of changes
     * `Added` for new features.
