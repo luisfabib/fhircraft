@@ -88,30 +88,36 @@ class SnapshotResolver:
             )
         if mode == "snapshot":
             # Type check assertions
-            assert (
-                sd.snapshot
-            ), f"StructureDefinition {sd.name or sd.url} snapshot is None"
-            assert (
-                sd.snapshot.element
-            ), f"StructureDefinition {sd.name or sd.url} snapshot.element is None"
-            assert all(
-                [e is not None for e in sd.snapshot.element]
-            ), f"StructureDefinition {sd.name or sd.url} snapshot.element contains None"
+            if not sd.snapshot:
+                raise DefinitionResolutionError(
+                    f"StructureDefinition {sd.name or sd.url} snapshot is None"
+                )
+            if not sd.snapshot.element:
+                raise DefinitionResolutionError(
+                    f"StructureDefinition {sd.name or sd.url} snapshot.element is None"
+                )
+            if not all([e is not None for e in sd.snapshot.element]):
+                raise DefinitionResolutionError(
+                    f"StructureDefinition {sd.name or sd.url} snapshot.element contains None"
+                )
             # Fast path: wrap snapshot elements directly without merging
             elements = sd.snapshot.element
             resolved_index = DefinitionIndex.from_elements(elements)
 
         elif mode == "differential":
             # Type check assertions
-            assert (
-                sd.differential
-            ), f"StructureDefinition {sd.name or sd.url} differential is None"
-            assert (
-                sd.differential.element
-            ), f"StructureDefinition {sd.name or sd.url} differential.element is None"
-            assert all(
-                [e is not None for e in sd.differential.element]
-            ), f"StructureDefinition {sd.name or sd.url} differential.element contains None"
+            if not sd.differential:
+                raise DefinitionResolutionError(
+                    f"StructureDefinition {sd.name or sd.url} differential is None"
+                )
+            if not sd.differential.element:
+                raise DefinitionResolutionError(
+                    f"StructureDefinition {sd.name or sd.url} differential.element is None"
+                )
+            if not all([e is not None for e in sd.differential.element]):
+                raise DefinitionResolutionError(
+                    f"StructureDefinition {sd.name or sd.url} differential.element contains None"
+                )
 
             if not (base_canonical := sd.baseDefinition):
                 raise DefinitionResolutionError(
@@ -157,9 +163,12 @@ class SnapshotResolver:
             parent_index = self._resolve_base_chain(parent_sd)
 
             if sd.differential and sd.differential.element:
-                assert all(
+                if not all(
                     [e is not None for e in sd.differential.element]
-                ), f"StructureDefinition {sd.name or sd.url} differential.element contains None"
+                ):
+                    raise DefinitionResolutionError(
+                        f"StructureDefinition {sd.name or sd.url} differential.element contains None"
+                    )
                 resolved_diff = self._resolve_differential(
                     sd.differential.element, parent_index
                 )

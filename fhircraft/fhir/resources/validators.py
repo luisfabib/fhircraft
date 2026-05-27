@@ -100,7 +100,8 @@ def _validate_FHIR_element_constraint(
             if effective_severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)
             else:
-                assert valid, error_message
+                if not valid:
+                    raise AssertionError(error_message)
         except (
             ValueError,
             FhirPathLexerError,
@@ -271,12 +272,8 @@ def validate_FHIR_element_pattern(
         _element.model_dump() if isinstance(_element, FHIRBaseModel) else _element
     )
     _pattern = pattern.model_dump() if isinstance(pattern, FHIRBaseModel) else pattern
-    try:
-        if isinstance(_pattern, dict):
-            assert is_dict_subset(_pattern, _element)
-        else:
-            assert _element == _pattern
-    except AssertionError:
+    if (isinstance(pattern, dict) and not is_dict_subset(_pattern, _element)) \
+         or (not isinstance(pattern, dict) and _element != _pattern):
         error = f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2) if isinstance(pattern, FHIRBaseModel) else pattern}"
         if config.mode == "lenient":
             warnings.warn(str(error))
@@ -333,12 +330,12 @@ def validate_FHIR_element_fixed_value(
     if isinstance(constant, list):
         constant = constant[0]
     _element = element[0] if isinstance(element, list) else element
-    try:
-        if isinstance(constant, FHIRBaseModel) and isinstance(_element, FHIRBaseModel):
-            assert constant.model_dump() == _element.model_dump()
-        else:
-            assert constant == _element
-    except AssertionError as e:
+
+    if isinstance(constant, FHIRBaseModel):
+        constant = constant.model_dump()
+    if isinstance(_element, FHIRBaseModel):
+        _element = _element.model_dump()
+    if constant != _element:
         error = f"Value does not fulfill constant:\n{constant.model_dump_json(indent=2) if isinstance(constant, FHIRBaseModel) else constant}"
         if config.mode == "lenient":
             warnings.warn(error)
@@ -492,21 +489,21 @@ def validate_slicing_cardinalities(
         slice_instances_count = sum([isinstance(value, slice) for value in values])
         # Only validate cardinalities if there are instances of the slice present
         if slice_instances_count > 0:
-            try:
-                assert (
-                    slice_instances_count >= slice.min_cardinality
-                ), f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. \
+            if slice_instances_count < slice.min_cardinality:
+                message = f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. \
                         Requires min. cardinality of {slice.min_cardinality}, but got {slice_instances_count}"
-                if slice.max_cardinality is not None:
-                    assert (
-                        slice_instances_count <= slice.max_cardinality
-                    ), f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
-                            Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
-            except AssertionError as e:
                 if config.mode == "lenient":
-                    warnings.warn(str(e))
+                    warnings.warn(message)
                 else:
-                    raise
+                    raise AssertionError(message)
+            if slice.max_cardinality is not None:
+                if slice_instances_count > slice.max_cardinality:
+                    message = f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
+                            Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
+                    if config.mode == "lenient":
+                        warnings.warn(message)
+                    else:
+                        raise AssertionError(message)
     return values
 
 

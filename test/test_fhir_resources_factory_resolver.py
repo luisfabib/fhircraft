@@ -1204,7 +1204,7 @@ def test_resolve__snapshot_mode_index_contains_all_elements(resolver, base_index
 
 def test_resolve__snapshot_mode_raises_when_snapshot_is_none(resolver, base_index):
     sd = make_structure_def(snapshot_elements=None)
-    with pytest.raises(AssertionError):
+    with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="snapshot")
 
 
@@ -1214,7 +1214,7 @@ def test_resolve__snapshot_mode_raises_when_snapshot_elements_is_none(
     sd = make_structure_def(snapshot_elements=None)
     sd.snapshot = MagicMock()
     sd.snapshot.element = None
-    with pytest.raises(AssertionError):
+    with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="snapshot")
 
 
@@ -1224,7 +1224,7 @@ def test_resolve__snapshot_mode_raises_when_snapshot_elements_contain_none(
     elements = [n.definition for n in base_index.nodes]
     elements.append(None)
     sd = make_structure_def(snapshot_elements=elements)
-    with pytest.raises(AssertionError):
+    with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="snapshot")
 
 
@@ -1280,7 +1280,7 @@ def test_resolve__differential_mode_raises_when_differential_is_none(
     resolver, base_index
 ):
     sd = make_structure_def(differential_elements=None)
-    with pytest.raises(AssertionError):
+    with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
 
 
@@ -1290,7 +1290,7 @@ def test_resolve__differential_mode_raises_when_differential_elements_is_none(
     sd = make_structure_def(differential_elements=None)
     sd.differential = MagicMock()
     sd.differential.element = None
-    with pytest.raises(AssertionError):
+    with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
 
 
@@ -1299,7 +1299,7 @@ def test_resolve__differential_mode_raises_when_differential_elements_contain_no
 ):
     diff_elements = [make_element("MyProfile.status", "MyProfile.status"), None]
     sd = make_structure_def(differential_elements=diff_elements)
-    with pytest.raises(AssertionError):
+    with pytest.raises(DefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
 
 

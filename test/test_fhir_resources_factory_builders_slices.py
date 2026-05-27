@@ -555,7 +555,7 @@ def test_build__raises_assertion_error_when_assembler_returns_non_slice_model(
     slice_node = make_slice_node()
     index.get_slices.return_value = [slice_node]
     node = make_entry_node()
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         builder.build(node, index)
 
 
@@ -690,7 +690,7 @@ def test_per_slice__entry_base_used_when_no_profile_urls(index, assembler, monke
 
     # resolve_type should NOT be called for the per-slice branch in this case
     resolve_type_spy = MagicMock(
-        side_effect=AssertionError("resolve_type must not be called per-slice")
+        side_effect=TypeError("resolve_type must not be called per-slice")
     )
     monkeypatch.setattr(builder, "resolve_type", resolve_type_spy)
 
@@ -782,7 +782,7 @@ def test_per_slice__fhirslicemodel_itself_as_base_not_duplicated(
 def test_per_slice__assert_fires_when_slice_base_is_not_a_type(
     index, assembler, monkeypatch
 ):
-    """An AssertionError is raised when slice_base resolves to a non-type value."""
+    """A TypeError is raised when slice_base resolves to a non-type value."""
     ctx = MagicMock(name="mock-ctx-no-base")
     ctx.fhir_release = "R4B"
     ctx.base = None
@@ -796,5 +796,5 @@ def test_per_slice__assert_fires_when_slice_base_is_not_a_type(
     index.get_slices.return_value = [slice_node]
     node = make_entry_node(name="category", type_codes=["CodeableConcept"])
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         builder.build(node, index)

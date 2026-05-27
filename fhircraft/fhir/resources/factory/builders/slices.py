@@ -77,9 +77,10 @@ class SlicedFieldBuilder(Builder):
             else:
                 slice_base = slice_entry_base
 
-            assert isinstance(
+            if not isinstance(
                 slice_base, type
-            ), f"Resolved slice base for slice '{node.id}' is not a type"
+            ):
+                raise TypeError(f"Resolved slice base for slice '{node.id}' is not a type")
 
             # Ensure the slice base is a subclass of FHIRSliceModel, as all slice models must inherit from it for validation purposes
             if slice_base is FHIRSliceModel or (
@@ -96,9 +97,8 @@ class SlicedFieldBuilder(Builder):
             )
             slice_model = assembler.assemble(slice_model_name, base=slice_bases)
             # Set the slice cardinality on the model for later validation use
-            assert isinstance(slice_model, type) and issubclass(
-                slice_model, FHIRSliceModel
-            ), f"Built slice model '{slice_model_name}' does not inherit from FHIRSliceModel"
+            if not (isinstance(slice_model, type) and issubclass(slice_model, FHIRSliceModel)):
+                raise TypeError(f"Built slice model '{slice_model_name}' does not inherit from FHIRSliceModel")
             slice_model.min_cardinality = slice_node.min_cardinality
             slice_model.max_cardinality = slice_node.max_cardinality
 

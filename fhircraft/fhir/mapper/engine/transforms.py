@@ -680,7 +680,10 @@ class Quantity(MappingTransform):
                 code=None,
             )
         else:
-            assert self.value and self.unit
+            if not (self.value and self.unit):
+                raise ValueError(
+                    "Quantity transform requires either a text parameter or value and unit parameters"
+                )
             value = (
                 scope.resolve_fhirpath(self.value)
                 if isinstance(self.value, str)
