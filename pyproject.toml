@@ -61,7 +61,6 @@ Changelog = "https://github.com/luisfabib/fhircraft/blob/main/CHANGELOG.md"
 
 
 [project.optional-dependencies]
-cli = ["typer==0.12.3"]
 dev = [
     "pytest>=8.2",
     "pytest-mock==3.14.0",
