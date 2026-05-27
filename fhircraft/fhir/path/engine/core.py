@@ -334,7 +334,7 @@ class FHIRPath(ABC):
             # Still try to get trace even if evaluation failed
             try:
                 debug_data["trace"] = self.trace(data, verbose=True)
-            except:
+            except Exception:
                 debug_data["trace"] = [
                     f"Failed to generate trace for expression: {self}"
                 ]

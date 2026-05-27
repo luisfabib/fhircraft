@@ -50,12 +50,10 @@ class FhirMappingLanguageParser(FhirPathParser):
             lexer_class or FhirMappingLanguageLexer
         )  # Crufty but works around statefulness in PLY
         self.lexer = self.lexer_class()
-        # Since PLY has some crufty aspects and dumps files, we try to keep them local
-        # However, we need to derive the name of the output Python file :-/
         output_directory = os.path.dirname(__file__)
         try:
             module_name = os.path.splitext(os.path.split(__file__)[1])[0]
-        except:
+        except Exception:
             module_name = __name__
 
         start_symbol = "structureMap"
