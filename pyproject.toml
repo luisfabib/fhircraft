@@ -37,6 +37,7 @@ readme = "README.md"
 dependencies = [
     'requests',
     'pydantic>=2.7',
+    'pydantic_core>=2.18',
     'ply>=3.11',
     'pyyaml>=6.0.1',
     'python-dotenv>=1.0',
@@ -44,7 +45,8 @@ dependencies = [
     'jsonpath-ng>1',
     'jinja2>=3.1',
     'Pint>=0.24',
-    'packaging>=25'
+    'packaging>=25',
+    'typing_extensions>=4.6.0',
 ]
 
 [project.optional-dependencies]
