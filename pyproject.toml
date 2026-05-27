@@ -74,11 +74,11 @@ docs = [
 ]
 
 [tool.hatch.build.targets.sdist]
-# limit which files are included in the sdist (.tar.gz) asset,
-# see https://github.com/pydantic/pydantic/pull/4542
 include = [
-    '/README.md',
-    '/HISTORY.md',
+    'pyproject.toml',
+    'README.md',
+    'CHANGELOG.md',
+    'LICENSE',
     '/fhircraft',
     '/test',
 ]
