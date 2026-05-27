@@ -6,6 +6,8 @@ Users can import everything they need from the top level without worrying about
 internal package structure.
 """
 
+__version__ = "0.8.3"
+
 # Utility functions are safe to import directly (no circular dependencies)
 from fhircraft.utils import capitalize, ensure_list, get_FHIR_release_from_version
 

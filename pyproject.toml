@@ -2,24 +2,28 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "fhircraft/__init__.py"
+
 [project]
 name = 'fhircraft'
-version='0.8.3'
+dynamic = ["version"]
 description = "Fhircraft transforms FHIR (Fast Healthcare Interoperability Resources) specifications into type-safe Python models using Pydantic. Build healthcare applications with automatic validation, intelligent code completion, and seamless integration with Python's ecosystem."
 authors = [
     {name = 'Luis Fábregas-Ibáñez', email = 'luisfabib@gmail.com'},
 ]
 keywords = ["Pydantic", "FHIR", "healthcare", "modelling", "validation"]
-license = {'file' = 'LICENSE'}
+license = 'MIT'
+license-files = ['LICENSE']
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
     'Intended Audience :: Developers',
     'Intended Audience :: Information Technology',
     'Intended Audience :: Healthcare Industry',
@@ -27,9 +31,11 @@ classifiers = [
     'License :: OSI Approved :: MIT License',
     'Operating System :: Unix',
     'Operating System :: POSIX :: Linux',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: OS Independent',
     'Environment :: Console',
-    'Environment :: MacOS X',
     'Framework :: Pydantic',
+    'Framework :: Pydantic :: 2',
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
 requires-python = '>=3.11'
@@ -49,8 +55,14 @@ dependencies = [
     'typing_extensions>=4.6.0',
 ]
 
+[project.urls]
+Homepage = "https://github.com/luisfabib/fhircraft"
+Issues = "https://github.com/luisfabib/fhircraft/issues"
+Documentation = "https://luisfabib.github.io/fhircraft/"
+Changelog = "https://github.com/luisfabib/fhircraft/blob/main/CHANGELOG.md"
+
+
 [project.optional-dependencies]
-cli = ["typer==0.12.3"]
 dev = [
     "pytest>=8.2",
     "pytest-mock>=3.14.0",
@@ -66,20 +78,14 @@ docs = [
 ]
 
 [tool.hatch.build.targets.sdist]
-# limit which files are included in the sdist (.tar.gz) asset,
-# see https://github.com/pydantic/pydantic/pull/4542
 include = [
-    '/README.md',
-    '/HISTORY.md',
+    'pyproject.toml',
+    'README.md',
+    'CHANGELOG.md',
+    'LICENSE',
     '/fhircraft',
     '/test',
 ]
-
-[project.urls]
-Homepage = "https://github.com/luisfabib/fhircraft"
-Issues = "https://github.com/luisfabib/fhircraft/issues"
-Documentation = "https://luisfabib.github.io/fhircraft/"
-
 
 [tool.pytest.ini_options]
 python_files = [
