@@ -13,7 +13,8 @@ authors = [
     {name = 'Luis Fábregas-Ibáñez', email = 'luisfabib@gmail.com'},
 ]
 keywords = ["Pydantic", "FHIR", "healthcare", "modelling", "validation"]
-license = {'file' = 'LICENSE'}
+license = 'MIT'
+license-files = ['LICENSE']
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Programming Language :: Python',
@@ -50,6 +51,12 @@ dependencies = [
     'packaging>=25'
 ]
 
+[project.urls]
+Homepage = "https://github.com/luisfabib/fhircraft"
+Issues = "https://github.com/luisfabib/fhircraft/issues"
+Documentation = "https://luisfabib.github.io/fhircraft/"
+
+
 [project.optional-dependencies]
 cli = ["typer==0.12.3"]
 dev = [
@@ -75,15 +82,6 @@ include = [
     '/fhircraft',
     '/test',
 ]
-
-[tool.hatch.build.targets.wheel.force-include]
-"fhircraft/py.typed" = "fhircraft/py.typed"
-
-[project.urls]
-Homepage = "https://github.com/luisfabib/fhircraft"
-Issues = "https://github.com/luisfabib/fhircraft/issues"
-Documentation = "https://luisfabib.github.io/fhircraft/"
-
 
 [tool.pytest.ini_options]
 python_files = [
