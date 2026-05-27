@@ -245,7 +245,7 @@ class Builder(ABC):
     def build_field_information(
         name: str,
         node: ElementNode,
-        type: type | Annotated,
+        type: Any,
         alias: str | None = None,
         validation_alias: AliasChoices | None = None,
         description: str | None = None,
