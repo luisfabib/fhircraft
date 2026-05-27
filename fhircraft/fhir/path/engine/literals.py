@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional, Union, Any, TYPE_CHECKING
 from pint import UnitRegistry, Quantity as PintQuantity
-from fhircraft.fhir.path.exceptions import FhirPathWarning
+from fhircraft.exceptions import FhirPathWarning
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.quantity import (

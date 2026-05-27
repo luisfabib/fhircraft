@@ -9,11 +9,9 @@ import pytest
 from unittest.mock import Mock, MagicMock, patch
 
 from fhircraft.fhir.mapper.engine.source import RuleSource
-from fhircraft.fhir.mapper.engine.exceptions import (
-    SourceAssertionError,
-    SourceProcessingError,
-    SourceConditionError,
-    SourceTypeError,
+from fhircraft.exceptions import (
+    MapperExecutionError,
+    MapperSourceProcessingError,
 )
 from fhircraft.fhir.path import engine as fp
 from fhircraft.fhir.path.engine.core import FHIRPath
@@ -164,20 +162,24 @@ def test_process__with_element_path(
 @pytest.mark.parametrize(
     "condition_method,exception_class,error_pattern",
     [
-        ("_check_type_condition", SourceTypeError, "Source type condition not met"),
+        (
+            "_check_type_condition", 
+            MapperSourceProcessingError, 
+            "Source type condition not met"
+        ),
         (
             "_check_where_condition",
-            SourceConditionError,
+            MapperSourceProcessingError,
             "Source condition not met",
         ),
         (
             "_check_assertion_condition",
-            SourceAssertionError,
+            MapperSourceProcessingError,
             "Source assertion failed",
         ),
         (
             "_validate_cardinality",
-            SourceProcessingError,
+            MapperSourceProcessingError,
             "Cardinality constraints violated",
         ),
     ],

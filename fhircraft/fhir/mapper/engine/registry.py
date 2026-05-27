@@ -11,6 +11,7 @@ import requests
 from pydantic import BaseModel, ValidationError
 
 from fhircraft.config import override_config
+from fhircraft.exceptions import MapperRegistryNotFoundError
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
@@ -26,12 +27,6 @@ _RELEASE_STRUCTURE_MAP = {
     "R4B": R4B_models.StructureMap,
     "R5": R5_models.StructureMap,
 }
-
-
-class StructureMapNotFoundError(FileNotFoundError):
-    """Raised when a required StructureMap cannot be resolved."""
-
-    pass
 
 
 class StructureMapRegistry:

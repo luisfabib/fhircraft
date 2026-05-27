@@ -11,7 +11,7 @@ from fhircraft.fhir.resources.factory.builders.base import (
     Builder,
 )
 from fhircraft.fhir.resources.factory.element_node import ElementNode
-from fhircraft.fhir.resources.factory.exceptions import TypeResolutionError
+from fhircraft.exceptions import FactoryTypeResolutionError
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.builders.base import Builder
 
@@ -35,7 +35,7 @@ class SimpleFieldBuilder(Builder):
         field_types = [self.resolve_type(type) for type in node.types]
 
         if not field_types:
-            raise TypeResolutionError(
+            raise FactoryTypeResolutionError(
                 f"Element '{node.path}' has no types that could be resolved"
             )
 

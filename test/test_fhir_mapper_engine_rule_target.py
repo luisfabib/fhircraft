@@ -3,9 +3,9 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.target import RuleTarget
 from fhircraft.fhir.mapper.engine.scope import MappingScope
-from fhircraft.fhir.mapper.engine.exceptions import (
-    MappingDigestionError,
-    SourceProcessingError,
+from fhircraft.exceptions import (
+    MapperDigestionError,
+    MapperTargetProcessingError,
 )
 from fhircraft.fhir.path.engine.core import Element
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
@@ -151,7 +151,7 @@ def test_init__raises_error_for_unsupported_transform(mock_rule):
     )
 
     with pytest.raises(
-        SourceProcessingError, match="Unsupported transform: invalid_transform"
+        MapperTargetProcessingError, match="Unsupported transform: invalid_transform"
     ):
         RuleTarget(target_def, mock_rule)
 
@@ -277,7 +277,7 @@ def test_resolve_transform__raises_error_for_unsupported_transform(
     target = RuleTarget(basic_target_definition, mock_rule)
 
     with pytest.raises(
-        SourceProcessingError, match="Unsupported transform: unsupported_transform"
+        MapperTargetProcessingError, match="Unsupported transform: unsupported_transform"
     ):
         target._resolve_transform("unsupported_transform", [])
 

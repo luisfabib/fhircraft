@@ -8,7 +8,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
     Invocation,
     Literal,
-    FHIRPathError,
+    FhirPathException,
     This,
 )
 from fhircraft.fhir.path.engine.strings import Upper
@@ -27,7 +27,7 @@ from fhircraft.fhir.path.engine.core import (
     RootElement,
     TypeSpecifier,
 )
-from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
+from fhircraft.exceptions import FhirPathRuntimeError
 
 from fhircraft.fhir.resources.datatypes.R4 import core, complex, primitive
 
@@ -78,7 +78,7 @@ class TestRoot(TestCase):
 
     def test_raises_error_for_wrong_type(self):
         item = FHIRPathCollectionItem(value=MockPatient())
-        with pytest.raises(FHIRPathError):
+        with pytest.raises(FhirPathException):
             RootElement("Condition").evaluate([item], env)
 
     def test_root_string_representation(self):
@@ -407,7 +407,7 @@ class TestPublicFHIRPathInterface(TestCase):
         """Test single() raises error when multiple matches found."""
         path = Element("name")
 
-        with self.assertRaises(FHIRPathRuntimeError) as context:
+        with self.assertRaises(FhirPathRuntimeError) as context:
             path.single(self.patient)
 
         self.assertIn(

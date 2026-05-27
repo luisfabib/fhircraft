@@ -6,7 +6,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
 )
-from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
+from fhircraft.exceptions import FhirPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_left_right_expressions
 
 
@@ -99,7 +99,7 @@ class In(FHIRCollectionOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FHIRPathRuntimeError: If the left expression evaluates to a non-singleton collection.
+            FhirPathRuntimeError: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
@@ -109,7 +109,7 @@ class In(FHIRCollectionOperator):
         if len(right_collection) == 0:
             return [FHIRPathCollectionItem.wrap(False)]
         if len(left_collection) != 1:
-            raise FHIRPathRuntimeError(
+            raise FhirPathRuntimeError(
                 "Left expression evaluates to a non-singleton collection."
             )
         value = left_collection[0].value
@@ -149,7 +149,7 @@ class Contains(FHIRCollectionOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FHIRPathError: If the left expression evaluates to a non-singleton collection.
+            FhirPathException: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
@@ -159,7 +159,7 @@ class Contains(FHIRCollectionOperator):
         if len(left_collection) == 0:
             return [FHIRPathCollectionItem.wrap(False)]
         if len(right_collection) != 1:
-            raise FHIRPathRuntimeError(
+            raise FhirPathRuntimeError(
                 "Right expression evaluates to a non-singleton collection."
             )
         value = right_collection[0].value

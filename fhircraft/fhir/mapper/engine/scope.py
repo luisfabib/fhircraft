@@ -24,7 +24,7 @@ from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroup as R5_StructureMapGroup,
 )
 
-from .exceptions import MappingError
+from fhircraft.exceptions import MapperScopeError
 
 if TYPE_CHECKING:
     from .group import Group
@@ -122,7 +122,7 @@ class MappingScope:
             ConceptMap: The ConceptMap instance associated with the given identifier.
 
         Raises:
-            MappingError: If the ConceptMap with the specified identifier is not found in the current or any parent scopes.
+            MapperScopeError: If the ConceptMap with the specified identifier is not found in the current or any parent scopes.
         """
         concept_map = self.concept_maps.get(identifier)
         if concept_map:
@@ -131,7 +131,7 @@ class MappingScope:
         if self.parent:
             return self.parent.get_concept_map(identifier)
 
-        raise MappingError(
+        raise MapperScopeError(
             f"Concept map '{identifier}' not found in current or parent scopes."
         )
 
@@ -146,7 +146,7 @@ class MappingScope:
             BaseModel: The target instance associated with the given identifier.
 
         Raises:
-            MappingError: If the target instance is not found in the current or any parent scopes.
+            MapperScopeError: If the target instance is not found in the current or any parent scopes.
         """
         instance = self.target_instances.get(identifier)
         if instance:
@@ -155,7 +155,7 @@ class MappingScope:
         if self.parent:
             return self.parent.get_target_instance(identifier)
 
-        raise MappingError(
+        raise MapperScopeError(
             f"Target instance '{identifier}' not found in current or parent scopes."
         )
 
@@ -170,7 +170,7 @@ class MappingScope:
             BaseModel: The source instance associated with the given identifier.
 
         Raises:
-            MappingError: If the source instance is not found in the current or any parent scopes.
+            MapperScopeError: If the source instance is not found in the current or any parent scopes.
         """
         instance = self.source_instances.get(identifier)
         if instance:
@@ -179,7 +179,7 @@ class MappingScope:
         if self.parent:
             return self.parent.get_source_instance(identifier)
 
-        raise MappingError(
+        raise MapperScopeError(
             f"Source instance '{identifier}' not found in current or parent scopes."
         )
 
@@ -194,7 +194,7 @@ class MappingScope:
             type[BaseModel]: The type associated with the identifier.
 
         Raises:
-            MappingError: If the identifier is not found in the current or any parent scope.
+            MapperScopeError: If the identifier is not found in the current or any parent scope.
         """
         type_ = self.types.get(identifier)
         if type_:
@@ -203,7 +203,7 @@ class MappingScope:
         if self.parent:
             return self.parent.get_type(identifier)
 
-        raise MappingError(
+        raise MapperScopeError(
             f"Type '{identifier}' not found in current or parent scopes."
         )
 
@@ -222,7 +222,7 @@ class MappingScope:
             value: The resolved symbol, which can be a variable, a type, or a group.
 
         Raises:
-            MappingError: If the symbol cannot be found in the current or any parent scopes.
+            MapperScopeError: If the symbol cannot be found in the current or any parent scopes.
         """
         # Handle special _DefaultMappingGroup_ symbol
         if identifier == "-DefaultMappingGroup-":
@@ -240,16 +240,16 @@ class MappingScope:
         if self.parent:
             try:
                 return self.parent.resolve_symbol(identifier)
-            except MappingError:
+            except MapperScopeError:
                 pass
 
         # Fall through: try resolving as a group from imported StructureMaps
         try:
             return self.resolve_group(identifier)
-        except MappingError:
+        except MapperScopeError:
             pass
 
-        raise MappingError(
+        raise MapperScopeError(
             f"Symbol '{identifier}' not found in current or parent scopes."
         )
 
@@ -267,7 +267,7 @@ class MappingScope:
             The matching :class:`Group` instance.
 
         Raises:
-            MappingError: If the group cannot be found in local scope or any
+            MapperScopeError: If the group cannot be found in local scope or any
                 imported StructureMap, or if the name is ambiguous.
         """
         from .group import Group as GroupClass
@@ -279,7 +279,7 @@ class MappingScope:
         if self.parent:
             try:
                 return self.parent.resolve_group(group_name)
-            except MappingError:
+            except MapperScopeError:
                 pass
 
         # 2. Search groups from imported StructureMaps
@@ -290,12 +290,12 @@ class MappingScope:
                     matches.append((GroupClass(group_def), sm.url))
 
         if len(matches) == 0:
-            raise MappingError(
+            raise MapperScopeError(
                 f"Group '{group_name}' not found in local scope or any imported StructureMap."
             )
         if len(matches) > 1:
             urls = [str(url) for _, url in matches]
-            raise MappingError(
+            raise MapperScopeError(
                 f"Ambiguous group '{group_name}': found in multiple imported StructureMaps: {urls}."
             )
         return matches[0][0]
@@ -321,7 +321,7 @@ class MappingScope:
         try:
             self.resolve_symbol(identifier)
             return True
-        except MappingError:
+        except MapperScopeError:
             return False
 
     def has_local_symbol(self, identifier: str) -> bool:
@@ -403,11 +403,11 @@ class MappingScope:
         Returns:
             The resolved FHIRPath expression
         Raises:
-            MappingError: If the symbol is not found or is not a FHIRPath
+            MapperScopeError: If the symbol is not found or is not a FHIRPath
         """
         symbol = self.resolve_symbol(identifier)
         if not isinstance(symbol, FHIRPath):
-            raise MappingError(f"Symbol '{identifier}' is not a FHIRPath expression.")
+            raise MapperScopeError(f"Symbol '{identifier}' is not a FHIRPath expression.")
         return symbol
 
     def get_all_visible_symbols(

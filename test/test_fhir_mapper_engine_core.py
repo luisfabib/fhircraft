@@ -12,7 +12,7 @@ from fhircraft.fhir.mapper.engine.core import (
     FHIRMappingEngine,
     StructureMapModelMode,
 )
-from fhircraft.fhir.mapper.engine.registry import StructureMapNotFoundError
+from fhircraft.exceptions import MapperRegistryNotFoundError
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapGroup,

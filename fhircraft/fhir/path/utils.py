@@ -7,7 +7,7 @@ from fhircraft.utils import ensure_list
 if TYPE_CHECKING:
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 
-from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
+from fhircraft.exceptions import FhirPathRuntimeError
 
 
 def split_fhirpath(fhir_path: str) -> list[str]:
@@ -161,11 +161,11 @@ def evaluate_and_prepare_collection_values(
     right_collection = _get_collection_values(right_collection)
 
     if len(left_collection) > 1:
-        raise FHIRPathRuntimeError(
+        raise FhirPathRuntimeError(
             f"FHIRPath operator {operator.__str__()} expected a single-item collection for the left expression, instead got a {len(left_collection)}-items collection."
         )
     if len(right_collection) > 1:
-        raise FHIRPathRuntimeError(
+        raise FhirPathRuntimeError(
             f"FHIRPath operator {operator.__str__()} expected a single-item collection for the right expression, instead got a {len(right_collection)}-items collection."
         )
     if prevent_all_empty and (len(left_collection) == 0 or len(right_collection) == 0):

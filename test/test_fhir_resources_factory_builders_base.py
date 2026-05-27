@@ -12,7 +12,7 @@ from fhircraft.fhir.resources.factory.builders.base import (
 )
 
 from fhircraft.fhir.resources.factory.builders.base import ValidatorInformation
-from fhircraft.fhir.resources.factory.exceptions import TypeResolutionError
+from fhircraft.exceptions import FactoryTypeResolutionError
 from fhircraft.fhir.resources.factory.builders.base import (
     Builder,
 )
@@ -226,12 +226,12 @@ def test_handle_python_keyword__alias_choices_order() -> None:
 
 
 def test_resolve_type__raises_when_code_is_none(builder: Builder):
-    with pytest.raises(TypeResolutionError, match="no code"):
+    with pytest.raises(FactoryTypeResolutionError, match="no code"):
         builder.resolve_type(make_type(code=None))
 
 
 def test_resolve_type__raises_when_code_is_empty_string(builder: Builder):
-    with pytest.raises(TypeResolutionError):
+    with pytest.raises(FactoryTypeResolutionError):
         builder.resolve_type(make_type(code=""))
 
 

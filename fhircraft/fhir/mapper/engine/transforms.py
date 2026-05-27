@@ -4,7 +4,7 @@ from sys import path
 from typing import TYPE_CHECKING, Any, Sequence, Tuple, Type
 from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.fhir.path import engine as fp, fhirpath as fhirpath_parser
-from fhircraft.fhir.mapper.engine.exceptions import MappingError
+from fhircraft.exceptions import MapperTargetProcessingError
 import uuid
 
 from fhircraft.fhir.path.engine.core import FHIRPath
@@ -215,20 +215,20 @@ class Append(MappingTransform):
         For each parameter:
         - If `valueId` is present, it resolves the FHIRPath and appends its string value.
         - If `valueString` is present, it appends the string directly.
-        - If neither is present, it raises a `RuleProcessingError`.
+        - If neither is present, it raises a `MapperTargetProcessingError`.
 
         Args:
             parameters: A sequence of StructureMapParameter objects to process.
 
         Raises:
-            RuleProcessingError: If no parameters are provided, or if a parameter does not have a valid type (`valueId` or `valueString`).
+            MapperTargetProcessingError: If no parameters are provided, or if a parameter does not have a valid type (`valueId` or `valueString`).
         """
         if len(parameters) < 1:
-            raise ValueError("Append transform requires at least one parameter")
+            raise MapperTargetProcessingError("Append transform requires at least one parameter")
         self.elements = []
         for parameter in parameters:
             if not (parameter.valueId or parameter.valueString):
-                raise ValueError(
+                raise MapperTargetProcessingError(
                     "Append transform parameters must be of type Id or String"
                 )
             is_literal = parameter.valueId is None
@@ -247,7 +247,7 @@ class Append(MappingTransform):
             str: The concatenated string of all parameter values.
 
         Raises:
-            RuleProcessingError: If no parameters are provided, or if a parameter does not have a valid type (`valueId` or `valueString`).
+            MapperTargetProcessingError: If no parameters are provided, or if a parameter does not have a valid type (`valueId` or `valueString`).
         """
         strings = []
         for is_literal, value in self.elements:
@@ -271,11 +271,11 @@ class Reference(MappingTransform):
         ],
     ):
         if len(parameters) != 1:
-            raise ValueError("Reference transform requires exactly one parameter")
+            raise MapperTargetProcessingError("Reference transform requires exactly one parameter")
         if param := parameters[0].valueId:
             self.source = str(param)
         else:
-            raise ValueError("Reference transform parameter must be of type Id")
+            raise MapperTargetProcessingError("Reference transform parameter must be of type Id")
 
     def process(self, scope: "MappingScope") -> str:
         """
@@ -310,7 +310,7 @@ class UUID(MappingTransform):
         ],
     ):
         if len(parameters) != 0:
-            raise ValueError("UUID transform does not take any parameters")
+            raise MapperTargetProcessingError("UUID transform does not take any parameters")
 
     def process(self, scope: "MappingScope") -> Any:
         """
@@ -339,7 +339,7 @@ class Translate(MappingTransform):
         ],
     ):
         if len(parameters) not in [2, 3]:
-            raise ValueError(
+            raise MapperTargetProcessingError(
                 "Translate transform requires exactly two or three parameters"
             )
         self.source = parameters[0].value
@@ -362,13 +362,13 @@ class Translate(MappingTransform):
             str: The translated target code from the ConceptMap.
 
         Raises:
-            MappingError: If the ConceptMap has no groups, if a target code is not defined for the source code,
+            MapperException: If the ConceptMap has no groups, if a target code is not defined for the source code,
                           or if the source code cannot be mapped using the ConceptMap.
         """
         source_code = scope.resolve_fhirpath(self.source).single(scope.get_instances())
         concept_map = scope.get_concept_map(self.concept_map_name.lstrip("#"))
         if concept_map.group is None:
-            raise MappingError(
+            raise MapperTargetProcessingError(
                 f"Concept map '{self.concept_map_name}' has no groups defined."
             )
         for group in concept_map.group:
@@ -379,12 +379,12 @@ class Translate(MappingTransform):
                     if element.code == source_code:
                         if self.output_type == "code":
                             if element_target.code is None:
-                                raise MappingError(
+                                raise MapperTargetProcessingError(
                                     f"Concept map '{self.concept_map_name}' does not define a target code for source code '{source_code}'."
                                 )
                             return element_target.code
         else:
-            raise MappingError(
+            raise MapperTargetProcessingError(
                 f"Could not map source code '{source_code}' using concept map '{self.concept_map_name}'."
             )
 
@@ -657,8 +657,8 @@ class Quantity(MappingTransform):
             Quantity: A FHIR Quantity object constructed from the provided parameters.
 
         Raises:
-            RuleProcessingError: If the `text` parameter does not match the expected format.
-            AssertionError: If neither `text` nor both `value` and `unit` are provided.
+            MapperTargetProcessingError: If the `text` parameter does not match the expected format.
+            MapperTargetProcessingError: If neither `text` nor both `value` and `unit` are provided.
         """
         if self.text:
             text = (
@@ -668,7 +668,7 @@ class Quantity(MappingTransform):
             ).single(scope.get_instances())
             matches = re.search(r"(<|<=|>=|>|ad)?(\d+((\.|\,)\d+)?) (.*)", str(text))
             if not matches:
-                raise MappingError(
+                raise MapperTargetProcessingError(
                     "The 'qty' transform single parameter must be of the form '[<|<=|>=|>|ad]<number> <unit>'"
                 )
 
@@ -681,7 +681,7 @@ class Quantity(MappingTransform):
             )
         else:
             if not (self.value and self.unit):
-                raise ValueError(
+                raise MapperTargetProcessingError(
                     "Quantity transform requires either a text parameter or value and unit parameters"
                 )
             value = (

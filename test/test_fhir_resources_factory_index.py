@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
+from fhircraft.exceptions import FactoryDefinitionIndexError
 
 
 class CopyableMagickyMock(MagicMock):
@@ -154,7 +154,7 @@ def test_index_get_returns_node(simple_index):
 
 
 def test_index_get_raises_for_missing(simple_index):
-    with pytest.raises(DefinitionIndexError):
+    with pytest.raises(FactoryDefinitionIndexError):
         simple_index.get("Observation.missing")
 
 
@@ -269,7 +269,7 @@ def test_index_get_single_by_path_does_not_raise_when_slice_children_present():
 
 
 def test_index_get_by_path_raises_for_missing(simple_index):
-    with pytest.raises(DefinitionIndexError):
+    with pytest.raises(FactoryDefinitionIndexError):
         simple_index.get_by_path("Observation.missing")
 
 
@@ -311,7 +311,7 @@ def test_index_root_raises_when_no_root():
             make_node("Observation.code", "Observation.code"),
         ]
     )
-    with pytest.raises(DefinitionIndexError):
+    with pytest.raises(FactoryDefinitionIndexError):
         index.root()
 
 
@@ -322,7 +322,7 @@ def test_index_root_raises_for_multiple_roots():
             make_node("Patient", "Patient"),
         ]
     )
-    with pytest.raises(DefinitionIndexError):
+    with pytest.raises(FactoryDefinitionIndexError):
         index.root()
 
 
@@ -345,7 +345,7 @@ def test_get_parent(slicing_index, id, expected_parent_id):
 
 
 def test_get_parent_raises_for_root(simple_index):
-    with pytest.raises(DefinitionIndexError):
+    with pytest.raises(FactoryDefinitionIndexError):
         simple_index.get_parent("Observation")
 
 
@@ -421,7 +421,7 @@ def test_get_slices_excludes_type_choice_slice_nodes():
 
 
 def test_get_slices_raises_for_non_slice_entry(simple_index):
-    with pytest.raises(DefinitionIndexError):
+    with pytest.raises(FactoryDefinitionIndexError):
         simple_index.get_slices("Observation.code")
 
 

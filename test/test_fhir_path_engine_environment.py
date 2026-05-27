@@ -3,7 +3,7 @@ import pytest
 from fhircraft.fhir.path.engine.environment import *
 from fhircraft.fhir.path.engine.core import Invocation, Element
 from fhircraft.fhir.path.engine.filtering import Select
-from fhircraft.fhir.path.exceptions import FHIRPathError
+from fhircraft.exceptions import FhirPathException
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
 
@@ -41,7 +41,7 @@ def test_env_variable_returns_value():
 
 def test_env_variable_raises_error_out_of_context():
     collection = [FHIRPathCollectionItem(value="another-value")]
-    with pytest.raises(FHIRPathError):
+    with pytest.raises(FhirPathException):
         EnvironmentVariable("%variable").evaluate(collection, dict())
 
 
@@ -131,7 +131,7 @@ def test_contextual_index_returns_value():
 
 def test_contextual_index_raises_error_out_of_context():
     collection = [FHIRPathCollectionItem(value="another-value")]
-    with pytest.raises(FHIRPathError):
+    with pytest.raises(FhirPathException):
         ContextualIndex().evaluate(collection, dict())
 
 
@@ -154,7 +154,7 @@ def test_contextual_total_returns_value():
 
 def test_contextual_total_raises_error_out_of_context():
     collection = [FHIRPathCollectionItem(value="another-value")]
-    with pytest.raises(FHIRPathError):
+    with pytest.raises(FhirPathException):
         ContextualTotal().evaluate(collection, dict())
 
 

@@ -11,8 +11,8 @@ from fhircraft.fhir.resources.factory.element_node import (
     FHIRPATH_TYPE_PREFIX,
     FHIR_TYPE_PREFIX,
 )
-from fhircraft.fhir.resources.factory.exceptions import (
-    DefinitionResolutionError,
+from fhircraft.exceptions import (
+    FactoryDefinitionResolutionError,
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 
@@ -75,7 +75,7 @@ class SnapshotResolver:
 
         Raises:
             AssertionError: If the selected mode's required elements are missing or contain None values.
-            DefinitionResolutionError: If neither snapshot nor differential elements are available.
+            FactoryDefinitionResolutionError: If neither snapshot nor differential elements are available.
         """
 
         if mode == "auto":
@@ -89,15 +89,15 @@ class SnapshotResolver:
         if mode == "snapshot":
             # Type check assertions
             if not sd.snapshot:
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition {sd.name or sd.url} snapshot is None"
                 )
             if not sd.snapshot.element:
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition {sd.name or sd.url} snapshot.element is None"
                 )
             if not all([e is not None for e in sd.snapshot.element]):
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition {sd.name or sd.url} snapshot.element contains None"
                 )
             # Fast path: wrap snapshot elements directly without merging
@@ -107,20 +107,20 @@ class SnapshotResolver:
         elif mode == "differential":
             # Type check assertions
             if not sd.differential:
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition {sd.name or sd.url} differential is None"
                 )
             if not sd.differential.element:
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition {sd.name or sd.url} differential.element is None"
                 )
             if not all([e is not None for e in sd.differential.element]):
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition {sd.name or sd.url} differential.element contains None"
                 )
 
             if not (base_canonical := sd.baseDefinition):
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition, which is required for differential resolution."
                 )
             # Build base index by recursively applying ancestor differentials.
@@ -131,7 +131,7 @@ class SnapshotResolver:
                 sd.differential.element, base_index
             )
         else:
-            raise DefinitionResolutionError(
+            raise FactoryDefinitionResolutionError(
                 f"StructureDefinition '{getattr(sd, 'name', '?')}' has neither a "
                 "snapshot nor a differential element list."
             )
@@ -166,7 +166,7 @@ class SnapshotResolver:
                 if not all(
                     [e is not None for e in sd.differential.element]
                 ):
-                    raise DefinitionResolutionError(
+                    raise FactoryDefinitionResolutionError(
                         f"StructureDefinition {sd.name or sd.url} differential.element contains None"
                     )
                 resolved_diff = self._resolve_differential(
@@ -218,7 +218,7 @@ class SnapshotResolver:
         if sd.snapshot and sd.snapshot.element:
             return DefinitionIndex.from_elements(sd.snapshot.element)
 
-        raise DefinitionResolutionError(
+        raise FactoryDefinitionResolutionError(
             f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition and no snapshot; "
             "cannot anchor differential resolution."
         )
@@ -243,13 +243,13 @@ class SnapshotResolver:
             DefinitionIndex: Index built from the nearest ancestor snapshot.
 
         Raises:
-            DefinitionResolutionError: If the ancestor chain is exhausted without finding
+            FactoryDefinitionResolutionError: If the ancestor chain is exhausted without finding
                                        a definition that has a snapshot.
         """
         current = sd
         while True:
             if not current.baseDefinition:
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     f"StructureDefinition '{getattr(current, 'name', '?')}' has neither a "
                     "snapshot nor a baseDefinition — cannot reconstruct full ancestor index."
                 )
@@ -279,7 +279,7 @@ class SnapshotResolver:
                              representing full element ids of the profile being resolved.
 
         Raises:
-            DefinitionResolutionError: If a differential element is missing an id,
+            FactoryDefinitionResolutionError: If a differential element is missing an id,
                                        or if the resolution produces an empty element list.
         """
 
@@ -291,7 +291,7 @@ class SnapshotResolver:
         # Iterate over all differential elements, merging each one (and any missing
         for node in nodes:
             if not node.id:
-                raise DefinitionResolutionError(
+                raise FactoryDefinitionResolutionError(
                     "Differential element with missing id cannot be resolved."
                 )
 
@@ -323,7 +323,7 @@ class SnapshotResolver:
                 merged_nodes[node.id] = self._merge_node_with_base(node, base_node)
 
         if not merged_nodes:
-            raise DefinitionResolutionError(
+            raise FactoryDefinitionResolutionError(
                 "Differential resolution produced an empty element list."
             )
 
@@ -417,7 +417,7 @@ class SnapshotResolver:
             ElementNode: A newly constructed ElementNode with the expanded type definition.
 
         Raises:
-            DefinitionResolutionError
+            FactoryDefinitionResolutionError
 
         Notes:
             - This method is used during differential StructureDefinition resolution.
@@ -426,19 +426,19 @@ class SnapshotResolver:
             - The generated element id is checked against the base index to prevent conflicts.
         """
         if not self._registry:
-            raise DefinitionResolutionError(
+            raise FactoryDefinitionResolutionError(
                 "Repository is required for type expansion during differential resolution."
             )
 
         if not datatypes:
-            raise DefinitionResolutionError(
+            raise FactoryDefinitionResolutionError(
                 f"Type expansion failed for element '{id}'. No type codes provided."
             )
 
         local_id = id.rsplit(".", 1)[-1]
         id_path = ".".join([seg.split(":")[0] for seg in id.split(".")])
         if id in base_index:
-            raise DefinitionResolutionError(
+            raise FactoryDefinitionResolutionError(
                 f"Type expansion failed: generated intermediate node id '{id}' already exists in base index."
             )
 
@@ -481,7 +481,7 @@ class SnapshotResolver:
                 )
             )
 
-        raise DefinitionResolutionError(
+        raise FactoryDefinitionResolutionError(
             f"Type expansion failed for element '{id}'. No matching element with local id "
             f"'{local_id}' found in any of the provided types: {list(datatypes)}."
         )
@@ -527,7 +527,7 @@ class SnapshotResolver:
         )
         merged_node = ElementNode(definition=merged_definition)
         if merged_node.is_array == True and merged_node.base_is_array == False:
-            raise DefinitionResolutionError(
+            raise FactoryDefinitionResolutionError(
                 f"Invalid cardinality change in element '{node.id}': cannot change from non-array to array cardinality when merging with base element."
             )
         return merged_node

@@ -10,18 +10,7 @@ from pydantic import ValidationError
 import json
 
 from .models import PackageMetadata
-
-
-class FHIRPackageRegistryError(Exception):
-    """Base exception for FHIR Package Registry client errors."""
-
-    pass
-
-
-class PackageNotFoundError(FHIRPackageRegistryError):
-    """Raised when a package is not found."""
-
-    pass
+from fhircraft.exceptions import PackageException, PackageNotFoundError, PackageResolutionError
 
 
 class FHIRPackageRegistryClient:

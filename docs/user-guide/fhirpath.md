@@ -212,7 +212,7 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
     # Update single value with error checking
     try:
         patient.fhirpath_update_single("Patient.gender", "male") # (2)!
-    except FHIRPathError:
+    except FhirPathException:
         print("Expected single gender field but found multiple")
 
     # Safe conditional updates

@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import Any, Iterator, List, overload
 
 from fhircraft.fhir.resources.factory.element_node import ElementNode
-from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
+from fhircraft.exceptions import FactoryDefinitionIndexError
 from fhircraft.utils import capitalize
 
 
@@ -48,7 +48,7 @@ class DefinitionIndex:
         """Add an :class:`ElementNode` to this index."""
         if node.id in self._nodes_by_id:
             if not replace:
-                raise DefinitionIndexError(
+                raise FactoryDefinitionIndexError(
                     f"Duplicate element id {node.id!r} cannot be added to index."
                 )
             else:
@@ -143,7 +143,7 @@ class DefinitionIndex:
         else:
             node = self._nodes_by_id.get(id)
         if not node:
-            raise DefinitionIndexError(f"Element id {id!r} not found in index.")
+            raise FactoryDefinitionIndexError(f"Element id {id!r} not found in index.")
         return node
 
     def get_by_path(
@@ -163,7 +163,7 @@ class DefinitionIndex:
                 if non_slice_child_nodes:
                     nodes = non_slice_child_nodes
         if not nodes:
-            raise DefinitionIndexError(f"Element path {path!r} not found in index.")
+            raise FactoryDefinitionIndexError(f"Element path {path!r} not found in index.")
         return nodes
 
     def get_single_by_path(
@@ -176,7 +176,7 @@ class DefinitionIndex:
             path=path, ignore_root=ignore_root, ignore_slices=ignore_slices
         )
         if len(nodes) > 1:
-            raise DefinitionIndexError(
+            raise FactoryDefinitionIndexError(
                 f"expected a single element node but found {len(nodes)} for path {path!r} in index. The following nodes were found: {[n.id for n in nodes]}"
             )
         return nodes[0]
@@ -208,9 +208,9 @@ class DefinitionIndex:
         """
         root_node = [n for n in self.nodes if n.is_root]
         if not root_node:
-            raise DefinitionIndexError("DefinitionIndex has no root element.")
+            raise FactoryDefinitionIndexError("DefinitionIndex has no root element.")
         if len(root_node) > 1:
-            raise DefinitionIndexError(
+            raise FactoryDefinitionIndexError(
                 f"DefinitionIndex has multiple root candidates: {[n.id for n in root_node]}"
             )
         return root_node[0]
@@ -226,7 +226,7 @@ class DefinitionIndex:
         if parent_id := self.get(id).parent_id:
             return self.get(parent_id)
         else:
-            raise DefinitionIndexError(
+            raise FactoryDefinitionIndexError(
                 f"Element {id!r} has no parent (it is a root element)."
             )
 
@@ -254,7 +254,7 @@ class DefinitionIndex:
         """
         node = self.get(id)
         if not node.is_slice_entry:
-            raise DefinitionIndexError(
+            raise FactoryDefinitionIndexError(
                 f"Element {id!r} is not a slicing entry and cannot have slices."
             )
         return [n for n in self.nodes if n.is_slice and n.id.startswith(node.id + ":")]
@@ -335,5 +335,5 @@ class DefinitionIndex:
         try:
             r = self.root()
             return f"DefinitionIndex(root={r.id!r}, size={len(self)})"
-        except DefinitionIndexError:
+        except FactoryDefinitionIndexError:
             return f"DefinitionIndex(size={len(self)})"

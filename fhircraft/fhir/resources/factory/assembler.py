@@ -14,7 +14,7 @@ from fhircraft.fhir.resources.factory.builders.base import Builder, ValidatorInf
 from fhircraft.fhir.resources.factory.context import BuildContext
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.fhir.resources.factory.exceptions import AssemblerError
+from fhircraft.exceptions import FactoryAssemblerError
 from fhircraft.fhir.resources.factory.builders import (
     TypeChoiceFieldBuilder,
     SlicedFieldBuilder,
@@ -74,7 +74,7 @@ class ModelAssembler:
             type: The dynamically created Pydantic model class.
         Raises:
             ValueError: If a child element in the index lacks a definition.
-            AssemblerError: If a builder fails to construct a field or validator.
+            FactoryAssemblerError: If a builder fails to construct a field or validator.
         Notes:
             - Resolves base classes and iterates over child elements to build fields, validators, and properties.
             - Handles model-level constraints, including fixed values and patterns.
@@ -115,7 +115,7 @@ class ModelAssembler:
                     self.index,
                 )
             except Exception as exc:
-                raise AssemblerError(
+                raise FactoryAssemblerError(
                     f"Builder failed for element '{child_node.id}': {exc}"
                 ) from exc
 
@@ -191,7 +191,7 @@ class ModelAssembler:
         for builder in self.builder_chain:
             if builder.can_handle(node, self.index):
                 return builder
-        raise AssemblerError(f"No suitable builder found for node '{node.id}'.")
+        raise FactoryAssemblerError(f"No suitable builder found for node '{node.id}'.")
 
     @staticmethod
     def _set_constraint_default_values(

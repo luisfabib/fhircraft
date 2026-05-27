@@ -12,9 +12,9 @@ import pytest
 from fhircraft.fhir.resources.definitions.registry import (
     Manifest,
     ManifestEntry,
-    StructureDefinitionNotFoundError,
     StructureDefinitionRegistry,
 )
+from fhircraft.exceptions import DefinitionNotFoundError
 
 # Patch targets
 _MANIFEST_LOAD = "fhircraft.fhir.resources.definitions.registry.Manifest.load"
@@ -265,7 +265,7 @@ def test_get__raises_file_not_found_when_manifest_entry_file_missing(tmp_path):
 
 def test_get__raises_not_found_when_internet_disabled_and_sd_unknown():
     reg = make_registry()
-    with pytest.raises(StructureDefinitionNotFoundError):
+    with pytest.raises(DefinitionNotFoundError):
         reg.get("http://example.org/Unknown")
 
 

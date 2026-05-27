@@ -22,7 +22,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
     Literal,
 )
-from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
+from fhircraft.exceptions import FhirPathRuntimeError
 from fhircraft.fhir.path.utils import get_expression_context
 
 
@@ -68,11 +68,11 @@ class Iif(FHIRPathFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
 
         """
         if len(collection) > 1:
-            raise FHIRPathRuntimeError(
+            raise FhirPathRuntimeError(
                 f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
 
@@ -88,7 +88,7 @@ class Iif(FHIRPathFunction):
             environment=eval_context(collection),
         )
         if not isinstance(criterion, bool):
-            raise FHIRPathRuntimeError(
+            raise FhirPathRuntimeError(
                 f"FHIRPath Iif function expected the criterion to evaluate to a single Boolean value, instead got {type(criterion)}."
             )
 
@@ -124,10 +124,10 @@ class FHIRTypeConversionFunction(FHIRPathFunction):
             collection (FHIRPathCollection): Collection to be validated.
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         if len(collection) > 1:
-            raise FHIRPathRuntimeError(
+            raise FhirPathRuntimeError(
                 f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
 
@@ -159,7 +159,7 @@ class ToBoolean(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
 
         """
         self.validate_collection(collection)
@@ -202,7 +202,7 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:
@@ -238,7 +238,7 @@ class ToInteger(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:
@@ -280,7 +280,7 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
 
         """
         self.validate_collection(collection)
@@ -319,7 +319,7 @@ class ToDate(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
@@ -382,7 +382,7 @@ class ConvertsToDate(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:
@@ -420,7 +420,7 @@ class ToDateTime(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
@@ -489,7 +489,7 @@ class ConvertsToDateTime(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:
@@ -526,7 +526,7 @@ class ToDecimal(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
@@ -572,7 +572,7 @@ class ConvertsToDecimal(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:
@@ -616,7 +616,7 @@ class ToQuantity(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
@@ -683,7 +683,7 @@ class ConvertsToQuantity(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:
@@ -724,7 +724,7 @@ class ToString(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
@@ -770,7 +770,7 @@ class ConvertsToString(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:
@@ -807,7 +807,7 @@ class ToTime(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
@@ -866,7 +866,7 @@ class ConvertsToTime(FHIRTypeConversionFunction):
             FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathRuntimeError: If input collection has more than one item.
+            FhirPathRuntimeError: If input collection has more than one item.
         """
         self.validate_collection(collection)
         if not collection:

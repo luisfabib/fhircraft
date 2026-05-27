@@ -48,9 +48,9 @@ def _validate_FHIR_element_constraint(
         Warning: If the validation fails and severity is 'warning'.
     """
     from fhircraft.config import get_config
-    from fhircraft.fhir.path.exceptions import (
-        FhirPathLexerError,
-        FhirPathParserError,
+    from fhircraft.exceptions import (
+        FhirPathLexingError,
+        FhirPathParsingError,
         FhirPathWarning,
     )
     from fhircraft.fhir.path.parser import fhirpath
@@ -104,8 +104,8 @@ def _validate_FHIR_element_constraint(
                     raise AssertionError(error_message)
         except (
             ValueError,
-            FhirPathLexerError,
-            FhirPathParserError,
+            FhirPathLexingError,
+            FhirPathParsingError,
             AttributeError,
             NotImplementedError,
         ) as e:

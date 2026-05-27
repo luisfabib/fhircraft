@@ -21,13 +21,13 @@ from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.definitions.registry import (
     StructureDefinitionRegistry,
-    StructureDefinitionNotFoundError,
 )
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from .registry import StructureMapRegistry
 
-from .exceptions import (
-    MappingError,
+from fhircraft.exceptions import (
+    DefinitionNotFoundError,
+    MapperException,
 )
 from .scope import MappingScope
 from .group import Group
@@ -435,7 +435,7 @@ class FHIRMappingEngine:
                 KeyError,
                 ValueError,
                 AttributeError,
-                StructureDefinitionNotFoundError,
+                DefinitionNotFoundError,
             ) as e:
                 # If StructureDefinition not found, log warning but continue
                 logger.warning(
@@ -466,7 +466,7 @@ class FHIRMappingEngine:
             dict[str, BaseModel | dict]: A dictionary mapping aliases to validated Pydantic model instances or raw data.
 
         Raises:
-            MappingError: If any entry in `source_data` does not match any of the provided source models.
+            MapperException: If any entry in `source_data` does not match any of the provided source models.
         """
         if not source_models:
             # No models defined - treat all source data as arbitrary
@@ -505,7 +505,7 @@ class FHIRMappingEngine:
 
         for idx, entry in enumerate(source_data):
             if not _validate_entry(entry, idx):
-                raise MappingError(
+                raise MapperException(
                     f"Source data entry of type {type(entry)} does not match any source model. "
                     f"Available models: {list(source_models.keys())}"
                 )

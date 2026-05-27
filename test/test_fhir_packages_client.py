@@ -8,12 +8,13 @@ from unittest.mock import Mock, patch
 import pytest
 
 from fhircraft.fhir.packages import (
-    FHIRPackageRegistryClient,
-    FHIRPackageRegistryError,
     PackageMetadata,
-    PackageNotFoundError,
+    FHIRPackageRegistryClient
 )
-
+from fhircraft.exceptions import (
+   PackageResolutionError,
+   PackageNotFoundError,
+)
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, List, Optional, Sequence
 from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
-from fhircraft.fhir.mapper.engine.exceptions import (
-    MappingDigestionError,
-    MappingError,
+from fhircraft.exceptions import (
+    MapperDigestionError,
+    MapperGroupProcessingError,
 )
 import logging
 
@@ -92,7 +92,7 @@ class Group(FHIRMappingEngineComponent):
         add extra inputs.
 
         Raises:
-            MappingError: If a required parent input is absent, or has a mismatched
+            MapperGroupProcessingError: If a required parent input is absent, or has a mismatched
                 mode or type.
         """
         parent_by_name = {str(inp.name): inp for inp in parent_group.inputs}
@@ -101,12 +101,12 @@ class Group(FHIRMappingEngineComponent):
         for pname, pinp in parent_by_name.items():
             cinp = child_by_name.get(pname)
             if cinp is None:
-                raise MappingError(
+                raise MapperGroupProcessingError(
                     f"Group '{self.name}' extends '{parent_group.name}' but is "
                     f"missing required input '{pname}'."
                 )
             if str(cinp.mode) != str(pinp.mode):
-                raise MappingError(
+                raise MapperGroupProcessingError(
                     f"Group '{self.name}' input '{pname}' has mode '{cinp.mode}', "
                     f"but parent group '{parent_group.name}' requires mode '{pinp.mode}'."
                 )
@@ -116,10 +116,10 @@ class Group(FHIRMappingEngineComponent):
                 cinp_type = str(cinp.type) if cinp.type else None
                 try:
                     scope.get_type(pinp_type)
-                except MappingError:
+                except MapperGroupProcessingError:
                     pass  # type not registered in scope; still enforce name match
                 if cinp_type != pinp_type:
-                    raise MappingError(
+                    raise MapperGroupProcessingError(
                         f"Group '{self.name}' input '{pname}' has type '{cinp_type}', "
                         f"but parent group '{parent_group.name}' requires type '{pinp_type}'."
                     )
@@ -129,26 +129,26 @@ class Group(FHIRMappingEngineComponent):
     ) -> None:
         """Bind input parameters to the group scope."""
         if len(parameters) != len(self.inputs):
-            raise MappingError(
+            raise MapperGroupProcessingError(
                 f"Expected {len(self.inputs)} parameters, got {len(parameters)}"
             )
 
         for input, parameter in zip(self.inputs, parameters):
             if input.mode == "target" and not is_dependent:
                 if not input.type:
-                    raise MappingError(
+                    raise MapperGroupProcessingError(
                         f"Target input '{input.name}' in group '{self.name}' must have a type specified."
                     )
 
             if input.type:
                 try:
                     scope.get_type(str(input.type))
-                except MappingError:
-                    raise MappingError(
+                except MapperGroupProcessingError:
+                    raise MapperGroupProcessingError(
                         f"Input '{input.name}' in group '{self.name}' has unknown type '{input.type}'."
                     )
             if not input.name:
-                raise MappingError(
+                raise MapperGroupProcessingError(
                     f"A {input.mode} input in group '{self.name}' is missing a name."
                 )
 
@@ -169,7 +169,7 @@ class Group(FHIRMappingEngineComponent):
             scope: The parent mapping scope to use as the basis for the group's local scope.
 
         Raises:
-            MappingError: If the number of provided parameters does not match the group's input definitions.
+            MapperGroupProcessingError: If the number of provided parameters does not match the group's input definitions.
             RuntimeError: If more than one rule with 'first' or 'last' target list mode is found in the group.
             NotImplementedError: If a target list mode other than 'first' or 'last' is encountered.
         """

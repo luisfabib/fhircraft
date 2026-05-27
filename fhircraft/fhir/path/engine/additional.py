@@ -14,7 +14,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathError,
+    FhirPathException,
     FHIRPathFunction,
     Invocation,
     Literal,
@@ -25,7 +25,7 @@ from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.utils import ensure_list
 from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive
-from fhircraft.fhir.path.exceptions import FhirPathWarning
+from fhircraft.exceptions import FhirPathWarning
 
 
 class Extension(FHIRPathFunction):
@@ -45,7 +45,7 @@ class Extension(FHIRPathFunction):
         if isinstance(url, Literal):
             url = url.value
         if not isinstance(url, str):
-            raise FHIRPathError("Extension() argument must be a string.")
+            raise FhirPathException("Extension() argument must be a string.")
         self.url = url
 
     def evaluate(
@@ -87,7 +87,7 @@ class TypeChoice(FHIRPath):
         if isinstance(type_choice_name, Literal):
             type_choice_name = type_choice_name.value
         if not isinstance(type_choice_name, str):
-            raise FHIRPathError("TypeChoice() argument must be a string.")
+            raise FhirPathException("TypeChoice() argument must be a string.")
         self.type_choice_name = type_choice_name
 
     def evaluate(
@@ -230,7 +230,7 @@ class Resolve(FHIRPathFunction):
                 )
                 or ((resource_url := value))
             ) or not isinstance(resource_url, (str, StringBase)):
-                raise FHIRPathError(
+                raise FhirPathException(
                     "The resolve() function requires either a collection of URIs, Canonicals, URLs or References."
                 )
             if resource_url.startswith("http://"):
@@ -477,7 +477,7 @@ class HtmlChecks(FHIRPathFunction):
             bool
 
         Raises:
-            FHIRPathError: If the collection is not a single item.
+            FhirPathException: If the collection is not a single item.
         """
 
         collection = ensure_list(collection)
@@ -757,12 +757,12 @@ class Slice(FHIRPathFunction):
         if isinstance(structure, Literal):
             structure = structure.value
         if not isinstance(structure, str):
-            raise FHIRPathError("Slice() argument must be a string.")
+            raise FhirPathException("Slice() argument must be a string.")
         self.structure = structure
         if isinstance(name, Literal):
             name = name.value
         if not isinstance(name, str):
-            raise FHIRPathError("Slice() argument must be a string.")
+            raise FhirPathException("Slice() argument must be a string.")
         self.name = name
 
     def evaluate(
@@ -800,7 +800,7 @@ class CheckModifiers(FHIRPathFunction):
         if isinstance(modifier, Literal):
             modifier = modifier.value
         if not isinstance(modifier, str):
-            raise FHIRPathError("checkModifiers() argument must be a string.")
+            raise FhirPathException("checkModifiers() argument must be a string.")
         self.modifier = modifier
 
     def evaluate(
@@ -834,7 +834,7 @@ class ConformsTo(FHIRPathFunction):
         if isinstance(structure, Literal):
             structure = structure.value
         if not isinstance(structure, str):
-            raise FHIRPathError("conformsTo() argument must be a string.")
+            raise FhirPathException("conformsTo() argument must be a string.")
         self.structure = structure
 
     def evaluate(
@@ -869,7 +869,7 @@ class MemberOf(FHIRPathFunction):
         if isinstance(valueset, Literal):
             valueset = valueset.value
         if not isinstance(valueset, str):
-            raise FHIRPathError("memberOf() argument must be a string.")
+            raise FhirPathException("memberOf() argument must be a string.")
         self.valueset = valueset
 
     def evaluate(
@@ -909,7 +909,7 @@ class Subsumes(FHIRPathFunction):
         if isinstance(code, Literal):
             code = code.value
         if not isinstance(code, str):
-            raise FHIRPathError("subsumes() argument must be a string.")
+            raise FhirPathException("subsumes() argument must be a string.")
         self.code = code
 
     def evaluate(
@@ -947,7 +947,7 @@ class SubsumedBy(FHIRPathFunction):
         if isinstance(code, Literal):
             code = code.value
         if not isinstance(code, str):
-            raise FHIRPathError("subsumedBy() argument must be a string.")
+            raise FhirPathException("subsumedBy() argument must be a string.")
         self.code = code
 
     def evaluate(
@@ -987,7 +987,7 @@ class Comparable(FHIRPathFunction):
         if isinstance(quantity, Quantity):
             quantity = Literal(quantity)
         if not isinstance(quantity, FHIRPath):
-            raise FHIRPathError(
+            raise FhirPathException(
                 "comparable() argument must be a FHIRPath Quantity or valid FHIRPath."
             )
         self.quantity = quantity
@@ -1013,20 +1013,20 @@ class Comparable(FHIRPathFunction):
         if len(collection) == 0:
             return []
         elif len(collection) != 1:
-            raise FHIRPathError("comparable() requires a singleton collection.")
+            raise FhirPathException("comparable() requires a singleton collection.")
         query_quantity = self.quantity.single(collection, environment=environment)
         collection_value = collection[0].value
         if (collection_value is None) or (query_quantity is None):
             return [FHIRPathCollectionItem.wrap(False)]
         if collection_value and not Quantity.is_quantity(collection_value):
-            raise FHIRPathError(
+            raise FhirPathException(
                 f"Comparable() can only be called on Quantity types, got: {type(collection_value)}"
             )
         input_quantity: Quantity = Quantity.parse_quantity(collection_value)
         query_quantity: Quantity = Quantity.parse_quantity(query_quantity)
 
         if query_quantity and not Quantity.is_quantity(query_quantity):
-            raise FHIRPathError(
+            raise FhirPathException(
                 f"Comparable() input did not evaluate to a Quantity, it was: {type(query_quantity)}"
             )
 

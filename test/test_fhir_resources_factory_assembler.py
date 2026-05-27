@@ -16,7 +16,7 @@ from fhircraft.fhir.resources.factory.builders.base import (
     FieldInformation,
     ValidatorInformation,
 )
-from fhircraft.fhir.resources.factory.exceptions import AssemblerError
+from fhircraft.exceptions import FactoryAssemblerError
 
 
 # ---------------------------------------------------------------------------
@@ -171,7 +171,7 @@ def test_find_builder__raises_assembler_error_when_no_builder_matches():
     a.builder_chain = [make_mock_builder(can_handle=False)]
     node = MagicMock()
     node.id = "Resource.field"
-    with pytest.raises(AssemblerError):
+    with pytest.raises(FactoryAssemblerError):
         a._find_builder(node)
 
 
@@ -397,7 +397,7 @@ def test_assemble__wraps_builder_exception_in_assembler_error():
     mock_b = make_mock_builder()
     mock_b.build.side_effect = RuntimeError("builder exploded")
     a.builder_chain = [mock_b]
-    with pytest.raises(AssemblerError):
+    with pytest.raises(FactoryAssemblerError):
         a.assemble("M")
 
 
@@ -408,7 +408,7 @@ def test_assemble__assembler_error_message_contains_node_id():
     mock_b = make_mock_builder()
     mock_b.build.side_effect = RuntimeError("boom")
     a.builder_chain = [mock_b]
-    with pytest.raises(AssemblerError, match="Resource.broken"):
+    with pytest.raises(FactoryAssemblerError, match="Resource.broken"):
         a.assemble("M")
 
 

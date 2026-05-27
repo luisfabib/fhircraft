@@ -11,7 +11,7 @@ from fhircraft.fhir.resources.factory.builders.base import (
     ValidatorInformation,
 )
 from fhircraft.fhir.resources.factory.builders.type_choice import TypeChoiceFieldBuilder
-from fhircraft.fhir.resources.factory.exceptions import TypeResolutionError
+from fhircraft.exceptions import FactoryTypeResolutionError
 
 
 # ---------------------------------------------------------------------------
@@ -118,13 +118,13 @@ def test_build__returns_build_instance(builder, index):
 
 def test_build__raises_when_no_types(builder, index):
     node = make_node("value", type_codes=[])
-    with pytest.raises(TypeResolutionError):
+    with pytest.raises(FactoryTypeResolutionError):
         builder.build(node, index)
 
 
 def test_build__error_message_contains_node_path(builder, index):
     node = make_node("value", type_codes=[], path="Observation.value[x]")
-    with pytest.raises(TypeResolutionError, match="Observation.value"):
+    with pytest.raises(FactoryTypeResolutionError, match="Observation.value"):
         builder.build(node, index)
 
 

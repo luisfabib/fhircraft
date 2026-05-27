@@ -12,9 +12,9 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.group import Group
 from fhircraft.fhir.mapper.engine.scope import MappingScope
-from fhircraft.fhir.mapper.engine.exceptions import (
-    MappingDigestionError,
-    MappingError,
+from fhircraft.exceptions import (
+    MapperDigestionError,
+    MapperGroupProcessingError,
 )
 from fhircraft.fhir.path.engine import Exists
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
@@ -332,7 +332,7 @@ def test_bind_parameters__parameter_count_mismatch(
 ):
     group = Group(minimal_group_definition, None)
 
-    with pytest.raises(MappingError, match="Expected 1 parameters, got 2"):
+    with pytest.raises(MapperGroupProcessingError, match="Expected 1 parameters, got 2"):
         group.bind_parameters(
             mapping_scope, [sample_fhirpath, sample_fhirpath], is_dependent=False
         )
@@ -347,7 +347,7 @@ def test_bind_parameters__target_input_missing_type_non_dependent(mock_parent_gr
     sample_fhirpath = Exists()
 
     with pytest.raises(
-        MappingError,
+        MapperGroupProcessingError,
         match="Target input 'tgt' in group 'test-group' must have a type specified",
     ):
         group.bind_parameters(mapping_scope, [sample_fhirpath], is_dependent=False)
@@ -375,7 +375,7 @@ def test_bind_parameters__unknown_input_type(mock_parent_group):
     sample_fhirpath = Exists()
 
     with pytest.raises(
-        MappingError,
+        MapperGroupProcessingError,
         match="Input 'src' in group 'test-group' has unknown type 'UnknownType'",
     ):
         group.bind_parameters(mapping_scope, [sample_fhirpath], is_dependent=False)
@@ -511,7 +511,7 @@ def test_process__with_extends_runs_parent_rules_first(mapping_scope, sample_fhi
 def test_process__raises_error_for_unresolvable_extends(mapping_scope, sample_fhirpath):
     inp = StructureMapGroupInput(name="src", type="Person", mode="source")
     child = Group(_gdef("Child", [inp], extends="NonExistent"))
-    with pytest.raises(MappingError):
+    with pytest.raises(MapperGroupProcessingError):
         child.process(mapping_scope, [sample_fhirpath], is_dependent=False)
 
 
@@ -604,7 +604,7 @@ def test_check_compatibility__raises_error_for_missing_parent_input(mapping_scop
     inp_tgt = StructureMapGroupInput(name="tgt", mode="target")
     parent = Group(_gdef("Parent", [inp_src, inp_tgt]))
     child = Group(_gdef("Child", [inp_src]))  # tgt is missing
-    with pytest.raises(MappingError, match="missing required input 'tgt'"):
+    with pytest.raises(MapperGroupProcessingError, match="missing required input 'tgt'"):
         child._check_extends_compatibility(parent, mapping_scope)
 
 
@@ -613,7 +613,7 @@ def test_check_compatibility__raises_error_for_mode_mismatch(mapping_scope):
     inp_child = StructureMapGroupInput(name="x", mode="target")
     parent = Group(_gdef("Parent", [inp_parent]))
     child = Group(_gdef("Child", [inp_child]))
-    with pytest.raises(MappingError, match="mode"):
+    with pytest.raises(MapperGroupProcessingError, match="mode"):
         child._check_extends_compatibility(parent, mapping_scope)
 
 
@@ -622,7 +622,7 @@ def test_check_compatibility__raises_error_for_type_mismatch(mapping_scope):
     inp_child = StructureMapGroupInput(name="src", mode="source", type="Person")
     parent = Group(_gdef("Parent", [inp_parent]))
     child = Group(_gdef("Child", [inp_child]))
-    with pytest.raises(MappingError, match="type"):
+    with pytest.raises(MapperGroupProcessingError, match="type"):
         child._check_extends_compatibility(parent, mapping_scope)
 
 

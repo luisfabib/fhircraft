@@ -19,7 +19,7 @@ from fhircraft.fhir.path.engine.conversion import (
     ToTime,
     ConvertsToTime,
 )
-from fhircraft.fhir.path.engine.conversion import FHIRPathRuntimeError
+from fhircraft.fhir.path.engine.conversion import FhirPathRuntimeError
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathCollectionItem,
@@ -172,7 +172,7 @@ def test_toBoolean_converts_correctly_for_valid_type(value, expected):
 
 def test_toBoolean_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToBoolean().evaluate(collection, env)
 
 
@@ -240,7 +240,7 @@ def test_convertstoboolean_returns_true_for_valid_type(value):
 
 def test_convertsToBoolean_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToBoolean().evaluate(collection, env)
 
 
@@ -292,7 +292,7 @@ def test_tointeger_converts_correctly_for_valid_type(value, expected):
 
 def test_toInteger_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToInteger().evaluate(collection, env)
 
 
@@ -342,7 +342,7 @@ def test_convertstointeger_returns_true_for_valid_type(value):
 
 def test_convertstoInteger_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToInteger().evaluate(collection, env)
 
 
@@ -396,7 +396,7 @@ def test_todecimal_converts_correctly_for_valid_type(value, expected):
 
 def test_toDecimal_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToDecimal().evaluate(collection, env)
 
 
@@ -448,7 +448,7 @@ def test_convertstodecimal_returns_true_for_valid_type(value):
 
 def test_convertsToDecimal_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToDecimal().evaluate(collection, env)
 
 
@@ -500,7 +500,7 @@ def test_todate_converts_correctly_for_valid_type(value, expected):
 
 def test_toDate_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToDate().evaluate(collection, env)
 
 
@@ -552,7 +552,7 @@ def test_convertstodate_returns_true_for_valid_type(value):
 
 def test_convertsToDate_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToDate().evaluate(collection, env)
 
 
@@ -605,7 +605,7 @@ def test_todatetime_converts_correctly_for_valid_type(value, expected):
 
 def test_toDateTime_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToDateTime().evaluate(collection, env)
 
 
@@ -657,7 +657,7 @@ def test_convertstodatetime_returns_true_for_valid_type(value):
 
 def test_convertsToDateTime_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToDateTime().evaluate(collection, env)
 
 
@@ -727,7 +727,7 @@ def test_toquantity_converts_to_input_unit(value, expected):
 
 def test_toQuantity_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToQuantity().evaluate(collection, env)
 
 
@@ -796,7 +796,7 @@ def test_convertstoquantity_returns_correct_conversion(value, expected):
 
 def test_convertsToQuantity_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToQuantity().evaluate(collection, env)
 
 
@@ -852,7 +852,7 @@ def test_toString_converts_correctly_for_valid_type(value, expected):
 
 def test_toString_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToString().evaluate(collection, env)
 
 
@@ -907,7 +907,7 @@ def test_convertstostring_returns_true_for_valid_type(value):
 
 def test_convertsToString_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToString().evaluate(collection, env)
 
 
@@ -956,7 +956,7 @@ def test_totime_converts_correctly_for_valid_type(value, expected):
 
 def test_toTime_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ToTime().evaluate(collection, env)
 
 
@@ -1005,7 +1005,7 @@ def test_convertstotime_returns_true_for_valid_type(value):
 
 def test_convertsToTime_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FHIRPathRuntimeError):
+    with pytest.raises(FhirPathRuntimeError):
         ConvertsToTime().evaluate(collection, env)
 
 

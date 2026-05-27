@@ -1,11 +1,10 @@
 from typing import TYPE_CHECKING, List
 from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
-from fhircraft.fhir.mapper.engine.exceptions import (
-    RuleProcessingError,
-    SourceAssertionError,
-    SourceConditionError,
-    SourceTypeError,
-    MappingDigestionError,
+from fhircraft.exceptions import (
+    MapperRuleProcessingError,
+    MapperExecutionError,
+    MapperSourceProcessingError,
+    MapperDigestionError,
 )
 from fhircraft.fhir.mapper.engine import transforms as tf
 from fhircraft.fhir.mapper.engine.source import RuleSource
@@ -116,8 +115,8 @@ class Rule(FHIRMappingEngineComponent):
                         f"Source type or condition violated in rule {self.name}. Skipping rule."
                     )
                     return scope
-                except SourceAssertionError:
-                    raise SourceAssertionError(
+                except MapperRuleProcessingError:
+                    raise MapperRuleProcessingError(
                         f"Source assertion failed for rule {self.name}"
                     )
                 source_iterations[source.variable] = source.iteration_count
@@ -139,7 +138,7 @@ class Rule(FHIRMappingEngineComponent):
 
                     # Set the source variable to an indexed FHIRPath
                     if (rule_source := scope.resolve_fhirpath(source_var)) is None:
-                        raise RuleProcessingError(
+                        raise MapperRuleProcessingError(
                             f"Source variable {source_var} not found"
                         )
                     iteration_scope.define_variable(
@@ -171,11 +170,11 @@ class Rule(FHIRMappingEngineComponent):
 
         dependent_group = iteration_scope.resolve_symbol(dependent.name)
         if not dependent_group:
-            raise RuleProcessingError(
+            raise MapperRuleProcessingError(
                 f"Dependent group or rule '{dependent.name}' not found"
             )
         if not isinstance(dependent_group, Group):
-            raise RuleProcessingError(f"Dependent '{dependent.name}' is not a group")
+            raise MapperRuleProcessingError(f"Dependent '{dependent.name}' is not a group")
         # R5-specific logic
         if _parameters := getattr(dependent, "parameter", None):
             parameters = [
@@ -188,7 +187,7 @@ class Rule(FHIRMappingEngineComponent):
                 iteration_scope.resolve_fhirpath(str(var)) for var in _variables or []
             ]
         else:
-            raise RuleProcessingError(
+            raise MapperRuleProcessingError(
                 f"Dependent '{dependent.name}' has no parameters or variables defined"
             )
         dependent_group.process(
