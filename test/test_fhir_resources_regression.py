@@ -1,4 +1,4 @@
-from typing_extensions import get_args, get_origin
+from typing import get_args, get_origin
 
 import pytest
 from pydantic import ValidationError
