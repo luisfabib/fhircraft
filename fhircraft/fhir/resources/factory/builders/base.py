@@ -18,7 +18,6 @@ from functools import partial
 import keyword
 
 from dataclasses import dataclass, field as dc_field
-from typing_extensions import Annotated
 
 from pydantic import Field, field_validator, model_validator
 from pydantic.aliases import AliasChoices

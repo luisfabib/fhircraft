@@ -38,19 +38,21 @@ classifiers = [
     'Framework :: Pydantic :: 2',
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
-requires-python = '>=3.10'
+requires-python = '>=3.11'
 readme = "README.md"
 dependencies = [
-    'requests',
+    'requests>=2.28',
     'pydantic>=2.7',
+    'pydantic_core>=2.18',
     'ply>=3.11',
     'pyyaml>=6.0.1',
     'python-dotenv>=1.0',
-    'jsonschema>4',
-    'jsonpath-ng>1',
+    'jsonschema>=4',
+    'jsonpath-ng>=1',
     'jinja2>=3.1',
     'Pint>=0.24',
-    'packaging>=25'
+    'packaging>=25',
+    'typing_extensions>=4.6.0',
 ]
 
 [project.urls]
@@ -63,9 +65,9 @@ Changelog = "https://github.com/luisfabib/fhircraft/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 dev = [
     "pytest>=8.2",
-    "pytest-mock==3.14.0",
-    "parameterized==0.9.0",
-    "coverage==7.5.1",
+    "pytest-mock>=3.14.0",
+    "parameterized>=0.9.0",
+    "coverage>=7.5.1",
 ]
 docs = [
     "mkdocs-material==9.5.27",

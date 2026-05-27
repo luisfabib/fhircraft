@@ -8,8 +8,7 @@ FHIR Mapping Language engine, with optional internet-fallback resolution.
 from typing import Any, Dict, Optional, Tuple, Union
 
 import requests
-from pydantic import BaseModel
-from pydantic_core import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from fhircraft.config import override_config
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models

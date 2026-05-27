@@ -7,8 +7,7 @@ import warnings
 from abc import ABC
 from copy import copy
 from itertools import zip_longest
-from typing import Any, ClassVar, Iterable, Mapping, SupportsIndex, Union, Literal
-from typing_extensions import Self
+from typing import Any, ClassVar, Iterable, Mapping, SupportsIndex, Union, Literal, Self
 
 from pydantic.config import ExtraValues
 from pydantic import (

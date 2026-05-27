@@ -1,8 +1,7 @@
 import keyword
-from typing_extensions import get_args, get_origin
 from unittest.mock import MagicMock
 import pytest
-from typing import Any, List, Optional
+from typing import Any, List, Optional, get_args, get_origin
 from pydantic.aliases import AliasChoices
 from fhircraft.fhir.resources.datatypes.R4 import core, complex, primitive
 from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
