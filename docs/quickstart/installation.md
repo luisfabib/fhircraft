@@ -1,7 +1,7 @@
 
 ## Requirements
 
-Fhircraft requires a recent version of [Python](https://www.python.org/) (3.10 or higher) and a Python package manager (e.g., [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/)) to be installed on your system.
+Fhircraft requires a recent version of [Python](https://www.python.org/) (3.11 or higher) and a Python package manager (e.g., [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/)) to be installed on your system.
 
 !!! note "Internet Connection (optional)"
 

@@ -70,7 +70,7 @@ No contribution is too small—every improvement counts!
 
 Before you begin, ensure you have:
 
-- **Python 3.10 or higher** (3.10, 3.11, 3.12, or 3.13)
+- **Python 3.11 or higher**
 - **Git** for version control
 - **pip** for package management
 
