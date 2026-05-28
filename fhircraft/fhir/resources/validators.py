@@ -4,7 +4,7 @@ import warnings
 from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 
 from pydantic import BaseModel
-
+from pydantic_core import PydanticCustomError
 from fhircraft.config import get_config
 from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 from fhircraft.utils import (
@@ -44,7 +44,7 @@ def _validate_FHIR_element_constraint(
         Any: The validated value.
 
     Raises:
-        AssertionError: If the validation fails and severity is not 'warning'.
+        PydanticCustomError: If the validation fails and severity is not 'warning'.
         Warning: If the validation fails and severity is 'warning'.
     """
     from fhircraft.config import get_config
@@ -94,14 +94,6 @@ def _validate_FHIR_element_constraint(
             valid = fhirpath.parse(expression).single(
                 item, default=True, environment=environment
             )
-            error_message = f"[{key}] {human}. -> {expression}"
-            if element:
-                error_message = f"{element}\n\t{error_message}"
-            if effective_severity == "warning" and not valid:
-                warnings.warn(error_message, FhirPathWarning)
-            else:
-                if not valid:
-                    raise AssertionError(error_message)
         except (
             ValueError,
             FhirPathLexingError,
@@ -112,6 +104,15 @@ def _validate_FHIR_element_constraint(
             warnings.warn(
                 f"Warning: FHIRPath raised {e.__class__.__name__} for expression: [{key}] -> {expression}. {traceback.format_exc()}"
             )
+            return value
+        error_message = f"[{key}] {human} -> {expression}"
+        if element:
+            error_message = f"{element}\n\t{error_message}"
+        if effective_severity == "warning" and not valid:
+            warnings.warn(error_message, FhirPathWarning)
+        else:
+            if not valid:
+                raise PydanticCustomError("fhir_invariant_violation", error_message)  # type: ignore
     return value
 
 
@@ -138,7 +139,7 @@ def validate_element_constraint(
         Any: The validated value.
 
     Raises:
-        AssertionError: If the validation fails and severity is not `warning`.
+        PydanticCustomError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
 
@@ -229,7 +230,7 @@ def validate_model_constraint(
         instance (type[T]): The validated model instance.
 
     Raises:
-        AssertionError: If the validation fails and severity is not `warning`.
+        PydanticCustomError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
     config = get_config()
@@ -257,7 +258,7 @@ def validate_FHIR_element_pattern(
         Union[FHIRBaseModel, List[FHIRBaseModel]]: The validated FHIR element.
 
     Raises:
-        AssertionError: If the element does not fulfill the specified pattern.
+        PydanticCustomError: If the element does not fulfill the specified pattern.
     """
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
@@ -272,13 +273,14 @@ def validate_FHIR_element_pattern(
         _element.model_dump() if isinstance(_element, FHIRBaseModel) else _element
     )
     _pattern = pattern.model_dump() if isinstance(pattern, FHIRBaseModel) else pattern
-    if (isinstance(pattern, dict) and not is_dict_subset(_pattern, _element)) \
-         or (not isinstance(pattern, dict) and _element != _pattern):
+    if (isinstance(pattern, dict) and not is_dict_subset(_pattern, _element)) or (
+        not isinstance(pattern, dict) and _element != _pattern
+    ):
         error = f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2) if isinstance(pattern, FHIRBaseModel) else pattern}"
         if config.mode == "lenient":
             warnings.warn(str(error))
         else:
-            raise AssertionError(str(error))
+            raise PydanticCustomError("fhir_pattern_violation", str(error))  # type: ignore
     return element
 
 
@@ -297,7 +299,7 @@ def validate_FHIR_model_pattern(
         Union[FHIRBaseModel, List[FHIRBaseModel]]: The validated FHIR model.
 
     Raises:
-        AssertionError: If the model does not fulfill the specified pattern.
+        PydanticCustomError: If the model does not fulfill the specified pattern.
     """
     return validate_FHIR_element_pattern(cls=None, element=model, pattern=pattern)
 
@@ -319,7 +321,7 @@ def validate_FHIR_element_fixed_value(
         Union[FHIRBaseModel, List[FHIRBaseModel]]: The validated FHIR element.
 
     Raises:
-        AssertionError: If the element does not fulfill the specified constant.
+        PydanticCustomError: If the element does not fulfill the specified constant.
     """
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
@@ -340,7 +342,7 @@ def validate_FHIR_element_fixed_value(
         if config.mode == "lenient":
             warnings.warn(error)
         else:
-            raise AssertionError(error)
+            raise PydanticCustomError("fhir_pattern_violation", str(error))  # type: ignore
     return element
 
 
@@ -359,7 +361,7 @@ def validate_FHIR_model_fixed_value(
         Union[FHIRBaseModel, List[FHIRBaseModel]]: The validated FHIR element.
 
     Raises:
-        AssertionError: If the element does not fulfill the specified constant.
+        PydanticCustomError: If the element does not fulfill the specified constant.
     """
     return validate_FHIR_element_fixed_value(cls=None, element=model, constant=constant)
 
@@ -385,7 +387,7 @@ def validate_type_choice_element(
         T: The validated instance.
 
     Raises:
-        AssertionError: If more than one value is set for the type choice element or if a non-allowed type is set.
+        PydanticCustomError: If more than one value is set for the type choice element or if a non-allowed type is set.
     """
 
     config = get_config()
@@ -421,7 +423,7 @@ def validate_type_choice_element(
             if config.mode == "lenient":
                 warnings.warn(message)
             else:
-                raise AssertionError(message)
+                raise PydanticCustomError("fhir_type_choice_violation", message)  # type: ignore
 
     _assert(
         types_set_count <= 1,
@@ -495,7 +497,7 @@ def validate_slicing_cardinalities(
                 if config.mode == "lenient":
                     warnings.warn(message)
                 else:
-                    raise AssertionError(message)
+                    raise PydanticCustomError("fhir_cardinality_violation", message)  # type: ignore
             if slice.max_cardinality is not None:
                 if slice_instances_count > slice.max_cardinality:
                     message = f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
@@ -503,7 +505,7 @@ def validate_slicing_cardinalities(
                     if config.mode == "lenient":
                         warnings.warn(message)
                     else:
-                        raise AssertionError(message)
+                        raise PydanticCustomError("fhir_cardinality_violation", message)  # type: ignore
     return values
 
 
