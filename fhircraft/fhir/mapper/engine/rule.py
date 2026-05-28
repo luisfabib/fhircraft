@@ -52,7 +52,7 @@ class Rule(FHIRMappingEngineComponent):
             definition: The StructureMapGroupRuleTarget definition to initialize from.
             parent_group: The parent Group if this rule is nested within a group, or None if it is not.
         Raises:
-            SourceProcessingError: If required fields are missing.
+            MapperDigestionError: If required fields are missing.
         """
         self.definition = definition
         self.name = (
@@ -81,7 +81,7 @@ class Rule(FHIRMappingEngineComponent):
         # Extract dependents
         for dependent in self.definition.dependent or []:
             if not dependent.name:
-                raise MappingDigestionError("Dependent rule or group must have a name")
+                raise MapperDigestionError("Dependent rule or group must have a name")
             self.dependents.append(dependent)
 
     def process(
@@ -110,7 +110,7 @@ class Rule(FHIRMappingEngineComponent):
             for source in self.sources:
                 try:
                     source.process(scope)
-                except (SourceTypeError, SourceConditionError):
+                except MapperSourceProcessingError:
                     logger.debug(
                         f"Source type or condition violated in rule {self.name}. Skipping rule."
                     )
@@ -174,7 +174,9 @@ class Rule(FHIRMappingEngineComponent):
                 f"Dependent group or rule '{dependent.name}' not found"
             )
         if not isinstance(dependent_group, Group):
-            raise MapperRuleProcessingError(f"Dependent '{dependent.name}' is not a group")
+            raise MapperRuleProcessingError(
+                f"Dependent '{dependent.name}' is not a group"
+            )
         # R5-specific logic
         if _parameters := getattr(dependent, "parameter", None):
             parameters = [

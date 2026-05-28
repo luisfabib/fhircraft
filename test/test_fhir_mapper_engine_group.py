@@ -15,6 +15,7 @@ from fhircraft.fhir.mapper.engine.scope import MappingScope
 from fhircraft.exceptions import (
     MapperDigestionError,
     MapperGroupProcessingError,
+    MapperScopeError,
 )
 from fhircraft.fhir.path.engine import Exists
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
@@ -22,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
     StructureMapGroupInput,
     StructureMapGroupRule,
 )
-
 
 # ============================================================================
 # Helpers & Fixtures
@@ -199,7 +199,7 @@ def test_init__without_inputs_raises_error(
     group_definition_without_inputs, mock_parent_group
 ):
     with pytest.raises(
-        MappingDigestionError, match="Group 'no-inputs-group' has no input definitions"
+        MapperDigestionError, match="Group 'no-inputs-group' has no input definitions"
     ):
         Group(group_definition_without_inputs, mock_parent_group)
 
@@ -281,7 +281,7 @@ def test_organize_rules__multiple_first_rules_raises_error(mock_parent_group):
     group.rules = [first_rule1, first_rule2]
 
     with pytest.raises(
-        MappingDigestionError,
+        MapperDigestionError,
         match="Only one rule with 'first' target list mode allowed",
     ):
         group._organize_rules()
@@ -304,7 +304,7 @@ def test_organize_rules__multiple_last_rules_raises_error(mock_parent_group):
     group.rules = [last_rule1, last_rule2]
 
     with pytest.raises(
-        MappingDigestionError,
+        MapperDigestionError,
         match="Only one rule with 'last' target list mode allowed",
     ):
         group._organize_rules()
@@ -332,7 +332,9 @@ def test_bind_parameters__parameter_count_mismatch(
 ):
     group = Group(minimal_group_definition, None)
 
-    with pytest.raises(MapperGroupProcessingError, match="Expected 1 parameters, got 2"):
+    with pytest.raises(
+        MapperGroupProcessingError, match="Expected 1 parameters, got 2"
+    ):
         group.bind_parameters(
             mapping_scope, [sample_fhirpath, sample_fhirpath], is_dependent=False
         )
@@ -511,7 +513,7 @@ def test_process__with_extends_runs_parent_rules_first(mapping_scope, sample_fhi
 def test_process__raises_error_for_unresolvable_extends(mapping_scope, sample_fhirpath):
     inp = StructureMapGroupInput(name="src", type="Person", mode="source")
     child = Group(_gdef("Child", [inp], extends="NonExistent"))
-    with pytest.raises(MapperGroupProcessingError):
+    with pytest.raises(MapperScopeError, match="Group 'NonExistent' not found"):
         child.process(mapping_scope, [sample_fhirpath], is_dependent=False)
 
 
@@ -604,7 +606,9 @@ def test_check_compatibility__raises_error_for_missing_parent_input(mapping_scop
     inp_tgt = StructureMapGroupInput(name="tgt", mode="target")
     parent = Group(_gdef("Parent", [inp_src, inp_tgt]))
     child = Group(_gdef("Child", [inp_src]))  # tgt is missing
-    with pytest.raises(MapperGroupProcessingError, match="missing required input 'tgt'"):
+    with pytest.raises(
+        MapperGroupProcessingError, match="missing required input 'tgt'"
+    ):
         child._check_extends_compatibility(parent, mapping_scope)
 
 

@@ -3,6 +3,7 @@ from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.exceptions import (
     MapperDigestionError,
     MapperGroupProcessingError,
+    MapperScopeError,
 )
 import logging
 
@@ -43,7 +44,7 @@ class Group(FHIRMappingEngineComponent):
             definition: The StructureMapGroupRuleTarget definition to initialize from.
             parent_group: The parent Group if this group extends another, or None if it does not.
         Raises:
-            SourceProcessingError: If required fields are missing.
+            MapperDigestionError: If required fields are missing.
         """
         self.definition = definition
         self.name = (
@@ -56,9 +57,7 @@ class Group(FHIRMappingEngineComponent):
         self._organize_rules()
         # Parse inputs
         if not self.definition.input:
-            raise MappingDigestionError(
-                f"Group '{self.name}' has no input definitions."
-            )
+            raise MapperDigestionError(f"Group '{self.name}' has no input definitions.")
         self.inputs = self.definition.input
         # Store the name of the group this group extends, resolved lazily at process() time
         self.extends_name: Optional[str] = (
@@ -116,7 +115,7 @@ class Group(FHIRMappingEngineComponent):
                 cinp_type = str(cinp.type) if cinp.type else None
                 try:
                     scope.get_type(pinp_type)
-                except MapperGroupProcessingError:
+                except MapperScopeError:
                     pass  # type not registered in scope; still enforce name match
                 if cinp_type != pinp_type:
                     raise MapperGroupProcessingError(
@@ -143,7 +142,7 @@ class Group(FHIRMappingEngineComponent):
             if input.type:
                 try:
                     scope.get_type(str(input.type))
-                except MapperGroupProcessingError:
+                except MapperScopeError:
                     raise MapperGroupProcessingError(
                         f"Input '{input.name}' in group '{self.name}' has unknown type '{input.type}'."
                     )
@@ -204,13 +203,13 @@ class Group(FHIRMappingEngineComponent):
             # Check for list mode ordering
             if rule.has_first_target:
                 if first_rule:
-                    raise MappingDigestionError(
+                    raise MapperDigestionError(
                         "Only one rule with 'first' target list mode allowed"
                     )
                 first_rule = rule
             elif rule.has_last_target:
                 if last_rule:
-                    raise MappingDigestionError(
+                    raise MapperDigestionError(
                         "Only one rule with 'last' target list mode allowed"
                     )
                 last_rule = rule

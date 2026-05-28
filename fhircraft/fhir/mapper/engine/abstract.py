@@ -10,7 +10,7 @@ class FHIRMappingEngineComponent(ABC):
     """Base class for components of the FHIR Mapper Engine."""
 
     @abstractmethod
-    def process(self, scope: "MappingScope") -> Any:
+    def process(self, scope: "MappingScope", *args, **kwargs) -> Any:
         """Process the component within the given mapping scope."""
         raise NotImplementedError("Subclasses must implement the process method.")
 

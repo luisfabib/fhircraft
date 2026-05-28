@@ -28,6 +28,7 @@ from .registry import StructureMapRegistry
 from fhircraft.exceptions import (
     DefinitionNotFoundError,
     MapperException,
+    MapperRegistryNotFoundError,
 )
 from .scope import MappingScope
 from .group import Group
@@ -125,7 +126,7 @@ class FHIRMappingEngine:
             tuple: A tuple of resulting target instances after the transformation, which can be a mixture of BaseModel instances and/or dictionaries.
 
         Raises:
-            StructureMapNotFoundError: If a non-wildcard import URL is not registered in the
+            MapperRegistryNotFoundError: If a non-wildcard import URL is not registered in the
                 StructureMapRegistry.
             ValueError: If a constant in the StructureMap is missing a name or conflicts with a model name.
             RuntimeError: If the number of provided sources or targets does not match the group parameters, or if required targets are missing.
@@ -158,16 +159,13 @@ class FHIRMappingEngine:
                     )
                 imported_maps.extend(matched)
             else:
-                from fhircraft.fhir.mapper.engine.registry import (
-                    StructureMapNotFoundError,
-                )
 
                 try:
                     imported_maps.append(
                         self.structure_map_registry.get(import_url_str)
                     )
-                except StructureMapNotFoundError:
-                    raise StructureMapNotFoundError(
+                except MapperRegistryNotFoundError:
+                    raise MapperRegistryNotFoundError(
                         f"StructureMap import failed: '{import_url_str}' is not registered. "
                         "Register it via structure_map_registry.add() before executing."
                     )

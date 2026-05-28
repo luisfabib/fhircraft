@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
     StructureMapGroupRuleDependent,
 )
 
-
 # ============================================================================
 # Helpers & Fixtures
 # ============================================================================
@@ -230,7 +229,7 @@ def test_init__raises_error_for_dependent_without_name(mock_parent_group):
     )
 
     with pytest.raises(
-        MappingDigestionError, match="Dependent rule or group must have a name"
+        MapperDigestionError, match="Dependent rule or group must have a name"
     ):
         Rule(rule_def, mock_parent_group)
 

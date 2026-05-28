@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 from fhircraft.utils import load_env_variables
 
-
 StructureMapUnion = Union[
     R4_models.StructureMap, R4B_models.StructureMap, R5_models.StructureMap
 ]
@@ -134,7 +133,7 @@ class StructureMapRegistry:
             The resolved StructureMap model instance.
 
         Raises:
-            StructureMapNotFoundError: If the StructureMap cannot be resolved
+            MapperRegistryNotFoundError: If the StructureMap cannot be resolved
                 and internet access is disabled (or the download fails).
         """
         base_url, _ = self.parse_canonical_url(canonical_url)
@@ -151,7 +150,7 @@ class StructureMapRegistry:
         if self._internet_access_enabled:
             return self.from_dict(self.download_url(canonical_url))
 
-        raise StructureMapNotFoundError(
+        raise MapperRegistryNotFoundError(
             f"StructureMap not found for '{canonical_url}'. "
             "Either register it locally or enable internet access."
         )

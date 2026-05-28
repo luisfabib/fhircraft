@@ -46,7 +46,9 @@ class FhircraftException(Exception):
         """Return a detailed representation of the exception."""
         class_name = self.__class__.__name__
         if self.component:
-            return f"{class_name}(message={self.message!r}, component={self.component!r})"
+            return (
+                f"{class_name}(message={self.message!r}, component={self.component!r})"
+            )
         return f"{class_name}(message={self.message!r})"
 
 
@@ -199,8 +201,15 @@ class FhirPathWarning(Warning):
 
 
 # ============================================================================
-# Factory Exceptions
+# Resources Exceptions
 # ============================================================================
+
+
+class FhirTypeError(FhircraftException):
+    """Raised when type checking or conversion fails."""
+
+    def __init__(self, message: str, component: str = "type"):
+        super().__init__(message, component=component)
 
 
 class DefinitionNotFoundError(FhircraftException, FileNotFoundError):
@@ -231,12 +240,6 @@ class FactoryDefinitionResolutionError(FactoryException):
 
 class FactoryBuilderError(FactoryException):
     """Raised when a Builder operation fails."""
-
-    pass
-
-
-class FactoryBuildError(FactoryBuilderError):
-    """Alias for FactoryBuilderError for backward compatibility."""
 
     pass
 
@@ -312,7 +315,6 @@ __all__ = [
     "FactoryDefinitionIndexError",
     "FactoryDefinitionResolutionError",
     "FactoryBuilderError",
-    "FactoryBuildError",
     "FactoryTypeResolutionError",
     "FactoryAssemblerError",
     "DefinitionNotFoundError",
@@ -322,4 +324,3 @@ __all__ = [
     "PackageResolutionError",
     "PackageValidationError",
 ]
-

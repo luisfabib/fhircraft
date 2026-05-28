@@ -12,7 +12,6 @@ import logging
 
 from fhircraft.fhir.path.engine.core import FHIRPath
 
-
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
@@ -43,11 +42,11 @@ class RuleSource(FHIRMappingEngineComponent):
         Args:
             source: The StructureMapGroupRuleSource to initialize from.
         Raises:
-            MappingDigestionError: If required fields are missing.
+            MapperDigestionError: If required fields are missing.
         """
         self.definition = source
         if self.definition.context is None:
-            raise MappingDigestionError("Source context is required")
+            raise MapperDigestionError("Source context is required")
         self.parent_rule = parent_rule
         self.variable = (
             str(source.variable) if source.variable else f"source-{id(source)}"
@@ -68,7 +67,7 @@ class RuleSource(FHIRMappingEngineComponent):
         """
         self.resolved_path = scope.resolve_fhirpath(self.definition.context)  # type: ignore
         if self.resolved_path is None:
-            raise SourceProcessingError(
+            raise MapperSourceProcessingError(
                 f"Source context {self.definition.context} not found"
             )
 
@@ -165,6 +164,6 @@ class RuleSource(FHIRMappingEngineComponent):
                         fhirpath.Exclude(self.resolved_path._invoke(fhirpath.Last()))
                     )
                 case _:
-                    raise SourceProcessingError(
+                    raise MapperSourceProcessingError(
                         f"Unsupported listMode '{self.definition.listMode}' in source {self.variable}"
                     )

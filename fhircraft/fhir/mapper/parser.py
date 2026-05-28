@@ -703,6 +703,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         rule = self.StructureMapGroupRule(source=sources)
 
         targets = []
+        _rule = None
         for data in _targets:
             target = self.StructureMapGroupRuleTarget.model_construct()
             targets.append(target)
@@ -742,11 +743,11 @@ class FhirMappingLanguageParser(FhirPathParser):
             target.listMode = data.get("listMode")
             target.transform = data.get("transform")
             target.parameter = data.get("parameter")
-
-        _rule.dependent = dependent.get("dependent") if dependent else None
-        if dependent_rule := dependent.get("rule"):
-            _rule.rule = _rule.rule or []  # type: ignore
-            _rule.rule.extend(dependent_rule)
+        if _rule is not None:
+            _rule.dependent = dependent.get("dependent") if dependent else None
+            if dependent_rule := dependent.get("rule"):
+                _rule.rule = _rule.rule or []  # type: ignore
+                _rule.rule.extend(dependent_rule)
 
         rule.target = targets
         return rule
