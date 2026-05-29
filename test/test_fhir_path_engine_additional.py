@@ -852,7 +852,7 @@ def test_subsumes_raises_error_when_fhir_release_not_in_environment(
             value=R4_Coding(system="http://loinc.org", code="parent")
         )
     ]
-    with pytest.raises(FhirPathException, match="required for evaluating memberOf"):
+    with pytest.raises(FhirPathException, match="required for evaluating subsumes"):
         Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
             collection,
             {
@@ -878,6 +878,102 @@ def test_subsumes_raises_error_for_different_code_systems(terminology_service):
                 "%terminologyService": terminology_service,
                 "%otherCoding": R4_Coding(
                     system="http://snomed.info/sct", code="child"
+                ),
+            },
+        )
+
+
+# -------------
+# SubsumedBy
+# -------------
+
+
+def test_subsumedby_returns_empty_for_empty_collection():
+    collection = []
+    result = SubsumedBy(Element("example-code")).evaluate(collection, env)
+    assert result == []
+
+
+def test_subsumedby_returns_true_for_subsumed_code(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="child"))
+    ]
+    result = SubsumedBy(EnvironmentVariable("%otherCoding")).evaluate(
+        collection,
+        {
+            "%fhirRelease": "R4",
+            "%terminologyService": terminology_service,
+            "%otherCoding": R4_Coding(system="http://loinc.org", code="parent"),
+        },
+    )
+    assert result[0].value == True
+
+
+def test_subsumedby_returns_false_for_non_subsumed_code(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4_Coding(system="http://loinc.org", code="parent")
+        )
+    ]
+    result = SubsumedBy(EnvironmentVariable("%otherCoding")).evaluate(
+        collection,
+        {
+            "%fhirRelease": "R4",
+            "%terminologyService": terminology_service,
+            "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
+        },
+    )
+    assert result[0].value == False
+
+
+def test_subsumedby_returns_empty_when_service_returns_none(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4_Coding(system="http://loinc.org", code="unknown")
+        )
+    ]
+    result = SubsumedBy(EnvironmentVariable("%otherCoding")).evaluate(
+        collection,
+        {
+            "%fhirRelease": "R4",
+            "%terminologyService": terminology_service,
+            "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
+        },
+    )
+    assert result == []
+
+
+def test_subsumedby_raises_error_when_fhir_release_not_in_environment(
+    terminology_service,
+):
+    collection = [
+        FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="child"))
+    ]
+    with pytest.raises(FhirPathException, match="required for evaluating"):
+        SubsumedBy(EnvironmentVariable("%otherCoding")).evaluate(
+            collection,
+            {
+                "%terminologyService": terminology_service,
+                "%otherCoding": R4_Coding(system="http://loinc.org", code="parent"),
+            },
+        )
+
+
+def test_subsumedby_raises_error_for_different_code_systems(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="child"))
+    ]
+    with pytest.raises(
+        FhirPathException,
+        match="Subsumption across different code systems",
+    ):
+        SubsumedBy(EnvironmentVariable("%otherCoding")).evaluate(
+            collection,
+            {
+                "%fhirRelease": "R4",
+                "%terminologyService": terminology_service,
+                "%otherCoding": R4_Coding(
+                    system="http://snomed.info/sct", code="parent"
                 ),
             },
         )

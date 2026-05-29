@@ -966,12 +966,82 @@ class MemberOf(FHIRPathFunction):
         return [FHIRPathCollectionItem.wrap(bool(result))]
 
 
+def _evaluate_subsumtion(code, collection, environment, create, invert=False):
+    """
+    Helper function to evaluate subsumption relationships for both subsumes() and subsumedBy() functions.
+    """
+    from fhircraft.fhir.resources.datatypes import utils as type_utils
+
+    if len(collection) != 1:
+        return []
+    service = _get_terminology_service(environment)
+    if service is None:
+        return []
+    release = environment.get("%fhirRelease")
+    if not release or not isinstance(release, str):
+        raise FhirPathException(
+            f"The %fhirRelease environment variable is required for evaluating {'subsumes()' if not invert else 'subsumedBy()'}."
+        )
+    given = code.evaluate(collection, environment=environment, create=create)
+    if len(given) != 1:
+        return []
+    given = given[0].value
+    if type_utils.is_fhir_complex_type(given, "Coding", release):
+        codingsB = [given]
+    elif type_utils.is_fhir_complex_type(given, "CodeableConcept", release):
+        if len(given.coding) == 0:
+            raise FhirPathException(
+                f"The code argument to {'subsumes()' if not invert else 'subsumedBy()'} cannot be an empty CodeableConcept."
+            )
+        codingsB = given.coding
+    else:
+        raise FhirPathException(
+            f"The code argument to {'subsumes()' if not invert else 'subsumedBy()'} must be a Coding or CodeableConcept."
+        )
+
+    source = collection[0].value
+    if type_utils.is_fhir_complex_type(source, "CodeableConcept", release):
+        if len(source.coding) == 0:
+            raise FhirPathException(
+                f"The source collection in {'subsumes()' if not invert else 'subsumedBy()'} cannot be an empty CodeableConcept."
+            )
+        codingsA = source.coding
+    elif type_utils.is_fhir_complex_type(source, "Coding", release):
+        codingsA = [source]
+    else:
+        return []
+    for codingA in codingsA:
+        for codingB in codingsB:
+            if codingA.system != codingB.system:
+                raise FhirPathException(
+                    f"Subsumption across different code systems is not a valid operation. Attempting to subsume between code systems '{codingA.system}' and '{codingB.system}'."
+                )
+            try:
+                result = service.codesystem_subsumes(
+                    codeA=codingA if not invert else codingB,
+                    codeB=codingB if not invert else codingA,
+                    system=codingA.system,
+                    version=codingA.version,
+                )
+            except Exception as e:
+                warnings.warn(
+                    f"Error during terminology service call in {'subsumes()' if not invert else 'subsumedBy()'} function: {e}. Skipping evaluation of {'subsumes()' if not invert else 'subsumedBy()'}.",
+                    FhirPathWarning,
+                )
+                return []
+            if result is None:
+                return []
+            if result is True:
+                return [FHIRPathCollectionItem.wrap(bool(True))]
+    return [FHIRPathCollectionItem.wrap(bool(False))]
+
+
 class Subsumes(FHIRPathFunction):
     """
     A representation of the FHIRPath [`subsumes()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        code (str): The code to check for subsumption.
+        code (FHIRPath): The code to check for subsumption.
     """
 
     def __init__(self, code: FHIRPath):
@@ -997,59 +1067,13 @@ class Subsumes(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        from fhircraft.fhir.resources.datatypes import utils as type_utils
-
-        if len(collection) != 1:
-            return []
-        service = _get_terminology_service(environment)
-        if service is None:
-            return []
-        release = environment.get("%fhirRelease")
-        if not release or not isinstance(release, str):
-            raise FhirPathException(
-                "The %fhirRelease environment variable is required for evaluating memberOf()."
-            )
-        codingB = self.code.single(collection, environment=environment)
-        if type_utils.is_fhir_complex_type(codingB, "CodeableConcept", release):
-            if len(codingB.coding) == 0:
-                raise FhirPathException(
-                    "The code argument to subsumes() cannot be an empty CodeableConcept."
-                )
-            codingB = codingB.coding[0]
-        elif not type_utils.is_fhir_complex_type(codingB, "Coding", release):
-            raise FhirPathException(
-                "The code argument to subsumes() must be a Coding or CodeableConcept."
-            )
-
-        codingA = collection[0].value
-        if type_utils.is_fhir_complex_type(codingA, "CodeableConcept", release):
-            if len(codingA.coding) == 0:
-                raise FhirPathException(
-                    "The code argument to subsumes() cannot be an empty CodeableConcept."
-                )
-            codingA = codingA.coding[0]
-        elif not type_utils.is_fhir_complex_type(codingA, "Coding", release):
-            return []
-        if codingA.system != codingB.system:
-            raise FhirPathException(
-                f"Subsumption across different code systems is not a valid operation. Attempting to subsume between code systems '{codingA.system}' and '{codingB.system}'."
-            )
-        try:
-            result = service.codesystem_subsumes(
-                codeA=codingA,
-                codeB=codingB,
-                system=codingA.system,
-                version=codingA.version,
-            )
-        except Exception as e:
-            warnings.warn(
-                f"Error during terminology service call in subsumes() function: {e}. Skipping evaluation of subsumes().",
-                FhirPathWarning,
-            )
-            return []
-        if result is None:
-            return []
-        return [FHIRPathCollectionItem.wrap(bool(result))]
+        return _evaluate_subsumtion(
+            code=self.code,
+            collection=collection,
+            environment=environment,
+            create=create,
+            invert=False,
+        )
 
 
 class SubsumedBy(FHIRPathFunction):
@@ -1057,14 +1081,14 @@ class SubsumedBy(FHIRPathFunction):
     A representation of the FHIRPath [`subsumedBy()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        code (str): The code to check for subsumption.
+        code (FHIRPath): The code to check for subsumption.
     """
 
-    def __init__(self, code: str | Literal):
-        if isinstance(code, Literal):
-            code = code.value
-        if not isinstance(code, str):
-            raise FhirPathException("subsumedBy() argument must be a string.")
+    def __init__(self, code: FHIRPath):
+        if not isinstance(code, FHIRPath):
+            raise FhirPathException(
+                "subsumedBy() argument must be a FHIRPath instance."
+            )
         self.code = code
 
     def evaluate(
@@ -1087,8 +1111,12 @@ class SubsumedBy(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath subsumes() function is not supported."
+        return _evaluate_subsumtion(
+            code=self.code,
+            collection=collection,
+            environment=environment,
+            create=create,
+            invert=True,
         )
 
 
