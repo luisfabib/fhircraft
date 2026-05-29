@@ -10,11 +10,15 @@ Fhircraft provides configuration controls that let you adjust validation behavio
 
 Understanding when and how to adjust validation settings helps you balance data quality requirements with practical constraints such as performance. Production systems often need different validation configurations than development environments, and batch processing pipelines might use different settings than interactive user interfaces.
 
+!!! info "See also"
+
+    For details on catching and handling the exceptions that validation raises, see [Error Handling](error-handling.md).
+
 ## Disabling Validation Warnings
 
 Validation warnings alert you to FHIR data quality issues that do not prevent resource use but indicate potential problems or best-practice recommendations. For example, the `dom-6` constraint warns when a resource lacks human-readable narrative text. In production systems processing thousands of resources, these warnings can create excessive log noise without providing actionable information.
 
-Disabling warnings globally affects all FHIR resource operations in your application from that point forward. This setting persists until you change it or restart your application. Validation errors that indicate serious data problems continue to raise exceptions even when warnings are disabled:
+Disabling warnings globally affects all FHIR resource operations in your application from that point forward. This setting persists until you change it or restart your application. Validation errors that indicate serious data problems continue to raise `ValidationError` even when warnings are disabled:
 
 ```python
 # Import the configuration function
@@ -89,7 +93,7 @@ Fhircraft supports three validation modes that control how the library responds 
 
 ### Strict Mode
 
-Strict mode enforces the complete set of FHIR constraints. Validation errors raise exceptions that stop execution, while validation warnings emit Python warnings that appear in logs. This mode catches data quality problems early and enforces compliance with FHIR standards:
+Strict mode enforces the complete set of FHIR constraints. FHIR constraint violations raise Pydantic's `ValidationError` (wrapping a `PydanticCustomError` per constraint) that stops execution, while validation warnings emit Python warnings that appear in logs. This mode catches data quality problems early and enforces compliance with FHIR standards:
 
 ```python hl_lines="5"
 from fhircraft import configure
@@ -100,7 +104,7 @@ configure(validation_mode='strict')
 
 Patient = get_fhir_type("Patient", "R5")
 
-# Validation errors will raise exceptions
+# Validation errors will raise ValidationError
 # Validation warnings will emit Python warnings
 patient = Patient(name=[{"given": ["Alice"]}])
 ```

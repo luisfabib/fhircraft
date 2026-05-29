@@ -11,6 +11,7 @@
           - [Configuring Validation Behavior](user-guide/configuration.md)
           - [Querying Data with FHIRPath](user-guide/fhirpath.md)
           - [Transforming Data with FHIR Mapper](user-guide/mapper.md)
+          - [Error Handling](user-guide/error-handling.md)
   - Community
     - [Contributing](community/contributing.md)
     - [Code of Conduct](community/code_of_conduct.md)
@@ -43,7 +44,6 @@
           - [Engine](reference/fhir-path-engine.md)
           - [Mixin](reference/fhir-path-mixin.md)
           - [Parser](reference/fhir-path-parser.md)
-          - [Exceptions](reference/fhir-path-exceptions.md)
       - FHIR Mapping
           - [Engine](reference/fhir-mapping-engine.md)
           - [Parser](reference/fhir-mapping-parser.md)
@@ -52,4 +52,5 @@
           - [Models](reference/fhir-packages-models.md)
       - Other
           - [Core Utilities](reference/core-utilities.md)
+          - [Exceptions](reference/exceptions.md)
 
