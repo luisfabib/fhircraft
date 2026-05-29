@@ -561,3 +561,65 @@ def test_resolve_with_unresolvable_internal_reference():
     collection = [FHIRPathCollectionItem(value="#1234")]
     result = Resolve().evaluate(collection, {"%resource": resource})
     assert result == []
+
+
+# -------------
+# ConformsTo
+# -------------
+
+
+def test_conformsto_returns_empty_for_empty_collection():
+    collection = []
+    result = ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
+        collection, env
+    )
+    assert result == []
+
+
+def test_conformsto_returns_empty_for_non_singleton_collection():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    result = ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
+        collection, env
+    )
+    assert result == []
+
+
+def test_conformsto_raises_error_when_fhir_release_not_in_environment():
+    collection = [FHIRPathCollectionItem(value={"resourceType": "Patient"})]
+    with pytest.raises(FhirPathException, match="required for evaluating conformsTo"):
+        ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
+            collection, {}
+        )
+
+
+def test_conformsto_returns_true_for_conforming_resource():
+    collection = [
+        FHIRPathCollectionItem(value={"resourceType": "Patient", "gender": "female"})
+    ]
+    result = ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
+        collection, {"%fhirRelease": "R4"}
+    )
+    assert result[0].value == True
+
+
+def test_conformsto_returns_false_for_non_conforming_resource():
+    collection = [
+        FHIRPathCollectionItem(
+            value={"resourceType": "Observation", "valueCode": "female"}
+        )
+    ]
+    result = ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
+        collection, {"%fhirRelease": "R4"}
+    )
+    assert result[0].value == False
+
+
+def test_conformsto_returns_empty_for_unresolvable_structure_definition():
+    collection = [
+        FHIRPathCollectionItem(value={"resourceType": "Patient", "gender": "female"})
+    ]
+    with pytest.warns(FhirPathWarning, match="Could not resolve structure definition"):
+        result = ConformsTo("http://example.org/StructureDefinition/Unknown").evaluate(
+            collection, {"%fhirRelease": "R4"}
+        )
+    assert result == []

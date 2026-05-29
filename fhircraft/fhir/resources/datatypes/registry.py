@@ -274,13 +274,13 @@ def get_fhir_type(
 
 @overload
 def get_fhir_type_by_url(
-    url: str, release, fail_if_not_found: Literal[True] = True
+    url: str, release: str, fail_if_not_found: Literal[True] = True
 ) -> type[FHIRBaseModel]: ...
 
 
 @overload
 def get_fhir_type_by_url(
-    url: str, release, fail_if_not_found: Literal[False] = False
+    url: str, release: str, fail_if_not_found: Literal[False] = False
 ) -> type[FHIRBaseModel] | None: ...
 
 

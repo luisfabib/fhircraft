@@ -8,7 +8,7 @@ import re
 import sys
 from html.parser import HTMLParser
 from xml.etree import ElementTree as ET
-
+from pydantic import ValidationError
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPath,
@@ -23,6 +23,8 @@ from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.path.engine.filtering import Where
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
+from fhircraft.fhir.resources.datatypes.registry import get_fhir_type_by_url
+from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.utils import ensure_list
 from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive
 from fhircraft.exceptions import FhirPathWarning
@@ -852,9 +854,28 @@ class ConformsTo(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath conformsTo() function is not supported."
-        )
+        if len(collection) != 1:
+            return []
+        fhir_release: None = environment.get("%fhirRelease")
+        if not fhir_release or not isinstance(fhir_release, str):
+            raise FhirPathException(
+                "The %fhirRelease environment variable is required for evaluating conformsTo()."
+            )
+        try:
+            get_fhir_type_by_url(
+                self.structure, release=fhir_release, fail_if_not_found=True
+            ).model_validate(collection[0].value)
+        except AttributeError:
+            warnings.warn(
+                f"Could not resolve structure definition '{self.structure}' for conformsTo() function."
+                f" Current implementation is limited to core resources. Returning empty result.",
+                FhirPathWarning,
+            )
+            return []
+        except ValidationError as e:
+            print(f"Validation error during conformsTo() evaluation: {e}")
+            return [FHIRPathCollectionItem.wrap(False)]
+        return [FHIRPathCollectionItem.wrap(True)]
 
 
 class MemberOf(FHIRPathFunction):
