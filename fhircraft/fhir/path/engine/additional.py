@@ -9,6 +9,8 @@ import sys
 from html.parser import HTMLParser
 from xml.etree import ElementTree as ET
 from pydantic import ValidationError
+from typing import Callable
+from fhircraft.config import get_config
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPath,
@@ -23,11 +25,19 @@ from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.path.engine.filtering import Where
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
+from fhircraft.fhir.terminology import TerminologyService
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type_by_url
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.utils import ensure_list
 from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive
 from fhircraft.exceptions import FhirPathWarning
+
+
+def _get_terminology_service(environment: dict) -> TerminologyService | None:
+    service = environment.get("%terminologyService")
+    if service is not None:
+        return service
+    return get_config().terminology_service
 
 
 class Extension(FHIRPathFunction):
@@ -913,9 +923,50 @@ class MemberOf(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath memberOf() function is not supported."
+        from fhircraft.fhir.resources.datatypes import utils as type_utils
+
+        if len(collection) != 1:
+            return []
+        service = _get_terminology_service(environment)
+        if service is None:
+            return []
+        release = environment.get("%fhirRelease")
+        if not release or not isinstance(release, str):
+            raise FhirPathException(
+                "The %fhirRelease environment variable is required for evaluating memberOf()."
+            )
+        codeable = collection[0].value
+        if isinstance(codeable, str):
+            code = codeable
+            system, version = None, None
+        elif type_utils.is_fhir_complex_type(codeable, "Coding", release):
+            code = codeable.code
+            system = codeable.system
+            version = codeable.version
+        elif type_utils.is_fhir_complex_type(codeable, "CodeableConcept", release):
+            if len(codeable.coding) == 0:
+                return []
+            code = codeable.coding[0].code
+            system = codeable.coding[0].system
+            version = codeable.coding[0].version
+        else:
+            return []
+        print(
+            f"Validating code '{code}' from system '{system}' against valueset '{self.valueset}' using terminology service."
         )
+        try:
+            result = service.validate_valueset_code(
+                url=self.valueset, code=code, system=system, version=version
+            )
+        except Exception as e:
+            warnings.warn(
+                f"Error validating code against valueset in memberOf() function: {e}. Skipping evaluation of memberOf().",
+                FhirPathWarning,
+            )
+            return []
+        if result is None:
+            return []
+        return [FHIRPathCollectionItem.wrap(bool(result))]
 
 
 class Subsumes(FHIRPathFunction):
