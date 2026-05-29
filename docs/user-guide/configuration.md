@@ -205,6 +205,82 @@ reset_config()
 
 Resetting proves useful in test suites where each test should start with clean configuration, or in long-running applications that process different types of data requiring different validation approaches.
 
+## Configuring the Terminology Service
+
+Fhircraft's FHIRPath terminology functions — `memberOf()`, `subsumes()`, and `subsumedBy()` — require a terminology service to produce results. You provide one by registering an object that implements the `TerminologyService` protocol from `fhircraft.fhir.terminology`.
+
+### The `TerminologyService` Protocol
+
+The protocol uses Python structural subtyping, so your class does not need to inherit from anything. It just needs to implement the relevant methods:
+
+```python
+from fhircraft.fhir.terminology import TerminologyService
+
+class MyTerminologyService:
+    """Delegates terminology operations to a remote FHIR server."""
+
+    def validate_valueset_code(self, *, url=None, code=None, system=None,
+                               version=None, display=None) -> bool:
+        # ValueSet/$validate-code
+        ...
+
+    def validate_codesystem_code(self, *, url=None, code=None,
+                                 version=None, display=None) -> bool:
+        # CodeSystem/$validate-code
+        ...
+
+    def codesystem_lookup(self, *, code, system=None, version=None):
+        # CodeSystem/$lookup
+        ...
+
+    def codesystem_subsumes(self, codeA, codeB, system=None, version=None):
+        # CodeSystem/$subsumes
+        ...
+
+# Verify structural compatibility at runtime
+assert isinstance(MyTerminologyService(), TerminologyService)
+```
+
+You only need to implement the methods that your application actually calls. Unimplemented methods that raise `NotImplementedError` are handled gracefully by the FHIRPath engine — they cause the function to return an empty collection rather than crashing.
+
+### Registering Globally
+
+Use `configure()` to set a default terminology service for the entire application. The service is then used automatically by all `memberOf()`, `subsumes()`, and `subsumedBy()` FHIRPath evaluations:
+
+```python
+from fhircraft import configure
+
+configure(terminology_service=MyTerminologyService())
+```
+
+### Clearing the Service
+
+Pass `None` explicitly to remove a previously registered service:
+
+```python
+from fhircraft import configure
+
+configure(terminology_service=None)  # (1)!
+```
+
+1. Omitting the argument entirely leaves the existing service unchanged. Only `None` clears it.
+
+### Scoped Service with `override_config`
+
+Use `override_config` when you need a different terminology service for a specific block of code without affecting the global configuration:
+
+```python
+from fhircraft import override_config
+
+with override_config(terminology_service=StagingTerminologyService()):
+    # All FHIRPath evaluations in this block use the staging service
+    result = obs.fhirpath_values(
+        "Observation.code.memberOf('http://example.org/ValueSet/LabCodes')"
+    )
+
+# Global service (or no service) is automatically restored after the block
+```
+
 ## Common Problems and Solutions
 
 | Problem | Solution |
