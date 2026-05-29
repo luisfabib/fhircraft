@@ -607,6 +607,15 @@ def test_resolve_with_unresolvable_internal_reference():
     result = Resolve().evaluate(collection, {"%resource": resource})
     assert result == []
 
+def test_resolve_ignores_non_reference_items():
+    contained_resource = {"id": "123", "resourceType": "Patient"}
+    resource = {"contained": [contained_resource]}
+    collection = [
+        FHIRPathCollectionItem(value="#123"),
+        FHIRPathCollectionItem(value=123),
+    ]
+    result = Resolve().evaluate(collection, {"%resource": resource})
+    assert result[0].value == contained_resource
 
 # -------------
 # ConformsTo

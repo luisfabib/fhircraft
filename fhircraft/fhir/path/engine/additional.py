@@ -242,9 +242,7 @@ class Resolve(FHIRPathFunction):
                 )
                 or ((resource_url := value))
             ) or not isinstance(resource_url, (str, StringBase)):
-                raise FhirPathException(
-                    "The resolve() function requires either a collection of URIs, Canonicals, URLs or References."
-                )
+                continue
             if resource_url.startswith("http://"):
                 # Resolving URLs is not supported
                 warnings.warn(
