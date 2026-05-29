@@ -7,6 +7,7 @@ from fhircraft.fhir.resources.factory.builders.base import (
     Builder,
     ValidatorInformation,
 )
+from fhircraft.exceptions import FactoryWarning
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.base import FHIRSliceModel
@@ -67,7 +68,8 @@ class SlicedFieldBuilder(Builder):
             if len(slice_node.types) > 1:
                 warnings.warn(
                     f"Slice '{slice_name}' on element '{node.path}' has multiple types; "
-                    f"only the first will be used for slice model base class resolution."
+                    f"only the first will be used for slice model base class resolution.",
+                    FactoryWarning,
                 )
 
             if slice_node.profile_urls:
@@ -77,10 +79,10 @@ class SlicedFieldBuilder(Builder):
             else:
                 slice_base = slice_entry_base
 
-            if not isinstance(
-                slice_base, type
-            ):
-                raise TypeError(f"Resolved slice base for slice '{node.id}' is not a type")
+            if not isinstance(slice_base, type):
+                raise TypeError(
+                    f"Resolved slice base for slice '{node.id}' is not a type"
+                )
 
             # Ensure the slice base is a subclass of FHIRSliceModel, as all slice models must inherit from it for validation purposes
             if slice_base is FHIRSliceModel or (
@@ -97,8 +99,13 @@ class SlicedFieldBuilder(Builder):
             )
             slice_model = assembler.assemble(slice_model_name, base=slice_bases)
             # Set the slice cardinality on the model for later validation use
-            if not (isinstance(slice_model, type) and issubclass(slice_model, FHIRSliceModel)):
-                raise TypeError(f"Built slice model '{slice_model_name}' does not inherit from FHIRSliceModel")
+            if not (
+                isinstance(slice_model, type)
+                and issubclass(slice_model, FHIRSliceModel)
+            ):
+                raise TypeError(
+                    f"Built slice model '{slice_model_name}' does not inherit from FHIRSliceModel"
+                )
             slice_model.min_cardinality = slice_node.min_cardinality
             slice_model.max_cardinality = slice_node.max_cardinality
 

@@ -19,7 +19,7 @@ from fhircraft.config import override_config
 from fhircraft.fhir.packages.client import FHIRPackageRegistryClient
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 from fhircraft.utils import load_env_variables
-from fhircraft.exceptions import DefinitionNotFoundError 
+from fhircraft.exceptions import DefinitionNotFoundError, FhirValidationWarning
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.core import (
@@ -309,7 +309,8 @@ class StructureDefinitionRegistry:
                     raise e
                 else:
                     warnings.warn(
-                        f"Skipping invalid structure definition {sd.get('url', 'unknown')} in package {package_name} version {version}:\n{e}"
+                        f"Skipping invalid structure definition {sd.get('url', 'unknown')} in package {package_name} version {version}:\n{e}",
+                        FhirValidationWarning,
                     )
 
     def set_registry_base_url(self, base_url: str) -> None:

@@ -52,6 +52,17 @@ class FhircraftException(Exception):
         return f"{class_name}(message={self.message!r})"
 
 
+class FhircraftWarning(Warning):
+    """
+    Base warning for all fhircraft warnings.
+
+    This can be used to signal non-critical issues or potential problems without
+    raising an exception.
+    """
+
+    pass
+
+
 # ============================================================================
 # Mapper Exceptions
 # ============================================================================
@@ -189,7 +200,7 @@ class FhirPathOperationError(FhirPathException):
     pass
 
 
-class FhirPathWarning(Warning):
+class FhirPathWarning(FhircraftWarning):
     """
     Warning raised for non-critical issues encountered during FHIRPath expression processing.
 
@@ -203,6 +214,12 @@ class FhirPathWarning(Warning):
 # ============================================================================
 # Resources Exceptions
 # ============================================================================
+
+
+class FhirValidationWarning(FhircraftWarning):
+    """Warning raised for non-critical issues encountered during FHIR resource validation."""
+
+    pass
 
 
 class FhirTypeError(FhircraftException):
@@ -252,6 +269,12 @@ class FactoryTypeResolutionError(FactoryException, LookupError):
 
 class FactoryAssemblerError(FactoryException, LookupError):
     """Raised when the assembler encounters an error."""
+
+    pass
+
+
+class FactoryWarning(FhircraftWarning):
+    """Warning raised for non-critical issues encountered during factory operations."""
 
     pass
 

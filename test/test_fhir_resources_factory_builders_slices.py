@@ -4,6 +4,7 @@ from typing import Annotated, List, Optional, Union, get_args, get_origin
 import pytest
 from pydantic.aliases import AliasChoices
 
+from fhircraft.exceptions import FactoryWarning
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 from fhircraft.fhir.resources.factory.builders.base import (
     Build,
@@ -140,15 +141,11 @@ def make_slice_node(
     return node
 
 
-def make_index(slices=None, children=None, is_slice_entry_error=False):
+def make_index(slices=None, children=None):
     index = MagicMock(name="mock-index")
     index.get_slices.return_value = slices if slices is not None else []
     index.get_subtree.return_value = MagicMock(name="mock-subtree")
     index.get_children.return_value = children if children is not None else []
-    if is_slice_entry_error:
-        from fhircraft.fhir.resources.factory.index import DefinitionIndexError
-
-        index.get_slices.side_effect = DefinitionIndexError("not a slice entry")
     return index
 
 
@@ -571,7 +568,7 @@ def test_build__warns_when_slice_has_multiple_types(builder: Builder, index, ass
         warnings.simplefilter("always")
         builder.build(node, index)
     assert len(w) == 1
-    assert issubclass(w[0].category, UserWarning)
+    assert issubclass(w[0].category, FactoryWarning)
 
 
 def test_per_slice__profile_urls_causes_resolve_type_to_be_called(

@@ -14,7 +14,7 @@ from fhircraft.fhir.resources.factory.builders.base import Builder, ValidatorInf
 from fhircraft.fhir.resources.factory.context import BuildContext
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.exceptions import FactoryAssemblerError
+from fhircraft.exceptions import FactoryAssemblerError, FactoryWarning
 from fhircraft.fhir.resources.factory.builders import (
     TypeChoiceFieldBuilder,
     SlicedFieldBuilder,
@@ -157,7 +157,8 @@ class ModelAssembler:
         )
         if not fields and not has_inherited_fields:
             warnings.warn(
-                f"No fields built for model '{name}' and no fields defined on base class(es) {base_classes}."
+                f"No fields built for model '{name}' and no fields defined on base class(es) {base_classes}.",
+                FactoryWarning,
             )
 
         # ------------------------------------------------------------------

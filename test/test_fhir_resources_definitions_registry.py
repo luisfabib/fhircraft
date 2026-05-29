@@ -14,7 +14,7 @@ from fhircraft.fhir.resources.definitions.registry import (
     ManifestEntry,
     StructureDefinitionRegistry,
 )
-from fhircraft.exceptions import DefinitionNotFoundError
+from fhircraft.exceptions import DefinitionNotFoundError, FhirValidationWarning
 
 # Patch targets
 _MANIFEST_LOAD = "fhircraft.fhir.resources.definitions.registry.Manifest.load"
@@ -469,7 +469,7 @@ def test_download_package__skip_invalid_true_emits_warning():
         "_validate_structure_definition",
         side_effect=ValueError("invalid SD"),
     ):
-        with pytest.warns(UserWarning, match="http://example.org/Bad"):
+        with pytest.warns(FhirValidationWarning, match="http://example.org/Bad"):
             reg.download_package("pkg", "1.0", skip_invalid=True)
 
 

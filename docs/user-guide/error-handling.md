@@ -4,10 +4,15 @@ This guide shows you how to handle errors raised by Fhircraft. You will learn ab
 
 ## Exception Hierarchy
 
-Fhircraft organizes its exceptions into a clear tree rooted at `FhircraftException`. Every exception the library raises — whether from the FHIRPath engine, the model factory, the FHIR Mapper, or the package registry — lives somewhere in this tree. Because each of these components has its own intermediate base class that inherits from `FhircraftException`, you can tune the granularity of your `except` clauses: catch the root for a coarse safety net, or catch only the specific leaf class you care about. All classes are importable from the single public module `fhircraft.exceptions`.
+Fhircraft organizes its exceptions and warnings into two parallel trees, both importable from `fhircraft.exceptions`. **Exceptions** (`FhircraftException` and its subclasses) signal errors that stop execution and must be handled. **Warnings** (`FhircraftWarning` and its subclasses) signal non-critical issues issued via Python's `warnings` module and do not interrupt execution.
+
+Because each component has its own intermediate base class, you can tune the granularity of your `except` and `warnings.filterwarnings` calls: catch the root for a coarse safety net, or target only the specific leaf class you care about.
+
+**Exceptions**
 
 ```
 FhircraftException
+├── FhirTypeError              # FHIR type checking and conversion
 ├── MapperException            # FHIR Mapping Language engine
 │   ├── MapperParsingError
 │   ├── MapperValidationError
@@ -29,7 +34,6 @@ FhircraftException
 │   ├── FactoryDefinitionIndexError
 │   ├── FactoryDefinitionResolutionError
 │   ├── FactoryBuilderError
-│   │   └── FactoryBuildError
 │   ├── FactoryTypeResolutionError
 │   └── FactoryAssemblerError
 ├── DefinitionNotFoundError    # Structure definition registry
@@ -39,7 +43,16 @@ FhircraftException
     └── PackageValidationError
 ```
 
-There is one deliberate exception to this rule: FHIR **resource validation errors** (constraint and invariant failures on `Patient`, `Observation`, etc.) surface as Pydantic's `ValidationError`, not as a `FhircraftException` subclass. This is intentional — resource models are standard Pydantic models, so they use the standard Pydantic error mechanism. See [FHIR Validation Errors](#fhir-validation-errors) for details.
+**Warnings**
+
+```
+FhircraftWarning  (also a Warning)
+├── FhirPathWarning        # FHIRPath evaluation engine
+├── FhirValidationWarning  # FHIR resource validation
+└── FactoryWarning         # FHIR model factory
+```
+
+There is one deliberate exception to the exceptions tree: FHIR **resource validation errors** (constraint and invariant failures on `Patient`, `Observation`, etc.) surface as Pydantic's `ValidationError`, not as a `FhircraftException` subclass. This is intentional — resource models are standard Pydantic models, so they use the standard Pydantic error mechanism. Non-critical constraint issues that do not block execution emit `FhirValidationWarning` instead. See [FHIR Validation Errors](#fhir-validation-errors) for details.
 
 ??? abstract "Technical Documentation"
 
@@ -48,14 +61,14 @@ There is one deliberate exception to this rule: FHIR **resource validation error
 
 ## Importing Exceptions
 
-All exceptions live in `fhircraft.exceptions`. Import exactly what you need — using the intermediate base class (e.g. `FhirPathException`) keeps your `except` clauses readable without catching too broadly:
+All exceptions and warnings live in `fhircraft.exceptions`. Import exactly what you need — using the intermediate base class (e.g. `FhirPathException`) keeps your `except` clauses readable without catching too broadly:
 
 ```python
-from fhircraft.exceptions import (
-    FhircraftException,              # catch-all for any Fhircraft error
-    FhirPathException,               # catch-all for any FHIRPath error
-    FhirPathRuntimeError,            # runtime evaluation failures
-)
+# Exceptions
+from fhircraft.exceptions import FhircraftException, FhirPathException
+
+# Warnings
+from fhircraft.exceptions import FhircraftWarning, FhirValidationWarning
 ```
 
 !!! tip "Catch specific before broad"
@@ -82,11 +95,7 @@ try:
     model = factory.build("http://example.org/StructureDefinition/Unknown")
 except FhircraftException as e:
     print(e.message)    # the raw description
-    #> Definition 'http://example.org/StructureDefinition/Unknown' not found in registry
     print(e.component)  # which subsystem raised it
-    #> registry
-    print(str(e))       # formatted "[component] message"
-    #> [registry] Definition 'http://example.org/...' not found in registry
 ```
 
 The `str()` representation always produces `[component] message`, making it easy to read in log output without needing a log formatter to add context.
@@ -140,24 +149,33 @@ except FhirPathRuntimeError as e:
 
 !!! note "FhirPathWarning"
 
-    `FhirPathWarning` is not part of the `FhircraftException` tree — it inherits from Python's built-in `Warning` class. It is issued via Python's `warnings` module for non-fatal FHIRPath situations (such as using a deprecated function). Use the standard `warnings.catch_warnings()` context manager to capture or suppress it:
+    `FhirPathWarning` inherits from `FhircraftWarning`, which in turn inherits from Python's built-in `Warning`. It is issued via Python's `warnings` module for non-fatal FHIRPath situations. Because of the shared base, you can filter on `FhirPathWarning` to target only FHIRPath warnings, or on `FhircraftWarning` to capture warnings from any Fhircraft component at once:
 
     ```python
     import warnings
-    from fhircraft.exceptions import FhirPathWarning
+    from fhircraft.exceptions import FhirPathWarning, FhircraftWarning
 
+    # Capture only FHIRPath warnings
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always", FhirPathWarning)
         result = patient.fhirpath_values("Patient.name")
 
     for w in caught:
         print(f"FHIRPath warning: {w.message}")
+
+    # Or suppress all Fhircraft warnings at once
+    warnings.filterwarnings("ignore", category=FhircraftWarning)
     ```
 
 
 ### FHIR Validation Errors
 
-When Fhircraft constructs or modifies a FHIR resource, Pydantic validates every field automatically. Failures raise `pydantic.ValidationError`, which bundles all constraint violations into a single exception. Each entry in the `errors()` list describes one violation.
+When Fhircraft constructs or modifies a FHIR resource, Pydantic validates every field automatically. Hard failures raise `pydantic.ValidationError`, which bundles all constraint violations into a single exception. Each entry in the `errors()` list describes one violation.
+
+There are two kinds of failures inside a `ValidationError`:
+
+- **Field type errors** — a field received a value of the wrong Python type or an unrecognized code.
+- **FHIR invariant violations** — an invariant from the FHIR specification failed (e.g. `dom-6` for missing narrative). These use Pydantic's `PydanticCustomError` internally and appear with a `type` string prefixed `fhir_`.
 
 ```python
 from pydantic import ValidationError
@@ -166,16 +184,36 @@ from fhircraft.fhir.resources import get_fhir_type
 Observation = get_fhir_type("Observation", "R4")
 
 try:
-    patient = Observation.model_validate({"valueReference": {"type": "only-type"}}})  # (1)!
+    obs = Observation.model_validate({"valueReference": {"type": "only-type"}})  # (1)!
 except ValidationError as e:
     for error in e.errors():
-        print(f"  field : {error['loc']}")
-        print(f"  type  : {error['type']}")
-        print(f"  detail: {error['msg']}")
-        print() 
+        if error["type"].startswith("fhir_"):   # (2)!
+            key = error["type"].removeprefix("fhir_")
+            print(f"FHIR invariant [{key}]: {error['msg']}")
+        else:
+            print(f"Field error {error['loc']}: {error['msg']}")
 ```
 
-To distinguish between validation errorrs (e.g to determine FHIR-invariant errors), inspect the `type` key.
+1. Any missing required field or mismatched type triggers a `ValidationError`.
+2. FHIR constraint violations use the pattern `fhir_<constraint-key>`, e.g. `fhir_dom-6`, `fhir_ele-1`.
+
+**Non-critical validation issues** — where a constraint is considered a warning rather than an error — emit `FhirValidationWarning` via Python's `warnings` module instead of raising. You can capture these the same way as other Fhircraft warnings:
+
+```python
+import warnings
+from fhircraft.exceptions import FhirValidationWarning
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always", FhirValidationWarning)
+    patient = Patient(name=[{"given": ["Alice"]}])  # may emit dom-6 warning
+
+for w in caught:
+    print(f"Validation warning: {w.message}")
+```
+
+!!! info "See also"
+
+    See [Configuring Validation Behavior](configuration.md) for details on switching between strict, lenient, and skip validation modes, and for disabling specific constraint keys.
 
 ### Resource factory Errors
 
@@ -194,7 +232,7 @@ from fhircraft.fhir.resources import FHIRModelFactory
 factory = FHIRModelFactory(fhir_release="R4")
 
 try:
-    MyPatient = factory.build("http://example.org/StructureDefinition/MyPatient")  # (1)!
+    MyPatient = factory.build("http://example.org/StructureDefinition/MyPatient") 
 except DefinitionNotFoundError as e:
     # The most common case: the definition was never loaded into the registry
     print(f"Load the definition first: {e.message}")
@@ -209,8 +247,6 @@ except FactoryBuilderError as e:
     print(f"Build failed: {e.message}")
 ```
 
-1. `factory.register(...)` or `factory.load_package(...)` must be called before `build()` for any non-base FHIR definition.
-
 | Exception | When it is raised |
 |---|---|
 | `DefinitionNotFoundError` | The requested canonical URL is not present in the definition registry |
@@ -219,6 +255,21 @@ except FactoryBuilderError as e:
 | `FactoryBuilderError` | A builder step fails during model construction |
 | `FactoryTypeResolutionError` | A FHIR type referenced in the definition cannot be mapped to a Python type |
 | `FactoryAssemblerError` | The final model assembly step fails when combining builder outputs |
+| `FhirTypeError` | A type checking or conversion operation on a FHIR primitive or complex type fails |
+
+Non-critical factory situations — such as falling back to a default when an optional feature is unavailable — emit `FactoryWarning` rather than raising. Use `warnings.filterwarnings` to capture or suppress them:
+
+```python
+import warnings
+from fhircraft.exceptions import FactoryWarning
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always", FactoryWarning)
+    MyModel = factory.build("http://example.org/StructureDefinition/MyPatient")
+
+for w in caught:
+    print(f"Factory warning: {w.message}")
+```
 
 !!! tip "DefinitionNotFoundError is also a FileNotFoundError"
 
@@ -298,7 +349,7 @@ from fhircraft.fhir.resources import FHIRModelFactory
 factory = FHIRModelFactory(fhir_release="R4")
 
 try:
-    factory.load_package("hl7.fhir.us.core", "6.1.0")  # (1)!
+    factory.register_package("hl7.fhir.us.core", "6.1.0")  # (1)!
 except PackageNotFoundError as e:
     # Package name or version does not exist in the registry
     print(f"Package not published: {e.message}")
@@ -311,7 +362,7 @@ except PackageValidationError as e:
     print(f"Package contents are invalid: {e.message}")
 ```
 
-1. `load_package` contacts the FHIR package registry, downloads the specified version, extracts the `.tgz` archive, and registers all contained StructureDefinitions.
+1. `register_package` contacts the FHIR package registry, downloads the specified version, extracts the `.tgz` archive, and registers all contained StructureDefinitions.
 
 | Exception | When it is raised |
 |---|---|
@@ -331,6 +382,10 @@ Several Fhircraft exceptions also inherit from standard Python built-ins. This d
 | `FhirPathRuntimeError` | `RuntimeError` | Caught by generic runtime error handlers |
 | `FactoryTypeResolutionError` | `LookupError` | Caught by generic lookup/key-error handlers |
 | `FactoryAssemblerError` | `LookupError` | Caught by generic lookup/key-error handlers |
+| `FhircraftWarning` | `Warning` | Suppressed/filtered by any handler targeting `Warning` |
+| `FhirPathWarning` | `FhircraftWarning`, `Warning` | Filtered by either `FhircraftWarning` or `Warning` |
+| `FhirValidationWarning` | `FhircraftWarning`, `Warning` | Filtered by either `FhircraftWarning` or `Warning` |
+| `FactoryWarning` | `FhircraftWarning`, `Warning` | Filtered by either `FhircraftWarning` or `Warning` |
 
 ```python
 # A framework handler that catches FileNotFoundError will also catch this
@@ -339,8 +394,8 @@ from fhircraft.exceptions import DefinitionNotFoundError
 try:
     raise DefinitionNotFoundError("No definition for 'MyPatient'")
 except FileNotFoundError as e:
-    print(str(e))  # caught without any Fhircraft import needed
-    #> [registry] No definition for 'MyPatient'
+    print('Exception caught')  # caught without any Fhircraft import needed
+    #> Exception caught
 ```
 
 
@@ -349,7 +404,7 @@ except FileNotFoundError as e:
 | Problem | Solution |
 |---------|----------|
 | `FhircraftException` catch-all hides the root cause | Narrow the `except` clause to the component's base class (e.g. `FactoryException`, `FhirPathException`) or to the specific leaf exception. Log `e.component` and `e.message` separately so the subsystem is always visible in output. |
-| `DefinitionNotFoundError` raised at build time | The required structure definition was not loaded before calling `factory.build()`. Call `factory.register()`, `factory.load_directory()`, or `factory.load_package()` first, then retry the build. |
+| `DefinitionNotFoundError` raised at build time | The required structure definition was not loaded before calling `factory.build()`. Call `factory.register()` or `factory.register_package()` first, then retry the build. |
 | `ValidationError` raised but unclear which field failed | Iterate `e.errors()` and print each entry's `loc`, `type`, and `msg` keys. Types prefixed with `fhir_` identify FHIR invariant violations (e.g. `fhir_dom-6`); all others are Pydantic field-type errors. |
 | FHIR constraint violations appear even on valid-looking data | The resource may be missing optional-but-constrained elements such as narrative text (`dom-6`). Use `disable_constraint('dom-6')` or switch to `validation_mode='lenient'` for that operation. See [Configuring Validation Behavior](configuration.md). |
 | `FhirPathParsingError` on a seemingly correct expression | Check for unclosed parentheses, mismatched quotes, or unsupported syntax. Validate the expression against the [:material-fire: FHIRPath specification](https://hl7.org/fhirpath/N1/). |
