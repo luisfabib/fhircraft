@@ -8,7 +8,9 @@ import re
 import sys
 from html.parser import HTMLParser
 from xml.etree import ElementTree as ET
-
+from pydantic import ValidationError
+from typing import Callable
+from fhircraft.config import get_config
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPath,
@@ -23,9 +25,19 @@ from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.path.engine.filtering import Where
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
+from fhircraft.fhir.terminology import TerminologyService
+from fhircraft.fhir.resources.datatypes.registry import get_fhir_type_by_url
+from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.utils import ensure_list
 from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive
 from fhircraft.exceptions import FhirPathWarning
+
+
+def _get_terminology_service(environment: dict) -> TerminologyService | None:
+    service = environment.get("%terminologyService")
+    if service is not None:
+        return service
+    return get_config().terminology_service
 
 
 class Extension(FHIRPathFunction):
@@ -781,9 +793,11 @@ class Slice(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath slice() function is not supported."
+        warnings.warn(
+            "Evaluation of the FHIRPath slice() function is not supported. Returning an empty collection.",
+            FhirPathWarning,
         )
+        return []
 
 
 class CheckModifiers(FHIRPathFunction):
@@ -850,9 +864,30 @@ class ConformsTo(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath conformsTo() function is not supported."
-        )
+        if len(collection) != 1:
+            return []
+        fhir_release: None = environment.get("%fhirRelease")
+        if isinstance(fhir_release, FHIRPathCollectionItem):
+            fhir_release = fhir_release.value
+        if not fhir_release or not isinstance(fhir_release, str):
+            raise FhirPathException(
+                "The %fhirRelease environment variable is required for evaluating conformsTo()."
+            )
+        try:
+            get_fhir_type_by_url(
+                self.structure, release=fhir_release, fail_if_not_found=True
+            ).model_validate(collection[0].value)
+        except AttributeError:
+            warnings.warn(
+                f"Could not resolve structure definition '{self.structure}' for conformsTo() function."
+                f" Current implementation is limited to core resources. Returning empty result.",
+                FhirPathWarning,
+            )
+            return []
+        except ValidationError as e:
+            print(f"Validation error during conformsTo() evaluation: {e}")
+            return [FHIRPathCollectionItem.wrap(False)]
+        return [FHIRPathCollectionItem.wrap(True)]
 
 
 class MemberOf(FHIRPathFunction):
@@ -890,9 +925,122 @@ class MemberOf(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath memberOf() function is not supported."
+        from fhircraft.fhir.resources.datatypes import utils as type_utils
+
+        if len(collection) != 1:
+            return []
+        service = _get_terminology_service(environment)
+        if service is None:
+            return []
+        release = environment.get("%fhirRelease")
+        if isinstance(release, FHIRPathCollectionItem):
+            release = release.value
+
+        if not release or not isinstance(release, str):
+            raise FhirPathException(
+                "The %fhirRelease environment variable is required for evaluating memberOf()."
+            )
+        codeable = collection[0].value
+        if isinstance(codeable, str):
+            code = codeable
+            system, version = None, None
+        elif type_utils.is_fhir_complex_type(codeable, "Coding", release):
+            code = codeable.code
+            system = codeable.system
+            version = codeable.version
+        elif type_utils.is_fhir_complex_type(codeable, "CodeableConcept", release):
+            if len(codeable.coding) == 0:
+                return []
+            code = codeable.coding[0].code
+            system = codeable.coding[0].system
+            version = codeable.coding[0].version
+        else:
+            return []
+        try:
+            result = service.validate_valueset_code(
+                url=self.valueset, code=code, system=system, version=version
+            )
+        except Exception as e:
+            warnings.warn(
+                f"Error during terminology service call in memberOf() function: {e}. Skipping evaluation of memberOf().",
+                FhirPathWarning,
+            )
+            return []
+        if result is None:
+            return []
+        return [FHIRPathCollectionItem.wrap(bool(result))]
+
+
+def _evaluate_subsumtion(code, collection, environment, create, invert=False):
+    """
+    Helper function to evaluate subsumption relationships for both subsumes() and subsumedBy() functions.
+    """
+    from fhircraft.fhir.resources.datatypes import utils as type_utils
+
+    if len(collection) != 1:
+        return []
+    service = _get_terminology_service(environment)
+    if service is None:
+        return []
+    release = environment.get("%fhirRelease")
+    if isinstance(release, FHIRPathCollectionItem):
+        release = release.value
+    if not release or not isinstance(release, str):
+        raise FhirPathException(
+            f"The %fhirRelease environment variable is required for evaluating {'subsumes()' if not invert else 'subsumedBy()'}."
         )
+    given = code.evaluate(collection, environment=environment, create=create)
+    if len(given) != 1:
+        return []
+    given = given[0].value
+    if type_utils.is_fhir_complex_type(given, "Coding", release):
+        codingsB = [given]
+    elif type_utils.is_fhir_complex_type(given, "CodeableConcept", release):
+        if len(given.coding) == 0:
+            raise FhirPathException(
+                f"The code argument to {'subsumes()' if not invert else 'subsumedBy()'} cannot be an empty CodeableConcept."
+            )
+        codingsB = given.coding
+    else:
+        raise FhirPathException(
+            f"The code argument to {'subsumes()' if not invert else 'subsumedBy()'} must be a Coding or CodeableConcept."
+        )
+
+    source = collection[0].value
+    if type_utils.is_fhir_complex_type(source, "CodeableConcept", release):
+        if len(source.coding) == 0:
+            raise FhirPathException(
+                f"The source collection in {'subsumes()' if not invert else 'subsumedBy()'} cannot be an empty CodeableConcept."
+            )
+        codingsA = source.coding
+    elif type_utils.is_fhir_complex_type(source, "Coding", release):
+        codingsA = [source]
+    else:
+        return []
+    for codingA in codingsA:
+        for codingB in codingsB:
+            if codingA.system != codingB.system:
+                raise FhirPathException(
+                    f"Subsumption across different code systems is not a valid operation. Attempting to subsume between code systems '{codingA.system}' and '{codingB.system}'."
+                )
+            try:
+                result = service.codesystem_subsumes(
+                    codeA=codingA if not invert else codingB,
+                    codeB=codingB if not invert else codingA,
+                    system=codingA.system,
+                    version=codingA.version,
+                )
+            except Exception as e:
+                warnings.warn(
+                    f"Error during terminology service call in {'subsumes()' if not invert else 'subsumedBy()'} function: {e}. Skipping evaluation of {'subsumes()' if not invert else 'subsumedBy()'}.",
+                    FhirPathWarning,
+                )
+                return []
+            if result is None:
+                return []
+            if result is True:
+                return [FHIRPathCollectionItem.wrap(bool(True))]
+    return [FHIRPathCollectionItem.wrap(bool(False))]
 
 
 class Subsumes(FHIRPathFunction):
@@ -900,14 +1048,12 @@ class Subsumes(FHIRPathFunction):
     A representation of the FHIRPath [`subsumes()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        code (str): The code to check for subsumption.
+        code (FHIRPath): The code to check for subsumption.
     """
 
-    def __init__(self, code: str | Literal):
-        if isinstance(code, Literal):
-            code = code.value
-        if not isinstance(code, str):
-            raise FhirPathException("subsumes() argument must be a string.")
+    def __init__(self, code: FHIRPath):
+        if not isinstance(code, FHIRPath):
+            raise FhirPathException("subsumes() argument must be a FHIRPath instance.")
         self.code = code
 
     def evaluate(
@@ -928,8 +1074,12 @@ class Subsumes(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath subsumes() function is not supported."
+        return _evaluate_subsumtion(
+            code=self.code,
+            collection=collection,
+            environment=environment,
+            create=create,
+            invert=False,
         )
 
 
@@ -938,14 +1088,14 @@ class SubsumedBy(FHIRPathFunction):
     A representation of the FHIRPath [`subsumedBy()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        code (str): The code to check for subsumption.
+        code (FHIRPath): The code to check for subsumption.
     """
 
-    def __init__(self, code: str | Literal):
-        if isinstance(code, Literal):
-            code = code.value
-        if not isinstance(code, str):
-            raise FhirPathException("subsumedBy() argument must be a string.")
+    def __init__(self, code: FHIRPath):
+        if not isinstance(code, FHIRPath):
+            raise FhirPathException(
+                "subsumedBy() argument must be a FHIRPath instance."
+            )
         self.code = code
 
     def evaluate(
@@ -968,8 +1118,12 @@ class SubsumedBy(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath subsumes() function is not supported."
+        return _evaluate_subsumtion(
+            code=self.code,
+            collection=collection,
+            environment=environment,
+            create=create,
+            invert=True,
         )
 
 

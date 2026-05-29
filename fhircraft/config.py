@@ -7,9 +7,12 @@ import os
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from typing import FrozenSet, Generator, Literal, Container
+from typing import Container, FrozenSet, Generator, Literal
+
+from fhircraft.fhir.terminology import TerminologyService
 
 _VALID_MODES = ("strict", "lenient", "skip")
+_UNSET = object()
 
 
 @dataclass(frozen=True)
@@ -32,6 +35,9 @@ class FhircraftConfig:
     disable_fhir_errors: bool = False
     disabled_fhir_constraints: FrozenSet[str] = field(default_factory=frozenset)
     mode: Literal["strict", "lenient", "skip"] = "strict"
+    terminology_service: TerminologyService | None = field(
+        default=None, compare=False, hash=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         # Coerce mutable set to frozenset so the type contract is always satisfied
@@ -74,6 +80,7 @@ def configure(
     disable_fhir_errors: bool | None = None,
     disabled_fhir_constraints: Container[str] | None = None,
     validation_mode: Literal["strict", "lenient", "skip"] | None = None,
+    terminology_service: TerminologyService | None | object = _UNSET,
 ) -> None:
     """Configure FHIRcraft settings.
 
@@ -88,22 +95,20 @@ def configure(
         validation_mode: Validation mode - 'strict', 'lenient', or 'skip'.
     """
     current = get_config()
-    _config_context.set(
-        dataclasses.replace(
-            current,
-            **{
-                k: v
-                for k, v in {
-                    "disable_validation_warnings": disable_validation_warnings,
-                    "disable_fhir_warnings": disable_fhir_warnings,
-                    "disable_fhir_errors": disable_fhir_errors,
-                    "disabled_fhir_constraints": disabled_fhir_constraints,
-                    "mode": validation_mode,
-                }.items()
-                if v is not None
-            },
-        )
-    )
+    updates = {
+        k: v
+        for k, v in {
+            "disable_validation_warnings": disable_validation_warnings,
+            "disable_fhir_warnings": disable_fhir_warnings,
+            "disable_fhir_errors": disable_fhir_errors,
+            "disabled_fhir_constraints": disabled_fhir_constraints,
+            "mode": validation_mode,
+        }.items()
+        if v is not None
+    }
+    if terminology_service is not _UNSET:
+        updates["terminology_service"] = terminology_service
+    _config_context.set(dataclasses.replace(current, **updates))
 
 
 @contextmanager
@@ -114,6 +119,7 @@ def override_config(
     disable_fhir_errors: bool | None = None,
     disabled_fhir_constraints: Container[str] | None = None,
     validation_mode: Literal["strict", "lenient", "skip"] | None = None,
+    terminology_service: TerminologyService | None | object = _UNSET,
 ) -> Generator[FhircraftConfig, None, None]:
     """Context manager for temporary configuration changes.
 
@@ -132,19 +138,22 @@ def override_config(
         config (FhircraftConfig): The temporary configuration.
     """
     old_config = get_config()
+    updates = {
+        k: v
+        for k, v in {
+            "disable_validation_warnings": disable_validation_warnings,
+            "disable_fhir_warnings": disable_fhir_warnings,
+            "disable_fhir_errors": disable_fhir_errors,
+            "disabled_fhir_constraints": disabled_fhir_constraints,
+            "mode": validation_mode,
+        }.items()
+        if v is not None
+    }
+    if terminology_service is not _UNSET:
+        updates["terminology_service"] = terminology_service
     new_config = dataclasses.replace(
         old_config,
-        **{
-            k: v
-            for k, v in {
-                "disable_validation_warnings": disable_validation_warnings,
-                "disable_fhir_warnings": disable_fhir_warnings,
-                "disable_fhir_errors": disable_fhir_errors,
-                "disabled_fhir_constraints": disabled_fhir_constraints,
-                "mode": validation_mode,
-            }.items()
-            if v is not None
-        },
+        **updates,
     )
     token = _config_context.set(new_config)
     try:

@@ -241,6 +241,7 @@ Fhircraft automatically provides these environment variables in all FHIRPath eva
 | `%rootResource` | The root resource in the evaluation hierarchy (typically same as `%resource` for simple queries) | `Bundle` |
 | `%ucum` | The URL for the Unified Code for Units of Measure system | `http://unitsofmeasure.org` |
 | `%fhirRelease` | The FHIR release version of the node being evaluated in the expression | `R4B` |
+| `%terminologyService` | An optional terminology service instance used by `memberOf()`, `subsumes()`, and `subsumedBy()` | _(implementation object)_ |
 
 ```python
 from fhircraft.fhir.resources import get_fhir_type
@@ -483,3 +484,44 @@ print(patient.fhirpath_single("Patient.id is FHIR.integer"))
 #> False
 ```
 
+## Terminology Functions
+
+Fhircraft implements the [:material-fire: FHIR-specific FHIRPath terminology functions](https://www.hl7.org/fhir/fhirpath.html#functions) — `memberOf()`, `subsumes()`, and `subsumedBy()`. These functions perform code-system lookups and value-set validation at query time, and they require a terminology service to be configured before they produce results.
+
+When no terminology service is present, all three functions return an empty collection rather than raising an error, so existing expressions remain safe in environments where terminology validation is not needed.
+
+### Providing a Terminology Service
+
+You can supply a terminology service in two ways:
+
+**Global configuration** — registers a default service used for all FHIRPath evaluations:
+
+```python
+from fhircraft import configure
+from fhircraft.fhir.terminology import TerminologyService
+
+class MyTerminologyService:
+    def validate_valueset_code(self, *, url, code, system=None, version=None, display=None):
+        # Delegate to a real terminology server, e.g. HAPI FHIR
+        ...
+
+    def codesystem_subsumes(self, codeA, codeB, system=None, version=None):
+        ...
+
+    def codesystem_lookup(self, *, code, system=None, version=None):
+        ...
+
+    def validate_codesystem_code(self, *, url=None, code=None, version=None, display=None):
+        ...
+
+configure(terminology_service=MyTerminologyService())
+```
+
+**Per-evaluation via environment variable** — passes a service only for a specific expression, overriding the global one:
+
+```python
+result = patient.fhirpath_values(
+    "Patient.gender.memberOf('http://hl7.org/fhir/ValueSet/administrative-gender')",
+    environment={"%terminologyService": MyTerminologyService()}
+)
+```
