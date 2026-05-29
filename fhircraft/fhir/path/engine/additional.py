@@ -951,16 +951,13 @@ class MemberOf(FHIRPathFunction):
             version = codeable.coding[0].version
         else:
             return []
-        print(
-            f"Validating code '{code}' from system '{system}' against valueset '{self.valueset}' using terminology service."
-        )
         try:
             result = service.validate_valueset_code(
                 url=self.valueset, code=code, system=system, version=version
             )
         except Exception as e:
             warnings.warn(
-                f"Error validating code against valueset in memberOf() function: {e}. Skipping evaluation of memberOf().",
+                f"Error during terminology service call in memberOf() function: {e}. Skipping evaluation of memberOf().",
                 FhirPathWarning,
             )
             return []
@@ -977,11 +974,9 @@ class Subsumes(FHIRPathFunction):
         code (str): The code to check for subsumption.
     """
 
-    def __init__(self, code: str | Literal):
-        if isinstance(code, Literal):
-            code = code.value
-        if not isinstance(code, str):
-            raise FhirPathException("subsumes() argument must be a string.")
+    def __init__(self, code: FHIRPath):
+        if not isinstance(code, FHIRPath):
+            raise FhirPathException("subsumes() argument must be a FHIRPath instance.")
         self.code = code
 
     def evaluate(
@@ -1002,9 +997,59 @@ class Subsumes(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath subsumes() function is not supported."
-        )
+        from fhircraft.fhir.resources.datatypes import utils as type_utils
+
+        if len(collection) != 1:
+            return []
+        service = _get_terminology_service(environment)
+        if service is None:
+            return []
+        release = environment.get("%fhirRelease")
+        if not release or not isinstance(release, str):
+            raise FhirPathException(
+                "The %fhirRelease environment variable is required for evaluating memberOf()."
+            )
+        codingB = self.code.single(collection, environment=environment)
+        if type_utils.is_fhir_complex_type(codingB, "CodeableConcept", release):
+            if len(codingB.coding) == 0:
+                raise FhirPathException(
+                    "The code argument to subsumes() cannot be an empty CodeableConcept."
+                )
+            codingB = codingB.coding[0]
+        elif not type_utils.is_fhir_complex_type(codingB, "Coding", release):
+            raise FhirPathException(
+                "The code argument to subsumes() must be a Coding or CodeableConcept."
+            )
+
+        codingA = collection[0].value
+        if type_utils.is_fhir_complex_type(codingA, "CodeableConcept", release):
+            if len(codingA.coding) == 0:
+                raise FhirPathException(
+                    "The code argument to subsumes() cannot be an empty CodeableConcept."
+                )
+            codingA = codingA.coding[0]
+        elif not type_utils.is_fhir_complex_type(codingA, "Coding", release):
+            return []
+        if codingA.system != codingB.system:
+            raise FhirPathException(
+                f"Subsumption across different code systems is not a valid operation. Attempting to subsume between code systems '{codingA.system}' and '{codingB.system}'."
+            )
+        try:
+            result = service.codesystem_subsumes(
+                codeA=codingA,
+                codeB=codingB,
+                system=codingA.system,
+                version=codingA.version,
+            )
+        except Exception as e:
+            warnings.warn(
+                f"Error during terminology service call in subsumes() function: {e}. Skipping evaluation of subsumes().",
+                FhirPathWarning,
+            )
+            return []
+        if result is None:
+            return []
+        return [FHIRPathCollectionItem.wrap(bool(result))]
 
 
 class SubsumedBy(FHIRPathFunction):

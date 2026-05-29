@@ -37,6 +37,10 @@ def terminology_service():
 
     class MockTerminologyService(TerminologyService):
 
+        @staticmethod
+        def _code_value(code):
+            return getattr(code, "code", code)
+
         def validate_valueset_code(self, *, url=None, code=None, **kwargs):
             if url == "http://example.org/ValueSet/ExampleVS":
                 if code == "valid-code":
@@ -52,7 +56,19 @@ def terminology_service():
             raise NotImplementedError()
 
         def codesystem_subsumes(self, codeA, codeB, system=None, version=None):
-            raise NotImplementedError()
+            code_a = self._code_value(codeA)
+            code_b = self._code_value(codeB)
+            if system is None:
+                raise ValueError("system is required")
+            if code_a == "parent" and code_b == "child":
+                return True
+            if code_a == "child" and code_b == "parent":
+                return False
+            if code_a == "unknown" or code_b == "unknown":
+                return None
+            if code_a == "error":
+                raise RuntimeError("terminology backend error")
+            return False
 
     return MockTerminologyService()
 
@@ -731,7 +747,7 @@ def test_memberof_returns_true_for_valid_codeableconcept(terminology_service):
 def test_memberof_returns_empty_for_unresolvable_valueset(terminology_service):
     collection = [FHIRPathCollectionItem(value="valid-code")]
     with pytest.warns(
-        FhirPathWarning, match="Error validating code against valueset in memberOf()"
+        FhirPathWarning, match="Error during terminology service call in memberOf()"
     ):
         result = MemberOf("http://example.org/ValueSet/Unknown").evaluate(
             collection,
@@ -747,4 +763,121 @@ def test_memberof_raises_error_when_fhir_release_not_in_environment(
     with pytest.raises(FhirPathException, match="required for evaluating memberOf"):
         MemberOf("http://example.org/ValueSet/ExampleVS").evaluate(
             collection, {"%terminologyService": terminology_service}
+        )
+
+
+# -------------
+# Subsumes
+# -------------
+
+
+def test_subsumes_returns_empty_for_empty_collection():
+    collection = []
+    result = Subsumes(Element("example-code")).evaluate(collection, env)
+    assert result == []
+
+
+def test_subsumes_returns_true_for_subsuming_code(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4_Coding(system="http://loinc.org", code="parent")
+        )
+    ]
+    result = Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
+        collection,
+        {
+            "%fhirRelease": "R4",
+            "%terminologyService": terminology_service,
+            "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
+        },
+    )
+    assert result[0].value == True
+
+
+def test_subsumes_returns_false_for_non_subsuming_code(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="child"))
+    ]
+    result = Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
+        collection,
+        {
+            "%fhirRelease": "R4",
+            "%terminologyService": terminology_service,
+            "%otherCoding": R4_Coding(system="http://loinc.org", code="parent"),
+        },
+    )
+    assert result[0].value == False
+
+
+def test_subsumes_returns_empty_when_service_returns_none(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4_Coding(system="http://loinc.org", code="unknown")
+        )
+    ]
+    result = Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
+        collection,
+        {
+            "%fhirRelease": "R4",
+            "%terminologyService": terminology_service,
+            "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
+        },
+    )
+    assert result == []
+
+
+def test_subsumes_warns_and_returns_empty_when_service_raises(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="error"))
+    ]
+    with pytest.warns(
+        FhirPathWarning, match="Error during terminology service call in subsumes()"
+    ):
+        result = Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
+            collection,
+            {
+                "%fhirRelease": "R4",
+                "%terminologyService": terminology_service,
+                "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
+            },
+        )
+    assert result == []
+
+
+def test_subsumes_raises_error_when_fhir_release_not_in_environment(
+    terminology_service,
+):
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4_Coding(system="http://loinc.org", code="parent")
+        )
+    ]
+    with pytest.raises(FhirPathException, match="required for evaluating memberOf"):
+        Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
+            collection,
+            {
+                "%terminologyService": terminology_service,
+                "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
+            },
+        )
+
+
+def test_subsumes_raises_error_for_different_code_systems(terminology_service):
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4_Coding(system="http://loinc.org", code="parent")
+        )
+    ]
+    with pytest.raises(
+        FhirPathException, match="Subsumption across different code systems"
+    ):
+        Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
+            collection,
+            {
+                "%fhirRelease": "R4",
+                "%terminologyService": terminology_service,
+                "%otherCoding": R4_Coding(
+                    system="http://snomed.info/sct", code="child"
+                ),
+            },
         )
