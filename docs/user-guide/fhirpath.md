@@ -521,54 +521,7 @@ configure(terminology_service=MyTerminologyService())
 
 ```python
 result = patient.fhirpath_values(
-    "Observation.code.memberOf('http://example.org/ValueSet/LabCodes')",
+    "Patient.gender.memberOf('http://hl7.org/fhir/ValueSet/administrative-gender')",
     environment={"%terminologyService": MyTerminologyService()}
 )
 ```
-
-### `memberOf(valueset)`
-
-Returns `true` if the source value (a `string`, `Coding`, or `CodeableConcept`) is a member of the given value set URL. Returns `false` if it is not a member, and returns an empty collection if the value set cannot be resolved or the service raises an error.
-
-```python
-from fhircraft.fhir.resources import get_fhir_type
-
-Observation = get_fhir_type("Observation", "R4")
-
-obs = Observation(
-    status="final",
-    code={"coding": [{"system": "http://loinc.org", "code": "55284-4"}]}
-)
-
-is_member = obs.fhirpath_single(
-    "Observation.code.memberOf('http://example.org/ValueSet/LabCodes')",
-    environment={"%terminologyService": my_service}
-)
-# True if the code is in the value set, False if not
-```
-
-### `subsumes(code)` and `subsumedBy(code)`
-
-`subsumes(code)` returns `true` if the source `Coding` is an ancestor of (or equivalent to) the given code in a subsumption hierarchy. `subsumedBy(code)` is the inverse — it returns `true` if the source code is a descendant of the given code.
-
-Both functions require that the source and argument `Coding` values belong to the **same code system**. Passing codings from different systems raises a `FhirPathException`. Both also accept `CodeableConcept` values, in which case the first coding in the concept is used.
-
-```python
-from fhircraft.fhir.resources.datatypes.R4.complex import Coding
-
-disease = Coding(system="http://snomed.info/sct", code="73211009")  # Diabetes mellitus
-parent  = Coding(system="http://snomed.info/sct", code="362969004") # Disorder of endocrine system
-
-result = patient.fhirpath_single(
-    "Observation.code.subsumes(%parent)",
-    environment={
-        "%terminologyService": my_service,
-        "%parent": parent,
-    }
-)
-```
-
-!!! info "Fallback behaviour"
-
-    If the terminology service returns `None` for a subsumption query (e.g. the relationship is unknown), both `subsumes()` and `subsumedBy()` return an empty collection rather than `false`.
-
