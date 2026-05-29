@@ -867,6 +867,8 @@ class ConformsTo(FHIRPathFunction):
         if len(collection) != 1:
             return []
         fhir_release: None = environment.get("%fhirRelease")
+        if isinstance(fhir_release, FHIRPathCollectionItem):
+            fhir_release = fhir_release.value
         if not fhir_release or not isinstance(fhir_release, str):
             raise FhirPathException(
                 "The %fhirRelease environment variable is required for evaluating conformsTo()."
@@ -931,6 +933,9 @@ class MemberOf(FHIRPathFunction):
         if service is None:
             return []
         release = environment.get("%fhirRelease")
+        if isinstance(release, FHIRPathCollectionItem):
+            release = release.value
+
         if not release or not isinstance(release, str):
             raise FhirPathException(
                 "The %fhirRelease environment variable is required for evaluating memberOf()."
@@ -978,6 +983,8 @@ def _evaluate_subsumtion(code, collection, environment, create, invert=False):
     if service is None:
         return []
     release = environment.get("%fhirRelease")
+    if isinstance(release, FHIRPathCollectionItem):
+        release = release.value
     if not release or not isinstance(release, str):
         raise FhirPathException(
             f"The %fhirRelease environment variable is required for evaluating {'subsumes()' if not invert else 'subsumedBy()'}."
