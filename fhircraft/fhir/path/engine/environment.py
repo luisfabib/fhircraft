@@ -4,7 +4,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
     This,
 )
-from fhircraft.fhir.path.exceptions import FHIRPathError
+from fhircraft.exceptions import FhirPathException
 
 
 class FHIRPathVariable(FHIRPath):
@@ -57,7 +57,7 @@ class EnvironmentVariable(FHIRPathVariable):
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
         if self.variable not in environment:
-            raise FHIRPathError(
+            raise FhirPathException(
                 f"The {self.variable} variable is not defined within the current context."
             )
         value = environment[self.variable]
@@ -88,7 +88,7 @@ class ContextualVariable(FHIRPath):
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
         if self.variable not in environment:
-            raise FHIRPathError(
+            raise FhirPathException(
                 f"The {self.variable} variable is not defined within the current context."
             )
         value = environment[self.variable]

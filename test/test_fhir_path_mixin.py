@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 from unittest.mock import Mock, patch
 
-from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
+from fhircraft.exceptions import FhirPathException, FhirPathRuntimeError
 from fhircraft.fhir.path.mixin import FHIRPathMixin
 
 
@@ -141,7 +141,7 @@ class TestFHIRPathMixin(unittest.TestCase):
         self.assertIsNone(missing_no_default)
 
         # Test error when multiple values exist
-        with self.assertRaises(FHIRPathRuntimeError):
+        with self.assertRaises(FhirPathRuntimeError):
             self.patient.fhirpath_single("Patient.name.family")
 
     def test_fhirpath_first(self):
@@ -237,7 +237,7 @@ class TestFHIRPathMixin(unittest.TestCase):
         self.assertEqual(updated_gender, "other")
 
         # Test error when multiple values exist
-        with self.assertRaises(FHIRPathError):
+        with self.assertRaises(FhirPathException):
             self.patient.fhirpath_update_single("Patient.name.family", "NewName")
 
     def test_fhirpath_update_values(self):
@@ -280,7 +280,7 @@ class TestFHIRPathMixin(unittest.TestCase):
             try:
                 patient.fhirpath_update_single(expression, value)
                 return True
-            except (FHIRPathError, RuntimeError):
+            except (FhirPathException, RuntimeError):
                 return False
 
         # Test successful single update
@@ -436,7 +436,7 @@ class TestFHIRPathMixin(unittest.TestCase):
                 try:
                     patient.fhirpath_update_single(phone_expr, new_phone)
                     return True
-                except (FHIRPathError, RuntimeError):
+                except (FhirPathException, RuntimeError):
                     return False
             return False
 

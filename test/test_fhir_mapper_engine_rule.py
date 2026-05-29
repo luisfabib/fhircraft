@@ -4,10 +4,10 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.rule import Rule
 from fhircraft.fhir.mapper.engine.scope import MappingScope
-from fhircraft.fhir.mapper.engine.exceptions import (
-    RuleProcessingError,
-    SourceAssertionError,
-    MappingDigestionError,
+from fhircraft.exceptions import (
+    MapperRuleProcessingError,
+    MapperExecutionError,
+    MapperDigestionError,
 )
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
     StructureMapGroupRule,
@@ -15,7 +15,6 @@ from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
     StructureMapGroupRuleTarget,
     StructureMapGroupRuleDependent,
 )
-
 
 # ============================================================================
 # Helpers & Fixtures
@@ -230,7 +229,7 @@ def test_init__raises_error_for_dependent_without_name(mock_parent_group):
     )
 
     with pytest.raises(
-        MappingDigestionError, match="Dependent rule or group must have a name"
+        MapperDigestionError, match="Dependent rule or group must have a name"
     ):
         Rule(rule_def, mock_parent_group)
 
@@ -271,17 +270,17 @@ def test_process__iterates_over_source_collections(
 def test_process__propagates_errors_from_sources(
     rule_definition_with_sources, mapping_scope
 ):
-    """Test that SourceAssertionError from sources is propagated."""
+    """Test that MapperRuleProcessingError from sources is propagated."""
     rule = Rule(rule_definition_with_sources, None)
 
-    # Mock source to raise SourceAssertionError
+    # Mock source to raise MapperRuleProcessingError
     mock_source = Mock()
     mock_source.variable = "patient"
-    mock_source.process.side_effect = SourceAssertionError("Test assertion error")
+    mock_source.process.side_effect = MapperRuleProcessingError("Test assertion error")
     rule.sources = [mock_source]
 
     with pytest.raises(
-        SourceAssertionError,
+        MapperRuleProcessingError,
         match="Source assertion failed for rule rules-with-sources",
     ):
         rule.process(mapping_scope)
@@ -303,7 +302,7 @@ def test_process__raises_error_for_source_variable_not_in_scope(
     mapping_scope.resolve_fhirpath = Mock(return_value=None)
 
     with pytest.raises(
-        RuleProcessingError, match="Source variable missing-var not found"
+        MapperRuleProcessingError, match="Source variable missing-var not found"
     ):
         rule.process(mapping_scope)
 
@@ -380,7 +379,7 @@ def test_process_dependent_group__raises_error_if_not_found(
     mapping_scope.resolve_symbol = Mock(return_value=None)
 
     with pytest.raises(
-        RuleProcessingError,
+        MapperRuleProcessingError,
         match="Dependent group or rule 'missing-group' not found",
     ):
         rule._process_dependent_group(dependent, mapping_scope)

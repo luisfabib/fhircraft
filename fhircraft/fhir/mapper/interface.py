@@ -329,7 +329,7 @@ class FHIRStructureMapper:
             canonical_url: Canonical URL (optionally suffixed with ``|version``).
 
         Raises:
-            StructureMapNotFoundError: If the URL is not registered.
+            MapperRegistryNotFoundError: If the URL is not registered.
         """
         return self._engine.structure_map_registry.get(canonical_url)
 

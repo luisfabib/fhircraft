@@ -13,17 +13,12 @@ from typing_extensions import TypeAliasType
 
 from pydantic import TypeAdapter, BaseModel, ValidationError
 
+from fhircraft.exceptions import FhirTypeError
 import fhircraft.fhir.resources.datatypes as constants
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel
-
-
-class FHIRTypeError(Exception):
-    """Raised when type checking or conversion fails."""
-
-    pass
 
 
 # Cache for TypeAdapter instances to avoid repeated creation
@@ -47,11 +42,11 @@ def is_fhir_primitive_type(
         bool: `True` if the value conforms to the type, `False` otherwise
 
     Raises:
-        FHIRTypeError: If the fhir_type is a string and does not correspond to a known primitive type
+        FhirTypeError: If the fhir_type is a string and does not correspond to a known primitive type
     """
     if isinstance(fhir_type, str):
         if not release:
-            raise FHIRTypeError(
+            raise FhirTypeError(
                 f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
             )
         fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
@@ -87,11 +82,11 @@ def is_fhir_complex_type(
         bool: `True` if the value conforms to the type, `False` otherwise
 
     Raises:
-        FHIRTypeError: If the fhir_type is a string and does not correspond to a known complex type
+        FhirTypeError: If the fhir_type is a string and does not correspond to a known complex type
     """
     if isinstance(fhir_type, str):
         if not release:
-            raise FHIRTypeError(
+            raise FhirTypeError(
                 f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
             )
         fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
@@ -128,11 +123,11 @@ def is_fhir_resource_type(
         bool: `True` if the value conforms to the type, `False` otherwise
 
     Raises:
-        FHIRTypeError: If the fhir_type is a string and does not correspond to a known resource type
+        FhirTypeError: If the fhir_type is a string and does not correspond to a known resource type
     """
     if isinstance(fhir_type, str):
         if not release:
-            raise FHIRTypeError(
+            raise FhirTypeError(
                 f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
             )
         fhir_type = get_fhir_type(fhir_type, release)  # type: ignore

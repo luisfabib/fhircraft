@@ -2,7 +2,8 @@ import warnings
 import pytest
 from unittest.mock import Mock, patch
 from pydantic import BaseModel
-from typing import ClassVar, List, Optional
+from pydantic_core import PydanticCustomError
+from typing import List, Optional
 
 from fhircraft.config import override_config
 from fhircraft.fhir.resources.datatypes.R4.primitive import (
@@ -25,7 +26,6 @@ from fhircraft.fhir.resources.validators import (
     validate_slicing_cardinalities,
     get_type_choice_value_by_base,
 )
-
 
 # ===========================================================
 # Fixtures & Helpers
@@ -394,7 +394,7 @@ def test__validate_FHIR_element_constraint__invalid_expression_raises_on_error(
 ):
     mock_fhirpath.parse.return_value.single.return_value = False
 
-    with pytest.raises(AssertionError, match=r"\[key-1\]"):
+    with pytest.raises(PydanticCustomError, match=r"\[key-1\]"):
         _validate_FHIR_element_constraint(
             "test_value", Mock(), "some.expr", "Human must hold", "key-1", "error"
         )
@@ -457,7 +457,7 @@ def test__validate_FHIR_element_constraint__element_prefix_in_error_message(
 ):
     mock_fhirpath.parse.return_value.single.return_value = False
 
-    with pytest.raises(AssertionError) as exc_info:
+    with pytest.raises(PydanticCustomError) as exc_info:
         _validate_FHIR_element_constraint(
             "val",
             Mock(),
@@ -488,7 +488,7 @@ def test_validate_FHIR_element_pattern__matching_scalar_returns_element():
 
 
 def test_validate_FHIR_element_pattern__non_matching_scalar_raises():
-    with pytest.raises(AssertionError, match="does not fulfill pattern"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill pattern"):
         validate_FHIR_element_pattern(None, "John", "Jane")
 
 
@@ -529,35 +529,35 @@ def test_validate_FHIR_element_pattern__passes_for_superset_of_pattern():
 def test_validate_FHIR_element_pattern__raises_error_for_subset_of_pattern():
     element = {"codes": ["A"]}
     pattern = {"codes": ["A"], "system": "B"}
-    with pytest.raises(AssertionError, match="does not fulfill pattern"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill pattern"):
         validate_FHIR_element_pattern(None, element, pattern)
 
 
 def test_validate_FHIR_element_pattern__raises_error_for_missing_pattern():
     element = {"extra": "value"}
     pattern = {"codes": ["A"]}
-    with pytest.raises(AssertionError, match="does not fulfill pattern"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill pattern"):
         validate_FHIR_element_pattern(None, element, pattern)
 
 
 def test_validate_FHIR_element_pattern__raises_error_for_conflicting_scalar_pattern():
     element = {"codes": "A"}
     pattern = {"codes": "B"}
-    with pytest.raises(AssertionError, match="does not fulfill pattern"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill pattern"):
         validate_FHIR_element_pattern(None, element, pattern)
 
 
 def test_validate_FHIR_element_pattern__raises_error_for_conflicting_pattern():
     element = {"codes": ["A"]}
     pattern = {"codes": ["B"]}
-    with pytest.raises(AssertionError, match="does not fulfill pattern"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill pattern"):
         validate_FHIR_element_pattern(None, element, pattern)
 
 
 def test_validate_FHIR_element_pattern__raises_error_for_conflicting_nested_pattern():
     element = {"codes": [{"code": "A", "system": "C"}]}
     pattern = {"codes": [{"code": "A", "system": "B"}]}
-    with pytest.raises(AssertionError, match="does not fulfill pattern"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill pattern"):
         validate_FHIR_element_pattern(None, element, pattern)
 
 
@@ -607,7 +607,7 @@ def test_validate_FHIR_element_fixed_value__matching_int_returns_element():
 
 
 def test_validate_FHIR_element_fixed_value__non_matching_values_raises():
-    with pytest.raises(AssertionError, match="does not fulfill constant"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill constant"):
         validate_FHIR_element_fixed_value(None, "actual", "expected")
 
 
@@ -632,7 +632,7 @@ def test_validate_FHIR_element_fixed_value__list_constant_uses_first_item():
 
 
 def test_validate_FHIR_element_fixed_value__non_matching_list_element_raises():
-    with pytest.raises(AssertionError, match="does not fulfill constant"):
+    with pytest.raises(PydanticCustomError, match="does not fulfill constant"):
         validate_FHIR_element_fixed_value(None, ["wrong", "other"], "exact")
 
 
@@ -687,7 +687,7 @@ def test_validate_type_choice_element__multiple_values_set_raises():
     instance = MockTypeChoiceModel(
         valueString=String(value="hello"), valueInteger=Integer(value=42)
     )
-    with pytest.raises(AssertionError, match="can only have one value set"):
+    with pytest.raises(PydanticCustomError, match="can only have one value set"):
         validate_type_choice_element(
             instance, ["String", "Integer", "Boolean"], "value"
         )
@@ -695,7 +695,7 @@ def test_validate_type_choice_element__multiple_values_set_raises():
 
 def test_validate_type_choice_element__required_and_no_value_raises():
     instance = MockTypeChoiceModel()
-    with pytest.raises(AssertionError, match="must have one value set"):
+    with pytest.raises(PydanticCustomError, match="must have one value set"):
         validate_type_choice_element(
             instance, ["String", "Integer", "Boolean"], "value", required=True
         )
@@ -712,13 +712,13 @@ def test_validate_type_choice_element__required_and_value_set_is_valid():
 def test_validate_type_choice_element__non_allowed_type_raises():
     # valueBoolean is set but only String and Integer are allowed
     instance = MockTypeChoiceModel(valueBoolean=Boolean(value=True))
-    with pytest.raises(AssertionError, match="cannot use non-allowed type"):
+    with pytest.raises(PydanticCustomError, match="cannot use non-allowed type"):
         validate_type_choice_element(instance, ["String", "Integer"], "value")
 
 
 def test_validate_type_choice_element__explicit_non_allowed_type_raises():
     instance = MockTypeChoiceModel(valueBoolean=Boolean(value=True))
-    with pytest.raises(AssertionError, match="cannot use non-allowed type"):
+    with pytest.raises(PydanticCustomError, match="cannot use non-allowed type"):
         validate_type_choice_element(
             instance,
             ["String", "Integer", "Boolean"],
@@ -821,7 +821,7 @@ def test_validate_slicing_cardinalities__violates_min_cardinality_raises(
     mock_cls.model_fields = {"items": Mock()}
     values = [MockSliceInstance()]  # only 1, but min is 3
 
-    with pytest.raises(AssertionError, match="min. cardinality"):
+    with pytest.raises(PydanticCustomError, match="min. cardinality"):
         validate_slicing_cardinalities(mock_cls, values, "items")
 
 
@@ -846,7 +846,7 @@ def test_validate_slicing_cardinalities__violates_max_cardinality_raises(
         MockSliceInstance(),
     ]  # 3 > max 2
 
-    with pytest.raises(AssertionError, match="max. cardinality"):
+    with pytest.raises(PydanticCustomError, match="max. cardinality"):
         validate_slicing_cardinalities(mock_cls, values, "items")
 
 

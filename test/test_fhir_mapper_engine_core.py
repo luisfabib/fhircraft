@@ -12,14 +12,13 @@ from fhircraft.fhir.mapper.engine.core import (
     FHIRMappingEngine,
     StructureMapModelMode,
 )
-from fhircraft.fhir.mapper.engine.registry import StructureMapNotFoundError
+from fhircraft.exceptions import MapperRegistryNotFoundError
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapGroup,
     StructureMapGroupInput,
     StructureMapStructure,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -71,7 +70,7 @@ def _engine(maps=None) -> FHIRMappingEngine:
 
 def test_execute__raises_structure_map_not_found_when_import_not_registered():
     engine = _engine()
-    with pytest.raises(StructureMapNotFoundError, match="http://example.org/Missing"):
+    with pytest.raises(MapperRegistryNotFoundError, match="http://example.org/Missing"):
         engine.execute(_main_map(["http://example.org/Missing"]), ({"x": 1},))
 
 
@@ -96,7 +95,7 @@ def test_execute__multiple_imports_all_registered():
 def test_execute__multiple_imports_one_missing_raises():
     sm1 = _sm("http://example.org/LibA")
     engine = _engine(maps=[sm1])
-    with pytest.raises(StructureMapNotFoundError, match="http://example.org/LibB"):
+    with pytest.raises(MapperRegistryNotFoundError, match="http://example.org/LibB"):
         engine.execute(
             _main_map(["http://example.org/LibA", "http://example.org/LibB"]),
             ({"x": 1},),

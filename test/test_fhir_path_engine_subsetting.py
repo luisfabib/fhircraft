@@ -7,7 +7,7 @@ from fhircraft.fhir.path.engine.core import (
     Element,
     Invocation,
     FHIRPathCollectionItem,
-    FHIRPathError,
+    FhirPathException,
 )
 from fhircraft.fhir.path.engine.core import This
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
@@ -107,7 +107,7 @@ class TestIndexPrimitive(TestCase):
         assert len(self.resource.field) == 3
 
     def test_index_handles_non_integer_indices(self):
-        with pytest.raises(FHIRPathError):
+        with pytest.raises(FhirPathException):
             Index("a")  # type: ignore
 
 
@@ -192,7 +192,7 @@ def test_single_raises_error_for_multiple_item_collection():
         FHIRPathCollectionItem(value="item1"),
         FHIRPathCollectionItem(value="item2"),
     ]
-    with pytest.raises(FHIRPathError):
+    with pytest.raises(FhirPathException):
         Single().evaluate(collection, env, create=False)
 
 

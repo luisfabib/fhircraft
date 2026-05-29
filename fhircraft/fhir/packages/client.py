@@ -10,18 +10,11 @@ from pydantic import ValidationError
 import json
 
 from .models import PackageMetadata
-
-
-class FHIRPackageRegistryError(Exception):
-    """Base exception for FHIR Package Registry client errors."""
-
-    pass
-
-
-class PackageNotFoundError(FHIRPackageRegistryError):
-    """Raised when a package is not found."""
-
-    pass
+from fhircraft.exceptions import (
+    PackageException,
+    PackageNotFoundError,
+    PackageResolutionError,
+)
 
 
 class FHIRPackageRegistryClient:
@@ -73,7 +66,7 @@ class FHIRPackageRegistryClient:
 
         Raises:
             PackageNotFoundError: If the package is not found
-            FHIRPackageRegistryError: For other API errors
+            PackageResolutionError: For other API errors
         """
         url = urljoin(self.base_url + "/", package_name)
 
@@ -88,10 +81,10 @@ class FHIRPackageRegistryClient:
             try:
                 return PackageMetadata.model_validate(response.json())
             except ValidationError as e:
-                raise FHIRPackageRegistryError(f"Invalid response format: {e}")
+                raise PackageResolutionError(f"Invalid response format: {e}")
 
         except requests.RequestException as e:
-            raise FHIRPackageRegistryError(f"Request failed: {e}")
+            raise PackageResolutionError(f"Request failed: {e}")
 
     def download_package(
         self, package_name: str, package_version: str, extract: bool = False
@@ -109,7 +102,7 @@ class FHIRPackageRegistryClient:
 
         Raises:
             PackageNotFoundError: If the package or version is not found
-            FHIRPackageRegistryError: For other API errors
+            PackageResolutionError: For other API errors
         """
         url = urljoin(self.base_url + "/", f"{package_name}/{package_version}")
 
@@ -133,7 +126,7 @@ class FHIRPackageRegistryClient:
                 return response.content
 
         except requests.RequestException as e:
-            raise FHIRPackageRegistryError(f"Download failed: {e}")
+            raise PackageResolutionError(f"Download failed: {e}")
 
     def get_latest_version(self, package_name: str) -> Optional[str]:
         """
@@ -163,7 +156,7 @@ class FHIRPackageRegistryClient:
 
         Raises:
             PackageNotFoundError: If the package is not found or has no latest version
-            FHIRPackageRegistryError: For other API errors
+            FHIRPackageResolutionError: For other API errors
         """
         latest_version = self.get_latest_version(package_name)
         if not latest_version:
@@ -192,7 +185,7 @@ class FHIRPackageRegistryClient:
 
         Raises:
             PackageNotFoundError: If package or version not found
-            FHIRPackageRegistryError: If download fails
+            FHIRPackageResolutionError: If download fails
             RuntimeError: If package processing fails
         """
 
@@ -201,7 +194,7 @@ class FHIRPackageRegistryClient:
         if not target_version:
             try:
                 target_version = self.get_latest_version(package_name)
-            except (PackageNotFoundError, FHIRPackageRegistryError) as e:
+            except (PackageNotFoundError, PackageResolutionError) as e:
                 raise PackageNotFoundError(
                     f"Failed to get latest version for package {package_name}: {e}"
                 )
@@ -246,7 +239,7 @@ class FHIRPackageRegistryClient:
 
                 return results
 
-            except (PackageNotFoundError, FHIRPackageRegistryError) as e:
+            except (PackageNotFoundError, PackageResolutionError) as e:
                 raise e
         except Exception as e:
             raise RuntimeError(f"Failed to process package {package_key}: {e}")

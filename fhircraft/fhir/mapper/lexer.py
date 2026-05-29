@@ -194,7 +194,7 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         t.value = t.value.strip("`")
         return t
 
-    def t_error_invalid_function(self, t):
+    def t_error_invalid_function(self, t):  # type: ignore
         r""" " """
         pass
 

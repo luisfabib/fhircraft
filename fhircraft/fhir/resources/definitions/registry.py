@@ -19,6 +19,7 @@ from fhircraft.config import override_config
 from fhircraft.fhir.packages.client import FHIRPackageRegistryClient
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 from fhircraft.utils import load_env_variables
+from fhircraft.exceptions import DefinitionNotFoundError, FhirValidationWarning
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.core import (
@@ -33,12 +34,6 @@ if TYPE_CHECKING:
 
 
 DEFINITIONS_DIR = Path(__file__).resolve().parent
-
-
-class StructureDefinitionNotFoundError(FileNotFoundError):
-    """Raised when a required structure definition cannot be resolved."""
-
-    pass
 
 
 @dataclass
@@ -218,7 +213,7 @@ class StructureDefinitionRegistry:
             # Fall back to internet if enabled
             return self.from_dict(self.download_url(canonical_url))
 
-        raise StructureDefinitionNotFoundError(
+        raise DefinitionNotFoundError(
             f"Structure definition not found for {canonical_url}. Either load it locally, load the appropriate package, or enable internet access to download it."
         )
 
@@ -314,7 +309,8 @@ class StructureDefinitionRegistry:
                     raise e
                 else:
                     warnings.warn(
-                        f"Skipping invalid structure definition {sd.get('url', 'unknown')} in package {package_name} version {version}:\n{e}"
+                        f"Skipping invalid structure definition {sd.get('url', 'unknown')} in package {package_name} version {version}:\n{e}",
+                        FhirValidationWarning,
                     )
 
     def set_registry_base_url(self, base_url: str) -> None:

@@ -21,13 +21,14 @@ from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.definitions.registry import (
     StructureDefinitionRegistry,
-    StructureDefinitionNotFoundError,
 )
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from .registry import StructureMapRegistry
 
-from .exceptions import (
-    MappingError,
+from fhircraft.exceptions import (
+    DefinitionNotFoundError,
+    MapperException,
+    MapperRegistryNotFoundError,
 )
 from .scope import MappingScope
 from .group import Group
@@ -125,7 +126,7 @@ class FHIRMappingEngine:
             tuple: A tuple of resulting target instances after the transformation, which can be a mixture of BaseModel instances and/or dictionaries.
 
         Raises:
-            StructureMapNotFoundError: If a non-wildcard import URL is not registered in the
+            MapperRegistryNotFoundError: If a non-wildcard import URL is not registered in the
                 StructureMapRegistry.
             ValueError: If a constant in the StructureMap is missing a name or conflicts with a model name.
             RuntimeError: If the number of provided sources or targets does not match the group parameters, or if required targets are missing.
@@ -158,16 +159,13 @@ class FHIRMappingEngine:
                     )
                 imported_maps.extend(matched)
             else:
-                from fhircraft.fhir.mapper.engine.registry import (
-                    StructureMapNotFoundError,
-                )
 
                 try:
                     imported_maps.append(
                         self.structure_map_registry.get(import_url_str)
                     )
-                except StructureMapNotFoundError:
-                    raise StructureMapNotFoundError(
+                except MapperRegistryNotFoundError:
+                    raise MapperRegistryNotFoundError(
                         f"StructureMap import failed: '{import_url_str}' is not registered. "
                         "Register it via structure_map_registry.add() before executing."
                     )
@@ -435,7 +433,7 @@ class FHIRMappingEngine:
                 KeyError,
                 ValueError,
                 AttributeError,
-                StructureDefinitionNotFoundError,
+                DefinitionNotFoundError,
             ) as e:
                 # If StructureDefinition not found, log warning but continue
                 logger.warning(
@@ -466,7 +464,7 @@ class FHIRMappingEngine:
             dict[str, BaseModel | dict]: A dictionary mapping aliases to validated Pydantic model instances or raw data.
 
         Raises:
-            MappingError: If any entry in `source_data` does not match any of the provided source models.
+            MapperException: If any entry in `source_data` does not match any of the provided source models.
         """
         if not source_models:
             # No models defined - treat all source data as arbitrary
@@ -505,7 +503,7 @@ class FHIRMappingEngine:
 
         for idx, entry in enumerate(source_data):
             if not _validate_entry(entry, idx):
-                raise MappingError(
+                raise MapperException(
                     f"Source data entry of type {type(entry)} does not match any source model. "
                     f"Available models: {list(source_models.keys())}"
                 )

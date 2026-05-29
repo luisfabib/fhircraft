@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from fhircraft.fhir.resources.factory.core import FHIRModelFactory
-from fhircraft.fhir.resources.factory.exceptions import DefinitionResolutionError
 
 # Patch targets
 _SNAPSHOT_RESOLVER = "fhircraft.fhir.resources.factory.core.SnapshotResolver"

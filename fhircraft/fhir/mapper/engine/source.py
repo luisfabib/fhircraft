@@ -1,19 +1,16 @@
 from typing import TYPE_CHECKING, Optional
 from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
-from fhircraft.fhir.mapper.engine.exceptions import (
-    MappingDigestionError,
-    MappingError,
-    SourceAssertionError,
-    SourceProcessingError,
-    SourceConditionError,
-    SourceTypeError,
+from fhircraft.exceptions import (
+    MapperDigestionError,
+    MapperException,
+    MapperExecutionError,
+    MapperSourceProcessingError,
 )
 from fhircraft.fhir.path import engine as fhirpath
 from fhircraft.fhir.path import fhirpath as fhirpath_parser
 import logging
 
 from fhircraft.fhir.path.engine.core import FHIRPath
-
 
 logger = logging.getLogger(__name__)
 
@@ -45,11 +42,11 @@ class RuleSource(FHIRMappingEngineComponent):
         Args:
             source: The StructureMapGroupRuleSource to initialize from.
         Raises:
-            MappingDigestionError: If required fields are missing.
+            MapperDigestionError: If required fields are missing.
         """
         self.definition = source
         if self.definition.context is None:
-            raise MappingDigestionError("Source context is required")
+            raise MapperDigestionError("Source context is required")
         self.parent_rule = parent_rule
         self.variable = (
             str(source.variable) if source.variable else f"source-{id(source)}"
@@ -70,7 +67,7 @@ class RuleSource(FHIRMappingEngineComponent):
         """
         self.resolved_path = scope.resolve_fhirpath(self.definition.context)  # type: ignore
         if self.resolved_path is None:
-            raise SourceProcessingError(
+            raise MapperSourceProcessingError(
                 f"Source context {self.definition.context} not found"
             )
 
@@ -89,26 +86,26 @@ class RuleSource(FHIRMappingEngineComponent):
 
         # Evaluate conditions
         if not self._check_type_condition(scope):
-            raise SourceTypeError(
+            raise MapperSourceProcessingError(
                 f"Source type condition not met for source {self.variable}"
             )
         if not self._check_where_condition(scope):
-            raise SourceConditionError(
+            raise MapperSourceProcessingError(
                 f"Source condition not met for source {self.variable}"
             )
         if not self._check_assertion_condition(scope):
-            raise SourceAssertionError(
+            raise MapperSourceProcessingError(
                 f"Source assertion failed for source {self.variable}"
             )
         if not self._validate_cardinality():
-            raise SourceProcessingError("Cardinality constraints violated")
+            raise MapperSourceProcessingError("Cardinality constraints violated")
 
     def _check_type_condition(self, scope: "MappingScope") -> bool:
         """Check type condition."""
         if not self.definition.type:
             return True
         if not self.resolved_path:
-            raise SourceProcessingError("Source path not resolved")
+            raise MapperSourceProcessingError("Source path not resolved")
         condition_fhirpath = self.resolved_path._invoke(
             fhirpath.LegacyIs(fhirpath.TypeSpecifier(self.definition.type.title()))
         )
@@ -167,6 +164,6 @@ class RuleSource(FHIRMappingEngineComponent):
                         fhirpath.Exclude(self.resolved_path._invoke(fhirpath.Last()))
                     )
                 case _:
-                    raise SourceProcessingError(
+                    raise MapperSourceProcessingError(
                         f"Unsupported listMode '{self.definition.listMode}' in source {self.variable}"
                     )

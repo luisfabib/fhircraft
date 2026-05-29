@@ -11,7 +11,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
     Literal,
 )
-from fhircraft.fhir.path.exceptions import FHIRPathError
+from fhircraft.exceptions import FhirPathException
 from fhircraft.utils import ensure_list
 
 
@@ -27,7 +27,7 @@ class Index(FHIRPath):
         if isinstance(index, Literal):
             index = index.value
         if not isinstance(index, int):
-            raise FHIRPathError("Index() argument must be an integer number.")
+            raise FhirPathException("Index() argument must be an integer number.")
         self.index = index
 
     def evaluate(
@@ -104,7 +104,7 @@ class Index(FHIRPath):
                     )
                 ]
             else:
-                raise FHIRPathError(
+                raise FhirPathException(
                     f"Cannot create new array element due to inhomogeneity in parents"
                 )
         # If index is within array bounds, get element
@@ -151,7 +151,7 @@ class Single(FHIRPathFunction):
             Equivalent to `Index(0)` with additional error raising in case of non-singleton input collection.
         """
         if len(collection) > 1:
-            raise FHIRPathError(
+            raise FhirPathException(
                 f"Expected single value for single(), instead got {len(collection)} items in the collection"
             )
         return Index(0).evaluate(collection, environment, create=False)
@@ -261,7 +261,7 @@ class Skip(FHIRPathFunction):
         if not isinstance(
             num := self.num.single(collection, environment=environment), int
         ):
-            raise FHIRPathError("Skip() argument must evaluate to an integer number.")
+            raise FhirPathException("Skip() argument must evaluate to an integer number.")
         if num <= 0:
             return []
         return ensure_list(collection[num:])
@@ -297,7 +297,7 @@ class Take(FHIRPathFunction):
         if not isinstance(
             num := self.num.single(collection, environment=environment), int
         ):
-            raise FHIRPathError("Skip() argument must evaluate to an integer number.")
+            raise FhirPathException("Skip() argument must evaluate to an integer number.")
         if num <= 0:
             return []
         return ensure_list(collection[:num])

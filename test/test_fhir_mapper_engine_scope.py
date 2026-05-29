@@ -2,7 +2,7 @@ import pytest
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.core import MappingScope
-from fhircraft.fhir.mapper.engine.exceptions import MappingError
+from fhircraft.exceptions import MapperScopeError
 from fhircraft.fhir.path.engine.core import Element
 
 
@@ -156,7 +156,7 @@ def test_scope__resolve_symbol__parent_scope():
 
 def test_scope__resolve_symbol__raises_error_when_not_found():
     scope = MappingScope(name="test")
-    with pytest.raises(MappingError):
+    with pytest.raises(MapperScopeError):
         scope.resolve_symbol("nonexistent")
 
 
@@ -238,12 +238,12 @@ def test_scope__resolve_symbol__check_sibling_scopes_are_isolated():
     # Each child can see parent but not sibling
     assert child1.resolve_symbol("shared_var")
     assert child1.resolve_symbol("child1_var")
-    with pytest.raises(MappingError):
+    with pytest.raises(MapperScopeError):
         child1.resolve_symbol("child2_var")
 
     assert child2.resolve_symbol("shared_var")
     assert child2.resolve_symbol("child2_var")
-    with pytest.raises(MappingError):
+    with pytest.raises(MapperScopeError):
         child2.resolve_symbol("child1_var")
 
 
@@ -479,7 +479,7 @@ def test_resolve_group__prefers_local_over_imported():
 
 def test_resolve_group__raises_when_not_found():
     scope = MappingScope(name="test")
-    with pytest.raises(MappingError, match="NonExistent"):
+    with pytest.raises(MapperScopeError, match="NonExistent"):
         scope.resolve_group("NonExistent")
 
 
@@ -488,7 +488,7 @@ def test_resolve_group__raises_on_ambiguous_imported_group():
     sm2 = _make_structure_map("http://example.org/Map2", ["Shared"])
     scope = MappingScope(name="test")
     scope.imported_maps = [sm1, sm2]
-    with pytest.raises(MappingError, match="Ambiguous"):
+    with pytest.raises(MapperScopeError, match="Ambiguous"):
         scope.resolve_group("Shared")
 
 

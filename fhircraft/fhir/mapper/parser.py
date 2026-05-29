@@ -50,12 +50,10 @@ class FhirMappingLanguageParser(FhirPathParser):
             lexer_class or FhirMappingLanguageLexer
         )  # Crufty but works around statefulness in PLY
         self.lexer = self.lexer_class()
-        # Since PLY has some crufty aspects and dumps files, we try to keep them local
-        # However, we need to derive the name of the output Python file :-/
         output_directory = os.path.dirname(__file__)
         try:
             module_name = os.path.splitext(os.path.split(__file__)[1])[0]
-        except:
+        except Exception:
             module_name = __name__
 
         start_symbol = "structureMap"
@@ -705,6 +703,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         rule = self.StructureMapGroupRule(source=sources)
 
         targets = []
+        _rule = None
         for data in _targets:
             target = self.StructureMapGroupRuleTarget.model_construct()
             targets.append(target)
@@ -744,11 +743,11 @@ class FhirMappingLanguageParser(FhirPathParser):
             target.listMode = data.get("listMode")
             target.transform = data.get("transform")
             target.parameter = data.get("parameter")
-
-        _rule.dependent = dependent.get("dependent") if dependent else None
-        if dependent_rule := dependent.get("rule"):
-            _rule.rule = _rule.rule or []  # type: ignore
-            _rule.rule.extend(dependent_rule)
+        if _rule is not None:
+            _rule.dependent = dependent.get("dependent") if dependent else None
+            if dependent_rule := dependent.get("rule"):
+                _rule.rule = _rule.rule or []  # type: ignore
+                _rule.rule.extend(dependent_rule)
 
         rule.target = targets
         return rule

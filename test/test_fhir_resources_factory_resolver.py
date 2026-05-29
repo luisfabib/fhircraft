@@ -21,8 +21,8 @@ from fhircraft.fhir.resources.datatypes.R4.primitive import (
 
 from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import ElementNode
-from fhircraft.fhir.resources.factory.exceptions import (
-    DefinitionResolutionError,
+from fhircraft.exceptions import (
+    FactoryDefinitionResolutionError,
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
@@ -193,12 +193,12 @@ def test_build_type_node__resolves_sub_elements_on_primitive_types(
     ],
 )
 def test_build_type_node__ignores_fhirpath_type_nodes(base_index, resolver, type):
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._build_type_node([type], "Observation.value", base_index)
 
 
 def test_build_type_node__raises_error_for_empty_datatypes(base_index, resolver):
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._build_type_node([], "Observation.value", base_index)
 
 
@@ -229,7 +229,7 @@ def test_build_type_node__skips_non_matching_first_type_for_multiple_types(
 
 
 def test_build_type_node__raises_error_for_all_fhirpath_types(base_index, resolver):
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._build_type_node(
             [
                 "http://hl7.org/fhirpath/System.String",
@@ -243,7 +243,7 @@ def test_build_type_node__raises_error_for_all_fhirpath_types(base_index, resolv
 def test_build_type_node__raises_error_when_local_id_absent_in_all_types(
     base_index, resolver
 ):
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._build_type_node(
             ["string", "integer", "boolean"],
             "Observation.value.nonExistentField",
@@ -252,7 +252,7 @@ def test_build_type_node__raises_error_when_local_id_absent_in_all_types(
 
 
 def test_build_type_node__raises_error_for_no_type_matches(base_index, resolver):
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._build_type_node(
             ["Quantity", "CodeableConcept"],
             "Observation.value.nonExistentField",
@@ -744,12 +744,12 @@ def test_resolve_differential__multiple_diff_elements_all_in_result(
 
 def test_resolve_differential__raises_when_element_has_no_id(resolver, base_index):
     diff = [ElementDefinition.model_construct(id=None, path="MyProfile.status")]
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._resolve_differential(diff, base_index)
 
 
 def test_resolve_differential__raises_for_empty_diff(resolver, base_index):
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._resolve_differential([], base_index)
 
 
@@ -1204,7 +1204,7 @@ def test_resolve__snapshot_mode_index_contains_all_elements(resolver, base_index
 
 def test_resolve__snapshot_mode_raises_when_snapshot_is_none(resolver, base_index):
     sd = make_structure_def(snapshot_elements=None)
-    with pytest.raises(AssertionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver.resolve(sd, mode="snapshot")
 
 
@@ -1214,7 +1214,7 @@ def test_resolve__snapshot_mode_raises_when_snapshot_elements_is_none(
     sd = make_structure_def(snapshot_elements=None)
     sd.snapshot = MagicMock()
     sd.snapshot.element = None
-    with pytest.raises(AssertionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver.resolve(sd, mode="snapshot")
 
 
@@ -1224,7 +1224,7 @@ def test_resolve__snapshot_mode_raises_when_snapshot_elements_contain_none(
     elements = [n.definition for n in base_index.nodes]
     elements.append(None)
     sd = make_structure_def(snapshot_elements=elements)
-    with pytest.raises(AssertionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver.resolve(sd, mode="snapshot")
 
 
@@ -1280,7 +1280,7 @@ def test_resolve__differential_mode_raises_when_differential_is_none(
     resolver, base_index
 ):
     sd = make_structure_def(differential_elements=None)
-    with pytest.raises(AssertionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
 
 
@@ -1290,7 +1290,7 @@ def test_resolve__differential_mode_raises_when_differential_elements_is_none(
     sd = make_structure_def(differential_elements=None)
     sd.differential = MagicMock()
     sd.differential.element = None
-    with pytest.raises(AssertionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
 
 
@@ -1299,7 +1299,7 @@ def test_resolve__differential_mode_raises_when_differential_elements_contain_no
 ):
     diff_elements = [make_element("MyProfile.status", "MyProfile.status"), None]
     sd = make_structure_def(differential_elements=diff_elements)
-    with pytest.raises(AssertionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
 
 
@@ -1432,7 +1432,7 @@ def test_resolve__differential_raises_when_base_definition_is_missing(resolver):
         ]
     )
 
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver.resolve(sd, mode="differential")
 
 
@@ -1668,7 +1668,7 @@ def test_build_full_ancestor_index__raises_when_chain_has_no_snapshot(resolver):
 
     resolver._registry.get = MagicMock(return_value=sd_b)
 
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._build_full_ancestor_index(sd_a)
 
 
@@ -1692,7 +1692,7 @@ def test_resolve_base_chain__anchors_on_snapshot_when_no_base_definition(
 def test_resolve_base_chain__raises_when_no_base_definition_and_no_snapshot(resolver):
     sd = make_structure_def(snapshot_elements=None, differential_elements=None)
 
-    with pytest.raises(DefinitionResolutionError):
+    with pytest.raises(FactoryDefinitionResolutionError):
         resolver._resolve_base_chain(sd)
 
 

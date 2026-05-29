@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from fhircraft.fhir.mapper.engine.registry import (
-    StructureMapNotFoundError,
+    MapperRegistryNotFoundError,
     StructureMapRegistry,
 )
 
@@ -224,7 +224,7 @@ def test_get__returns_sm_when_queried_with_versioned_url():
 
 def test_get__raises_when_not_found_and_internet_disabled():
     reg = make_registry()
-    with pytest.raises(StructureMapNotFoundError):
+    with pytest.raises(MapperRegistryNotFoundError):
         reg.get(SM_URL)
 
 
@@ -255,7 +255,7 @@ def test_get__downloads_and_manifests_when_internet_enabled():
 def test_get__does_not_call_internet_when_disabled():
     reg = make_registry()
     with patch(_REQUESTS_GET) as mock_get:
-        with pytest.raises(StructureMapNotFoundError):
+        with pytest.raises(MapperRegistryNotFoundError):
             reg.get(SM_URL)
     mock_get.assert_not_called()
 

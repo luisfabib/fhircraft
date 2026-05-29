@@ -65,7 +65,7 @@ class FHIRPathMixin:
             Any: The single matching value
 
         Raises:
-            FHIRPathRuntimeError: If more than one value is found
+            FhirPathRuntimeError: If more than one value is found
         """
         return self.fhirpath.parse(expression).single(
             self,
@@ -216,7 +216,7 @@ class FHIRPathMixin:
             environment (dict | None): Optional environment variables for evaluation
 
         Raises:
-            FHIRPathError: If zero or more than one matching locations are found
+            FhirPathException: If zero or more than one matching locations are found
             RuntimeError: If the location cannot be set
         """
         self.fhirpath.parse(expression).update_single(

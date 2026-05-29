@@ -9,15 +9,12 @@ import pytest
 from unittest.mock import Mock, MagicMock, patch
 
 from fhircraft.fhir.mapper.engine.source import RuleSource
-from fhircraft.fhir.mapper.engine.exceptions import (
-    SourceAssertionError,
-    SourceProcessingError,
-    SourceConditionError,
-    SourceTypeError,
+from fhircraft.exceptions import (
+    MapperExecutionError,
+    MapperSourceProcessingError,
 )
 from fhircraft.fhir.path import engine as fp
 from fhircraft.fhir.path.engine.core import FHIRPath
-
 
 # ============================================================================
 # Helpers & Fixtures
@@ -164,20 +161,24 @@ def test_process__with_element_path(
 @pytest.mark.parametrize(
     "condition_method,exception_class,error_pattern",
     [
-        ("_check_type_condition", SourceTypeError, "Source type condition not met"),
+        (
+            "_check_type_condition",
+            MapperSourceProcessingError,
+            "Source type condition not met",
+        ),
         (
             "_check_where_condition",
-            SourceConditionError,
+            MapperSourceProcessingError,
             "Source condition not met",
         ),
         (
             "_check_assertion_condition",
-            SourceAssertionError,
+            MapperSourceProcessingError,
             "Source assertion failed",
         ),
         (
             "_validate_cardinality",
-            SourceProcessingError,
+            MapperSourceProcessingError,
             "Cardinality constraints violated",
         ),
     ],
@@ -216,7 +217,9 @@ def test_process__fails_when_context_not_found(
     mock_scope.resolve_fhirpath.return_value = None
     rule_source = rule_source_factory(mock_source_definition, mock_rule)
 
-    with pytest.raises(SourceProcessingError, match="Source context Patient not found"):
+    with pytest.raises(
+        MapperSourceProcessingError, match="Source context Patient not found"
+    ):
         rule_source.process(mock_scope)
 
 
@@ -359,5 +362,5 @@ def test_apply_list_mode__unsupported(
     rule_source = rule_source_factory(mock_source_definition, mock_rule)
     rule_source.resolved_path = fp.Element("A")
 
-    with pytest.raises(SourceProcessingError):
+    with pytest.raises(MapperSourceProcessingError):
         rule_source._apply_list_mode()

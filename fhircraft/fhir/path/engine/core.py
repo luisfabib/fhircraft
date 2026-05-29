@@ -9,7 +9,11 @@ from dataclasses import dataclass, field
 from functools import partial
 from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
-from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
+from fhircraft.exceptions import (
+    FhirPathException,
+    FhirPathRuntimeError,
+    FhirPathWarning,
+)
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
 
 if TYPE_CHECKING:
@@ -53,7 +57,7 @@ class FHIRPath(ABC):
             Any: The single matching value.
 
         Raises:
-            FHIRPathError: If more than one value is found.
+            FhirPathException: If more than one value is found.
         """
         values = self.values(data, environment=environment)
         if len(values) == 0:
@@ -61,7 +65,7 @@ class FHIRPath(ABC):
         elif len(values) == 1:
             return values[0]
         else:
-            raise FHIRPathRuntimeError(
+            raise FhirPathRuntimeError(
                 f"Expected single value but found {len(values)} values. "
                 f"Use values() to retrieve multiple values or first() to get the first one."
             )
@@ -172,16 +176,16 @@ class FHIRPath(ABC):
             value: The value to set at the matching location.
 
         Raises:
-            FHIRPathError: If zero or more than one matching locations are found.
+            FhirPathException: If zero or more than one matching locations are found.
             RuntimeError: If the location cannot be set.
         """
         collection = self.__evaluate_wrapped(data, environment=environment, create=True)
         if len(collection) == 0:
-            raise FHIRPathError(
+            raise FhirPathException(
                 "FHIRPath yielded empty collection. Cannot set value on empty result."
             )
         elif len(collection) > 1:
-            raise FHIRPathError(
+            raise FhirPathException(
                 f"Expected single location but found {len(collection)} locations. "
                 f"Use update_values() to set all locations."
             )
@@ -334,7 +338,7 @@ class FHIRPath(ABC):
             # Still try to get trace even if evaluation failed
             try:
                 debug_data["trace"] = self.trace(data, verbose=True)
-            except:
+            except Exception:
                 debug_data["trace"] = [
                     f"Failed to generate trace for expression: {self}"
                 ]
@@ -682,7 +686,7 @@ class Element(FHIRPath):
         if isinstance(label, Literal) or getattr(label, "_type", None) == "string":
             label = str(label)
         if not isinstance(label, str):
-            raise FHIRPathError(
+            raise FhirPathException(
                 "Element() argument must be a string, got %r" % (type(label).__name__,)
             )
         self.label = label
@@ -965,7 +969,7 @@ class RootElement(FHIRPath):
                 not isinstance(resource, dict)
                 and (not hasattr(resource, "_type") or not resource._type == self.type)
             ):
-                raise FHIRPathError(
+                raise FhirPathException(
                     f"Root element must be a valid FHIR resource of type {self.type}."
                 )
         return collection
@@ -1032,7 +1036,8 @@ class TypeSpecifier(FHIRPath):
             if not release:
                 warnings.warn(
                     "No %fhirRelease found in environment. Defaulting to R4 for type resolution.",
-                    UserWarning,
+                    FhirPathWarning,
+                    stacklevel=2,
                 )
                 release = "R4"
             resolved_type = get_fhir_type(self.specifier, release)

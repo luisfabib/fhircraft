@@ -32,9 +32,10 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.factory.context import BuildContext
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.fhir.resources.factory.exceptions import (
-    BuilderError,
-    TypeResolutionError,
+from fhircraft.exceptions import (
+    FactoryBuilderError,
+    FactoryDefinitionIndexError,
+    FactoryTypeResolutionError,
 )
 from fhircraft.fhir.resources.validators import (
     validate_FHIR_element_fixed_value,
@@ -337,7 +338,7 @@ class Builder(ABC):
             ValidatorInformation: An object containing the name, kind, function, and arguments for the constraint validator.
 
         Raises:
-            BuilderError: If the constraint is missing any required attributes
+            FactoryBuilderError: If the constraint is missing any required attributes
         """
 
         if not (
@@ -346,7 +347,7 @@ class Builder(ABC):
             and constraint.human
             and constraint.severity
         ):
-            raise BuilderError(
+            raise FactoryBuilderError(
                 "Invalid constraint definition: missing required attributes."
             )
 
@@ -396,14 +397,14 @@ class Builder(ABC):
             TypeInformation: An object containing the resolved Python type, its kind (primitive, complex, resource), and whether it requires a primitive extension field.
 
         Raises:
-            TypeResolutionError: If the type definition has no code attribute, making it
+            FactoryTypeResolutionError: If the type definition has no code attribute, making it
                 impossible to resolve the type for the given FHIR release.
         """
 
         fhir_release = type._fhir_release
         # Normalise the identifier: strip well-known URL prefixes
         if not type.code:
-            raise TypeResolutionError(
+            raise FactoryTypeResolutionError(
                 f"Cannot resolve FHIR type with no code for release '{fhir_release}'."
             )
 

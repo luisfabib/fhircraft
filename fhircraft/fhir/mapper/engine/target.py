@@ -1,19 +1,16 @@
 from typing import TYPE_CHECKING, Optional
 from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
-from fhircraft.fhir.mapper.engine.exceptions import (
-    MappingDigestionError,
-    MappingError,
-    SourceAssertionError,
-    SourceProcessingError,
-    SourceConditionError,
-    SourceTypeError,
+from fhircraft.exceptions import (
+    MapperDigestionError,
+    MapperException,
+    MapperExecutionError,
+    MapperTargetProcessingError,
 )
 from fhircraft.fhir.mapper.engine import transforms as tf
 from fhircraft.fhir.path import engine as fhirpath
 import logging
 
 from fhircraft.fhir.path.engine.core import FHIRPath
-
 
 logger = logging.getLogger(__name__)
 
@@ -45,11 +42,11 @@ class RuleTarget(FHIRMappingEngineComponent):
         Args:
             source: The StructureMapGroupRuleTarget to initialize from.
         Raises:
-            SourceProcessingError: If required fields are missing.
+            MapperTargetProcessingError: If required fields are missing.
         """
         self.definition = source
         if self.definition.context is None:
-            raise MappingDigestionError("Source context is required")
+            raise MapperDigestionError("Source context is required")
         self.parent_rule = parent_rule
         self.variable = (
             str(source.variable) if source.variable else f"target-{id(source)}"
@@ -122,7 +119,9 @@ class RuleTarget(FHIRMappingEngineComponent):
             case None:
                 return None
             case _:
-                raise SourceProcessingError(f"Unsupported transform: {transform_name}")
+                raise MapperTargetProcessingError(
+                    f"Unsupported transform: {transform_name}"
+                )
 
     def has_list_mode(self, mode: str) -> bool:
         """Check if this target has a specific list mode."""

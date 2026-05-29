@@ -11,7 +11,7 @@ from fhircraft.fhir.resources.factory.builders.base import (
 from fhircraft.fhir.resources.factory.builders.simple import SimpleFieldBuilder
 from fhircraft.fhir.resources.factory.context import BuildContext
 from fhircraft.fhir.resources.factory.element_node import ElementNode
-from fhircraft.fhir.resources.factory.exceptions import TypeResolutionError
+from fhircraft.exceptions import FactoryTypeResolutionError
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.validators import (
     validate_type_choice_element,
@@ -33,7 +33,7 @@ class TypeChoiceFieldBuilder(Builder):
         field_type_infos = [self.resolve_type(type) for type in node.types]
 
         if not field_type_infos:
-            raise TypeResolutionError(
+            raise FactoryTypeResolutionError(
                 f"Element '{node.path}' is a type choice but has none of its types could be resolved"
             )
 

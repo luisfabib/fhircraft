@@ -161,15 +161,6 @@ CONFIGS = [
         ],
     },
     {
-        "output": "reference/fhir-path-exceptions.md",
-        "title": "FHIRPath Exceptions",
-        "description": "FHIRPath exceptions components",
-        "patterns": [],
-        "files": [
-            "fhir/path/exceptions.py",
-        ],
-    },
-    {
         "output": "reference/fhir-mapping-engine.md",
         "title": "FHIR Mapping Language",
         "description": "FHIR Mapping Language parser and transformation utilities.",
@@ -216,6 +207,15 @@ CONFIGS = [
         "patterns": [],
         "files": [
             "fhir/packages/client.py",
+        ],
+    },
+    {
+        "output": "reference/exceptions.md",
+        "title": "Exceptions",
+        "description": "All public exceptions raised by Fhircraft, organized by component.",
+        "patterns": [],
+        "files": [
+            "exceptions.py",
         ],
     },
 ]
