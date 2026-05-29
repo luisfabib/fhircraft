@@ -14,6 +14,27 @@ from fhircraft.config import (
 from fhircraft.fhir.resources.validators import (
     _validate_FHIR_element_constraint,
 )
+from fhircraft.fhir.terminology import TerminologyService
+
+
+class _StubTerminologyService:
+    """Minimal structural implementation of TerminologyService for config tests."""
+
+    def codesystem_lookup(self, *, code, system=None, version=None):
+        return None
+
+    def validate_valueset_code(
+        self, *, url=None, code=None, system=None, version=None, display=None
+    ):
+        return False
+
+    def validate_codesystem_code(
+        self, *, url=None, code=None, version=None, display=None
+    ):
+        return False
+
+    def codesystem_subsumes(self, codeA, codeB, system=None, version=None):
+        return None
 
 
 @pytest.fixture(autouse=True)
@@ -305,6 +326,76 @@ def test_load_with_no_env_vars():
     # Should not raise any errors
     load_config_from_env()
     assert get_config().mode == "strict"
+
+
+# =========================================================================
+# Terminology_service configuration
+# =========================================================================
+
+
+def test_default_config_terminology_service_is_none():
+    assert get_config().terminology_service is None
+
+
+def test_configure__sets_terminology_service():
+    stub = _StubTerminologyService()
+    configure(terminology_service=stub)
+    assert get_config().terminology_service is stub
+
+
+def test_configure__clears_terminology_service_with_none():
+    stub = _StubTerminologyService()
+    configure(terminology_service=stub)
+    assert get_config().terminology_service is stub
+
+    configure(terminology_service=None)
+    assert get_config().terminology_service is None
+
+
+def test_configure__omitting_terminology_service_preserves_existing():
+    stub = _StubTerminologyService()
+    configure(terminology_service=stub)
+
+    # Call configure() for an unrelated setting — service must survive
+    configure(disable_validation_warnings=True)
+
+    assert get_config().terminology_service is stub
+
+
+def test_override_config__terminology_service_restored():
+    stub = _StubTerminologyService()
+
+    with override_config(terminology_service=stub):
+        assert get_config().terminology_service is stub
+
+    assert get_config().terminology_service is None
+
+
+def test_override_config__clears_terminology_service_within_context():
+    stub = _StubTerminologyService()
+    configure(terminology_service=stub)
+
+    with override_config(terminology_service=None):
+        assert get_config().terminology_service is None
+
+    # Restored after context
+    assert get_config().terminology_service is stub
+
+
+def test_override_config__omitting_terminology_service_preserves_existing():
+    stub = _StubTerminologyService()
+    configure(terminology_service=stub)
+
+    with override_config(disable_validation_warnings=True):
+        assert get_config().terminology_service is stub
+
+    assert get_config().terminology_service is stub
+
+
+def test_terminology_service_isinstance_check():
+    # TerminologyService is @runtime_checkable; structural implementations must pass
+    stub = _StubTerminologyService()
+    assert isinstance(stub, TerminologyService)
 
 
 # =========================================================================

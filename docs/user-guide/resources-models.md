@@ -239,7 +239,7 @@ Healthcare applications frequently need to convert data from external systems, A
 
 !!! danger "No Terminology Validation"
 
-    Fhircraft does not support validation of terminologies. This means that validation does not verify whether specific codes or CodeableConcepts are correct within the ValueSets or CodeSystems bound to the resource's elements.
+    Fhircraft does not validate terminologies by default. This means validation does not verify whether specific codes or CodeableConcepts are correct within the ValueSets or CodeSystems bound to the resource's elements unless you provide a terminology service for the relevant FHIRPath functions.
 
 ### Parsing FHIR JSON Files
 
