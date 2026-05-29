@@ -795,9 +795,11 @@ class Slice(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        raise NotImplementedError(
-            "Evaluation of the FHIRPath slice() function is not supported."
+        warnings.warn(
+            "Evaluation of the FHIRPath slice() function is not supported. Returning an empty collection.",
+            FhirPathWarning,
         )
+        return []
 
 
 class CheckModifiers(FHIRPathFunction):
