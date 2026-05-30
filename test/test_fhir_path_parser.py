@@ -1,4 +1,5 @@
 import operator
+import threading
 
 import pytest
 
@@ -447,3 +448,25 @@ parser_error_cases = (
 def test_parser_catches_invalid_syntax(parser, string):
     with pytest.raises((FhirPathParsingError, FhirPathLexingError)):
         parser.parse(string)
+
+
+def test_module_level_fhirpath_is_thread_local():
+    from fhircraft.fhir.path import parser as parser_module
+
+    main_thread_parser = parser_module._get_fhirpath()
+    assert main_thread_parser is parser_module._get_fhirpath()
+
+    barrier = threading.Barrier(2)
+    parser_ids: list[int] = []
+
+    def collect_parser_id():
+        barrier.wait()
+        parser_ids.append(id(parser_module._get_fhirpath()))
+
+    threads = [threading.Thread(target=collect_parser_id) for _ in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert len(set(parser_ids)) == 2
