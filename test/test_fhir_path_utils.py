@@ -1,6 +1,6 @@
 from  fhircraft.fhir.path.utils import split_fhirpath, join_fhirpath
 
-class Test_SplitFhirPath:
+class Test_SplitFHIRPath:
 
     def test_split_simple_paths(self):
         result = split_fhirpath("patient.name.family")
@@ -27,7 +27,7 @@ class Test_SplitFhirPath:
         assert result == ['']
         
 
-class Test_JoinFhirPath:
+class Test_JoinFHIRPath:
 
     def test_split_simple_paths(self):
         result = join_fhirpath("patient", "name", "family")

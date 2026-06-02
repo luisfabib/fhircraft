@@ -17,7 +17,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
     FHIRPathFunction,
 )
-from fhircraft.exceptions import FhirPathRuntimeError
+from fhircraft.exceptions import FHIRPathRuntimeError
 
 
 def _evaluate_boolean_expressions(
@@ -361,7 +361,7 @@ class Not(FHIRPathFunction):
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
         if len(collection) > 1:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 "Cannot assert Not() for a collection that has more than one item."
             )
         elif len(collection) == 0:

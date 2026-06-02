@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 from pydantic import BaseModel
 from pydantic_core import PydanticCustomError
 from fhircraft.config import get_config
-from fhircraft.exceptions import FhirValidationWarning, FhirPathWarning
+from fhircraft.exceptions import FhirValidationWarning, FHIRPathWarning
 from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 from fhircraft.utils import (
     capitalize,
@@ -51,9 +51,9 @@ def _validate_FHIR_element_constraint(
     from fhircraft.config import get_config
     from fhircraft.fhir.path import parse_fhirpath
     from fhircraft.exceptions import (
-        FhirPathLexingError,
-        FhirPathParsingError,
-        FhirPathWarning,
+        FHIRPathLexingError,
+        FHIRPathParsingError,
+        FHIRPathWarning,
     )
 
     # Check configuration for validation control
@@ -97,14 +97,14 @@ def _validate_FHIR_element_constraint(
             )
         except (
             ValueError,
-            FhirPathLexingError,
-            FhirPathParsingError,
+            FHIRPathLexingError,
+            FHIRPathParsingError,
             AttributeError,
             NotImplementedError,
         ) as e:
             warnings.warn(
                 f"Warning: FHIRPath raised {e.__class__.__name__} for expression: [{key}] -> {expression}. {traceback.format_exc()}",
-                FhirPathWarning,
+                FHIRPathWarning,
                 stacklevel=2,
             )
             return value

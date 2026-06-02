@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexingError
+from fhircraft.fhir.path.lexer import FHIRPathLexer, FHIRPathLexingError
 
 token_test_cases = (
     # ---------- Contextual Operators ------------
@@ -143,7 +143,7 @@ token_test_cases = (
 
 @pytest.fixture(scope="module")
 def lexer():
-    return FhirPathLexer()
+    return FHIRPathLexer()
 
 
 @pytest.mark.parametrize("string, expected_token_info", token_test_cases)
@@ -172,5 +172,5 @@ invalid_token_test_cases = (
 
 @pytest.mark.parametrize("string", invalid_token_test_cases)
 def test_lexer_errors(lexer, string):
-    with pytest.raises(FhirPathLexingError):
+    with pytest.raises(FHIRPathLexingError):
         list(lexer.tokenize(string))

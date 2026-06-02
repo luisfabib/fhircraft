@@ -24,12 +24,12 @@ FhircraftException
 │   ├── MapperTargetProcessingError
 │   ├── MapperExecutionError
 │   └── MapperRegistryNotFoundError
-├── FhirPathException          # FHIRPath evaluation engine
-│   ├── FhirPathParsingError
-│   ├── FhirPathLexingError
-│   ├── FhirPathRuntimeError
-│   ├── FhirPathTypeError
-│   └── FhirPathOperationError
+├── FHIRPathException          # FHIRPath evaluation engine
+│   ├── FHIRPathParsingError
+│   ├── FHIRPathLexingError
+│   ├── FHIRPathRuntimeError
+│   ├── FHIRPathTypeError
+│   └── FHIRPathOperationError
 ├── FactoryException           # FHIR model factory and builders
 │   ├── FactoryDefinitionIndexError
 │   ├── FactoryDefinitionResolutionError
@@ -47,7 +47,7 @@ FhircraftException
 
 ```
 FhircraftWarning  (also a Warning)
-├── FhirPathWarning        # FHIRPath evaluation engine
+├── FHIRPathWarning        # FHIRPath evaluation engine
 ├── FhirValidationWarning  # FHIR resource validation
 └── FactoryWarning         # FHIR model factory
 ```
@@ -61,11 +61,11 @@ There is one deliberate exception to the exceptions tree: FHIR **resource valida
 
 ## Importing Exceptions
 
-All exceptions and warnings live in `fhircraft.exceptions`. Import exactly what you need — using the intermediate base class (e.g. `FhirPathException`) keeps your `except` clauses readable without catching too broadly:
+All exceptions and warnings live in `fhircraft.exceptions`. Import exactly what you need — using the intermediate base class (e.g. `FHIRPathException`) keeps your `except` clauses readable without catching too broadly:
 
 ```python
 # Exceptions
-from fhircraft.exceptions import FhircraftException, FhirPathException
+from fhircraft.exceptions import FhircraftException, FHIRPathException
 
 # Warnings
 from fhircraft.exceptions import FhircraftWarning, FhirValidationWarning
@@ -109,9 +109,9 @@ FHIRPath evaluation can fail at two distinct stages: when parsing the expression
 
 ```python
 from fhircraft.exceptions import (
-    FhirPathParsingError,
-    FhirPathLexingError,
-    FhirPathRuntimeError,
+    FHIRPathParsingError,
+    FHIRPathLexingError,
+    FHIRPathRuntimeError,
 )
 from fhircraft.fhir.resources import get_fhir_type
 
@@ -126,13 +126,13 @@ patient = Patient(
 # A malformed expression fails at parse time
 try:
     patient.fhirpath_single("Patient.name.where(use = ")  # (1)!
-except FhirPathParsingError as e:
+except FHIRPathParsingError as e:
     print(f"Fix the expression: {e.message}")
 
 # A valid expression that returns multiple values fails at runtime
 try:
     patient.fhirpath_single("Patient.name")  # (2)!
-except FhirPathRuntimeError as e:
+except FHIRPathRuntimeError as e:
     print(f"Adjust the query: {e.message}")
 ```
 
@@ -141,23 +141,23 @@ except FhirPathRuntimeError as e:
 
 | Exception | When it is raised |
 |---|---|
-| `FhirPathParsingError` | Expression cannot be parsed — invalid syntax such as unclosed parentheses or unknown keywords |
-| `FhirPathLexingError` | Expression contains tokens the lexer does not recognize |
-| `FhirPathRuntimeError` | Evaluation fails at runtime — wrong cardinality, failed navigation, invalid `single()` or `update_single()` call |
-| `FhirPathTypeError` | Incompatible types used together (e.g. comparing a string to a date without conversion) |
-| `FhirPathOperationError` | A function or operator is called with incompatible or unsupported arguments |
+| `FHIRPathParsingError` | Expression cannot be parsed — invalid syntax such as unclosed parentheses or unknown keywords |
+| `FHIRPathLexingError` | Expression contains tokens the lexer does not recognize |
+| `FHIRPathRuntimeError` | Evaluation fails at runtime — wrong cardinality, failed navigation, invalid `single()` or `update_single()` call |
+| `FHIRPathTypeError` | Incompatible types used together (e.g. comparing a string to a date without conversion) |
+| `FHIRPathOperationError` | A function or operator is called with incompatible or unsupported arguments |
 
-!!! note "FhirPathWarning"
+!!! note "FHIRPathWarning"
 
-    `FhirPathWarning` inherits from `FhircraftWarning`, which in turn inherits from Python's built-in `Warning`. It is issued via Python's `warnings` module for non-fatal FHIRPath situations. Because of the shared base, you can filter on `FhirPathWarning` to target only FHIRPath warnings, or on `FhircraftWarning` to capture warnings from any Fhircraft component at once:
+    `FHIRPathWarning` inherits from `FhircraftWarning`, which in turn inherits from Python's built-in `Warning`. It is issued via Python's `warnings` module for non-fatal FHIRPath situations. Because of the shared base, you can filter on `FHIRPathWarning` to target only FHIRPath warnings, or on `FhircraftWarning` to capture warnings from any Fhircraft component at once:
 
     ```python
     import warnings
-    from fhircraft.exceptions import FhirPathWarning, FhircraftWarning
+    from fhircraft.exceptions import FHIRPathWarning, FhircraftWarning
 
     # Capture only FHIRPath warnings
     with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always", FhirPathWarning)
+        warnings.simplefilter("always", FHIRPathWarning)
         result = patient.fhirpath_values("Patient.name")
 
     for w in caught:
@@ -379,11 +379,11 @@ Several Fhircraft exceptions also inherit from standard Python built-ins. This d
 |---|---|---|
 | `DefinitionNotFoundError` | `FileNotFoundError` | Caught by filesystem / resource-not-found handlers |
 | `MapperRegistryNotFoundError` | `FileNotFoundError` | Caught by the same generic not-found handlers |
-| `FhirPathRuntimeError` | `RuntimeError` | Caught by generic runtime error handlers |
+| `FHIRPathRuntimeError` | `RuntimeError` | Caught by generic runtime error handlers |
 | `FactoryTypeResolutionError` | `LookupError` | Caught by generic lookup/key-error handlers |
 | `FactoryAssemblerError` | `LookupError` | Caught by generic lookup/key-error handlers |
 | `FhircraftWarning` | `Warning` | Suppressed/filtered by any handler targeting `Warning` |
-| `FhirPathWarning` | `FhircraftWarning`, `Warning` | Filtered by either `FhircraftWarning` or `Warning` |
+| `FHIRPathWarning` | `FhircraftWarning`, `Warning` | Filtered by either `FhircraftWarning` or `Warning` |
 | `FhirValidationWarning` | `FhircraftWarning`, `Warning` | Filtered by either `FhircraftWarning` or `Warning` |
 | `FactoryWarning` | `FhircraftWarning`, `Warning` | Filtered by either `FhircraftWarning` or `Warning` |
 
@@ -403,12 +403,12 @@ except FileNotFoundError as e:
 
 | Problem | Solution |
 |---------|----------|
-| `FhircraftException` catch-all hides the root cause | Narrow the `except` clause to the component's base class (e.g. `FactoryException`, `FhirPathException`) or to the specific leaf exception. Log `e.component` and `e.message` separately so the subsystem is always visible in output. |
+| `FhircraftException` catch-all hides the root cause | Narrow the `except` clause to the component's base class (e.g. `FactoryException`, `FHIRPathException`) or to the specific leaf exception. Log `e.component` and `e.message` separately so the subsystem is always visible in output. |
 | `DefinitionNotFoundError` raised at build time | The required structure definition was not loaded before calling `factory.build()`. Call `factory.register()` or `factory.register_package()` first, then retry the build. |
 | `ValidationError` raised but unclear which field failed | Iterate `e.errors()` and print each entry's `loc`, `type`, and `msg` keys. Types prefixed with `fhir_` identify FHIR invariant violations (e.g. `fhir_dom-6`); all others are Pydantic field-type errors. |
 | FHIR constraint violations appear even on valid-looking data | The resource may be missing optional-but-constrained elements such as narrative text (`dom-6`). Use `disable_constraint('dom-6')` or switch to `validation_mode='lenient'` for that operation. See [Configuring Validation Behavior](configuration.md). |
-| `FhirPathParsingError` on a seemingly correct expression | Check for unclosed parentheses, mismatched quotes, or unsupported syntax. Validate the expression against the [:material-fire: FHIRPath specification](https://hl7.org/fhirpath/N1/). |
-| `FhirPathRuntimeError` from `fhirpath_single()` | The expression matched more than one value. Use `fhirpath_values()` to retrieve all matches, or tighten the expression with a `where()` filter so only one result is returned. |
+| `FHIRPathParsingError` on a seemingly correct expression | Check for unclosed parentheses, mismatched quotes, or unsupported syntax. Validate the expression against the [:material-fire: FHIRPath specification](https://hl7.org/fhirpath/N1/). |
+| `FHIRPathRuntimeError` from `fhirpath_single()` | The expression matched more than one value. Use `fhirpath_values()` to retrieve all matches, or tighten the expression with a `where()` filter so only one result is returned. |
 | Mapper raises `MapperRegistryNotFoundError` | A `uses` declaration in the mapping script references a StructureDefinition that is not loaded. Register the definition or load the relevant package before running the mapper. |
 | `MapperExecutionError` with no clear cause | Enable verbose logging and inspect intermediate scope state. Break the mapping script into smaller groups to isolate the failing rule. |
 | `PackageNotFoundError` for a package that exists on the registry | Verify the package name and version string exactly match the registry entry (names are case-sensitive). Check that the configured registry URL is reachable. |

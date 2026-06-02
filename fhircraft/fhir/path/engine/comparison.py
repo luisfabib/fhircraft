@@ -70,7 +70,7 @@ class GreaterThan(FHIRComparisonOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
@@ -114,7 +114,7 @@ class LessThan(FHIRComparisonOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
@@ -158,7 +158,7 @@ class LessEqualThan(FHIRComparisonOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
@@ -202,7 +202,7 @@ class GreaterEqualThan(FHIRComparisonOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create

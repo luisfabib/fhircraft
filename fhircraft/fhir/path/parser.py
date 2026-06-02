@@ -32,30 +32,30 @@ from fhircraft.fhir.path.engine.core import (
     This,
     TypeSpecifier,
 )
-from fhircraft.exceptions import FhirPathLexingError, FhirPathParsingError
-from fhircraft.fhir.path.lexer import FhirPathLexer
+from fhircraft.exceptions import FHIRPathLexingError, FHIRPathParsingError
+from fhircraft.fhir.path.lexer import FHIRPathLexer
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
 
 logger = logging.getLogger(__name__)
 
 
-class FhirPathParser:
+class FHIRPathParser:
     """
     An LALR-parser for FHIRPath
     """
 
-    tokens = FhirPathLexer.tokens
+    tokens = FHIRPathLexer.tokens
 
     def __init__(self, debug=False, lexer_class=None):
         if self.__doc__ is None:
-            raise FhirPathParsingError(
+            raise FHIRPathParsingError(
                 "Docstrings have been removed! By design of PLY, "
             )
 
         self.debug = debug
         self.lexer_class = (
-            lexer_class or FhirPathLexer
+            lexer_class or FHIRPathLexer
         )  # Crufty but works around statefulness in PLY
         self.lexer = self.lexer_class()
         output_directory = os.path.dirname(__file__)
@@ -100,7 +100,7 @@ class FhirPathParser:
                 return True
             except NotImplementedError:
                 return True
-        except (FhirPathParsingError, FhirPathLexingError):
+        except (FHIRPathParsingError, FHIRPathLexingError):
             return False
 
     def parse_token_stream(self, token_iterator):
@@ -124,10 +124,10 @@ class FhirPathParser:
 
     def p_error(self, t):
         if t is None:
-            raise FhirPathParsingError(
+            raise FHIRPathParsingError(
                 f'FHIRPath parser error near the end of string "{self.string}"!'
             )
-        raise FhirPathParsingError(
+        raise FHIRPathParsingError(
             f'FHIRPath parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col)}'
         )
 
@@ -283,7 +283,7 @@ class FhirPathParser:
         elif p[1] == "$total":
             p[0] = environment.ContextualTotal()
         else:
-            raise FhirPathParsingError(
+            raise FHIRPathParsingError(
                 f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Invalid contextual operator "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}'
             )
 
@@ -308,7 +308,7 @@ class FhirPathParser:
                 params = [param for param in params if param is not None]
                 nprovided = len(params)
                 if nprovided not in ensure_list(nargs):
-                    raise FhirPathParsingError(
+                    raise FHIRPathParsingError(
                         f"FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Function {function}() requires {nargs} arguments, but {nprovided} were provided.\n{_underline_error_in_fhir_path(self.string, function, p.lexpos(1))}"
                     )
                 return True
@@ -526,7 +526,7 @@ class FhirPathParser:
             p[0] = aggregates.Aggregate(*p[3])
         else:
             pos = self.string.find(str(p[1]))
-            raise FhirPathParsingError(
+            raise FHIRPathParsingError(
                 f'FHIRPath parser error at {p.lineno(1)}:{pos}: Invalid function "{p[1]}".\n{_underline_error_in_fhir_path(self.string,p[1], pos)}'
             )
 

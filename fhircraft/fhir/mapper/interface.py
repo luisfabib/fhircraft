@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
 from fhircraft.fhir.mapper.engine.registry import StructureMapRegistry
-from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser, StructureMapUnion
+from fhircraft.fhir.mapper.parser import FHIRMappingLanguageParser, StructureMapUnion
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 
 if TYPE_CHECKING:
@@ -76,7 +76,7 @@ class FHIRStructureMapper:
             structure_definition_registry=structure_definition_registry,
             structure_map_registry=structure_map_registry,
         )
-        self._parser = FhirMappingLanguageParser()
+        self._parser = FHIRMappingLanguageParser()
 
     # ------------------------------------------------------------------
     # Core mapping operation

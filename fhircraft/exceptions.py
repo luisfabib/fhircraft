@@ -140,14 +140,14 @@ class MapperRegistryNotFoundError(MapperException, FileNotFoundError):
 # ============================================================================
 
 
-class FhirPathException(FhircraftException):
+class FHIRPathException(FhircraftException):
     """Base exception for all FHIRPath errors."""
 
     def __init__(self, message: str, component: str = "fhirpath"):
         super().__init__(message, component=component)
 
 
-class FhirPathParsingError(FhirPathException):
+class FHIRPathParsingError(FHIRPathException):
     """
     Exception raised for errors encountered during the parsing of FHIRPath expressions.
 
@@ -158,7 +158,7 @@ class FhirPathParsingError(FhirPathException):
     pass
 
 
-class FhirPathLexingError(FhirPathException):
+class FHIRPathLexingError(FHIRPathException):
     """
     Exception raised for errors encountered during the lexical analysis of FHIRPath expressions.
 
@@ -169,7 +169,7 @@ class FhirPathLexingError(FhirPathException):
     pass
 
 
-class FhirPathRuntimeError(FhirPathException, RuntimeError):
+class FHIRPathRuntimeError(FHIRPathException, RuntimeError):
     """
     Exception raised for errors that occur during the runtime evaluation of FHIRPath expressions.
 
@@ -180,7 +180,7 @@ class FhirPathRuntimeError(FhirPathException, RuntimeError):
     pass
 
 
-class FhirPathTypeError(FhirPathException):
+class FHIRPathTypeError(FHIRPathException):
     """
     Exception raised when there are type mismatches during FHIRPath expression evaluation.
 
@@ -190,7 +190,7 @@ class FhirPathTypeError(FhirPathException):
     pass
 
 
-class FhirPathOperationError(FhirPathException):
+class FHIRPathOperationError(FHIRPathException):
     """
     Exception raised when an unsupported or invalid operation is encountered during FHIRPath evaluation.
 
@@ -200,7 +200,7 @@ class FhirPathOperationError(FhirPathException):
     pass
 
 
-class FhirPathWarning(FhircraftWarning):
+class FHIRPathWarning(FhircraftWarning):
     """
     Warning raised for non-critical issues encountered during FHIRPath expression processing.
 
@@ -326,13 +326,13 @@ __all__ = [
     "MapperExecutionError",
     "MapperRegistryNotFoundError",
     # FHIRPath exceptions
-    "FhirPathException",
-    "FhirPathParsingError",
-    "FhirPathLexingError",
-    "FhirPathRuntimeError",
-    "FhirPathTypeError",
-    "FhirPathOperationError",
-    "FhirPathWarning",
+    "FHIRPathException",
+    "FHIRPathParsingError",
+    "FHIRPathLexingError",
+    "FHIRPathRuntimeError",
+    "FHIRPathTypeError",
+    "FHIRPathOperationError",
+    "FHIRPathWarning",
     # Factory exceptions
     "FactoryException",
     "FactoryDefinitionIndexError",

@@ -5,7 +5,7 @@ FHIRPath Module
 # These imports work after fixing the circular dependency
 from .engine import FHIRPath, FHIRPathCollection, FHIRPathCollectionItem
 from .mixin import FHIRPathMixin
-from .parser import FhirPathParser
+from .parser import FHIRPathParser
 from .utils import parse_fhirpath
 
 

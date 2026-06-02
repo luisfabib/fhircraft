@@ -8,7 +8,7 @@ from fhircraft.utils import ensure_list
 if TYPE_CHECKING:
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 
-from fhircraft.exceptions import FhirPathRuntimeError
+from fhircraft.exceptions import FHIRPathRuntimeError
 
 # Singleton parser instance with thread-safe initialization
 _parser_instance = None
@@ -21,9 +21,9 @@ def _get_parser():
     if _parser_instance is None:
         with _parser_lock:
             if _parser_instance is None:
-                from fhircraft.fhir.path.parser import FhirPathParser
+                from fhircraft.fhir.path.parser import FHIRPathParser
 
-                _parser_instance = FhirPathParser()
+                _parser_instance = FHIRPathParser()
     return _parser_instance
 
 
@@ -196,11 +196,11 @@ def evaluate_and_prepare_collection_values(
     right_collection = _get_collection_values(right_collection)
 
     if len(left_collection) > 1:
-        raise FhirPathRuntimeError(
+        raise FHIRPathRuntimeError(
             f"FHIRPath operator {operator.__str__()} expected a single-item collection for the left expression, instead got a {len(left_collection)}-items collection."
         )
     if len(right_collection) > 1:
-        raise FhirPathRuntimeError(
+        raise FHIRPathRuntimeError(
             f"FHIRPath operator {operator.__str__()} expected a single-item collection for the right expression, instead got a {len(right_collection)}-items collection."
         )
     if prevent_all_empty and (len(left_collection) == 0 or len(right_collection) == 0):

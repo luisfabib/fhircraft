@@ -3,7 +3,7 @@ from fhircraft.fhir.path.utils import parse_fhirpath
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.path.parser import FhirPathParser
+    from fhircraft.fhir.path.parser import FHIRPathParser
 
 
 class FHIRPathMixin:
@@ -59,7 +59,7 @@ class FHIRPathMixin:
             Any: The single matching value
 
         Raises:
-            FhirPathRuntimeError: If more than one value is found
+            FHIRPathRuntimeError: If more than one value is found
         """
         return parse_fhirpath(expression).single(
             self,
@@ -210,7 +210,7 @@ class FHIRPathMixin:
             environment (dict | None): Optional environment variables for evaluation
 
         Raises:
-            FhirPathException: If zero or more than one matching locations are found
+            FHIRPathException: If zero or more than one matching locations are found
             RuntimeError: If the location cannot be set
         """
         parse_fhirpath(expression).update_single(

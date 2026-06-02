@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
-    FhirPathException,
+    FHIRPathException,
     Literal,
 )
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
@@ -21,13 +21,13 @@ def test_string_manipulation_function_checks_singleton_collection():
         FHIRPathCollectionItem(value="mySubstringValue"),
         FHIRPathCollectionItem(value="mySubstringValue2"),
     ]
-    with pytest.raises(FhirPathException):
+    with pytest.raises(FHIRPathException):
         IndexOf("Substring").evaluate(collection, env)
 
 
 def test_string_manipulation_function_checks_type():
     collection = [FHIRPathCollectionItem(value=2)]
-    with pytest.raises(FhirPathException):
+    with pytest.raises(FHIRPathException):
         IndexOf("Substring").evaluate(collection, env)
 
 

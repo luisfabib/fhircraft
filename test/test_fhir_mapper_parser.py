@@ -4,8 +4,8 @@ from pprint import pprint
 
 import pytest
 
-from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
-from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
+from fhircraft.fhir.mapper.lexer import FHIRMappingLanguageLexer
+from fhircraft.fhir.mapper.parser import FHIRMappingLanguageParser
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import *
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
     StructureMap as R4B_StructureMap,
@@ -30,7 +30,7 @@ def add_rules_to_basic_map(rules, documentation=None):
 
 @pytest.fixture(scope="module")
 def parser():
-    return FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
+    return FHIRMappingLanguageParser(lexer_class=lambda: FHIRMappingLanguageLexer())
 
 
 # Format: (string, expected_object)

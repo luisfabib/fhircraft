@@ -3,7 +3,7 @@ from unittest import result
 import pytest
 import sys 
 
-from fhircraft.exceptions import FhirPathWarning, FhirPathException
+from fhircraft.exceptions import FHIRPathWarning, FHIRPathException
 from fhircraft.fhir.path.engine.additional import *
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.terminology import TerminologyService
@@ -578,7 +578,7 @@ def test_resolve_with_r4b_reference():
             value=R4B_Reference(reference="http://example.org/resource")
         )
     ]
-    with pytest.warns(FhirPathWarning, match="not supported"):
+    with pytest.warns(FHIRPathWarning, match="not supported"):
         result = Resolve().evaluate(collection, env)
     assert result == []
 
@@ -589,7 +589,7 @@ def test_resolve_with_r5_reference():
             value=R5_Reference(reference="http://example.org/resource")
         )
     ]
-    with pytest.warns(FhirPathWarning, match="not supported"):
+    with pytest.warns(FHIRPathWarning, match="not supported"):
         result = Resolve().evaluate(collection, env)
     assert result == []
 
@@ -642,7 +642,7 @@ def test_conformsto_returns_empty_for_non_singleton_collection():
 
 def test_conformsto_raises_error_when_fhir_release_not_in_environment():
     collection = [FHIRPathCollectionItem(value={"resourceType": "Patient"})]
-    with pytest.raises(FhirPathException, match="required for evaluating conformsTo"):
+    with pytest.raises(FHIRPathException, match="required for evaluating conformsTo"):
         ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
             collection, {}
         )
@@ -674,7 +674,7 @@ def test_conformsto_returns_empty_for_unresolvable_structure_definition():
     collection = [
         FHIRPathCollectionItem(value={"resourceType": "Patient", "gender": "female"})
     ]
-    with pytest.warns(FhirPathWarning, match="Could not resolve structure definition"):
+    with pytest.warns(FHIRPathWarning, match="Could not resolve structure definition"):
         result = ConformsTo("http://example.org/StructureDefinition/Unknown").evaluate(
             collection, {"%fhirRelease": "R4"}
         )
@@ -758,7 +758,7 @@ def test_memberof_returns_true_for_valid_codeableconcept(terminology_service):
 def test_memberof_returns_empty_for_unresolvable_valueset(terminology_service):
     collection = [FHIRPathCollectionItem(value="valid-code")]
     with pytest.warns(
-        FhirPathWarning, match="Error during terminology service call in memberOf()"
+        FHIRPathWarning, match="Error during terminology service call in memberOf()"
     ):
         result = MemberOf("http://example.org/ValueSet/Unknown").evaluate(
             collection,
@@ -771,7 +771,7 @@ def test_memberof_raises_error_when_fhir_release_not_in_environment(
     terminology_service,
 ):
     collection = [FHIRPathCollectionItem(value="example-code")]
-    with pytest.raises(FhirPathException, match="required for evaluating memberOf"):
+    with pytest.raises(FHIRPathException, match="required for evaluating memberOf"):
         MemberOf("http://example.org/ValueSet/ExampleVS").evaluate(
             collection, {"%terminologyService": terminology_service}
         )
@@ -842,7 +842,7 @@ def test_subsumes_warns_and_returns_empty_when_service_raises(terminology_servic
         FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="error"))
     ]
     with pytest.warns(
-        FhirPathWarning, match="Error during terminology service call in subsumes()"
+        FHIRPathWarning, match="Error during terminology service call in subsumes()"
     ):
         result = Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
             collection,
@@ -863,7 +863,7 @@ def test_subsumes_raises_error_when_fhir_release_not_in_environment(
             value=R4_Coding(system="http://loinc.org", code="parent")
         )
     ]
-    with pytest.raises(FhirPathException, match="required for evaluating subsumes"):
+    with pytest.raises(FHIRPathException, match="required for evaluating subsumes"):
         Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
             collection,
             {
@@ -880,7 +880,7 @@ def test_subsumes_raises_error_for_different_code_systems(terminology_service):
         )
     ]
     with pytest.raises(
-        FhirPathException, match="Subsumption across different code systems"
+        FHIRPathException, match="Subsumption across different code systems"
     ):
         Subsumes(EnvironmentVariable("%otherCoding")).evaluate(
             collection,
@@ -960,7 +960,7 @@ def test_subsumedby_raises_error_when_fhir_release_not_in_environment(
     collection = [
         FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="child"))
     ]
-    with pytest.raises(FhirPathException, match="required for evaluating"):
+    with pytest.raises(FHIRPathException, match="required for evaluating"):
         SubsumedBy(EnvironmentVariable("%otherCoding")).evaluate(
             collection,
             {
@@ -975,7 +975,7 @@ def test_subsumedby_raises_error_for_different_code_systems(terminology_service)
         FHIRPathCollectionItem(value=R4_Coding(system="http://loinc.org", code="child"))
     ]
     with pytest.raises(
-        FhirPathException,
+        FHIRPathException,
         match="Subsumption across different code systems",
     ):
         SubsumedBy(EnvironmentVariable("%otherCoding")).evaluate(

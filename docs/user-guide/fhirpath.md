@@ -129,14 +129,14 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
 | FHIR Model Method | Engine Method | Purpose | Returns | Error Behavior |
 |-------------------|---------------|---------|---------|----------------|
 | `fhirpath_values()` | `values()` | Get all matching values | `List[Any]` | Never raises errors, returns `[]` if empty |
-| `fhirpath_single()` | `single()` | Get exactly one value | `Any` | Raises `FhirPathRuntimeError` if multiple values found |
+| `fhirpath_single()` | `single()` | Get exactly one value | `Any` | Raises `FHIRPathRuntimeError` if multiple values found |
 | `fhirpath_first()` | `first()` | Get first value safely | `Any` | Never raises errors, returns default if empty |
 | `fhirpath_last()` | `last()` | Get last value safely | `Any` | Never raises errors, returns default if empty |
 | `fhirpath_exists()` | `exists()` | Check if any values exist | `bool` | Never raises errors |
 | `fhirpath_is_empty()` | `is_empty()` | Check if no values exist | `bool` | Never raises errors |
 | `fhirpath_count()` | `count()` | Count matching values | `int` | Never raises errors |
-| `fhirpath_update_values()` | `update_values()` | Update all matching locations | `None` | Raises `FhirPathRuntimeError` if no locations found |
-| `fhirpath_update_single()` | `update_single()` | Update exactly one location | `None` | Raises `FhirPathRuntimeError` if zero or multiple locations |
+| `fhirpath_update_values()` | `update_values()` | Update all matching locations | `None` | Raises `FHIRPathRuntimeError` if no locations found |
+| `fhirpath_update_single()` | `update_single()` | Update exactly one location | `None` | Raises `FHIRPathRuntimeError` if zero or multiple locations |
 | N/A | `trace()` | Get evaluation step trace | `List[str]` | Never raises errors |
 | N/A | `debug_info()` | Get comprehensive debug data | `dict` | Never raises errors |
 
@@ -212,7 +212,7 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
     # Update single value with error checking
     try:
         patient.fhirpath_update_single("Patient.gender", "male") # (2)!
-    except FhirPathException:
+    except FHIRPathException:
         print("Expected single gender field but found multiple")
 
     # Safe conditional updates

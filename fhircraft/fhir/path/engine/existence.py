@@ -24,7 +24,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.engine.filtering import Where
-from fhircraft.exceptions import FhirPathException
+from fhircraft.exceptions import FHIRPathException
 from fhircraft.fhir.path.utils import get_expression_context
 
 
@@ -164,7 +164,7 @@ def _all_or_any_boolean(
             return [FHIRPathCollectionItem.wrap(True)]
     for item in collection:
         if not isinstance(item.value, bool):
-            raise FhirPathException(
+            raise FHIRPathException(
                 f"The collection evaluated by allTrue() has a non-boolean value: {item.value}"
             )
         values.append(item.value == boolean)
