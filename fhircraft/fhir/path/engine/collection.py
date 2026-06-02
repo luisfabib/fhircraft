@@ -9,6 +9,11 @@ from fhircraft.fhir.path.engine.core import (
 from fhircraft.exceptions import FhirPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_left_right_expressions
 
+__all__ = [
+    "Union",
+    "Contains",
+    "In",
+]
 
 class FHIRCollectionOperator(FHIRPath):
     """

@@ -24,6 +24,19 @@ logger = logging.getLogger(__name__)
 
 FHIRPathCollection = List["FHIRPathCollectionItem"]
 
+__all__ = [
+    "FHIRPath",
+    "FHIRPathCollection",
+    "FHIRPathCollectionItem",
+    "FHIRPathFunction",
+    "Element",
+    "This",
+    "Literal",
+    "Invocation",
+    "RootElement",
+    "TypeSpecifier",
+]
+
 
 class FHIRPath(ABC):
     """Abstract base class for FHIRPath expressions."""

@@ -1,7 +1,7 @@
 import pytest
 
 from fhircraft.fhir.path.engine.environment import *
-from fhircraft.fhir.path.engine.core import Invocation, Element
+from fhircraft.fhir.path.engine.core import Invocation, Element, FHIRPathCollectionItem
 from fhircraft.fhir.path.engine.filtering import Select
 from fhircraft.exceptions import FhirPathException
 from fhircraft.fhir.resources.base import FHIRBaseModel

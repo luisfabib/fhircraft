@@ -96,13 +96,6 @@ class TestFHIRPathMixin(unittest.TestCase):
 
         self.empty_patient = MockPatient(id="empty-patient")
 
-    def test_fhirpath_property(self):
-        """Test that the fhirpath property returns a parser instance."""
-        parser = self.patient.fhirpath
-        self.assertIsNotNone(parser)
-        # Verify it has a parse method
-        self.assertTrue(hasattr(parser, "parse"))
-
     # Test value retrieval methods
     def test_fhirpath_values(self):
         """Test fhirpath_values() method."""
@@ -387,18 +380,6 @@ class TestFHIRPathMixin(unittest.TestCase):
         self.assertEqual(last_value, all_values[-1] if all_values else None)
         self.assertEqual(exists, count > 0)
 
-    @patch("fhircraft.fhir.path.mixin.import_fhirpath_engine")
-    def test_fhirpath_engine_import(self, mock_import):
-        """Test that the FHIRPath engine is properly imported."""
-        mock_engine = Mock()
-        mock_import.return_value = mock_engine
-
-        # Create new patient to trigger import
-        patient = MockPatient()
-        engine = patient.fhirpath
-
-        mock_import.assert_called_once()
-        self.assertEqual(engine, mock_engine)
 
     def test_real_world_scenarios(self):
         """Test real-world usage scenarios."""

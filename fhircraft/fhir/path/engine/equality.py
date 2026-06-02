@@ -1,5 +1,12 @@
 """The equality module contains the object representations of the equality FHIRPath operators."""
 
+__all__ = [
+    "Equals",
+    "Equivalent",
+    "NotEquals",
+    "NotEquivalent",
+]
+
 import re
 
 from pydantic import BaseModel

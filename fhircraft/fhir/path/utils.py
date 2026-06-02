@@ -1,4 +1,5 @@
 import re
+import threading
 from typing import TYPE_CHECKING, Any, Dict, Union
 
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
@@ -8,6 +9,22 @@ if TYPE_CHECKING:
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 
 from fhircraft.exceptions import FhirPathRuntimeError
+
+# Singleton parser instance with thread-safe initialization
+_parser_instance = None
+_parser_lock = threading.Lock()
+
+
+def _get_parser():
+    """Get or create the singleton FHIRPathParser instance in a thread-safe manner."""
+    global _parser_instance
+    if _parser_instance is None:
+        with _parser_lock:
+            if _parser_instance is None:
+                from fhircraft.fhir.path.parser import FhirPathParser
+
+                _parser_instance = FhirPathParser()
+    return _parser_instance
 
 
 def split_fhirpath(fhir_path: str) -> list[str]:
@@ -81,10 +98,28 @@ def _underline_error_in_fhir_path(text, error, error_position, line_number=None)
         return f"{text[:error_position+len(str(error))+15]}...\n{underline}"
 
 
-def import_fhirpath_engine():
-    from fhircraft.fhir.path.parser import fhirpath
 
-    return fhirpath
+def parse_fhirpath(expression: str) -> "FHIRPath":
+    """
+    Parses a FHIRPath expression string into a FHIRPath object.
+
+    Uses a thread-safe singleton instance of FHIRPathParser for efficiency.
+
+    Args:
+        expression (str): The FHIRPath expression string to parse.
+
+    Returns:
+        FHIRPath: The parsed FHIRPath object representing the expression.
+    
+    Example:
+        This shows how to parse a FHIRPath expression string into a FHIRPath object:
+        ``` python
+        >>> from fhircraft.fhir.path.utils import parse_fhirpath
+        >>> parse_fhirpath("Observation.components.where(code.coding.code='123')")
+        FHIRPath(Observation.components.where(code.coding.code='123'))
+        ```
+    """
+    return _get_parser().parse(expression)
 
 
 def evaluate_fhirpath_collection(

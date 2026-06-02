@@ -3,6 +3,25 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released.
 """
 
+__all__ = [
+    "Extension",
+    "TypeChoice",
+    "HasValue",
+    "GetValue",
+    "Resolve",
+    "HtmlChecks",
+    "MemberOf",
+    "Subsumes",
+    "SubsumedBy",
+    "Slice",
+    "LowBoundary",
+    "HighBoundary",
+    "ConformsTo",
+    "Comparable",
+    "ElementDefinition",
+    "CheckModifiers",
+]
+
 import warnings
 import re
 import sys

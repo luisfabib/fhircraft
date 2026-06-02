@@ -1,5 +1,12 @@
 """The filtering module contains the object representations of the filtering-category FHIRPath functions."""
 
+__all__ = [
+    "Where",
+    "Select",
+    "Repeat",
+    "OfType",
+]
+
 from typing import List, Optional, Union
 
 from fhircraft.fhir.path.engine.core import (

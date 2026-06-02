@@ -2,6 +2,7 @@
 from fhircraft.fhir.path.engine.comparison import *
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.existence import *
+from fhircraft.fhir.path.engine.filtering import Where
 
 env = dict()
 

@@ -7,7 +7,6 @@ from fhircraft.exceptions import (
     MapperSourceProcessingError,
 )
 from fhircraft.fhir.path import engine as fhirpath
-from fhircraft.fhir.path import fhirpath as fhirpath_parser
 import logging
 
 from fhircraft.fhir.path.engine.core import FHIRPath

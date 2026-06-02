@@ -1,5 +1,12 @@
 """The comparison module contains the object representations of the comparison FHIRPath operators."""
 
+__all__ = [
+    "GreaterThan",
+    "LessThan",
+    "LessEqualThan",
+    "GreaterEqualThan",
+]
+
 from abc import ABC
 
 from fhircraft.fhir.path.engine.core import (

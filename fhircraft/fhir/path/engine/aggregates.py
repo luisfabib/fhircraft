@@ -2,6 +2,10 @@
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed
 """
 
+__all__ = [
+    "Aggregate",
+]
+
 from typing import Any
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,

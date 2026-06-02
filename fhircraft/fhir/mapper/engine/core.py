@@ -13,12 +13,10 @@ from typing import Dict, Type
 from pydantic import BaseModel, ConfigDict
 
 import fhircraft.fhir.path.engine as fhirpath
-
+from fhircraft.fhir.path import parse_fhirpath
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
-
-from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.definitions.registry import (
     StructureDefinitionRegistry,
 )
@@ -226,7 +224,7 @@ class FHIRMappingEngine:
                     f"Constant name '{const.name}' conflicts with existing source or target model"
                 )
             # Add the constant as a variable in the global scope
-            global_scope.define_variable(const.name, fhirpath_parser.parse(const.value))
+            global_scope.define_variable(const.name, parse_fhirpath(const.value))
 
         # Determine the entrypoint group
         target_group = (global_scope.groups.get(group) if group else None) or list(

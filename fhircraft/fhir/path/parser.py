@@ -40,10 +40,6 @@ from fhircraft.utils import ensure_list
 logger = logging.getLogger(__name__)
 
 
-def parse(string):
-    return fhirpath.parse(string)
-
-
 class FhirPathParser:
     """
     An LALR-parser for FHIRPath
@@ -645,28 +641,3 @@ class IteratorToTokenStream:
             return next(self.iterator)
         except StopIteration:
             return None
-
-
-_fhirpath_instance: "FhirPathParser | None" = None
-
-
-def _get_fhirpath() -> "FhirPathParser":
-    """Return the module-level FhirPathParser singleton, creating it on first call."""
-    global _fhirpath_instance
-    if _fhirpath_instance is None:
-        try:
-            _fhirpath_instance = FhirPathParser()
-        except Exception:
-            print(traceback.format_exc())
-            raise
-    return _fhirpath_instance
-
-
-def __getattr__(name: str):
-    """PEP 562 module __getattr__ — defers FhirPathParser construction until first use."""
-    if name == "fhirpath":
-        instance = _get_fhirpath()
-        # Cache in the module dict so future attribute lookups skip __getattr__.
-        globals()["fhirpath"] = instance
-        return instance
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -1,5 +1,10 @@
 """The filtering module contains the object representations of the combining-category FHIRPath functions."""
 
+__all__ = [
+    "Union",
+    "Combine",
+]
+
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,

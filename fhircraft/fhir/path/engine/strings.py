@@ -6,6 +6,23 @@ To use these functions over a collection with multiple items, one may use filter
     Patient.name.given.select(substring(0))
 """
 
+__all__ = [
+    "IndexOf",
+    "Substring",
+    "StartsWith",
+    "EndsWith",
+    "Contains",
+    "Upper",
+    "Lower",
+    "Replace",
+    "Matches",
+    "ReplaceMatches",
+    "ToChars",
+    "Length",
+    "Concatenation",
+
+]
+
 import re
 from typing import Any, List, Optional
 

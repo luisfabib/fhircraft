@@ -1,5 +1,10 @@
 """The tree navigation module contains the object representations of the tree-navigation category FHIRPath functions."""
 
+__all__ = [
+    "Children",
+    "Descendants",
+]
+
 from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import (

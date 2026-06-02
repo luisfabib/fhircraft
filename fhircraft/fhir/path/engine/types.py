@@ -1,5 +1,12 @@
 """The tree navigation module contains the object representations of the types category FHIRPath operators/functions."""
 
+__all__ = [
+    "Is",
+    "LegacyIs",
+    "As",
+    "LegacyAs",
+]
+
 from typing import Any
 
 import fhircraft.fhir.path.engine.literals as fhirpath_literals

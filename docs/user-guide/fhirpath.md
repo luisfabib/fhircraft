@@ -95,7 +95,7 @@ The FHIR model methods automatically handle environment setup and provide the si
 When you need to query raw dictionaries, JSON data, or other data structures that aren't Fhircraft FHIR models, use the engine interface directly. This gives you control over expression parsing and evaluation:
 
 ```python
-from fhircraft.fhir.path import fhirpath
+from fhircraft.fhir.path import parse_fhirpath 
 
 # Raw dictionary data (e.g., from an API or JSON file)
 patient_dict = {
@@ -104,7 +104,7 @@ patient_dict = {
 } # (1)!
 
 # Parse an expression once for reuse
-name_expr = fhirpath.parse("name.family") # (2)!
+name_expr = parse_fhirpath("name.family") # (2)!
 
 # Evaluate against the dictionary data
 family_names = name_expr.values(patient_dict) # (3)!
@@ -366,19 +366,19 @@ FHIRPath provides contextual variables that give you access to the current evalu
     The `$total` variable is an accumulator used within the `aggregate()` function to build up results:
 
     ```python
-    from fhircraft.fhir.path import fhirpath
+    from fhircraft.fhir.path import parse_fhirpath
 
     # Sum all values using $total as accumulator
     numbers = [1, 2, 3, 4, 5]
-    total_sum = fhirpath.parse("aggregate($this + $total, 0)").single(numbers) # (1)!
+    total_sum = parse_fhirpath("aggregate($this + $total, 0)").single(numbers) # (1)!
     assert total_sum == 15
 
     # Find minimum value using $total for comparison
-    min_value = fhirpath.parse("aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))").single(numbers) # (2)!
+    min_value = parse_fhirpath("aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))").single(numbers) # (2)!
     assert min_value == 1
 
     # Calculate average using $total accumulation
-    avg_calc = fhirpath.parse("aggregate($total + $this, 0)").single(numbers)  # (3)!
+    avg_calc = parse_fhirpath("aggregate($total + $this, 0)").single(numbers)  # (3)!
     average = avg_calc / len(numbers)
     assert average == 3.0
     ```
