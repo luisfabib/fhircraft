@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, List, ClassVar
+from typing import TYPE_CHECKING, Any, List
 from fhircraft.fhir.path.utils import parse_fhirpath
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 
