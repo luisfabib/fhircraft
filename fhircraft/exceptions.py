@@ -308,11 +308,17 @@ class PackageValidationError(PackageException):
 
     pass
 
+class PackageValidationWarning(FhircraftWarning):
+    """Warning raised for non-critical issues encountered during package validation."""
+
+    pass
+
 
 # Public API list
 __all__ = [
     # Root exception
     "FhircraftException",
+    "FhircraftWarning",
     # Mapper exceptions
     "MapperException",
     "MapperParsingError",
@@ -346,4 +352,5 @@ __all__ = [
     "PackageNotFoundError",
     "PackageResolutionError",
     "PackageValidationError",
+    "PackageValidationWarning",
 ]

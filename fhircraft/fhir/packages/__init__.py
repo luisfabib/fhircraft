@@ -15,7 +15,6 @@ from .models import (
 )
 
 __all__ = [
-    "FHIRPackageRegistryClient",
     "get_package_metadata",
     "download_package",
     "download_latest_package",
@@ -24,4 +23,5 @@ __all__ = [
     "PackageMetadata",
     "PackageDistribution",
     "DistributionTags",
+    "FHIRPackageRegistryClient",
 ]

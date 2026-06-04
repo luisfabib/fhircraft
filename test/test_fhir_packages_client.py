@@ -277,7 +277,7 @@ class TestProcessPackageTar:
             results, errors = client._process_package_tar("StructureDefinition", tar)
 
         mock_load.assert_called_once_with(
-            "StructureDefinition", "dep.pkg", "1.0.0", fail_if_exists=False
+            "StructureDefinition", "dep.pkg", "1.0.0", raise_on_errors=False
         )
         assert errors == []
         assert dep_sd in results
