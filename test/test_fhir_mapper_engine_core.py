@@ -110,17 +110,16 @@ def test_execute__wildcard_import_matches_registered_maps():
     assert isinstance(result, tuple)
 
 
-def test_execute__wildcard_no_match_logs_warning_and_continues(caplog):
+def test_execute__wildcard_no_match_logs_warning_and_continues():
     engine = _engine()
-    with caplog.at_level(logging.WARNING, logger="fhircraft.fhir.mapper.engine.core"):
+    with pytest.warns(Warning, match="matched no registered"):
         result = engine.execute(
             _main_map(["http://example.org/nomatch/*"]), ({"x": 1},)
         )
-    assert any("matched no registered" in r.message for r in caplog.records)
     assert isinstance(result, tuple)
 
 
-def test_execute__imported_map_groups_are_in_scope(caplog):
+def test_execute__imported_map_groups_are_in_scope():
     imported = _sm("http://example.org/Lib", group_names=["helperGroup"])
     engine = _engine(maps=[imported])
 
@@ -211,12 +210,7 @@ def test_resolve__core_fhir_type_with_alias_uses_alias_as_key():
     assert result["Src"] is not ArbitraryModel
 
 
-def test_resolve__unknown_core_fhir_type_falls_back_to_arbitrary(caplog):
-    """An hl7 URL whose type name doesn't exist falls back to ArbitraryModel.
-
-    get_fhir_type raises AttributeError for the unknown short name, then the registry
-    lookup raises StructureDefinitionNotFoundError — both are now caught.
-    """
+def test_resolve__unknown_core_fhir_type_falls_back_to_arbitrary():
     engine = FHIRMappingEngine()
     sm = _sm_structs(
         [
@@ -227,13 +221,13 @@ def test_resolve__unknown_core_fhir_type_falls_back_to_arbitrary(caplog):
             )
         ]
     )
-    with caplog.at_level(logging.WARNING):
+    with pytest.warns(Warning, match="Could not resolve"):
         result = engine._resolve_structure_definitions(sm, StructureMapModelMode.SOURCE)
     assert "Broken" in result
     assert result["Broken"] is ArbitraryModel
 
 
-def test_resolve__registry_lookup_failure_falls_back_to_arbitrary_with_alias(caplog):
+def test_resolve__registry_lookup_failure_falls_back_to_arbitrary_with_alias():
     """When the StructureDefinitionRegistry cannot find a URL the entry uses ArbitraryModel.
 
     StructureDefinitionNotFoundError is now caught alongside KeyError/ValueError/AttributeError.
@@ -248,14 +242,13 @@ def test_resolve__registry_lookup_failure_falls_back_to_arbitrary_with_alias(cap
             )
         ]
     )
-    with caplog.at_level(logging.WARNING, logger="fhircraft.fhir.mapper.engine.core"):
+    with pytest.warns(Warning, match="Could not resolve"):
         result = engine._resolve_structure_definitions(sm, StructureMapModelMode.SOURCE)
     assert "MyAlias" in result
     assert result["MyAlias"] is ArbitraryModel
-    assert any("Could not resolve" in r.message for r in caplog.records)
 
 
-def test_resolve__registry_lookup_failure_no_alias_uses_url_as_key(caplog):
+def test_resolve__registry_lookup_failure_no_alias_uses_url_as_key():
     """When registry lookup fails and no alias is set, the URL itself is used as key.
 
     StructureDefinitionNotFoundError is now caught alongside KeyError/ValueError/AttributeError.
@@ -263,7 +256,7 @@ def test_resolve__registry_lookup_failure_no_alias_uses_url_as_key(caplog):
     engine = FHIRMappingEngine()
     url = "http://example.org/StructureDefinition/Unknown"
     sm = _sm_structs([StructureMapStructure(url=url, mode="source")])
-    with caplog.at_level(logging.WARNING, logger="fhircraft.fhir.mapper.engine.core"):
+    with pytest.warns(Warning, match="Could not resolve"):
         result = engine._resolve_structure_definitions(sm, StructureMapModelMode.SOURCE)
     assert url in result
     assert result[url] is ArbitraryModel
@@ -349,21 +342,20 @@ def test_resolve__multiple_structures_same_mode_all_returned():
     assert len(result) == 2
 
 
-def test_resolve__missing_url_logs_warning_and_uses_alias(caplog):
+def test_resolve__missing_url_logs_warning_and_uses_alias():
     """A structure with no URL logs a warning and stores ArbitraryModel under the alias."""
     engine = FHIRMappingEngine()
     sm = _sm_structs([StructureMapStructure(mode="source", alias="NoUrl")])
-    with caplog.at_level(logging.WARNING, logger="fhircraft.fhir.mapper.engine.core"):
+    with pytest.warns(Warning, match="missing URL"):
         result = engine._resolve_structure_definitions(sm, StructureMapModelMode.SOURCE)
-    assert any("missing URL" in r.message for r in caplog.records)
     assert result["NoUrl"] is ArbitraryModel
 
 
-def test_resolve__missing_url_no_alias_uses_arbitrary_key(caplog):
+def test_resolve__missing_url_no_alias_uses_arbitrary_key():
     """A structure with no URL and no alias falls back to the key 'arbitrary'."""
     engine = FHIRMappingEngine()
     sm = _sm_structs([StructureMapStructure(mode="source")])
-    with caplog.at_level(logging.WARNING, logger="fhircraft.fhir.mapper.engine.core"):
+    with pytest.warns(Warning, match="missing URL"):
         result = engine._resolve_structure_definitions(sm, StructureMapModelMode.SOURCE)
     assert "arbitrary" in result
     assert result["arbitrary"] is ArbitraryModel

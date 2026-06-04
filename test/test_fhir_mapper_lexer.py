@@ -1,9 +1,6 @@
 import pytest
 
-from fhircraft.fhir.mapper.lexer import (
-    FHIRMappingLanguageLexer,
-    FHIRMappingLanguageLexerError,
-)
+from fhircraft.fhir.mapper.lexer import FHIRMappingLanguageLexer
 
 token_test_cases = (
     # ----------------- Keywords -----------------

@@ -1,17 +1,16 @@
-from ast import arg
-import datetime
-import html
 import logging
+import html
+import datetime
 import os.path
 from typing import Literal
 
 import ply.yacc
 
 import fhircraft.fhir.path.engine.literals as literals
+from fhircraft.exceptions import MapperParsingError
 from fhircraft.fhir.mapper.lexer import FHIRMappingLanguageLexer
 from fhircraft.fhir.path.parser import FHIRPathParser
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
-from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
@@ -21,15 +20,14 @@ StructureMapUnion = (
     R4_models.StructureMap | R4B_models.StructureMap | R5_models.StructureMap
 )
 
+__all__ = ["FHIRMappingLanguageParser", "StructureMapUnion", "parse"]
+
 logger = logging.getLogger(__name__)
 
 
 def parse(string: str) -> StructureMapUnion:
     return FHIRMappingLanguageParser().parse(string)
 
-
-class FHIRMappingLanguageParserError(Exception):
-    pass
 
 
 class FHIRMappingLanguageParser(FHIRPathParser):
@@ -41,7 +39,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
 
     def __init__(self, debug=False, lexer_class=None):
         if self.__doc__ is None:
-            raise FHIRMappingLanguageParserError(
+            raise MapperParsingError(
                 "Docstrings have been removed! By design of PLY, "
             )
 
@@ -109,7 +107,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
             case "R5":
                 return getattr(R5_models, model_name)
             case _:
-                raise FHIRMappingLanguageParserError(
+                raise MapperParsingError(
                     f"Unsupported FHIR release: {self.fhir_release}"
                 )
 
@@ -223,7 +221,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
                 return True
             except NotImplementedError:
                 return True
-        except (FHIRMappingLanguageParserError, FHIRMappingLanguageParserError):
+        except MapperParsingError:
             return False
 
     def parse_token_stream(self, token_iterator):
@@ -249,10 +247,10 @@ class FHIRMappingLanguageParser(FHIRPathParser):
 
     def p_error(self, t):
         if t is None:
-            raise FHIRMappingLanguageParserError(
+            raise MapperParsingError(
                 f'FHIR Mapping Language parser error at EOF "{self.string}"'
             )
-        raise FHIRMappingLanguageParserError(
+        raise MapperParsingError(
             f'FHIR Mapping Language parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col, t.lineno)}'
         )
 
@@ -305,7 +303,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
                     else:
                         p[0][section_type].append(section_value)
             elif section_type == "mapId" and "mapId" in p[0]:
-                raise FHIRMappingLanguageParserError(
+                raise MapperParsingError(
                     "The 'map' statement can be declared only once per map."
                 )
             else:
@@ -367,7 +365,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         m_conceptmap : CONCEPTMAP m_conceptmap_name '{' m_conceptmap_prefix_list  m_conceptmap_mapping_list '}'
         """
         if len(p[4]) != 2:
-            raise FHIRMappingLanguageParserError(
+            raise MapperParsingError(
                 f"Invalid concept map prefix definition at {p.lineno}:{p.col}"
             )
         source = p[4][0]
@@ -457,7 +455,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
             case "<=":
                 p[0] = "source-is-narrower-than-target"
             case _:
-                raise FHIRMappingLanguageParserError(
+                raise MapperParsingError(
                     f"Invalid concept map operator '{p[1]}'"
                 )
 
@@ -498,7 +496,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         m_const : LET m_identifier EQUAL m_fhirpath ';'
         """
         if self.fhir_release != "R5":
-            raise FHIRMappingLanguageParserError(
+            raise MapperParsingError(
                 f"StructureMap constants are only supported in FHIR R5 and above!"
             )
         p[0] = self.StructureMapConst(name=p[2], value=str(p[4]))
@@ -609,7 +607,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         m_rule_list : m_rule
                     | m_rule_list m_rule
         """
-        raise FHIRMappingLanguageParserError(
+        raise MapperParsingError(
             f"A rule was not properly closed. Did you forget a ';' at the end of a rule?",
         )
 

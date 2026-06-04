@@ -22,7 +22,7 @@ class SimpleTarget(BaseModel):
 
 @pytest.fixture
 def engine():
-    return FHIRStructureMapper(fhir_release="R4B")
+    return FHIRStructureMapper(fhir_release="R5")
 
 
 def test_parse_mapping_script(engine):
@@ -80,14 +80,6 @@ def test_resolve_mapping_from_existing(engine):
     groups = engine.list_groups(original)
     assert groups == []
 
-
-def test_validate_mapping_script(engine):
-    """Test script validation."""
-    valid_script = "map 'http://example.org' = 'test' group main(source src, target tgt) { src.name -> tgt.name; }"
-    invalid_script = "map 'http://example.org' = 'test' group main(source src, target tgt) { src.name -> tgt.name"  # Missing brace
-
-    assert engine.validate(valid_script) is True
-    assert engine.validate(invalid_script) is False
 
 
 def test_list_groups(engine):

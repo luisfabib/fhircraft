@@ -74,6 +74,15 @@ class MapperException(FhircraftException):
     def __init__(self, message: str, component: str = "mapper"):
         super().__init__(message, component=component)
 
+class MapperWarning(FhircraftWarning):
+    """Warning raised for non-critical issues encountered during mapping operations."""
+
+    pass
+
+class MapperLexingError(MapperException):
+    """Raised when FHIR Mapping Language parsing fails."""
+
+    pass
 
 class MapperParsingError(MapperException):
     """Raised when FHIR Mapping Language syntax or parsing fails."""
@@ -321,7 +330,9 @@ __all__ = [
     "FhircraftWarning",
     # Mapper exceptions
     "MapperException",
+    "MapperWarning",
     "MapperParsingError",
+    "MapperLexingError",
     "MapperValidationError",
     "MapperScopeError",
     "MapperDigestionError",
