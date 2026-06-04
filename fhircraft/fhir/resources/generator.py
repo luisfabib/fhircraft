@@ -624,7 +624,7 @@ class CodeGenerator:
                         rf"(?<!\.)(\b{model.__name__}\b)",
                         f'"{model.__name__}"',
                         annotation_string,
-                        0,
+                        count=0,
                     )
 
                 if isinstance(info.annotation, type(Enum)):
