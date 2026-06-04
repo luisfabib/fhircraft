@@ -7,7 +7,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
 )
 from fhircraft.exceptions import FHIRPathRuntimeError
-from fhircraft.fhir.path.utils import evaluate_left_right_expressions
+from fhircraft.fhir.path.utils import _evaluate_left_right_expressions
 
 __all__ = [
     "Union",
@@ -67,7 +67,7 @@ class Union(FHIRCollectionOperator):
         Returns:
             FHIRPathCollection: The output collection.
         """
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create=create
         )
         return UnionFunction(left_collection).evaluate(
@@ -106,7 +106,7 @@ class In(FHIRCollectionOperator):
         Raises:
             FHIRPathRuntimeError: If the left expression evaluates to a non-singleton collection.
         """
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
         )
         if len(left_collection) == 0:
@@ -156,7 +156,7 @@ class Contains(FHIRCollectionOperator):
         Raises:
             FHIRPathException: If the left expression evaluates to a non-singleton collection.
         """
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
         )
         if len(right_collection) == 0:

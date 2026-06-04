@@ -17,7 +17,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
 )
 from fhircraft.fhir.path.engine.literals import TypePrecisionError
-from fhircraft.fhir.path.utils import evaluate_left_right_expressions
+from fhircraft.fhir.path.utils import _evaluate_left_right_expressions
 
 
 class Equals(FHIRPath):
@@ -65,7 +65,7 @@ class Equals(FHIRPath):
         Returns:
             FHIRPathCollection: The output collection.
         """
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
         )
         if len(left_collection) == 0 or len(right_collection) == 0:
@@ -143,7 +143,7 @@ class Equivalent(FHIRPath):
             FHIRPathCollection: The output collection.
         """
 
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
         )
         if len(left_collection) == 0 and len(right_collection) == 0:

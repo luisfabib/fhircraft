@@ -23,7 +23,7 @@ from fhircraft.fhir.path.engine.core import (
     Literal,
 )
 from fhircraft.exceptions import FHIRPathRuntimeError
-from fhircraft.fhir.path.utils import get_expression_context
+from fhircraft.fhir.path.utils import _get_expression_context
 
 __all__ = [
     "Iif",
@@ -95,7 +95,7 @@ class Iif(FHIRPathFunction):
                 f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
 
-        eval_context = lambda collection: get_expression_context(
+        eval_context = lambda collection: _get_expression_context(
             environment,
             collection[0] if collection else FHIRPathCollectionItem.wrap(None),
             0,

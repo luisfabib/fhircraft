@@ -32,8 +32,8 @@ from fhircraft.fhir.path.engine.core import (
 from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import (
-    evaluate_and_prepare_collection_values,
-    get_expression_context,
+    _evaluate_and_prepare_collection_values,
+    _get_expression_context,
 )
 
 
@@ -96,7 +96,7 @@ class Addition(FHIRMathOperator):
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase, StringBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -149,7 +149,7 @@ class Subtraction(FHIRMathOperator):
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -199,7 +199,7 @@ class Multiplication(FHIRMathOperator):
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -251,7 +251,7 @@ class Division(FHIRMathOperator):
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -303,7 +303,7 @@ class Div(FHIRMathOperator):
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -351,7 +351,7 @@ class Mod(FHIRMathOperator):
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -489,7 +489,7 @@ class Log(FHIRPathMathFunction):
 
         collection = self._validate_collection(collection)
         value = collection[0].value
-        environment = get_expression_context(environment, value, index=0)
+        environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(
                 base := self.base.single(collection, environment=environment),
@@ -537,7 +537,7 @@ class Power(FHIRPathMathFunction):
 
         collection = self._validate_collection(collection)
         value = collection[0].value
-        environment = get_expression_context(environment, value, index=0)
+        environment = _get_expression_context(environment, value, index=0)
 
         if not isinstance(
             exponent := self.exponent.single(collection, environment=environment),
@@ -586,7 +586,7 @@ class Round(FHIRPathMathFunction):
 
         collection = self._validate_collection(collection)
         value = collection[0].value
-        environment = get_expression_context(environment, value, index=0)
+        environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(
                 precision := self.precision.single(collection, environment=environment),

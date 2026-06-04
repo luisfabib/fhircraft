@@ -35,8 +35,8 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.exceptions import FHIRPathException
 from fhircraft.fhir.path.utils import (
-    evaluate_and_prepare_collection_values,
-    get_expression_context,
+    _evaluate_and_prepare_collection_values,
+    _get_expression_context,
 )
 
 
@@ -130,7 +130,7 @@ class IndexOf(StringManipulationFunction):
         # Get string value
         string_item = collection[0].value
         # Update the evaluation context
-        environment = get_expression_context(environment, item=string_item, index=0)
+        environment = _get_expression_context(environment, item=string_item, index=0)
         if not isinstance(
             substring := self.substring.single(collection, environment=environment),
             (str, StringBase),
@@ -188,7 +188,7 @@ class Substring(StringManipulationFunction):
             return []
         string_item = self.validate_collection(collection)
         # Update the evaluation context
-        environment = get_expression_context(
+        environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Get start and end positions
@@ -266,7 +266,7 @@ class StartsWith(StringManipulationFunction):
             return []
         string_item = self.validate_collection(collection)
         # Update the evaluation context
-        environment = get_expression_context(
+        environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Get prefix value
@@ -325,7 +325,7 @@ class EndsWith(StringManipulationFunction):
             return []
         string_item = self.validate_collection(collection)
         # Update the evaluation context
-        environment = get_expression_context(
+        environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Get suffix value
@@ -389,7 +389,7 @@ class Contains(StringManipulationFunction):
             return []
         string_item = self.validate_collection(collection)
         # Update the evaluation context
-        environment = get_expression_context(
+        environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Get substring value
@@ -548,7 +548,7 @@ class Replace(StringManipulationFunction):
             return []
         string_item = self.validate_collection(collection)
         # Update the evaluation context
-        environment = get_expression_context(
+        environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Validate pattern and substitution
@@ -622,7 +622,7 @@ class Matches(StringManipulationFunction):
             return []
         string_item = self.validate_collection(collection)
         # Update the evaluation context
-        environment = get_expression_context(
+        environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Get regex value
@@ -688,7 +688,7 @@ class ReplaceMatches(StringManipulationFunction):
             return []
         string_item = self.validate_collection(collection)
         # Update the evaluation context
-        environment = get_expression_context(
+        environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Validate pattern and substitution
@@ -812,7 +812,7 @@ class Concatenation(FHIRPath):
         Raises:
             FHIRPathException: If either expression evaluates to a non-singleton collection.
         """
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self,
             self.left,
             self.right,

@@ -25,7 +25,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.filtering import Where
 from fhircraft.exceptions import FHIRPathException
-from fhircraft.fhir.path.utils import get_expression_context
+from fhircraft.fhir.path.utils import _get_expression_context
 
 
 class Empty(FHIRPathFunction):
@@ -130,7 +130,7 @@ class All(FHIRPathFunction):
                         (
                             self.criteria.single(
                                 [item],
-                                environment=get_expression_context(
+                                environment=_get_expression_context(
                                     environment, item, index
                                 ),
                             )

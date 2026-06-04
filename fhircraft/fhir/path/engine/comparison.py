@@ -14,7 +14,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
 )
-from fhircraft.fhir.path.utils import evaluate_and_prepare_collection_values
+from fhircraft.fhir.path.utils import _evaluate_and_prepare_collection_values
 
 
 class FHIRComparisonOperator(FHIRPath, ABC):
@@ -72,7 +72,7 @@ class GreaterThan(FHIRComparisonOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if (not left_value and left_value!=0) or (not right_value and right_value!=0):
@@ -116,7 +116,7 @@ class LessThan(FHIRComparisonOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if (not left_value and left_value!=0) or (not right_value and right_value!=0):
@@ -160,7 +160,7 @@ class LessEqualThan(FHIRComparisonOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if (not left_value and left_value!=0) or (not right_value and right_value!=0):
@@ -204,7 +204,7 @@ class GreaterEqualThan(FHIRComparisonOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if (not left_value and left_value!=0) or (not right_value and right_value!=0):

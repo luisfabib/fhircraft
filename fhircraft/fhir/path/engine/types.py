@@ -21,7 +21,7 @@ from fhircraft.fhir.path.engine.core import (
     This,
 )
 from fhircraft.exceptions import FHIRPathRuntimeError
-from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
+from fhircraft.fhir.path.utils import _evaluate_fhirpath_collection
 
 
 class FHIRTypesOperator(FHIRPath):
@@ -40,7 +40,7 @@ class FHIRTypesOperator(FHIRPath):
     def _get_singleton_collection_value(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> Any:
-        left_collection = evaluate_fhirpath_collection(
+        left_collection = _evaluate_fhirpath_collection(
             self.left, collection, environment, create
         )
         if len(left_collection) == 0:

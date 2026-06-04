@@ -17,7 +17,7 @@ from fhircraft.fhir.path.engine.core import (
     TypeSpecifier,
 )
 from fhircraft.fhir.path.engine.types import As
-from fhircraft.fhir.path.utils import get_expression_context
+from fhircraft.fhir.path.utils import _get_expression_context
 from fhircraft.utils import ensure_list
 
 
@@ -52,7 +52,7 @@ class Where(FHIRPathFunction):
         collection = ensure_list(collection)
         expression_collection = [
             self.expression.evaluate(
-                [item], get_expression_context(environment, item, index), create
+                [item], _get_expression_context(environment, item, index), create
             )
             for index, item in enumerate(collection)
         ]
@@ -111,7 +111,7 @@ class Select(FHIRPathFunction):
             for index, item in enumerate(collection)
             for projected_item in ensure_list(
                 self.projection.evaluate(
-                    [item], get_expression_context(environment, item, index), create
+                    [item], _get_expression_context(environment, item, index), create
                 )
             )
         ]
@@ -160,7 +160,7 @@ class Repeat(FHIRPathFunction):
             output_collection = []
             for index, item in enumerate(input_collection):
                 new_collection = self.projection.evaluate(
-                    [item], get_expression_context(environment, item, index), create
+                    [item], _get_expression_context(environment, item, index), create
                 )
                 output_collection.extend(new_collection)
                 if len(new_collection) > 0:
