@@ -181,7 +181,7 @@ config = get_config()
 
 # Inspect current validation settings
 print(f"Warnings disabled: {config.disable_validation_warnings}")
-print(f"Validation mode: {config.mode}")
+print(f"Validation mode: {config.validation_mode}")
 print(f"Disabled constraints: {config.disabled_fhir_constraints}")
 ```
 

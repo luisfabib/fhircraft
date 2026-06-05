@@ -60,7 +60,7 @@ def _validate_FHIR_element_constraint(
     config = get_config()
 
     # Skip validation if mode is 'skip'
-    if config.mode == "skip":
+    if config.validation_mode == "skip":
         return value
 
     # Skip if this specific constraint is disabled
@@ -79,7 +79,7 @@ def _validate_FHIR_element_constraint(
 
     # In lenient mode, convert errors to warnings
     effective_severity = severity
-    if config.mode == "lenient" and severity == "error":
+    if config.validation_mode == "lenient" and severity == "error":
         effective_severity = "warning"
 
     if value is None:
@@ -147,7 +147,7 @@ def validate_element_constraint(
     """
 
     config = get_config()
-    if config.mode == "skip":
+    if config.validation_mode == "skip":
         return instance
 
     values = {}
@@ -237,7 +237,7 @@ def validate_model_constraint(
         Warning: If the validation fails and severity is `warning`.
     """
     config = get_config()
-    if config.mode == "skip":
+    if config.validation_mode == "skip":
         return instance
     return _validate_FHIR_element_constraint(
         instance, instance, expression, human, key, severity
@@ -266,7 +266,7 @@ def validate_FHIR_element_pattern(
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
     config = get_config()
-    if config.mode == "skip":
+    if config.validation_mode == "skip":
         return element
 
     if isinstance(pattern, list):
@@ -280,7 +280,7 @@ def validate_FHIR_element_pattern(
         not isinstance(pattern, dict) and _element != _pattern
     ):
         error = f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2) if isinstance(pattern, FHIRBaseModel) else pattern}"
-        if config.mode == "lenient":
+        if config.validation_mode == "lenient":
             warnings.warn(str(error), FhirValidationWarning, stacklevel=2)
         else:
             raise PydanticCustomError("fhir_pattern_violation", str(error))  # type: ignore
@@ -329,7 +329,7 @@ def validate_FHIR_element_fixed_value(
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
     config = get_config()
-    if config.mode == "skip":
+    if config.validation_mode == "skip":
         return element
 
     if isinstance(constant, list):
@@ -342,7 +342,7 @@ def validate_FHIR_element_fixed_value(
         _element = _element.model_dump()
     if constant != _element:
         error = f"Value does not fulfill constant:\n{constant.model_dump_json(indent=2) if isinstance(constant, FHIRBaseModel) else constant}"
-        if config.mode == "lenient":
+        if config.validation_mode == "lenient":
             warnings.warn(error, FhirValidationWarning, stacklevel=2)
         else:
             raise PydanticCustomError("fhir_pattern_violation", str(error))  # type: ignore
@@ -394,7 +394,7 @@ def validate_type_choice_element(
     """
 
     config = get_config()
-    if config.mode == "skip":
+    if config.validation_mode == "skip":
         return instance
 
     _field_types: List[str] = [
@@ -423,7 +423,7 @@ def validate_type_choice_element(
 
     def _assert(condition: bool, message: str) -> None:
         if not condition:
-            if config.mode == "lenient":
+            if config.validation_mode == "lenient":
                 warnings.warn(message, FhirValidationWarning, stacklevel=2)
             else:
                 raise PydanticCustomError("fhir_type_choice_violation", message)  # type: ignore
@@ -482,7 +482,7 @@ def validate_slicing_cardinalities(
     from fhircraft.fhir.resources.base import FHIRSliceModel
 
     config = get_config()
-    if config.mode == "skip":
+    if config.validation_mode == "skip":
         return values
 
     if values is None:
@@ -497,7 +497,7 @@ def validate_slicing_cardinalities(
             if slice_instances_count < slice.min_cardinality:
                 message = f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. \
                         Requires min. cardinality of {slice.min_cardinality}, but got {slice_instances_count}"
-                if config.mode == "lenient":
+                if config.validation_mode == "lenient":
                     warnings.warn(message, FhirValidationWarning, stacklevel=2)
                 else:
                     raise PydanticCustomError("fhir_cardinality_violation", message)  # type: ignore
@@ -505,7 +505,7 @@ def validate_slicing_cardinalities(
                 if slice_instances_count > slice.max_cardinality:
                     message = f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
                             Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
-                    if config.mode == "lenient":
+                    if config.validation_mode == "lenient":
                         warnings.warn(message, FhirValidationWarning, stacklevel=2)
                     else:
                         raise PydanticCustomError("fhir_cardinality_violation", message)  # type: ignore
