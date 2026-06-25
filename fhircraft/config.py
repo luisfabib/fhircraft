@@ -7,9 +7,20 @@ import os
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from typing import Container, FrozenSet, Generator, Literal
+from typing import Sequence, FrozenSet, Generator, Literal
 
 from fhircraft.fhir.terminology import TerminologyService
+
+__all__ = [
+    "FhircraftConfig",
+    "get_config",
+    "configure",
+    "override_config",
+    "disable_constraint",
+    "enable_constraint",
+    "reset_config",
+    "load_config_from_env",
+]
 
 _VALID_MODES = ("strict", "lenient", "skip")
 _UNSET = object()
@@ -24,7 +35,7 @@ class FhircraftConfig:
         disable_fhir_warnings: Disable only FHIR warning-severity issues, keep errors.
         disable_fhir_errors: Disable error-level constraints (use with extreme caution).
         disabled_fhir_constraints: Set of constraint keys to disable (e.g., 'dom-6').
-        mode: Validation mode - 'strict', 'lenient', or 'skip'.
+        validation_mode: Validation mode - 'strict', 'lenient', or 'skip'.
             - strict: All validations enabled (default)
             - lenient: Convert errors to warnings
             - skip: Disable all validations
@@ -34,7 +45,7 @@ class FhircraftConfig:
     disable_fhir_warnings: bool = False
     disable_fhir_errors: bool = False
     disabled_fhir_constraints: FrozenSet[str] = field(default_factory=frozenset)
-    mode: Literal["strict", "lenient", "skip"] = "strict"
+    validation_mode: Literal["strict", "lenient", "skip"] = "strict"
     terminology_service: TerminologyService | None = field(
         default=None, compare=False, hash=False, repr=False
     )
@@ -47,9 +58,9 @@ class FhircraftConfig:
                 "disabled_fhir_constraints",
                 frozenset(self.disabled_fhir_constraints),
             )
-        if self.mode not in _VALID_MODES:
+        if self.validation_mode not in _VALID_MODES:
             raise ValueError(
-                f"Invalid validation mode {self.mode!r}. "
+                f"Invalid validation mode {self.validation_mode!r}. "
                 f"Must be one of: {', '.join(_VALID_MODES)}"
             )
 
@@ -78,7 +89,7 @@ def configure(
     disable_validation_warnings: bool | None = None,
     disable_fhir_warnings: bool | None = None,
     disable_fhir_errors: bool | None = None,
-    disabled_fhir_constraints: Container[str] | None = None,
+    disabled_fhir_constraints: Sequence[str] | None = None,
     validation_mode: Literal["strict", "lenient", "skip"] | None = None,
     terminology_service: TerminologyService | None | object = _UNSET,
 ) -> None:
@@ -102,7 +113,7 @@ def configure(
             "disable_fhir_warnings": disable_fhir_warnings,
             "disable_fhir_errors": disable_fhir_errors,
             "disabled_fhir_constraints": disabled_fhir_constraints,
-            "mode": validation_mode,
+            "validation_mode": validation_mode,
         }.items()
         if v is not None
     }
@@ -117,7 +128,7 @@ def override_config(
     disable_validation_warnings: bool | None = None,
     disable_fhir_warnings: bool | None = None,
     disable_fhir_errors: bool | None = None,
-    disabled_fhir_constraints: Container[str] | None = None,
+    disabled_fhir_constraints: Sequence[str] | None = None,
     validation_mode: Literal["strict", "lenient", "skip"] | None = None,
     terminology_service: TerminologyService | None | object = _UNSET,
 ) -> Generator[FhircraftConfig, None, None]:
@@ -145,7 +156,7 @@ def override_config(
             "disable_fhir_warnings": disable_fhir_warnings,
             "disable_fhir_errors": disable_fhir_errors,
             "disabled_fhir_constraints": disabled_fhir_constraints,
-            "mode": validation_mode,
+            "validation_mode": validation_mode,
         }.items()
         if v is not None
     }
@@ -233,14 +244,3 @@ def load_config_from_env() -> None:
     if kwargs:
         configure(**kwargs)
 
-
-__all__ = [
-    "FhircraftConfig",
-    "get_config",
-    "configure",
-    "override_config",
-    "disable_constraint",
-    "enable_constraint",
-    "reset_config",
-    "load_config_from_env",
-]

@@ -19,8 +19,9 @@ FHIRPath is a query language designed specifically for healthcare data. If you'v
 FHIR resources have complex, deeply nested structures that reflect real-world healthcare complexity. Consider a patient with multiple names, addresses, and contact points, or an observation with coded values, components, and references to other resources. FHIRPath expressions handle this complexity naturally:
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.core import Patient
+from fhircraft import get_fhir_type
 
+Patient = get_fhir_type("Patient", "R5")
 patient = Patient(
     name=[
         {"given": ["Alice"], "family": "Johnson", "use": "official"},
@@ -58,7 +59,7 @@ FHIRPath also handles edge cases automatically - missing values, lists of values
 When working with Fhircraft FHIR resources, you can use FHIRPath expressions directly on the resource instances. This provides the most convenient way to query FHIR data since all Fhircraft models include built-in FHIRPath methods:
 
 ```python
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 Patient = get_fhir_type("Patient", "R5")
 
@@ -95,7 +96,7 @@ The FHIR model methods automatically handle environment setup and provide the si
 When you need to query raw dictionaries, JSON data, or other data structures that aren't Fhircraft FHIR models, use the engine interface directly. This gives you control over expression parsing and evaluation:
 
 ```python
-from fhircraft.fhir.path import fhirpath
+from fhircraft.fhir.path import parse_fhirpath 
 
 # Raw dictionary data (e.g., from an API or JSON file)
 patient_dict = {
@@ -104,7 +105,7 @@ patient_dict = {
 } # (1)!
 
 # Parse an expression once for reuse
-name_expr = fhirpath.parse("name.family") # (2)!
+name_expr = parse_fhirpath("name.family") # (2)!
 
 # Evaluate against the dictionary data
 family_names = name_expr.values(patient_dict) # (3)!
@@ -129,21 +130,21 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
 | FHIR Model Method | Engine Method | Purpose | Returns | Error Behavior |
 |-------------------|---------------|---------|---------|----------------|
 | `fhirpath_values()` | `values()` | Get all matching values | `List[Any]` | Never raises errors, returns `[]` if empty |
-| `fhirpath_single()` | `single()` | Get exactly one value | `Any` | Raises `FhirPathRuntimeError` if multiple values found |
+| `fhirpath_single()` | `single()` | Get exactly one value | `Any` | Raises `FHIRPathRuntimeError` if multiple values found |
 | `fhirpath_first()` | `first()` | Get first value safely | `Any` | Never raises errors, returns default if empty |
 | `fhirpath_last()` | `last()` | Get last value safely | `Any` | Never raises errors, returns default if empty |
 | `fhirpath_exists()` | `exists()` | Check if any values exist | `bool` | Never raises errors |
 | `fhirpath_is_empty()` | `is_empty()` | Check if no values exist | `bool` | Never raises errors |
 | `fhirpath_count()` | `count()` | Count matching values | `int` | Never raises errors |
-| `fhirpath_update_values()` | `update_values()` | Update all matching locations | `None` | Raises `FhirPathRuntimeError` if no locations found |
-| `fhirpath_update_single()` | `update_single()` | Update exactly one location | `None` | Raises `FhirPathRuntimeError` if zero or multiple locations |
+| `fhirpath_update_values()` | `update_values()` | Update all matching locations | `None` | Raises `FHIRPathRuntimeError` if no locations found |
+| `fhirpath_update_single()` | `update_single()` | Update exactly one location | `None` | Raises `FHIRPathRuntimeError` if zero or multiple locations |
 | N/A | `trace()` | Get evaluation step trace | `List[str]` | Never raises errors |
 | N/A | `debug_info()` | Get comprehensive debug data | `dict` | Never raises errors |
 
 !!! example "Working with Collections"
 
     ```python
-    from fhircraft.fhir.resources import get_fhir_type
+    from fhircraft import get_fhir_type
 
     Patient = get_fhir_type("Patient", "R5")
 
@@ -212,7 +213,7 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
     # Update single value with error checking
     try:
         patient.fhirpath_update_single("Patient.gender", "male") # (2)!
-    except FhirPathException:
+    except FHIRPathException:
         print("Expected single gender field but found multiple")
 
     # Safe conditional updates
@@ -244,7 +245,7 @@ Fhircraft automatically provides these environment variables in all FHIRPath eva
 | `%terminologyService` | An optional terminology service instance used by `memberOf()`, `subsumes()`, and `subsumedBy()` | _(implementation object)_ |
 
 ```python
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 Patient = get_fhir_type("Patient", "R5")
 
@@ -314,7 +315,7 @@ FHIRPath provides contextual variables that give you access to the current evalu
     The `$this` variable refers to the current item when iterating through collections:
 
     ```python
-    from fhircraft.fhir.resources import get_fhir_type
+    from fhircraft import get_fhir_type
 
     Patient = get_fhir_type("Patient", "R5")
 
@@ -366,19 +367,19 @@ FHIRPath provides contextual variables that give you access to the current evalu
     The `$total` variable is an accumulator used within the `aggregate()` function to build up results:
 
     ```python
-    from fhircraft.fhir.path import fhirpath
+    from fhircraft.fhir.path import parse_fhirpath
 
     # Sum all values using $total as accumulator
     numbers = [1, 2, 3, 4, 5]
-    total_sum = fhirpath.parse("aggregate($this + $total, 0)").single(numbers) # (1)!
+    total_sum = parse_fhirpath("aggregate($this + $total, 0)").single(numbers) # (1)!
     assert total_sum == 15
 
     # Find minimum value using $total for comparison
-    min_value = fhirpath.parse("aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))").single(numbers) # (2)!
+    min_value = parse_fhirpath("aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))").single(numbers) # (2)!
     assert min_value == 1
 
     # Calculate average using $total accumulation
-    avg_calc = fhirpath.parse("aggregate($total + $this, 0)").single(numbers)  # (3)!
+    avg_calc = parse_fhirpath("aggregate($total + $this, 0)").single(numbers)  # (3)!
     average = avg_calc / len(numbers)
     assert average == 3.0
     ```
@@ -470,8 +471,9 @@ print(f"Birth date is FHIR.date: {birth_is_date}")
 FHIRPath provides `is` and `as` operators for type checking and casting. These operators work with type specifiers that can optionally include namespaces:
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.core import Patient
+from fhircraft import get_fhir_type
 
+Patient = get_fhir_type("Patient", "R5")
 patient = Patient(id="ID1234") # (1)!
 
 print(patient.fhirpath_single("Patient.id is id"))

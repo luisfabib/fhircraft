@@ -1,5 +1,17 @@
 """The filtering module contains the object representations of the subsetting-category FHIRPath functions."""
 
+__all__ = [
+    "Index",
+    "Single",
+    "First",
+    "Last",
+    "Tail",
+    "Skip",
+    "Take",
+    "Intersect",
+    "Exclude",
+]
+
 from functools import partial
 from typing import List, Optional, Union
 
@@ -11,7 +23,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
     Literal,
 )
-from fhircraft.exceptions import FhirPathException
+from fhircraft.exceptions import FHIRPathException
 from fhircraft.utils import ensure_list
 
 
@@ -27,7 +39,7 @@ class Index(FHIRPath):
         if isinstance(index, Literal):
             index = index.value
         if not isinstance(index, int):
-            raise FhirPathException("Index() argument must be an integer number.")
+            raise FHIRPathException("Index() argument must be an integer number.")
         self.index = index
 
     def evaluate(
@@ -46,7 +58,7 @@ class Index(FHIRPath):
             FHIRPathCollection): The indexed collection item.
 
         Raises:
-            FhirPathError: If `create=True` and collection is composed of items with different parent elements.
+            FHIRPathError: If `create=True` and collection is composed of items with different parent elements.
 
         Notes:
             The collection padding with `create=True` allows the function to create and later access new elements.
@@ -104,7 +116,7 @@ class Index(FHIRPath):
                     )
                 ]
             else:
-                raise FhirPathException(
+                raise FHIRPathException(
                     f"Cannot create new array element due to inhomogeneity in parents"
                 )
         # If index is within array bounds, get element
@@ -151,7 +163,7 @@ class Single(FHIRPathFunction):
             Equivalent to `Index(0)` with additional error raising in case of non-singleton input collection.
         """
         if len(collection) > 1:
-            raise FhirPathException(
+            raise FHIRPathException(
                 f"Expected single value for single(), instead got {len(collection)} items in the collection"
             )
         return Index(0).evaluate(collection, environment, create=False)
@@ -261,7 +273,7 @@ class Skip(FHIRPathFunction):
         if not isinstance(
             num := self.num.single(collection, environment=environment), int
         ):
-            raise FhirPathException("Skip() argument must evaluate to an integer number.")
+            raise FHIRPathException("Skip() argument must evaluate to an integer number.")
         if num <= 0:
             return []
         return ensure_list(collection[num:])
@@ -297,7 +309,7 @@ class Take(FHIRPathFunction):
         if not isinstance(
             num := self.num.single(collection, environment=environment), int
         ):
-            raise FhirPathException("Skip() argument must evaluate to an integer number.")
+            raise FHIRPathException("Skip() argument must evaluate to an integer number.")
         if num <= 0:
             return []
         return ensure_list(collection[:num])

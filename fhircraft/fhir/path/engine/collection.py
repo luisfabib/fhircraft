@@ -6,9 +6,14 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
 )
-from fhircraft.exceptions import FhirPathRuntimeError
-from fhircraft.fhir.path.utils import evaluate_left_right_expressions
+from fhircraft.exceptions import FHIRPathRuntimeError
+from fhircraft.fhir.path.utils import _evaluate_left_right_expressions
 
+__all__ = [
+    "Union",
+    "Contains",
+    "In",
+]
 
 class FHIRCollectionOperator(FHIRPath):
     """
@@ -62,7 +67,7 @@ class Union(FHIRCollectionOperator):
         Returns:
             FHIRPathCollection: The output collection.
         """
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create=create
         )
         return UnionFunction(left_collection).evaluate(
@@ -99,9 +104,9 @@ class In(FHIRCollectionOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If the left expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If the left expression evaluates to a non-singleton collection.
         """
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
         )
         if len(left_collection) == 0:
@@ -109,7 +114,7 @@ class In(FHIRCollectionOperator):
         if len(right_collection) == 0:
             return [FHIRPathCollectionItem.wrap(False)]
         if len(left_collection) != 1:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 "Left expression evaluates to a non-singleton collection."
             )
         value = left_collection[0].value
@@ -149,9 +154,9 @@ class Contains(FHIRCollectionOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathException: If the left expression evaluates to a non-singleton collection.
+            FHIRPathException: If the left expression evaluates to a non-singleton collection.
         """
-        left_collection, right_collection = evaluate_left_right_expressions(
+        left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create
         )
         if len(right_collection) == 0:
@@ -159,7 +164,7 @@ class Contains(FHIRCollectionOperator):
         if len(left_collection) == 0:
             return [FHIRPathCollectionItem.wrap(False)]
         if len(right_collection) != 1:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 "Right expression evaluates to a non-singleton collection."
             )
         value = right_collection[0].value

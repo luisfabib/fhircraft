@@ -3,6 +3,25 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released.
 """
 
+__all__ = [
+    "Extension",
+    "TypeChoice",
+    "HasValue",
+    "GetValue",
+    "Resolve",
+    "HtmlChecks",
+    "MemberOf",
+    "Subsumes",
+    "SubsumedBy",
+    "Slice",
+    "LowBoundary",
+    "HighBoundary",
+    "ConformsTo",
+    "Comparable",
+    "ElementDefinition",
+    "CheckModifiers",
+]
+
 import warnings
 import re
 import sys
@@ -16,7 +35,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FhirPathException,
+    FHIRPathException,
     FHIRPathFunction,
     Invocation,
     Literal,
@@ -30,7 +49,7 @@ from fhircraft.fhir.resources.datatypes.registry import get_fhir_type_by_url
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.utils import ensure_list
 from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive
-from fhircraft.exceptions import FhirPathWarning
+from fhircraft.exceptions import FHIRPathWarning
 
 
 def _get_terminology_service(environment: dict) -> TerminologyService | None:
@@ -57,7 +76,7 @@ class Extension(FHIRPathFunction):
         if isinstance(url, Literal):
             url = url.value
         if not isinstance(url, str):
-            raise FhirPathException("Extension() argument must be a string.")
+            raise FHIRPathException("Extension() argument must be a string.")
         self.url = url
 
     def evaluate(
@@ -99,7 +118,7 @@ class TypeChoice(FHIRPath):
         if isinstance(type_choice_name, Literal):
             type_choice_name = type_choice_name.value
         if not isinstance(type_choice_name, str):
-            raise FhirPathException("TypeChoice() argument must be a string.")
+            raise FHIRPathException("TypeChoice() argument must be a string.")
         self.type_choice_name = type_choice_name
 
     def evaluate(
@@ -247,7 +266,7 @@ class Resolve(FHIRPathFunction):
                 # Resolving URLs is not supported
                 warnings.warn(
                     f"Resolving external URLs is not supported. Skipping resolution of '{resource_url}'.",
-                    FhirPathWarning,
+                    FHIRPathWarning,
                 )
                 continue
             elif resource_url.startswith("#"):
@@ -487,7 +506,7 @@ class HtmlChecks(FHIRPathFunction):
             bool
 
         Raises:
-            FhirPathException: If the collection is not a single item.
+            FHIRPathException: If the collection is not a single item.
         """
 
         collection = ensure_list(collection)
@@ -767,12 +786,12 @@ class Slice(FHIRPathFunction):
         if isinstance(structure, Literal):
             structure = structure.value
         if not isinstance(structure, str):
-            raise FhirPathException("Slice() argument must be a string.")
+            raise FHIRPathException("Slice() argument must be a string.")
         self.structure = structure
         if isinstance(name, Literal):
             name = name.value
         if not isinstance(name, str):
-            raise FhirPathException("Slice() argument must be a string.")
+            raise FHIRPathException("Slice() argument must be a string.")
         self.name = name
 
     def evaluate(
@@ -795,7 +814,7 @@ class Slice(FHIRPathFunction):
         """
         warnings.warn(
             "Evaluation of the FHIRPath slice() function is not supported. Returning an empty collection.",
-            FhirPathWarning,
+            FHIRPathWarning,
         )
         return []
 
@@ -812,7 +831,7 @@ class CheckModifiers(FHIRPathFunction):
         if isinstance(modifier, Literal):
             modifier = modifier.value
         if not isinstance(modifier, str):
-            raise FhirPathException("checkModifiers() argument must be a string.")
+            raise FHIRPathException("checkModifiers() argument must be a string.")
         self.modifier = modifier
 
     def evaluate(
@@ -846,7 +865,7 @@ class ConformsTo(FHIRPathFunction):
         if isinstance(structure, Literal):
             structure = structure.value
         if not isinstance(structure, str):
-            raise FhirPathException("conformsTo() argument must be a string.")
+            raise FHIRPathException("conformsTo() argument must be a string.")
         self.structure = structure
 
     def evaluate(
@@ -870,7 +889,7 @@ class ConformsTo(FHIRPathFunction):
         if isinstance(fhir_release, FHIRPathCollectionItem):
             fhir_release = fhir_release.value
         if not fhir_release or not isinstance(fhir_release, str):
-            raise FhirPathException(
+            raise FHIRPathException(
                 "The %fhirRelease environment variable is required for evaluating conformsTo()."
             )
         try:
@@ -881,7 +900,7 @@ class ConformsTo(FHIRPathFunction):
             warnings.warn(
                 f"Could not resolve structure definition '{self.structure}' for conformsTo() function."
                 f" Current implementation is limited to core resources. Returning empty result.",
-                FhirPathWarning,
+                FHIRPathWarning,
             )
             return []
         except ValidationError as e:
@@ -902,7 +921,7 @@ class MemberOf(FHIRPathFunction):
         if isinstance(valueset, Literal):
             valueset = valueset.value
         if not isinstance(valueset, str):
-            raise FhirPathException("memberOf() argument must be a string.")
+            raise FHIRPathException("memberOf() argument must be a string.")
         self.valueset = valueset
 
     def evaluate(
@@ -937,7 +956,7 @@ class MemberOf(FHIRPathFunction):
             release = release.value
 
         if not release or not isinstance(release, str):
-            raise FhirPathException(
+            raise FHIRPathException(
                 "The %fhirRelease environment variable is required for evaluating memberOf()."
             )
         codeable = collection[0].value
@@ -963,7 +982,7 @@ class MemberOf(FHIRPathFunction):
         except Exception as e:
             warnings.warn(
                 f"Error during terminology service call in memberOf() function: {e}. Skipping evaluation of memberOf().",
-                FhirPathWarning,
+                FHIRPathWarning,
             )
             return []
         if result is None:
@@ -986,7 +1005,7 @@ def _evaluate_subsumtion(code, collection, environment, create, invert=False):
     if isinstance(release, FHIRPathCollectionItem):
         release = release.value
     if not release or not isinstance(release, str):
-        raise FhirPathException(
+        raise FHIRPathException(
             f"The %fhirRelease environment variable is required for evaluating {'subsumes()' if not invert else 'subsumedBy()'}."
         )
     given = code.evaluate(collection, environment=environment, create=create)
@@ -997,19 +1016,19 @@ def _evaluate_subsumtion(code, collection, environment, create, invert=False):
         codingsB = [given]
     elif type_utils.is_fhir_complex_type(given, "CodeableConcept", release):
         if len(given.coding) == 0:
-            raise FhirPathException(
+            raise FHIRPathException(
                 f"The code argument to {'subsumes()' if not invert else 'subsumedBy()'} cannot be an empty CodeableConcept."
             )
         codingsB = given.coding
     else:
-        raise FhirPathException(
+        raise FHIRPathException(
             f"The code argument to {'subsumes()' if not invert else 'subsumedBy()'} must be a Coding or CodeableConcept."
         )
 
     source = collection[0].value
     if type_utils.is_fhir_complex_type(source, "CodeableConcept", release):
         if len(source.coding) == 0:
-            raise FhirPathException(
+            raise FHIRPathException(
                 f"The source collection in {'subsumes()' if not invert else 'subsumedBy()'} cannot be an empty CodeableConcept."
             )
         codingsA = source.coding
@@ -1020,7 +1039,7 @@ def _evaluate_subsumtion(code, collection, environment, create, invert=False):
     for codingA in codingsA:
         for codingB in codingsB:
             if codingA.system != codingB.system:
-                raise FhirPathException(
+                raise FHIRPathException(
                     f"Subsumption across different code systems is not a valid operation. Attempting to subsume between code systems '{codingA.system}' and '{codingB.system}'."
                 )
             try:
@@ -1033,7 +1052,7 @@ def _evaluate_subsumtion(code, collection, environment, create, invert=False):
             except Exception as e:
                 warnings.warn(
                     f"Error during terminology service call in {'subsumes()' if not invert else 'subsumedBy()'} function: {e}. Skipping evaluation of {'subsumes()' if not invert else 'subsumedBy()'}.",
-                    FhirPathWarning,
+                    FHIRPathWarning,
                 )
                 return []
             if result is None:
@@ -1053,7 +1072,7 @@ class Subsumes(FHIRPathFunction):
 
     def __init__(self, code: FHIRPath):
         if not isinstance(code, FHIRPath):
-            raise FhirPathException("subsumes() argument must be a FHIRPath instance.")
+            raise FHIRPathException("subsumes() argument must be a FHIRPath instance.")
         self.code = code
 
     def evaluate(
@@ -1093,7 +1112,7 @@ class SubsumedBy(FHIRPathFunction):
 
     def __init__(self, code: FHIRPath):
         if not isinstance(code, FHIRPath):
-            raise FhirPathException(
+            raise FHIRPathException(
                 "subsumedBy() argument must be a FHIRPath instance."
             )
         self.code = code
@@ -1139,7 +1158,7 @@ class Comparable(FHIRPathFunction):
         if isinstance(quantity, Quantity):
             quantity = Literal(quantity)
         if not isinstance(quantity, FHIRPath):
-            raise FhirPathException(
+            raise FHIRPathException(
                 "comparable() argument must be a FHIRPath Quantity or valid FHIRPath."
             )
         self.quantity = quantity
@@ -1165,20 +1184,20 @@ class Comparable(FHIRPathFunction):
         if len(collection) == 0:
             return []
         elif len(collection) != 1:
-            raise FhirPathException("comparable() requires a singleton collection.")
+            raise FHIRPathException("comparable() requires a singleton collection.")
         query_quantity = self.quantity.single(collection, environment=environment)
         collection_value = collection[0].value
         if (collection_value is None) or (query_quantity is None):
             return [FHIRPathCollectionItem.wrap(False)]
         if collection_value and not Quantity.is_quantity(collection_value):
-            raise FhirPathException(
+            raise FHIRPathException(
                 f"Comparable() can only be called on Quantity types, got: {type(collection_value)}"
             )
         input_quantity: Quantity = Quantity.parse_quantity(collection_value)
         query_quantity: Quantity = Quantity.parse_quantity(query_quantity)
 
         if query_quantity and not Quantity.is_quantity(query_quantity):
-            raise FhirPathException(
+            raise FHIRPathException(
                 f"Comparable() input did not evaluate to a Quantity, it was: {type(query_quantity)}"
             )
 

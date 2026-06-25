@@ -1,5 +1,12 @@
 """The tree navigation module contains the object representations of the types category FHIRPath operators/functions."""
 
+__all__ = [
+    "Is",
+    "LegacyIs",
+    "As",
+    "LegacyAs",
+]
+
 from typing import Any
 
 import fhircraft.fhir.path.engine.literals as fhirpath_literals
@@ -13,8 +20,8 @@ from fhircraft.fhir.path.engine.core import (
     TypeSpecifier,
     This,
 )
-from fhircraft.exceptions import FhirPathRuntimeError
-from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
+from fhircraft.exceptions import FHIRPathRuntimeError
+from fhircraft.fhir.path.utils import _evaluate_fhirpath_collection
 
 
 class FHIRTypesOperator(FHIRPath):
@@ -33,13 +40,13 @@ class FHIRTypesOperator(FHIRPath):
     def _get_singleton_collection_value(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> Any:
-        left_collection = evaluate_fhirpath_collection(
+        left_collection = _evaluate_fhirpath_collection(
             self.left, collection, environment, create
         )
         if len(left_collection) == 0:
             return None
         if len(left_collection) > 1:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} expected a singleton collection for the left expression, instead got a {len(collection)}-items collection."
             )
         return left_collection[0].value
@@ -75,7 +82,7 @@ class FHIRTypesOperator(FHIRPath):
         elif namespace == "System":
             return isinstance(value, type_)
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"Invalid type specifier namespace '{self.type_specifier.namespace}' in operator {self.__str__()}. Expected 'FHIR' or 'System'."
             )
 
@@ -124,7 +131,7 @@ class Is(FHIRTypesOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         value = self._get_singleton_collection_value(collection, environment, create)
         if value is None:
@@ -190,7 +197,7 @@ class As(FHIRTypesOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         value = self._get_singleton_collection_value(collection, environment, create)
         if value is None:

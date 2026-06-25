@@ -1,6 +1,6 @@
 import ply.lex
 
-from fhircraft.exceptions import FhirPathLexingError
+from fhircraft.exceptions import FHIRPathLexingError
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.fhir.resources.datatypes.registry import get_registry
 
@@ -32,7 +32,7 @@ class MergeLexerMetaclass(type):
         return super().__new__(metacls, name, bases, attrs)
 
 
-class FhirPathLexer(metaclass=MergeLexerMetaclass):
+class FHIRPathLexer(metaclass=MergeLexerMetaclass):
     """
     A Lexical analyzer for JsonPath.
 
@@ -41,7 +41,7 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
     def __init__(self, debug=False):
         self.debug = debug
         if self.__doc__ is None:
-            raise FhirPathLexingError("Docstrings have been removed by design of PLY.")
+            raise FHIRPathLexingError("Docstrings have been removed by design of PLY.")
         # Create the lexer once during initialization for better performance
         self.lexer = ply.lex.lex(module=self)
 
@@ -63,7 +63,7 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
             yield t
 
         if self.lexer.string_value is not None:
-            raise FhirPathLexingError("Unexpected EOF in string literal or identifier")
+            raise FHIRPathLexingError("Unexpected EOF in string literal or identifier")
 
     # ============== PLY Lexer specification ==================
     #
@@ -329,18 +329,18 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
         r"[a-zA-Z][a-zA-Z_0-9]*\((?:.*)?\)"
         t.value = t.value.split("(")[0]
         pos = t.lexpos - t.lexer.latest_newline
-        raise FhirPathLexingError(
+        raise FHIRPathLexingError(
             f'FHIRPath lexer error at {t.lexer.lineno}:{pos} - Invalid function: "{t.value}".\n{_underline_error_in_fhir_path(t.lexer.lexdata, t.value, pos)}'
         )
 
     def t_error_doublequote_string(self, t):
         r"\"([^\"]*)?\" "
         pos = t.lexpos - t.lexer.latest_newline
-        raise FhirPathLexingError(
+        raise FHIRPathLexingError(
             f"FHIRPath lexer error at {t.lexer.lineno}:{pos} - Double-quoted strings are not valid in FHIRPath: {t.value}\n{_underline_error_in_fhir_path(t.lexer.lexdata, t.value, pos)}"
         )
 
     def t_error(self, t):
-        raise FhirPathLexingError(
+        raise FHIRPathLexingError(
             f"FHIRPath lexer error at {t.lexer.lineno}:{t.lexpos - t.lexer.latest_newline} - Unexpected character: {t.value[0]}"
         )

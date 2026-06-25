@@ -1,3 +1,12 @@
+__all__ = [
+    "TypePrecisionError",
+    "Quantity",
+    "Date",
+    "Time",
+    "DateTime",
+    "ureg",
+]
+
 import operator
 from pathlib import Path
 import re
@@ -7,7 +16,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional, Union, Any, TYPE_CHECKING
 from pint import UnitRegistry, Quantity as PintQuantity
-from fhircraft.exceptions import FhirPathWarning
+from fhircraft.exceptions import FHIRPathWarning
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.quantity import (
@@ -75,7 +84,7 @@ class Quantity(FHIRPathLiteralType):
             if instance.system not in (None, "http://unitsofmeasure.org"):
                 warnings.warn(
                     f"Quantity with non-UCUM system '{instance.system}' may not be parsed correctly.",
-                    FhirPathWarning,
+                    FHIRPathWarning,
                 )
             if not instance.value:
                 raise ValueError("Quantity value is required")

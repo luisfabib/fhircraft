@@ -1,9 +1,6 @@
 import pytest
 
-from fhircraft.fhir.mapper.lexer import (
-    FhirMappingLanguageLexer,
-    FhirMappingLanguageLexerError,
-)
+from fhircraft.fhir.mapper.lexer import FHIRMappingLanguageLexer
 
 token_test_cases = (
     # ----------------- Keywords -----------------
@@ -298,7 +295,7 @@ token_test_cases = (
 
 @pytest.fixture(scope="module")
 def lexer():
-    return FhirMappingLanguageLexer()
+    return FHIRMappingLanguageLexer()
 
 
 @pytest.mark.parametrize("string, expected_token_info", token_test_cases)

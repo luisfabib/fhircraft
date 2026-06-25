@@ -195,7 +195,7 @@ test/
 ```python
 # test/test_my_feature.py
 import pytest
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 def test_patient_creation_validates_gender():
     """Test that invalid gender codes raise validation errors."""

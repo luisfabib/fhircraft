@@ -3,7 +3,7 @@ import re
 from sys import path
 from typing import TYPE_CHECKING, Any, Sequence, Tuple, Type
 from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
-from fhircraft.fhir.path import engine as fp, fhirpath as fhirpath_parser
+from fhircraft.fhir.path import engine as fp
 from fhircraft.exceptions import MapperTargetProcessingError
 import uuid
 

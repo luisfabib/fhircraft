@@ -1,5 +1,20 @@
 """The filtering module contains the object representations of the existence-category FHIRPath functions."""
 
+__all__ = [
+    "Empty",
+    "Exists",
+    "All",
+    "AllTrue",
+    "AnyTrue",
+    "AllFalse",
+    "AnyFalse",
+    "SubsetOf",
+    "SupersetOf",
+    "Count",
+    "Distinct",
+    "IsDistinct",
+]
+
 from typing import Callable
 
 from fhircraft.fhir.path.engine.core import (
@@ -9,8 +24,8 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.engine.filtering import Where
-from fhircraft.exceptions import FhirPathException
-from fhircraft.fhir.path.utils import get_expression_context
+from fhircraft.exceptions import FHIRPathException
+from fhircraft.fhir.path.utils import _get_expression_context
 
 
 class Empty(FHIRPathFunction):
@@ -115,7 +130,7 @@ class All(FHIRPathFunction):
                         (
                             self.criteria.single(
                                 [item],
-                                environment=get_expression_context(
+                                environment=_get_expression_context(
                                     environment, item, index
                                 ),
                             )
@@ -149,7 +164,7 @@ def _all_or_any_boolean(
             return [FHIRPathCollectionItem.wrap(True)]
     for item in collection:
         if not isinstance(item.value, bool):
-            raise FhirPathException(
+            raise FHIRPathException(
                 f"The collection evaluated by allTrue() has a non-boolean value: {item.value}"
             )
         values.append(item.value == boolean)

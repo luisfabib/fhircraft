@@ -2,6 +2,10 @@
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed
 """
 
+__all__ = [
+    "Aggregate",
+]
+
 from typing import Any
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
@@ -9,7 +13,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
     FHIRPathFunction,
 )
-from fhircraft.fhir.path.utils import get_expression_context
+from fhircraft.fhir.path.utils import _get_expression_context
 from fhircraft.utils import ensure_list
 
 
@@ -57,7 +61,7 @@ class Aggregate(FHIRPathFunction):
         context = environment.copy()
         for index, item in enumerate(collection):
             # Set up the environment for evaluating the expression
-            context = get_expression_context(context, item, index)
+            context = _get_expression_context(context, item, index)
             context["$total"] = context.get("$total", self.init if self.init else [])
             # Evaluate the expression
             result = self.expression.evaluate([item], context, create=create)

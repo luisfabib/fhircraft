@@ -3,13 +3,21 @@ For all boolean operators, the collections passed as operands are first evaluate
 The operators then use three-valued logic to propagate empty operands.
 """
 
+__all__ = [
+    "And",
+    "Or",
+    "Xor",
+    "Implies",
+    "Not",
+]
+
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
 )
-from fhircraft.exceptions import FhirPathRuntimeError
+from fhircraft.exceptions import FHIRPathRuntimeError
 
 
 def _evaluate_boolean_expressions(
@@ -353,7 +361,7 @@ class Not(FHIRPathFunction):
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
         if len(collection) > 1:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 "Cannot assert Not() for a collection that has more than one item."
             )
         elif len(collection) == 0:

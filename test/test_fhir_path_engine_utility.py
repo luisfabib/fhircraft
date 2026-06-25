@@ -1,11 +1,11 @@
 from fhircraft.fhir.path.engine.core import Element, FHIRPathCollectionItem
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
-from fhircraft.fhir.path.engine.literals import Date, Time
+from fhircraft.fhir.path.engine.literals import Date, Time, DateTime
 from fhircraft.fhir.path.engine.utility import *
+import datetime 
+import logging
 
 env = dict()
-
-logger = logging.getLogger("FHIRPath")
 
 # -------------
 # Trace

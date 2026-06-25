@@ -1,5 +1,24 @@
 """The tree navigation module contains the object representations of the math category FHIRPath operators/functions."""
 
+__all__ = [
+    "Addition",
+    "Subtraction",
+    "Multiplication",
+    "Division",
+    "Div",
+    "Mod",
+    "Abs",
+    "Ceiling",
+    "Exp",
+    "Floor",
+    "Ln",
+    "Log",
+    "Sqrt",
+    "Truncate",
+    "Power",
+    "Round",
+]
+
 from math import ceil, exp, floor, log, sqrt
 from typing import Callable
 
@@ -11,10 +30,10 @@ from fhircraft.fhir.path.engine.core import (
     Literal,
 )
 from fhircraft.fhir.path.engine.literals import Quantity
-from fhircraft.exceptions import FhirPathRuntimeError
+from fhircraft.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import (
-    evaluate_and_prepare_collection_values,
-    get_expression_context,
+    _evaluate_and_prepare_collection_values,
+    _get_expression_context,
 )
 
 
@@ -73,11 +92,11 @@ class Addition(FHIRMathOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase, StringBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -93,7 +112,7 @@ class Addition(FHIRMathOperator):
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
             return [FHIRPathCollectionItem.wrap(left_value + right_value)]
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot add {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
@@ -126,11 +145,11 @@ class Subtraction(FHIRMathOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -142,7 +161,7 @@ class Subtraction(FHIRMathOperator):
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
             return [FHIRPathCollectionItem.wrap(left_value - right_value)]
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot subtract {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
@@ -176,11 +195,11 @@ class Multiplication(FHIRMathOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -192,7 +211,7 @@ class Multiplication(FHIRMathOperator):
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
             return [FHIRPathCollectionItem.wrap(left_value * right_value)]
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot multiply {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
@@ -228,11 +247,11 @@ class Division(FHIRMathOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -248,7 +267,7 @@ class Division(FHIRMathOperator):
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
             return [FHIRPathCollectionItem.wrap(left_value / right_value)]
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
@@ -280,11 +299,11 @@ class Div(FHIRMathOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -296,7 +315,7 @@ class Div(FHIRMathOperator):
                 return []
             return [FHIRPathCollectionItem.wrap(left_value // right_value)]  # type: ignore
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot perform truncated division between {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
@@ -328,11 +347,11 @@ class Mod(FHIRMathOperator):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
-        left_value, right_value = evaluate_and_prepare_collection_values(
+        left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
@@ -342,7 +361,7 @@ class Mod(FHIRMathOperator):
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
             return [FHIRPathCollectionItem.wrap(left_value % right_value)]
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
@@ -361,7 +380,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
         if len(collection) == 0:
             return []
         elif len(collection) > 1:
-            raise FhirPathRuntimeError("Input collection must be a singleton.")
+            raise FHIRPathRuntimeError("Input collection must be a singleton.")
         return collection
 
     def evaluate(
@@ -379,7 +398,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: For non-singleton collections.
+            FHIRPathRuntimeError: For non-singleton collections.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
@@ -392,7 +411,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
         elif Quantity.is_quantity(value):
             value = Quantity(self.math_operation(value.value), value.unit)
         else:
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath function {self.__class__.__name__}() cannot compute abs for {value} ({type(value).__name__})."
             )
         return [FHIRPathCollectionItem.wrap(value)]
@@ -464,13 +483,13 @@ class Log(FHIRPathMathFunction):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: For non-singleton collections or invalid base.
+            FHIRPathRuntimeError: For non-singleton collections or invalid base.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
         value = collection[0].value
-        environment = get_expression_context(environment, value, index=0)
+        environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(
                 base := self.base.single(collection, environment=environment),
@@ -479,7 +498,7 @@ class Log(FHIRPathMathFunction):
             or (isinstance(base, IntegerBase) and (base := base.value) is None)
             or base <= 1
         ):
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 "The base argument of the log function must be an integer greater than 1."
             )
         self.math_operation = lambda x: log(x, base)
@@ -512,13 +531,13 @@ class Power(FHIRPathMathFunction):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: For non-singleton collections or invalid exponent.
+            FHIRPathRuntimeError: For non-singleton collections or invalid exponent.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
         value = collection[0].value
-        environment = get_expression_context(environment, value, index=0)
+        environment = _get_expression_context(environment, value, index=0)
 
         if not isinstance(
             exponent := self.exponent.single(collection, environment=environment),
@@ -526,7 +545,7 @@ class Power(FHIRPathMathFunction):
         ) or (
             isinstance(exponent, IntegerBase) and (exponent := exponent.value) is None
         ):
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 "The exponent argument of the power function must be a number."
             )
         self.math_operation = lambda x: pow(x, exponent)
@@ -561,13 +580,13 @@ class Round(FHIRPathMathFunction):
             FHIRPathCollection: The output collection.
 
         Raises:
-            FhirPathRuntimeError: For non-singleton collections or invalid precision.
+            FHIRPathRuntimeError: For non-singleton collections or invalid precision.
         """
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
         value = collection[0].value
-        environment = get_expression_context(environment, value, index=0)
+        environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(
                 precision := self.precision.single(collection, environment=environment),
@@ -579,7 +598,7 @@ class Round(FHIRPathMathFunction):
             )
             or precision < 0
         ):
-            raise FhirPathRuntimeError(
+            raise FHIRPathRuntimeError(
                 "The precision argument of the round function must be a non-negative integer."
             )
         self.math_operation = lambda x: round(x, precision)

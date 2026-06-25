@@ -2,20 +2,22 @@
 
 import io
 import tarfile
+import json
+import warnings
 from typing import Optional, Union
 from urllib.parse import urljoin
 
 import requests
 from pydantic import ValidationError
-import json
 
-from .models import PackageMetadata
 from fhircraft.exceptions import (
-    PackageException,
     PackageNotFoundError,
     PackageResolutionError,
+    PackageValidationError,
+    PackageValidationWarning,
 )
 
+from .models import PackageMetadata
 
 class FHIRPackageRegistryClient:
     """
@@ -37,7 +39,7 @@ class FHIRPackageRegistryClient:
         Initialize the FHIR Package Registry client.
 
         Args:
-            base_url (Optional[str]): Base URL for the API. Defaults to packages.simplifier.net
+            base_url (Optional[str]): Base URL for the API
             timeout (float): Request timeout in seconds
             session (Optional[requests.Session]): Optional requests session to use
         """
@@ -81,10 +83,10 @@ class FHIRPackageRegistryClient:
             try:
                 return PackageMetadata.model_validate(response.json())
             except ValidationError as e:
-                raise PackageResolutionError(f"Invalid response format: {e}")
+                raise PackageResolutionError(f"Invalid response format: {e}") from e
 
         except requests.RequestException as e:
-            raise PackageResolutionError(f"Request failed: {e}")
+            raise PackageResolutionError(f"Request failed: {e}") from e
 
     def download_package(
         self, package_name: str, package_version: str, extract: bool = False
@@ -126,7 +128,7 @@ class FHIRPackageRegistryClient:
                 return response.content
 
         except requests.RequestException as e:
-            raise PackageResolutionError(f"Download failed: {e}")
+            raise PackageResolutionError(f"Download failed: {e}") from e
 
     def get_latest_version(self, package_name: str) -> Optional[str]:
         """
@@ -156,7 +158,7 @@ class FHIRPackageRegistryClient:
 
         Raises:
             PackageNotFoundError: If the package is not found or has no latest version
-            FHIRPackageResolutionError: For other API errors
+            PackageResolutionError: For other API errors
         """
         latest_version = self.get_latest_version(package_name)
         if not latest_version:
@@ -172,7 +174,7 @@ class FHIRPackageRegistryClient:
         package_name: str,
         package_version: Optional[str] = None,
         install_dependencies: bool = True,
-        fail_if_exists: bool = False,
+        raise_on_errors: bool = False,
     ) -> list[dict]:
         """
         Load a FHIR package from the registry and add all structure definitions.
@@ -181,12 +183,12 @@ class FHIRPackageRegistryClient:
             package_name: Name of the package (e.g., "hl7.fhir.us.core")
             package_version: Version of the package (defaults to latest)
             install_dependencies: If True, checks and installs any dependencies of the package
-            fail_if_exists: If True, raise error if package already loaded
+            raise_on_errors: If True, raises on processing errors; otherwise emits warnings
 
         Raises:
             PackageNotFoundError: If package or version not found
-            FHIRPackageResolutionError: If download fails
-            RuntimeError: If package processing fails
+            PackageResolutionError: If download fails
+            PackageValidationError: If downloaded content is not a tar.gz file or no valid resources are found in the package
         """
 
         # Determine version to load
@@ -197,7 +199,7 @@ class FHIRPackageRegistryClient:
             except (PackageNotFoundError, PackageResolutionError) as e:
                 raise PackageNotFoundError(
                     f"Failed to get latest version for package {package_name}: {e}"
-                )
+                ) from e
 
         if not target_version:
             raise PackageNotFoundError(
@@ -212,43 +214,50 @@ class FHIRPackageRegistryClient:
 
             # Ensure we got a TarFile object (should be guaranteed when extract=True)
             if not isinstance(result, tarfile.TarFile):
-                raise RuntimeError(
+                raise PackageValidationError(
                     f"Expected TarFile object but got {type(result)} when downloading package"
                 )
 
-            try:
-                results, errors = self._process_package_tar(
-                    target_resource,
-                    result,
-                    install_dependencies,
+            results, errors = self._process_package_tar(
+                target_resource,
+                result,
+                install_dependencies,
+                raise_on_errors,
+            )
+
+            if len(results) == 0:
+                warnings.warn(
+                    f"No valid resources ({target_resource}) found in package {package_key}",
+                    category=PackageValidationWarning,
+                    stacklevel=2,
+                )
+            if errors:
+                error_summary = f"Loaded {len(results)} {target_resource} resources with {len(errors)} errors"
+                error_details = "\n".join(
+                    [f"  - {error}" for error in errors[:5]]
+                    + ([f"  ... and {len(errors) - 5} more errors"] if len(errors) > 5 else [])
+                )
+                if raise_on_errors:
+                    raise PackageValidationError(f"{error_summary}\n{error_details}")
+                warnings.warn(
+                    f"{error_summary}\n{error_details}",
+                    category=PackageValidationWarning,
+                    stacklevel=2,
                 )
 
-                if len(results) == 0:
-                    raise RuntimeError(
-                        f"No valid resources ({target_resource}) found in package"
-                    )
+            return results
 
-                if errors:
-                    # Log errors but don't fail if we got some definitions
-                    error_summary = f"Loaded {len(results)} {target_resource} resources with {len(errors)} errors"
-                    print(f"Warning: {error_summary}")
-                    for error in errors[:5]:  # Show first 5 errors
-                        print(f"  - {error}")
-                    if len(errors) > 5:
-                        print(f"  ... and {len(errors) - 5} more errors")
-
-                return results
-
-            except (PackageNotFoundError, PackageResolutionError) as e:
-                raise e
+        except (PackageNotFoundError, PackageResolutionError) as e:
+            raise e
         except Exception as e:
-            raise RuntimeError(f"Failed to process package {package_key}: {e}")
+            raise PackageValidationError(f"Failed to process package {package_key}: {e}") from e
 
     def _process_package_tar(
         self,
         target_resource: str,
         tar_file: tarfile.TarFile,
         install_dependencies: bool = True,
+        raise_on_errors: bool = False,
     ) -> tuple[list[dict], list[str]]:
         """
         Process a tar file and extract structure definitions.
@@ -284,7 +293,7 @@ class FHIRPackageRegistryClient:
                                     target_resource,
                                     dependency,
                                     version,
-                                    fail_if_exists=False,
+                                    raise_on_errors=raise_on_errors,
                                 )
                                 results.extend(dependency_results)
                             except Exception as e:
@@ -333,7 +342,7 @@ def get_package_metadata(
 
     Args:
         package_name (str): Name of the package
-        base_url (Optional[str]): Optional base URL (defaults to packages.simplifier.net)
+        base_url (Optional[str]): Optional base URL
 
     Returns:
         (PackageMetadata) Metadata of the package
@@ -354,11 +363,11 @@ def download_package(
     Args:
         package_name (str): Name of the package
         package_version (str): Version of the package
-        base_url (Optional[str]): Optional base URL (defaults to packages.simplifier.net)
+        base_url (Optional[str]): Optional base URL
         extract (bool): If True, return extracted TarFile object, otherwise raw bytes
 
     Returns:
-        (Union[bytes, tarfile.TarFile]) Raw tar.gz bytes or extracted TarFile object
+        Raw tar.gz bytes or extracted TarFile object
     """
     client = FHIRPackageRegistryClient(base_url=base_url)
     return client.download_package(package_name, package_version, extract=extract)
@@ -372,7 +381,7 @@ def download_latest_package(
 
     Args:
         package_name (str): Name of the package
-        base_url (Optional[str]): Optional base URL (defaults to packages.simplifier.net)
+        base_url (Optional[str]): Optional base URL
         extract (bool): If True, return extracted TarFile object, otherwise raw bytes
 
     Returns:

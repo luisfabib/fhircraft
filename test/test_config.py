@@ -55,24 +55,24 @@ def test_default_config_values():
     assert config.disabled_fhir_constraints == frozenset()
     assert config.disable_fhir_warnings is False
     assert config.disable_fhir_errors is False
-    assert config.mode == "strict"
+    assert config.validation_mode == "strict"
 
 
 def test_config_with_custom_values():
     config = FhircraftConfig(
         disable_validation_warnings=True,
         disabled_fhir_constraints={"dom-6", "sdf-0"},  # type: ignore
-        mode="lenient",
+        validation_mode="lenient",
     )
     assert config.disable_validation_warnings is True
     assert config.disabled_fhir_constraints == frozenset({"dom-6", "sdf-0"})
-    assert config.mode == "lenient"
+    assert config.validation_mode == "lenient"
 
 
 def test_default_fhircraft_config():
     config = FhircraftConfig()
     assert isinstance(config, FhircraftConfig)
-    assert config.mode == "strict"
+    assert config.validation_mode == "strict"
 
 
 def test_fhircraft_config_with_custom_field():
@@ -82,7 +82,7 @@ def test_fhircraft_config_with_custom_field():
 
 def test_fhircraft_config_invalid_mode():
     with pytest.raises(ValueError, match="Invalid validation mode"):
-        FhircraftConfig(mode="invalid")  # type: ignore
+        FhircraftConfig(validation_mode="invalid")  # type: ignore
 
 
 # =========================================================================
@@ -93,7 +93,7 @@ def test_fhircraft_config_invalid_mode():
 def test_get_config__get_default_config():
     config = get_config()
     assert isinstance(config, FhircraftConfig)
-    assert config.mode == "strict"
+    assert config.validation_mode == "strict"
 
 
 def test_get_config__config_persistence():
@@ -119,7 +119,7 @@ def test_configure__validation_mode():
     configure(validation_mode="lenient")
 
     config = get_config()
-    assert config.mode == "lenient"
+    assert config.validation_mode == "lenient"
 
 
 def test_configure__disabled_constraints():
@@ -138,7 +138,7 @@ def test_configure__multiple_options():
 
     config = get_config()
     assert config.disable_validation_warnings is True
-    assert config.mode == "lenient"
+    assert config.validation_mode == "lenient"
     assert config.disabled_fhir_constraints == frozenset({"dom-6"})
 
 
@@ -175,28 +175,28 @@ def test_override_config__temporary_change():
 
 def test_override_config__nested():
     with override_config(validation_mode="lenient"):
-        assert get_config().mode == "lenient"
+        assert get_config().validation_mode == "lenient"
 
         with override_config(validation_mode="skip"):
-            assert get_config().mode == "skip"
+            assert get_config().validation_mode == "skip"
 
-        assert get_config().mode == "lenient"
+        assert get_config().validation_mode == "lenient"
 
-    assert get_config().mode == "strict"
+    assert get_config().validation_mode == "strict"
 
 
 def test_override_config__exception_handling():
-    assert get_config().mode == "strict"
+    assert get_config().validation_mode == "strict"
 
     try:
         with override_config(validation_mode="skip"):
-            assert get_config().mode == "skip"
+            assert get_config().validation_mode == "skip"
             raise ValueError("Test exception")
     except ValueError:
         pass
 
     # Config should be restored
-    assert get_config().mode == "strict"
+    assert get_config().validation_mode == "strict"
 
 
 def test_override_config__returns_config():
@@ -264,7 +264,7 @@ def test_reset_config():
     reset_config()
     config = get_config()
     assert config.disable_validation_warnings is False
-    assert config.mode == "strict"
+    assert config.validation_mode == "strict"
     assert config.disabled_fhir_constraints == frozenset()
 
 
@@ -286,7 +286,7 @@ def test_load_validation_mode_from_env(monkeypatch):
 
     load_config_from_env()
 
-    assert get_config().mode == "lenient"
+    assert get_config().validation_mode == "lenient"
 
 
 def test_load_disabled_constraints_from_env(monkeypatch):
@@ -309,7 +309,7 @@ def test_load_all_from_env(monkeypatch):
 
     config = get_config()
     assert config.disable_validation_warnings is True
-    assert config.mode == "skip"
+    assert config.validation_mode == "skip"
     assert "dom-6" in config.disabled_fhir_constraints
 
 
@@ -319,13 +319,13 @@ def test_load_invalid_validation_mode(monkeypatch):
     load_config_from_env()
 
     # Should remain default
-    assert get_config().mode == "strict"
+    assert get_config().validation_mode == "strict"
 
 
 def test_load_with_no_env_vars():
     # Should not raise any errors
     load_config_from_env()
-    assert get_config().mode == "strict"
+    assert get_config().validation_mode == "strict"
 
 
 # =========================================================================
@@ -523,7 +523,7 @@ def test_context_isolation():
     configure(validation_mode="strict")
 
     def check_config_in_context():
-        return get_config().mode
+        return get_config().validation_mode
 
     # Create a new context with different config
     ctx = copy_context()
@@ -533,4 +533,6 @@ def test_context_isolation():
         result_in_context = check_config_in_context()
 
     # Main context should be unchanged
-    assert get_config().mode == "strict"
+    assert get_config().validation_mode == "strict"
+    assert result_in_context == "lenient"
+    assert ctx.run(check_config_in_context) == "strict"

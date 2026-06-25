@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 from unittest.mock import Mock, patch
 
-from fhircraft.exceptions import FhirPathException, FhirPathRuntimeError
+from fhircraft.exceptions import FHIRPathException, FHIRPathRuntimeError
 from fhircraft.fhir.path.mixin import FHIRPathMixin
 
 
@@ -96,13 +96,6 @@ class TestFHIRPathMixin(unittest.TestCase):
 
         self.empty_patient = MockPatient(id="empty-patient")
 
-    def test_fhirpath_property(self):
-        """Test that the fhirpath property returns a parser instance."""
-        parser = self.patient.fhirpath
-        self.assertIsNotNone(parser)
-        # Verify it has a parse method
-        self.assertTrue(hasattr(parser, "parse"))
-
     # Test value retrieval methods
     def test_fhirpath_values(self):
         """Test fhirpath_values() method."""
@@ -141,7 +134,7 @@ class TestFHIRPathMixin(unittest.TestCase):
         self.assertIsNone(missing_no_default)
 
         # Test error when multiple values exist
-        with self.assertRaises(FhirPathRuntimeError):
+        with self.assertRaises(FHIRPathRuntimeError):
             self.patient.fhirpath_single("Patient.name.family")
 
     def test_fhirpath_first(self):
@@ -237,7 +230,7 @@ class TestFHIRPathMixin(unittest.TestCase):
         self.assertEqual(updated_gender, "other")
 
         # Test error when multiple values exist
-        with self.assertRaises(FhirPathException):
+        with self.assertRaises(FHIRPathException):
             self.patient.fhirpath_update_single("Patient.name.family", "NewName")
 
     def test_fhirpath_update_values(self):
@@ -280,7 +273,7 @@ class TestFHIRPathMixin(unittest.TestCase):
             try:
                 patient.fhirpath_update_single(expression, value)
                 return True
-            except (FhirPathException, RuntimeError):
+            except (FHIRPathException, RuntimeError):
                 return False
 
         # Test successful single update
@@ -387,18 +380,6 @@ class TestFHIRPathMixin(unittest.TestCase):
         self.assertEqual(last_value, all_values[-1] if all_values else None)
         self.assertEqual(exists, count > 0)
 
-    @patch("fhircraft.fhir.path.mixin.import_fhirpath_engine")
-    def test_fhirpath_engine_import(self, mock_import):
-        """Test that the FHIRPath engine is properly imported."""
-        mock_engine = Mock()
-        mock_import.return_value = mock_engine
-
-        # Create new patient to trigger import
-        patient = MockPatient()
-        engine = patient.fhirpath
-
-        mock_import.assert_called_once()
-        self.assertEqual(engine, mock_engine)
 
     def test_real_world_scenarios(self):
         """Test real-world usage scenarios."""
@@ -436,7 +417,7 @@ class TestFHIRPathMixin(unittest.TestCase):
                 try:
                     patient.fhirpath_update_single(phone_expr, new_phone)
                     return True
-                except (FhirPathException, RuntimeError):
+                except (FHIRPathException, RuntimeError):
                     return False
             return False
 

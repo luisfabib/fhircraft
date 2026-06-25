@@ -1,59 +1,60 @@
+"""
+FHIRPath utility functions for parsing, evaluating, and handling FHIRPath 
+expressions and collections.
+"""
 import re
-from typing import TYPE_CHECKING, Any, Dict, Union
+import threading
+from typing import Any, Dict, Union, TYPE_CHECKING
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPath, Literal
 from fhircraft.utils import ensure_list
+from fhircraft.exceptions import FHIRPathRuntimeError
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
+    from fhircraft.fhir.path.parser import FHIRPathParser
 
-from fhircraft.exceptions import FhirPathRuntimeError
+FHIRPATH_SEPARATORS = re.compile(r"\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)")
+    
+# Singleton parser instance with thread-safe initialization
+_parser_instance: "FHIRPathParser | None" = None
+_parser_lock = threading.Lock()
 
+__all__ = [
+    "parse_fhirpath",
+]
 
-def split_fhirpath(fhir_path: str) -> list[str]:
+def parse_fhirpath(expression: str) -> "FHIRPath":
     """
-    Split a FHIR path string at non-quoted dots.
+    Parses a FHIRPath expression string into a FHIRPath object.
+
+    Uses a thread-safe singleton instance of FHIRPathParser for efficiency.
 
     Args:
-        fhir_path (str): The FHIR path string to split.
+        expression (str): The FHIRPath expression string to parse.
 
     Returns:
-        List[str]: A list of strings resulting from splitting the FHIR path at non-quoted dots.
-
+        FHIRPath: The parsed FHIRPath object representing the expression.
+    
     Example:
-        This shows how to safely split a FHIRPath string into segments:
-
+        This shows how to parse a FHIRPath expression string into a FHIRPath object:
         ``` python
-        >>> from fhircraft.fhir.path.utils import join_fhirpath
-        >>> split_fhirpath("Observation.components.where(code.coding.code='123')"])
-        ["Observation","components","where(code.coding.code='123')"]
+        >>> from fhircraft.fhir.path.utils import parse_fhirpath
+        >>> parse_fhirpath("Observation.components.where(code.coding.code='123')")
+        FHIRPath(Observation.components.where(code.coding.code='123'))
         ```
     """
-    FHIRPATH_SEPARATORS = re.compile(r"\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)")
-    # Split FHIR path only at non-quoted dots
-    return FHIRPATH_SEPARATORS.split(fhir_path)
+    return _get_parser().parse(expression)
 
+def _get_parser():
+    """Get or create the singleton FHIRPathParser instance in a thread-safe manner."""
+    global _parser_instance
+    if _parser_instance is None:
+        with _parser_lock:
+            if _parser_instance is None:
+                from fhircraft.fhir.path.parser import FHIRPathParser
 
-def join_fhirpath(*segments: str) -> str:
-    """
-    Join multiple FHIR path segments into a single FHIR path string.
-
-    Args:
-        segments (str): Variable number of FHIR path segments to join.
-
-    Returns:
-        str: A single FHIR path string created by joining the input segments with dots.
-
-    Example:
-        This shows how to join a list of FHIRPath segments irrespectively of the separators:
-
-        ``` python
-        >>> from fhircraft.fhir.path.utils import join_fhirpath
-        >>> join_fhirpath(['Patient','.name','given.'])
-        Patient.name.given
-        ```
-    """
-    return ".".join((str(segment).strip(".") for segment in segments if segment != ""))
+                _parser_instance = FHIRPathParser()
+    return _parser_instance
 
 
 def _underline_error_in_fhir_path(text, error, error_position, line_number=None):
@@ -72,7 +73,6 @@ def _underline_error_in_fhir_path(text, error, error_position, line_number=None)
     lines = text.splitlines()
     if line_number is not None and 1 <= line_number <= len(lines):
         line = lines[line_number - 1]
-        line_offset = sum(len(l) + 1 for l in lines[: line_number - 1])  # +1 for '\n'
         error_pos_in_line = error_position - 1
         underline = " " * error_pos_in_line + "—" * len(str(error))
         return f'\nLine {line_number}: {line}\n{" " * (len(f"Line {line_number}: "))}{underline}'
@@ -81,20 +81,26 @@ def _underline_error_in_fhir_path(text, error, error_position, line_number=None)
         return f"{text[:error_position+len(str(error))+15]}...\n{underline}"
 
 
-def import_fhirpath_engine():
-    from fhircraft.fhir.path.parser import fhirpath
-
-    return fhirpath
 
 
-def evaluate_fhirpath_collection(
+def _evaluate_fhirpath_collection(
     fhir_path: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
     create: bool = False,
 ) -> "FHIRPathCollection":
-    from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollectionItem
+    """
+    Evaluates a FHIRPath expression or collection against a given collection and environment, optionally creating new elements.
 
+    Args:
+        fhir_path (FHIRPath | FHIRPathCollection): The FHIRPath expression or collection to evaluate.
+        collection (FHIRPathCollection): The collection to evaluate the expression against.
+        environment (dict): The evaluation environment containing variable bindings.
+        create (bool): Whether to create new elements during evaluation if necessary.
+
+    Returns:
+        FHIRPathCollection: The resulting collection after evaluation.
+    """
     return (
         [item for item in fhir_path.evaluate(collection, environment, create)]
         if isinstance(fhir_path, FHIRPath)
@@ -102,7 +108,7 @@ def evaluate_fhirpath_collection(
     )
 
 
-def evaluate_left_right_expressions(
+def _evaluate_left_right_expressions(
     left: Union["FHIRPath", "FHIRPathCollection"],
     right: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
@@ -122,16 +128,16 @@ def evaluate_left_right_expressions(
     Returns:
         tuple[FHIRPathCollection, FHIRPathCollection]: A tuple containing the evaluated left and right collections of values.
     """
-    left_collection = evaluate_fhirpath_collection(
+    left_collection = _evaluate_fhirpath_collection(
         left, collection, environment, create
     )
-    right_collection = evaluate_fhirpath_collection(
+    right_collection = _evaluate_fhirpath_collection(
         right, collection, environment, create
     )
     return left_collection, right_collection
 
 
-def evaluate_and_prepare_collection_values(
+def _evaluate_and_prepare_collection_values(
     operator: "FHIRPath",
     left: Union["FHIRPath", "FHIRPathCollection"],
     right: Union["FHIRPath", "FHIRPathCollection"],
@@ -140,7 +146,21 @@ def evaluate_and_prepare_collection_values(
     create=False,
     prevent_all_empty: bool = True,
 ) -> tuple[Any | None, Any | None]:
-    from fhircraft.fhir.path.engine.core import Literal
+    """
+    Evaluates the left and right FHIRPath expressions or collections, prepares their values for comparison, and returns them.
+
+    Args:
+        operator (FHIRPath): The FHIRPath operator being evaluated, used for error messages.
+        left (FHIRPath | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection of values.
+        right (FHIRPath | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection of values.
+        collection (FHIRPathCollection): The collection to evaluate the expressions against.
+        environment (dict): The evaluation environment containing variable bindings.
+        create (bool): Whether to create new elements during evaluation if necessary.
+        prevent_all_empty (bool): If True, returns None for both values if either collection is empty; otherwise treats empty collections as [None].
+
+    Returns:
+        tuple[Any | None, Any | None]: A tuple containing the prepared left and right values for comparison, or None if prevented by empty collections.
+    """
 
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
         from fhircraft.fhir.path.engine.literals import Quantity
@@ -154,19 +174,19 @@ def evaluate_and_prepare_collection_values(
             for item in collection
         ]
 
-    left_collection, right_collection = evaluate_left_right_expressions(
+    left_collection, right_collection = _evaluate_left_right_expressions(
         left, right, collection, environment, create
     )
     left_collection = _get_collection_values(left_collection)
     right_collection = _get_collection_values(right_collection)
 
     if len(left_collection) > 1:
-        raise FhirPathRuntimeError(
-            f"FHIRPath operator {operator.__str__()} expected a single-item collection for the left expression, instead got a {len(left_collection)}-items collection."
+        raise FHIRPathRuntimeError(
+            f"FHIRPath operator {operator} expected a single-item collection for the left expression, instead got a {len(left_collection)}-items collection."
         )
     if len(right_collection) > 1:
-        raise FhirPathRuntimeError(
-            f"FHIRPath operator {operator.__str__()} expected a single-item collection for the right expression, instead got a {len(right_collection)}-items collection."
+        raise FHIRPathRuntimeError(
+            f"FHIRPath operator {operator} expected a single-item collection for the right expression, instead got a {len(right_collection)}-items collection."
         )
     if prevent_all_empty and (len(left_collection) == 0 or len(right_collection) == 0):
         return None, None
@@ -184,11 +204,23 @@ def evaluate_and_prepare_collection_values(
     return left_value, right_value
 
 
-def get_expression_context(
+def _get_expression_context(
     environment: Dict[str, FHIRPathCollectionItem],
     item: FHIRPathCollectionItem,
     index: int,
 ) -> dict:
+    """ 
+    Creates a new evaluation context for a FHIRPath expression by copying the existing environment
+    and adding the current item and index.
+
+    Args:
+        environment (Dict[str, FHIRPathCollectionItem]): The existing evaluation environment containing variable bindings.
+        item (FHIRPathCollectionItem): The current item being evaluated, to be added to the context as $this.
+        index (int): The index of the current item in the collection, to be added to the context as $index.
+    
+    Returns:
+        dict: A new evaluation context dictionary containing the existing environment plus $this and $index.
+    """
     context = environment.copy()
     context["$this"] = item
     context["$index"] = FHIRPathCollectionItem.wrap(index)

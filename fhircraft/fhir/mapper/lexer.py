@@ -1,22 +1,21 @@
 import ply.lex
 
-from fhircraft.fhir.path.lexer import FhirPathLexer
+from fhircraft.fhir.path.lexer import FHIRPathLexer
+from fhircraft.exceptions import MapperLexingError
+
+__all__ = ["FHIRMappingLanguageLexer"]
 
 
-class FhirMappingLanguageLexerError(Exception):
-    pass
-
-
-class FhirMappingLanguageLexer(FhirPathLexer):
+class FHIRMappingLanguageLexer(FHIRPathLexer):
     """
-    A Lexical analyzer for JsonPath.
+    A Lexical analyzer for FHIR Mapping Language.
 
     """
 
     def __init__(self, debug=False):
         self.debug = debug
         if self.__doc__ is None:
-            raise FhirMappingLanguageLexerError(
+            raise MapperLexingError(
                 "Docstrings have been removed by design of PLY."
             )
         # Create the lexer once during initialization for better performance
@@ -40,7 +39,7 @@ class FhirMappingLanguageLexer(FhirPathLexer):
             yield t
 
         if self.lexer.string_value is not None:
-            raise FhirMappingLanguageLexerError(
+            raise MapperLexingError(
                 "Unexpected EOF in string literal or identifier"
             )
 
@@ -199,6 +198,6 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         pass
 
     def t_error(self, t):
-        raise FhirMappingLanguageLexerError(
+        raise MapperLexingError(
             f"FHIRPath lexer error at {t.lexer.lineno}:{t.lexpos - t.lexer.latest_newline} - Unexpected character: {t.value[0]}"
         )

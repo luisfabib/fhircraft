@@ -17,7 +17,7 @@ Fhircraft uses Pydantic v2 to create strongly-typed Python representations of FH
 ```python
 from pydantic import Field, model_validator
 from typing import Optional, List
-from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.R5.primitive import boolean, code  # (1)!
 from fhircraft.fhir.resources.datatypes.R5.complex import HumanName, Identifier
 
@@ -333,7 +333,7 @@ During serialization, each resource automatically includes a `resourceType` fiel
     During deserialization, Fhircraft reads the `resourceType` discriminator and dynamically instantiates the correct Python class for each resource. This means that accessing `bundle.entry[0].resource` returns an actual `Patient` instance with all its specific methods and fields, not a generic `Resource` object. This polymorphic deserialization works recursively through the entire resource tree, ensuring that every nested resource maintains its precise type identity.
 
     ```python
-    from fhircraft.fhir.resources import get_fhir_type
+    from fhircraft import get_fhir_type
 
     # Different resource types
     Patient = get_fhir_type("Patient", "R5") 
@@ -474,7 +474,8 @@ This approach ensures type safety while maintaining the flexibility that slicing
 !!! example "Working with sliced elements"
 
     ```python
-    from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+    from fhircraft import FHIRBaseModel
+    from fhircraft.fhir.resources import FHIRSliceModel
     from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, BackboneElement
     from pydantic import Field
     from typing import Optional, List, Union, Annotated

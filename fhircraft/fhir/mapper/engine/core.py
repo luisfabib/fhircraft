@@ -6,34 +6,31 @@ StructureMap resources to transform FHIR data from source to target structures.
 """
 
 import enum
-import logging
+import warnings
 from collections import OrderedDict
 from typing import Dict, Type
+import re
 
 from pydantic import BaseModel, ConfigDict
 
 import fhircraft.fhir.path.engine as fhirpath
-
+from fhircraft.fhir.path import parse_fhirpath
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
-
-from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.definitions.registry import (
     StructureDefinitionRegistry,
 )
 from fhircraft.fhir.resources.factory import FHIRModelFactory
-from .registry import StructureMapRegistry
-
 from fhircraft.exceptions import (
+    MapperWarning,
     DefinitionNotFoundError,
     MapperException,
     MapperRegistryNotFoundError,
 )
+from .registry import StructureMapRegistry
 from .scope import MappingScope
 from .group import Group
-
-logger = logging.getLogger(__name__)
 
 
 class ArbitraryModel(BaseModel):
@@ -143,10 +140,9 @@ class FHIRMappingEngine:
             import_url_str = str(import_url)
             if "*" in import_url_str:
                 # Wildcard: resolve all registered maps whose URL matches the pattern
-                import re as _re
 
-                pattern = _re.compile(
-                    _re.escape(import_url_str).replace(r"\*", ".*") + "$"
+                pattern = re.compile(
+                    re.escape(import_url_str).replace(r"\*", ".*") + "$"
                 )
                 matched = [
                     sm
@@ -154,8 +150,10 @@ class FHIRMappingEngine:
                     if pattern.match(url)
                 ]
                 if not matched:
-                    logger.warning(
-                        f"Import wildcard '{import_url_str}' matched no registered StructureMaps."
+                    warnings.warn(
+                        f"Import wildcard '{import_url_str}' matched no registered StructureMaps.",
+                        category=MapperWarning,
+                        stacklevel=2,
                     )
                 imported_maps.extend(matched)
             else:
@@ -164,11 +162,11 @@ class FHIRMappingEngine:
                     imported_maps.append(
                         self.structure_map_registry.get(import_url_str)
                     )
-                except MapperRegistryNotFoundError:
+                except MapperRegistryNotFoundError as e:
                     raise MapperRegistryNotFoundError(
                         f"StructureMap import failed: '{import_url_str}' is not registered. "
                         "Register it via structure_map_registry.add() before executing."
-                    )
+                    ) from e
 
         # Resolve structure definitions
         source_models = self._resolve_structure_definitions(
@@ -226,7 +224,7 @@ class FHIRMappingEngine:
                     f"Constant name '{const.name}' conflicts with existing source or target model"
                 )
             # Add the constant as a variable in the global scope
-            global_scope.define_variable(const.name, fhirpath_parser.parse(const.value))
+            global_scope.define_variable(const.name, parse_fhirpath(const.value))
 
         # Determine the entrypoint group
         target_group = (global_scope.groups.get(group) if group else None) or list(
@@ -403,9 +401,11 @@ class FHIRMappingEngine:
             if s.mode != mode:
                 continue
             if not (canonical_url := s.url):
-                logger.warning(
+                warnings.warn(
                     f"Structure definition for mode {mode} is missing URL. "
-                    f"Data for this structure will be treated as arbitrary."
+                    f"Data for this structure will be treated as arbitrary.",
+                    category=MapperWarning,
+                    stacklevel=2,
                 )
                 resolved[s.alias or "arbitrary"] = ArbitraryModel
                 continue
@@ -436,9 +436,11 @@ class FHIRMappingEngine:
                 DefinitionNotFoundError,
             ) as e:
                 # If StructureDefinition not found, log warning but continue
-                logger.warning(
+                warnings.warn(
                     f"Could not resolve structure definition for {canonical_url}: {e}. "
-                    f"Data for this structure will be treated as arbitrary."
+                    f"Data for this structure will be treated as arbitrary.",
+                    category=MapperWarning,
+                    stacklevel=2,
                 )
                 # Mark as no model validation available
                 resolved[s.alias or canonical_url] = ArbitraryModel
@@ -476,7 +478,7 @@ class FHIRMappingEngine:
         validated_entries = {}
         matched_indices = set()
 
-        def _validate_entry(entry: BaseModel | dict, entry_idx: int) -> bool:
+        def _validate_entry(entry: BaseModel | dict) -> bool:
             """Try to validate entry against available models. Returns True if matched."""
             for alias, source_model in source_models.items():
                 if source_model is None:
@@ -497,12 +499,16 @@ class FHIRMappingEngine:
                         validated_entries[alias] = source_model(**entry.__dict__)
                         return True
                 except Exception as e:
-                    print(e)
+                    warnings.warn(
+                        f"Source data entry did not match model '{alias}': {e}",
+                        category=MapperWarning,
+                        stacklevel=2,
+                    )
                     continue
             return False
 
         for idx, entry in enumerate(source_data):
-            if not _validate_entry(entry, idx):
+            if not _validate_entry(entry):
                 raise MapperException(
                     f"Source data entry of type {type(entry)} does not match any source model. "
                     f"Available models: {list(source_models.keys())}"
@@ -510,6 +516,3 @@ class FHIRMappingEngine:
             matched_indices.add(idx)
 
         return validated_entries
-
-
-mapper = FHIRMappingEngine()

@@ -28,7 +28,7 @@ from fhircraft import configure
 configure(disable_validation_warnings=True)
 
 # Create FHIR resources without validation warnings appearing
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 Patient = get_fhir_type("Patient", "R5")
 
 # This patient creation will not show warnings about missing narrative
@@ -45,7 +45,7 @@ The context manager `override_config` creates an isolated configuration scope. A
 
 ```python
 from fhircraft import override_config
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 Patient = get_fhir_type("Patient", "R5")
 
@@ -68,7 +68,7 @@ Disabling constraints by key provides surgical precision. You turn off only the 
 
 ```python
 from fhircraft import disable_constraint, enable_constraint
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 # Disable the dom-6 constraint that requires narrative text
 disable_constraint('dom-6')
@@ -97,7 +97,7 @@ Strict mode enforces the complete set of FHIR constraints. FHIR constraint viola
 
 ```python hl_lines="5"
 from fhircraft import configure
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 # Explicitly set strict mode (this is the default)
 configure(validation_mode='strict')
@@ -181,7 +181,7 @@ config = get_config()
 
 # Inspect current validation settings
 print(f"Warnings disabled: {config.disable_validation_warnings}")
-print(f"Validation mode: {config.mode}")
+print(f"Validation mode: {config.validation_mode}")
 print(f"Disabled constraints: {config.disabled_fhir_constraints}")
 ```
 

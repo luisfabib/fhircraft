@@ -307,17 +307,17 @@ def test_validate_model_constraint__basic(mock_validate):
 # ===========================================================
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__skip_mode_returns_value(mock_fhirpath):
     with override_config(validation_mode="skip"):
         result = _validate_FHIR_element_constraint(
             "value", Mock(), "expr", "Human", "key-1", "error"
         )
     assert result == "value"
-    mock_fhirpath.parse.assert_not_called()
+    mock_fhirpath.assert_not_called()
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__disabled_constraint_returns_value(
     mock_fhirpath,
 ):
@@ -326,10 +326,10 @@ def test__validate_FHIR_element_constraint__disabled_constraint_returns_value(
             "value", Mock(), "expr", "Human", "key-1", "error"
         )
     assert result == "value"
-    mock_fhirpath.parse.assert_not_called()
+    mock_fhirpath.assert_not_called()
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__disable_validation_warnings_skips_warning(
     mock_fhirpath,
 ):
@@ -338,10 +338,10 @@ def test__validate_FHIR_element_constraint__disable_validation_warnings_skips_wa
             "value", Mock(), "expr", "Human", "key-1", "warning"
         )
     assert result == "value"
-    mock_fhirpath.parse.assert_not_called()
+    mock_fhirpath.assert_not_called()
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__disable_fhir_warnings_skips_warning(
     mock_fhirpath,
 ):
@@ -350,10 +350,10 @@ def test__validate_FHIR_element_constraint__disable_fhir_warnings_skips_warning(
             "value", Mock(), "expr", "Human", "key-1", "warning"
         )
     assert result == "value"
-    mock_fhirpath.parse.assert_not_called()
+    mock_fhirpath.assert_not_called()
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__disable_fhir_errors_skips_error(
     mock_fhirpath,
 ):
@@ -362,37 +362,37 @@ def test__validate_FHIR_element_constraint__disable_fhir_errors_skips_error(
             "value", Mock(), "expr", "Human", "key-1", "error"
         )
     assert result == "value"
-    mock_fhirpath.parse.assert_not_called()
+    mock_fhirpath.assert_not_called()
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__none_value_returns_none(mock_fhirpath):
     result = _validate_FHIR_element_constraint(
         None, Mock(), "expr", "Human", "key-1", "error"
     )
     assert result is None
-    mock_fhirpath.parse.assert_not_called()
+    mock_fhirpath.assert_not_called()
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__valid_expression_returns_value(
     mock_fhirpath,
 ):
-    mock_fhirpath.parse.return_value.single.return_value = True
+    mock_fhirpath.return_value.single.return_value = True
 
     result = _validate_FHIR_element_constraint(
         "test_value", Mock(), "some.expr", "Human", "key-1", "error"
     )
 
     assert result == "test_value"
-    mock_fhirpath.parse.assert_called_once_with("some.expr")
+    mock_fhirpath.assert_called_once_with("some.expr")
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__invalid_expression_raises_on_error(
     mock_fhirpath,
 ):
-    mock_fhirpath.parse.return_value.single.return_value = False
+    mock_fhirpath.return_value.single.return_value = False
 
     with pytest.raises(PydanticCustomError, match=r"\[key-1\]"):
         _validate_FHIR_element_constraint(
@@ -400,11 +400,11 @@ def test__validate_FHIR_element_constraint__invalid_expression_raises_on_error(
         )
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__invalid_expression_warns_on_warning(
     mock_fhirpath,
 ):
-    mock_fhirpath.parse.return_value.single.return_value = False
+    mock_fhirpath.return_value.single.return_value = False
 
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
@@ -417,11 +417,11 @@ def test__validate_FHIR_element_constraint__invalid_expression_warns_on_warning(
     assert "key-1" in str(caught[0].message)
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__lenient_mode_converts_error_to_warning(
     mock_fhirpath,
 ):
-    mock_fhirpath.parse.return_value.single.return_value = False
+    mock_fhirpath.return_value.single.return_value = False
 
     with override_config(validation_mode="lenient"):
         with warnings.catch_warnings(record=True) as caught:
@@ -434,11 +434,11 @@ def test__validate_FHIR_element_constraint__lenient_mode_converts_error_to_warni
     assert len(caught) == 1
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__fhirpath_exception_emits_warning(
     mock_fhirpath,
 ):
-    mock_fhirpath.parse.side_effect = ValueError("bad expression")
+    mock_fhirpath.side_effect = ValueError("bad expression")
 
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
@@ -451,11 +451,11 @@ def test__validate_FHIR_element_constraint__fhirpath_exception_emits_warning(
     assert "ValueError" in str(caught[0].message)
 
 
-@patch("fhircraft.fhir.path.parser.fhirpath")
+@patch("fhircraft.fhir.path.parse_fhirpath")
 def test__validate_FHIR_element_constraint__element_prefix_in_error_message(
     mock_fhirpath,
 ):
-    mock_fhirpath.parse.return_value.single.return_value = False
+    mock_fhirpath.return_value.single.return_value = False
 
     with pytest.raises(PydanticCustomError) as exc_info:
         _validate_FHIR_element_constraint(

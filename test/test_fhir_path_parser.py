@@ -21,8 +21,8 @@ from fhircraft.fhir.path.engine.strings import *
 from fhircraft.fhir.path.engine.subsetting import *
 from fhircraft.fhir.path.engine.types import *
 from fhircraft.fhir.path.engine.utility import *
-from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexingError
-from fhircraft.fhir.path.parser import FhirPathParser, FhirPathParsingError
+from fhircraft.fhir.path.lexer import FHIRPathLexer, FHIRPathLexingError
+from fhircraft.fhir.path.parser import FHIRPathParser, FHIRPathParsingError
 
 # Format: (string, expected_object)
 parser_test_cases = (
@@ -429,7 +429,7 @@ parser_test_cases = (
 
 @pytest.fixture(scope="module")
 def parser():
-    return FhirPathParser(lexer_class=lambda: FhirPathLexer())
+    return FHIRPathParser(lexer_class=lambda: FHIRPathLexer())
 
 
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
@@ -445,5 +445,5 @@ parser_error_cases = (
 
 @pytest.mark.parametrize("string", parser_error_cases)
 def test_parser_catches_invalid_syntax(parser, string):
-    with pytest.raises((FhirPathParsingError, FhirPathLexingError)):
+    with pytest.raises((FHIRPathParsingError, FHIRPathLexingError)):
         parser.parse(string)

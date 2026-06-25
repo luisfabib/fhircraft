@@ -887,3 +887,184 @@ def test_primitives__xhtml_type_alias(release, value, expected):
 def test_primitives__xhtml_serialization(release, value, expected):
     instance = modules[release].Xhtml(value)
     assert instance.model_dump() == expected
+
+
+# ==========================================
+# Primitive Operator Tests (FHIRPrimitiveModel)
+# ==========================================
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_addition(release):
+    a = modules[release].Integer(5)
+    b = modules[release].Integer(3)
+    assert a + b == 8
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_addition_with_native_int(release):
+    a = modules[release].Integer(10)
+    assert a + 5 == 15
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_subtraction(release):
+    a = modules[release].Integer(10)
+    b = modules[release].Integer(4)
+    assert a - b == 6
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__decimal_addition(release):
+    a = modules[release].Decimal(2.5)
+    b = modules[release].Decimal(1.5)
+    assert a + b == pytest.approx(4.0)
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__decimal_addition_with_native_float(release):
+    a = modules[release].Decimal(3.0)
+    assert a + 1.5 == pytest.approx(4.5)
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_multiplication(release):
+    a = modules[release].Integer(6)
+    b = modules[release].Integer(7)
+    assert a * b == 42
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__string_concatenation(release):
+    a = modules[release].String("hello")
+    b = modules[release].String(" world")
+    assert a + b == "hello world"
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__string_concatenation_with_native_str(release):
+    a = modules[release].String("foo")
+    assert a + " bar" == "foo bar"
+
+
+# ==========================================
+# Primitive Comparison Operator Tests
+# ==========================================
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_equality_with_class(release):
+    a = modules[release].Integer(42)
+    b = modules[release].Integer(42)
+    assert a == b
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_equality_with_native(release):
+    a = modules[release].Integer(42)
+    assert a == 42
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_inequality(release):
+    a = modules[release].Integer(1)
+    b = modules[release].Integer(2)
+    assert a != b
+    assert a != 2
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_less_than(release):
+    a = modules[release].Integer(3)
+    b = modules[release].Integer(5)
+    assert a < b
+    assert a < 5
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__integer_greater_than(release):
+    a = modules[release].Integer(10)
+    b = modules[release].Integer(4)
+    assert a > b
+    assert a > 4
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__string_equality_with_native(release):
+    a = modules[release].String("hello")
+    assert a == "hello"
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__string_inequality_with_native(release):
+    a = modules[release].String("hello")
+    assert a != "world"
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__boolean_equality(release):
+    a = modules[release].Boolean(True)
+    b = modules[release].Boolean(True)
+    assert a == b
+    assert a == True  # noqa: E712
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__boolean_inequality(release):
+    a = modules[release].Boolean(True)
+    b = modules[release].Boolean(False)
+    assert a != b
+    assert b == False  # noqa: E712
+
+
+# ==========================================
+# Mixed Native/Class Coercion in Model Fields
+# ==========================================
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__model_field_accepts_native_and_class_string(release):
+    """A model field typed as the string type-alias accepts both str and String."""
+    from pydantic import create_model
+
+    string_alias = modules[release].string
+
+    Model = create_model("Model", name=(string_alias, ...))
+
+    # Native str
+    from_native = Model.model_validate({"name": "Alice"})
+    assert from_native.name == "Alice"  # type: ignore
+
+    # String class
+    from_class = Model.model_validate({"name": modules[release].String("Bob")})
+    assert from_class.name == "Bob"  # type: ignore
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__model_field_accepts_native_and_class_integer(release):
+    """A model field typed as the integer type-alias accepts both int and Integer."""
+    from pydantic import create_model
+
+    integer_alias = modules[release].integer
+
+    Model = create_model("Model", count=(integer_alias, ...))
+
+    from_native = Model.model_validate({"count": 7})
+    assert from_native.count == 7  # type: ignore
+
+    from_class = Model.model_validate({"count": modules[release].Integer(13)})
+    assert from_class.count == 13  # type: ignore
+
+
+@pytest.mark.parametrize(*FHIR_RELEASES)
+def test_primitives__none_value_with_extension_is_valid(release):
+    """A FHIRPrimitiveModel with no value but with an extension satisfies ele-1."""
+    import importlib
+
+    datatypes = importlib.import_module(f"fhircraft.fhir.resources.datatypes.{release}")
+    Extension = datatypes.Extension
+
+    instance = modules[release].String(extension=[Extension(url="http://example.org/ext", valueString="note")])  # type: ignore
+    assert instance.value is None
+    assert instance.extension is not None
+    assert len(instance.extension) == 1

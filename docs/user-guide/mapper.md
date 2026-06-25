@@ -22,8 +22,7 @@ Legacy systems often use different field names and value formats than FHIR expec
 
 ```python
 # Import the FHIR mapper
-from fhircraft.fhir.mapper import FHIRStructureMapper
-from fhircraft.fhir.resources.datatypes.R5.core.patient import Patient
+from fhircraft import FHIRStructureMapper
 
 # Legacy system data with non-FHIR field names
 legacy_patient = {
@@ -91,7 +90,7 @@ The map declaration identifies the mapping with a unique URL and human-readable 
 The simplest transformation type copies values directly from source fields to target fields without modification. This [:material-fire:  Identitty Transform](https://build.fhir.org/mapping-language.html#simple) approach works when source and target use compatible data types and the values need no transformation.
 
 ```python
-from fhircraft.fhir.mapper import FHIRStructureMapper
+from fhircraft import FHIRStructureMapper
 
 # Define simple field-to-field mappings
 script = """
@@ -340,7 +339,7 @@ Storing mappings in files separates transformation logic from application code, 
 
 ```python
 from fhircraft.utils import load_file
-from fhircraft.fhir.mapper import FHIRStructureMapper
+from fhircraft import FHIRStructureMapper
 
 mapper = FHIRStructureMapper()
 
