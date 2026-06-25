@@ -1,35 +1,52 @@
 """
 FHIR Resources Module
-
-This module provides all FHIR resource-related functionality including:
-- FHIRBaseModel: Base class for all FHIR resources
-- FHIRModelFactory: Factory for constructing FHIR resource models
-- Repository classes: For managing FHIR structure definitions
-- Definitions: StructureDefinition and ElementDefinition models
 """
 
-from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
-from fhircraft.fhir.resources.factory import FHIRModelFactory
-from fhircraft.fhir.resources.datatypes.registry import (
+from .base import FHIRBaseModel, FHIRModelKind, FHIRSliceModel, FHIRPrimitiveModel
+from .factory import FHIRModelFactory
+from .definitions import StructureDefinitionRegistry
+from .datatypes import (
     get_fhir_type,
     get_fhir_type_by_url,
 )
+from .generator import CodeGenerator
+from fhircraft.exceptions import (
+    FhirTypeError,
+    FhirValidationWarning,
+    FactoryException,
+    FactoryDefinitionIndexError,
+    FactoryDefinitionResolutionError,
+    FactoryBuilderError,
+    FactoryTypeResolutionError,
+    FactoryAssemblerError,
+    FactoryWarning,
+    DefinitionNotFoundError,
+)
 
 __all__ = [
+    # Core model classes
     "FHIRBaseModel",
     "FHIRSliceModel",
+    "FHIRModelKind",
+    "FHIRPrimitiveModel",
+    # Factory
     "FHIRModelFactory",
+    # Registry
+    "StructureDefinitionRegistry",
+    # Type helpers
     "get_fhir_type",
     "get_fhir_type_by_url",
+    # Code generation
+    "CodeGenerator",
+    # Exceptions (re-exported for convenience)
+    "FhirTypeError",
+    "FhirValidationWarning",
+    "FactoryException",
+    "FactoryDefinitionIndexError",
+    "FactoryDefinitionResolutionError",
+    "FactoryBuilderError",
+    "FactoryTypeResolutionError",
+    "FactoryAssemblerError",
+    "FactoryWarning",
+    "DefinitionNotFoundError",
 ]
-
-
-def __getattr__(name: str):
-    """Lazy import of heavyweight components to avoid loading the factory (and
-    transitively all 450+ FHIR resource classes) on every import of this package."""
-    if name == "FHIRModelFactory":
-        from fhircraft.fhir.resources.factory import FHIRModelFactory
-
-        globals()["FHIRModelFactory"] = FHIRModelFactory
-        return FHIRModelFactory
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

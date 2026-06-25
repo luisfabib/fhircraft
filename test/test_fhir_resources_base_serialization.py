@@ -540,3 +540,157 @@ def test_serialize_as_xml__resource__model_dump_xml_includes_xmlns():
     assert 'xmlns="http://hl7.org/fhir"' in xml_str
     assert "<Observation" in xml_str
     assert 'value="John"' in xml_str
+
+
+# ===================================================
+# XML Round-Trip Tests
+# ===================================================
+
+
+def test_xml_roundtrip__observation__status_and_code():
+    """Serialize Observation to XML and parse it back; JSON dumps must be identical."""
+    original = Observation(
+        status=Code(value="final"),
+        code=CodeableConcept(
+            coding=[
+                Coding(
+                    system="http://loinc.org",
+                    code=Code(value="29463-7"),
+                    display=String(value="Body Weight"),
+                )
+            ]
+        ),
+    )
+    xml_str = original.model_dump_xml()
+    parsed = Observation.model_validate_xml(xml_str)
+    assert json.loads(original.model_dump_json()) == json.loads(
+        parsed.model_dump_json()
+    )
+
+
+def test_xml_roundtrip__observation__polymorphic_value_string():
+    """Type-choice field (valueString) round-trips correctly through XML."""
+    original = Observation(
+        status=Code(value="final"),
+        valueString=String(value="72 kg"),
+    )
+    xml_str = original.model_dump_xml()
+    parsed = Observation.model_validate_xml(xml_str)
+    assert str(parsed.valueString) == "72 kg"
+    assert json.loads(original.model_dump_json()) == json.loads(
+        parsed.model_dump_json()
+    )
+
+
+def test_xml_roundtrip__observation__list_of_codings():
+    """Multiple coding entries round-trip correctly through XML."""
+    original = Observation(
+        status=Code(value="preliminary"),
+        code=CodeableConcept(
+            coding=[
+                Coding(system="http://loinc.org", code=Code(value="29463-7")),
+                Coding(
+                    system="http://snomed.info/sct",
+                    code=Code(value="27113001"),
+                ),
+            ]
+        ),
+    )
+    xml_str = original.model_dump_xml()
+    parsed = Observation.model_validate_xml(xml_str)
+    assert parsed.code
+    assert parsed.code.coding
+    assert len(parsed.code.coding) == 2
+    assert json.loads(original.model_dump_json()) == json.loads(
+        parsed.model_dump_json()
+    )
+
+
+def test_xml_roundtrip__observation__primitive_with_extension():
+    """A primitive with an extension round-trips through XML with the shadow field intact."""
+    original = Observation(
+        status=Code(
+            value="final",
+            extension=[Extension(url="http://example.org/status-note", valueString="confirmed")],  # type: ignore
+        ),
+    )
+    xml_str = original.model_dump_xml()
+    parsed = Observation.model_validate_xml(xml_str)
+    assert str(parsed.status) == "final"
+    assert isinstance(parsed.status, String)
+    assert parsed.status.extension is not None
+    assert len(parsed.status.extension) == 1
+    assert parsed.status.extension[0].url == "http://example.org/status-note"
+
+
+def test_xml_roundtrip__complex__human_name_full():
+    """HumanName with multiple given names round-trips correctly through XML."""
+    original = HumanName(
+        family=String(value="Smith"),
+        given=[String(value="John"), String(value="Robert")],
+    )
+    xml_str = original.model_dump_xml()
+    reparsed = HumanName.model_validate_xml(xml_str)
+    assert str(reparsed.family) == "Smith"
+    assert reparsed.given is not None
+    assert len(reparsed.given) == 2
+    assert [str(g) for g in reparsed.given] == ["John", "Robert"]
+
+
+# ===================================================
+# Extension Processing on Resources
+# ===================================================
+
+
+def test_extension__resource_field_extension_survives_json_roundtrip():
+    """An extension on a resource-level primitive field is preserved through JSON serialisation."""
+    obs = Observation(
+        status=Code(
+            value="final",
+            extension=[Extension(url="http://example.org/note", valueString="Checked")],  # type: ignore
+        ),
+    )
+    data = json.loads(obs.model_dump_json())
+    assert "_status" in data
+    assert data["_status"]["extension"][0]["url"] == "http://example.org/note"
+    restored = Observation.model_validate(data)
+    assert str(restored.status) == "final"
+    assert isinstance(restored.status, String)
+    assert restored.status.extension is not None
+    assert restored.status.extension[0].url == "http://example.org/note"
+
+
+def test_extension__nested_extensions_preserved_in_json_roundtrip():
+    """An extension that itself carries child extensions round-trips through JSON."""
+    inner = Extension(url="http://example.org/inner", valueString="inner-value")  # type: ignore
+    outer = Extension(url="http://example.org/outer", extension=[inner])  # type: ignore
+    obs = Observation(
+        status=Code(value="final", extension=[outer]),  # type: ignore
+    )
+    data = json.loads(obs.model_dump_json())
+    restored = Observation.model_validate(data)
+    assert isinstance(restored.status, String)
+    assert restored.status.extension is not None
+    assert isinstance(restored.status, String)
+    outer_ext = restored.status.extension[0]
+    assert outer_ext.url == "http://example.org/outer"
+    assert outer_ext.extension is not None
+    assert len(outer_ext.extension) == 1
+    assert outer_ext.extension[0].url == "http://example.org/inner"
+
+
+def test_extension__resource_level_extension_list():
+    """Top-level resource extensions are serialised and deserialised correctly."""
+    obs = Observation(
+        extension=[
+            Extension(url="http://example.org/ext1", valueBoolean=Boolean(value=True)),  # type: ignore
+            Extension(url="http://example.org/ext2", valueString="hello"),  # type: ignore
+        ]
+    )
+    data = json.loads(obs.model_dump_json())
+    assert "extension" in data
+    assert len(data["extension"]) == 2
+    restored = Observation.model_validate(data)
+    assert restored.extension is not None
+    assert len(restored.extension) == 2
+    assert restored.extension[0].url == "http://example.org/ext1"

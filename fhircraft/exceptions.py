@@ -350,6 +350,9 @@ __all__ = [
     "FHIRPathTypeError",
     "FHIRPathOperationError",
     "FHIRPathWarning",
+    # Resources exceptions
+    "FhirValidationWarning",
+    "FhirTypeError",
     # Factory exceptions
     "FactoryException",
     "FactoryDefinitionIndexError",
@@ -357,6 +360,7 @@ __all__ = [
     "FactoryBuilderError",
     "FactoryTypeResolutionError",
     "FactoryAssemblerError",
+    "FactoryWarning",
     "DefinitionNotFoundError",
     # Package exceptions
     "PackageException",
