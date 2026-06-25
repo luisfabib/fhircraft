@@ -19,8 +19,9 @@ FHIRPath is a query language designed specifically for healthcare data. If you'v
 FHIR resources have complex, deeply nested structures that reflect real-world healthcare complexity. Consider a patient with multiple names, addresses, and contact points, or an observation with coded values, components, and references to other resources. FHIRPath expressions handle this complexity naturally:
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.core import Patient
+from fhircraft import get_fhir_type
 
+Patient = get_fhir_type("Patient", "R5")
 patient = Patient(
     name=[
         {"given": ["Alice"], "family": "Johnson", "use": "official"},
@@ -58,7 +59,7 @@ FHIRPath also handles edge cases automatically - missing values, lists of values
 When working with Fhircraft FHIR resources, you can use FHIRPath expressions directly on the resource instances. This provides the most convenient way to query FHIR data since all Fhircraft models include built-in FHIRPath methods:
 
 ```python
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 Patient = get_fhir_type("Patient", "R5")
 
@@ -143,7 +144,7 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
 !!! example "Working with Collections"
 
     ```python
-    from fhircraft.fhir.resources import get_fhir_type
+    from fhircraft import get_fhir_type
 
     Patient = get_fhir_type("Patient", "R5")
 
@@ -244,7 +245,7 @@ Fhircraft automatically provides these environment variables in all FHIRPath eva
 | `%terminologyService` | An optional terminology service instance used by `memberOf()`, `subsumes()`, and `subsumedBy()` | _(implementation object)_ |
 
 ```python
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 Patient = get_fhir_type("Patient", "R5")
 
@@ -314,7 +315,7 @@ FHIRPath provides contextual variables that give you access to the current evalu
     The `$this` variable refers to the current item when iterating through collections:
 
     ```python
-    from fhircraft.fhir.resources import get_fhir_type
+    from fhircraft import get_fhir_type
 
     Patient = get_fhir_type("Patient", "R5")
 
@@ -470,8 +471,9 @@ print(f"Birth date is FHIR.date: {birth_is_date}")
 FHIRPath provides `is` and `as` operators for type checking and casting. These operators work with type specifiers that can optionally include namespaces:
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.core import Patient
+from fhircraft import get_fhir_type
 
+Patient = get_fhir_type("Patient", "R5")
 patient = Patient(id="ID1234") # (1)!
 
 print(patient.fhirpath_single("Patient.id is id"))

@@ -87,7 +87,7 @@ Every `FhircraftException` provides two structured attributes beyond the standar
 
 ```python
 from fhircraft.exceptions import FhircraftException, DefinitionNotFoundError
-from fhircraft.fhir.resources import FHIRModelFactory
+from fhircraft import FHIRModelFactory
 
 factory = FHIRModelFactory(fhir_release="R4")
 
@@ -113,7 +113,7 @@ from fhircraft.exceptions import (
     FHIRPathLexingError,
     FHIRPathRuntimeError,
 )
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 Patient = get_fhir_type("Patient", "R5")
 patient = Patient(
@@ -179,7 +179,7 @@ There are two kinds of failures inside a `ValidationError`:
 
 ```python
 from pydantic import ValidationError
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 Observation = get_fhir_type("Observation", "R4")
 
@@ -227,7 +227,7 @@ from fhircraft.exceptions import (
     FactoryDefinitionResolutionError,
     FactoryTypeResolutionError,
 )
-from fhircraft.fhir.resources import FHIRModelFactory
+from fhircraft import FHIRModelFactory
 
 factory = FHIRModelFactory(fhir_release="R4")
 
@@ -288,7 +288,7 @@ from fhircraft.exceptions import (
     MapperExecutionError,
     MapperRegistryNotFoundError,
 )
-from fhircraft.fhir.mapper import FHIRStructureMapper
+from fhircraft import FHIRStructureMapper
 
 mapper = FHIRStructureMapper()
 
@@ -344,7 +344,7 @@ from fhircraft.exceptions import (
     PackageResolutionError,
     PackageValidationError,
 )
-from fhircraft.fhir.resources import FHIRModelFactory
+from fhircraft import FHIRModelFactory
 
 factory = FHIRModelFactory(fhir_release="R4")
 

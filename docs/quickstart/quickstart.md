@@ -9,7 +9,7 @@ FHIR resources represent different types of healthcare data - patients, observat
 Fhircraft includes Pydantic models for all core FHIR resources. Here's how to create a [Patient resource from FHIR R5](https://hl7.org/fhir/patient.html):
 
 ```python
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 # Get the Patient model for FHIR R5
 Patient = get_fhir_type("Patient", "R5")
@@ -103,7 +103,7 @@ Base FHIR resources are designed to work across all healthcare contexts, but rea
 Load [:material-fire: FHIR implementation guides](https://hl7.org/fhir/implementationguide.html) and create specialized resource models:
 
 ```python
-from fhircraft.fhir.resources import FHIRModelFactory
+from fhircraft import FHIRModelFactory
 
 factory = FHIRModelFactory(fhir_release="R4")
 
@@ -142,7 +142,7 @@ Healthcare organizations often have legacy systems with data in non-FHIR formats
 The FHIR Mapper uses the [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html) to transform data between different structures:
 
 ```python
-from fhircraft.fhir.mapper import FHIRStructureMapper
+from fhircraft import FHIRStructureMapper
 
 # Some legacy patient data
 legacy_patient = {

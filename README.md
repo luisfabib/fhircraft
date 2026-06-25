@@ -73,7 +73,7 @@ pip install git+https://github.com/luisfabib/fhircraft.git
 To verify your installation:
 
 ```python
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 # This should work without errors
 Patient = get_fhir_type("Patient","R4B")
@@ -88,7 +88,7 @@ print("✓ Fhircraft installed successfully!")
 Work with pre-generated Pydantic models for all standard FHIR resources. Each model includes full validation rules from the FHIR specification:
 
 ```python
-from fhircraft.fhir.resources import get_fhir_type
+from fhircraft import get_fhir_type
 
 # Get built-in Patient model for FHIR R5
 Patient = get_fhir_type("Patient", "R5")
@@ -107,7 +107,7 @@ print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
 Extend base FHIR models with implementation guide profiles loaded directly from the official FHIR package registry:
 
 ```python
-from fhircraft.fhir.resources import FHIRModelFactory
+from fhircraft import FHIRModelFactory
 
 # Create a FHIR (R5 release) factory
 factory = FHIRModelFactory(fhir_release="R4")
@@ -147,7 +147,7 @@ print(f"Updated patient: {family_names[0]}, Phone: {has_phone}")
 Convert external data sources into valid FHIR resources using declarative mapping scripts:
 
 ```python
-from fhircraft.fhir.mapper import FHIRStructureMapper
+from fhircraft import FHIRStructureMapper
 
 # Legacy system data
 legacy_patient = {
