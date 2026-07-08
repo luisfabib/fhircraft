@@ -70,10 +70,9 @@ dev = [
     "coverage>=7.5.1",
 ]
 docs = [
-    "mkdocs-material==9.5.27",
-    "mkdocstrings[python]==0.26.1",
-    "mkdocs-gen-files==0.5.0",
-    "mkdocs-literate-nav==0.6.1",
+    "zensical>=0.0.47",   
+    "mkdocstrings-python>=1.13.0",
+    "markdown-exec[ansi]>=1.12.3",
     "griffe-fieldz==0.4.0",
 ]
 

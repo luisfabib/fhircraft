@@ -1,4 +1,7 @@
 
+```python exec="on"
+
+
 
 # Script to generate the project's credits.
 
@@ -20,16 +23,12 @@ from packaging.requirements import Requirement
 
 from pathlib import Path
 
-import mkdocs_gen_files
-
-
-# YORE: EOL 3.10: Replace block with line 2.
 if sys.version_info >= (3, 11):
     import tomllib
 else:
     import tomli as tomllib
 
-project_dir = Path(os.getenv("MKDOCS_CONFIG_DIR", "."))
+project_dir = Path(".")
 with project_dir.joinpath("pyproject.toml").open("rb") as pyproject_file:
     pyproject = tomllib.load(pyproject_file)
 project = pyproject["project"]
@@ -193,7 +192,7 @@ def _render_credits() -> str:
     return jinja_env.from_string(template_text).render(**template_data)
 
 
-full_doc_path = Path("community", 'credits.md')  # Path for the credits page
-with mkdocs_gen_files.open(full_doc_path, "w") as fd:  
-    print(_render_credits(), file=fd)  # Render the credits page content
+print(_render_credits())
 
+
+```
