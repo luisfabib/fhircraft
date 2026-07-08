@@ -13,14 +13,12 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Literal, overload, TYPE_CHECKING
 
+from fhircraft import SUPPORTED_FHIR_RELEASES
 from fhircraft.fhir.resources.indexer import Manifest, ManifestEntry
 from fhircraft.utils import to_snake_case, capitalize
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel
-
-# Supported FHIR releases that have a definitions manifest
-SUPPORTED_RELEASES = ("R4", "R4B", "R5")
 
 # Definitions directory: …/fhircraft/fhir/resources/definitions/
 _DEFINITIONS_DIR = Path(__file__).parent.parent / "definitions"

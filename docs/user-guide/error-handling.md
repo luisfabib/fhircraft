@@ -290,7 +290,7 @@ from fhircraft.exceptions import (
 )
 from fhircraft import FHIRStructureMapper
 
-mapper = FHIRStructureMapper()
+mapper = FHIRStructureMapper(fhir_release="R5")
 
 mapping_script = """
 map 'http://example.org/mapping' = 'MyMapping'

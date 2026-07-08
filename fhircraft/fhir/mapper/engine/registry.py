@@ -12,10 +12,11 @@ from pydantic import BaseModel, ValidationError
 
 from fhircraft.config import override_config
 from fhircraft.exceptions import MapperRegistryNotFoundError
+from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
-from fhircraft.utils import load_env_variables
+from fhircraft.utils import load_env_variables, FHIRRelease
 
 StructureMapUnion = Union[
     R4_models.StructureMap, R4B_models.StructureMap, R5_models.StructureMap
@@ -36,18 +37,20 @@ class StructureMapRegistry:
     internet access is enabled it will fall back to downloading a
     StructureMap from its canonical URL if it is not already in-memory.
 
-    The public API mirrors :class:`~fhircraft.fhir.resources.definitions.registry.StructureDefinitionRegistry`.
+    The public API mirrors 
+    :class:`~fhircraft.fhir.resources.definitions.registry.StructureDefinitionRegistry`.
 
     Attributes:
-        fhir_release (str): FHIR release used when validating raw dicts
+        fhir_release (FHIRRelease): FHIR release used when validating raw dicts
             (e.g. ``"R4"``, ``"R4B"``, ``"R5"``).
-        structure_maps_by_url (Dict[str, StructureMap]): In-memory manifest, keyed by the *base* canonical URL (version stripped).
+        structure_maps_by_url (Dict[str, StructureMapUnion]): In-memory manifest, keyed 
+        by the *base* canonical URL (version stripped).
     """
 
-    fhir_release: str
+    fhir_release: FHIRRelease
     structure_maps_by_url: "Dict[str, StructureMapUnion]"
 
-    def __init__(self, fhir_release: str = "R5") -> None:
+    def __init__(self, fhir_release: FHIRRelease) -> None:
         if fhir_release not in _RELEASE_STRUCTURE_MAP:
             raise ValueError(
                 f"Unsupported FHIR release '{fhir_release}'. "
@@ -173,20 +176,19 @@ class StructureMapRegistry:
 
     def _validate_structure_map(self, data: Any) -> "StructureMapUnion":
         """Validate *data* against the StructureMap model for the configured FHIR release."""
-        from fhircraft.fhir.resources.base import FHIRBaseModel
 
-        StructureMap = _RELEASE_STRUCTURE_MAP[self.fhir_release]
+        structure_map_class = _RELEASE_STRUCTURE_MAP[self.fhir_release]
 
         try:
-            if isinstance(data, StructureMap):
+            if isinstance(data, structure_map_class):
                 return data
             elif isinstance(data, FHIRBaseModel):
                 with override_config(validation_mode="skip"):
                     dumped = data.model_dump()
-                return StructureMap.model_validate(dumped)
+                return structure_map_class.model_validate(dumped)
             elif isinstance(data, BaseModel):
-                return StructureMap.model_validate(data.model_dump())
-            return StructureMap.model_validate(data)
+                return structure_map_class.model_validate(data.model_dump())
+            return structure_map_class.model_validate(data)
         except ValidationError as exc:
             raise ValueError(
                 f"Data does not conform to StructureMap for FHIR release "
@@ -237,6 +239,7 @@ class StructureMapRegistry:
             verify=settings.get("CERTIFICATE_BUNDLE_PATH"),
             headers=headers,
             allow_redirects=True,
+            timeout=settings.get("HTTP_TIMEOUT", 10)
         )
         response.raise_for_status()
         return response.json()

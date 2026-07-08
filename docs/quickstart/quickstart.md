@@ -171,7 +171,7 @@ group main(source legacy, target patient: Patient) {
 """ # (2)!
 
 # Run the transformation
-mapper = FHIRStructureMapper()
+mapper = FHIRStructureMapper(fhir_release="R5")
 targets = mapper.map(mapping_script, legacy_patient)  # (3)!
 patient = targets[0]
 

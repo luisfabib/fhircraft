@@ -14,6 +14,7 @@ from fhircraft.exceptions import (
     FHIRPathRuntimeError,
     FHIRPathWarning,
 )
+from fhircraft import SUPPORTED_FHIR_RELEASES
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
 
 if TYPE_CHECKING:
@@ -1046,6 +1047,13 @@ class TypeSpecifier(FHIRPath):
                     if isinstance(release, FHIRPathCollectionItem)
                     else release
                 )
+            if release not in SUPPORTED_FHIR_RELEASES:
+                warnings.warn(
+                    f"Unsupported %fhirRelease '{release}' found in environment. Defaulting to R4 for type resolution.",
+                    FHIRPathWarning,
+                    stacklevel=2,
+                )
+                release = "R4"
             if not release:
                 warnings.warn(
                     "No %fhirRelease found in environment. Defaulting to R4 for type resolution.",

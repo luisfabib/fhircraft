@@ -1,5 +1,6 @@
 import ply.lex
 
+from fhircraft import SUPPORTED_FHIR_RELEASES
 from fhircraft.exceptions import FHIRPathLexingError
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.fhir.resources.datatypes.registry import get_registry
@@ -144,7 +145,7 @@ class FHIRPathLexer(metaclass=MergeLexerMetaclass):
             for resource in set(
                 [
                     resource
-                    for release in ["R4", "R4B", "R5"]
+                    for release in SUPPORTED_FHIR_RELEASES
                     for resource in get_registry(release).all_names(kind="resource")
                 ]
             )
