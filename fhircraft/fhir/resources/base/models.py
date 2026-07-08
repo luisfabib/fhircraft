@@ -362,25 +362,13 @@ class FHIRBaseModel(
         by_alias: bool | None = None,
         by_name: bool | None = None,
     ) -> Self:
-        """Validate *obj* and return a model instance."""
+        """Validate `obj` and return a model instance."""
         if by_alias is not None:
-            warnings.warn(
-                "FHIRBaseModel.model_validate does not support by_alias. Ignoring.",
-                UserWarning,
-                stacklevel=2,
-            )
+            raise TypeError("FHIRBaseModel.model_validate does not support user-provided `by_alias`.")
         if extra is not None:
-            warnings.warn(
-                "FHIRBaseModel.model_validate does not support extra. Ignoring.",
-                UserWarning,
-                stacklevel=2,
-            )
+            raise TypeError("FHIRBaseModel.model_validate does not support user-provided `extra`.")
         if by_name is not None:
-            warnings.warn(
-                "FHIRBaseModel.model_validate does not support by_name. Ignoring.",
-                UserWarning,
-                stacklevel=2,
-            )
+            raise TypeError("FHIRBaseModel.model_validate does not support user-provided `by_name`.")
         return super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
@@ -398,23 +386,11 @@ class FHIRBaseModel(
     ) -> Self:
         """Deserialize *json_data* and return a validated model instance."""
         if by_alias is not None:
-            warnings.warn(
-                "FHIRBaseModel.model_validate_json does not support by_alias. Ignoring.",
-                UserWarning,
-                stacklevel=2,
-            )
+            raise TypeError("FHIRBaseModel.model_validate_json does not support user-provided `by_alias`.")
         if extra is not None:
-            warnings.warn(
-                "FHIRBaseModel.model_validate_json does not support extra. Ignoring.",
-                UserWarning,
-                stacklevel=2,
-            )
+            raise TypeError("FHIRBaseModel.model_validate_json does not support user-provided `extra`.")
         if by_name is not None:
-            warnings.warn(
-                "FHIRBaseModel.model_validate_json does not support by_name. Ignoring.",
-                UserWarning,
-                stacklevel=2,
-            )
+            raise TypeError("FHIRBaseModel.model_validate_json does not support user-provided `by_name`.")
         return super().model_validate_json(json_data, strict=strict, context=context)
 
     # ------------------------------------------------------------------
