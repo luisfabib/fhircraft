@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.8.3 - 2026-04-15
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.3...0.8.2)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.8.3)
 
 
 ### Fixed
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.8.2 - 2026-04-15
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.8.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.1...0.8.2)
 
 
 ### Fixed
@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.8.1 - 2026-04-15
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.1...0.8.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.0...0.8.1)
 
 ### Fixed
 
@@ -46,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.8.0 - 2026-04-12
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.0...0.7.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.1...0.8.0)
 
 ### Added
 
@@ -77,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.7.1 - 2026-03-28
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.1...0.7.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.0...0.7.1)
 
 ### Added
 
@@ -117,7 +117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.7.0 - 2026-03-20
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.7.0...0.6.5)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.7.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.5...0.7.0)
 
 ### Added
 
@@ -187,7 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.6.5 - 2026-02-26
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.5...0.6.4)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.4...0.6.5)
 
 ### Added
 
@@ -211,7 +211,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.6.4 - 2026-02-20
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.4) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.4...0.6.3)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.4) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.3...0.6.4)
 
 ### Fixed
 
@@ -233,7 +233,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.6.3 - 2026-02-13
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.3...0.6.2)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.2...0.6.3)
 
 ### Fixed
 
@@ -251,7 +251,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.6.2 - 2026-02-09
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.2...0.6.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.1...0.6.2)
 
 ### Added
 
@@ -285,7 +285,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v0.6.1 - 2026-02-03
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.1...0.6.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.0...0.6.1)
 
 ### Added
 
@@ -321,7 +321,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.6.0 - 2026-01-30
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.0...0.5.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.5.0...0.6.0)
 
 ### Added
 
@@ -402,7 +402,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.5.0 - 2025-12-19
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.5.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.5.0...0.4.2)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.5.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.2...0.5.0)
 
 ### Added
 
@@ -422,7 +422,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.4.2 - 2025-12-05
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.2...0.4.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.1...0.4.2)
 
 ### Changed
 
@@ -436,7 +436,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.4.1 - 2025-12-03
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.1...0.4.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.0...0.4.1)
 
 ### Added
 
@@ -466,7 +466,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.4.0 - 2025-11-30
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.0...0.3.7)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.7...0.4.0)
 
 ### Added
 
@@ -493,7 +493,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.7 - 2025-11-26
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.7) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.7...0.3.6)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.7) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.6...0.3.7)
 
 ### Added
 
@@ -516,7 +516,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.6 - 2025-11-19
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.6) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.6...0.3.5)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.6) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.5...0.3.6)
 
 ### Changed
 
@@ -532,7 +532,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.5 - 2025-11-19
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.5...0.3.4)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.4...0.3.5)
 
 ### Changed
 
@@ -552,7 +552,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.4 - 2025-11-11
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.4) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.4...0.3.3)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.4) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.3...0.3.4)
 
 ### Fixed
 - Fixed processing of pattern and fixed values for both primitive and complex FHIR types ([#82](https://github.com/luisfabib/fhircraft/pull/82))
@@ -570,7 +570,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.3 - 2025-10-13
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.3...0.3.2)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.2...0.3.3)
 
 ### Changed
 
@@ -594,7 +594,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.2 - 2025-10-09
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.2...0.3.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.1...0.3.2)
 
 ### Changed
 
@@ -609,7 +609,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.1 - 2025-10-09
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.1...0.3.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.0...0.3.1)
 
 ### Fixed
 
@@ -619,7 +619,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.3.0 - 2025-10-07
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.0...0.2.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.2.0...0.3.0)
 
 ### Added
 - Implement complete FHIR Mapping Language support with lexer, parser, and execution engine ([#30](https://github.com/luisfabib/fhircraft/pull/30))
@@ -703,7 +703,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.2.0 - 2025-08-12
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.2.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.2.0...0.1.1)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.2.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.1.1...0.2.0)
 
 ### Added
 - FHIR StructureDefinition repository system for managing FHIR Structure Definitions from local, package, or online sources ([#19](https://github.com/luisfabib/fhircraft/pull/19))
@@ -722,7 +722,7 @@ Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.c
 
 ## v0.1.1 - 2025-08-07
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.1.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.1.1...0.1.0)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.1.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.1.0...0.1.1)
 
 ### Added
 - Logic to load a JSON `StructureDefinition` from a file if a string path is provided to the factory method.
