@@ -10,6 +10,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 
 from pydantic import BaseModel
 
+
+from fhircraft import SUPPORTED_FHIR_RELEASES
+from fhircraft.utils import FHIRRelease
 from fhircraft.exceptions import FhircraftException, MapperExecutionError, MapperParsingError
 from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
 from fhircraft.fhir.mapper.engine.registry import StructureMapRegistry
@@ -61,7 +64,7 @@ class FHIRStructureMapper:
 
     def __init__(
         self,
-        fhir_release: str = "R5",
+        fhir_release: FHIRRelease,
         structure_definition_registry: StructureDefinitionRegistry | None = None,
         structure_map_registry: StructureMapRegistry | None = None,
     ) -> None:
@@ -69,19 +72,24 @@ class FHIRStructureMapper:
         Initialise the mapper.
 
         Args:
-            fhir_release: FHIR version to target (``"R4"``, ``"R4B"``, or ``"R5"``).
+            fhir_release: FHIR version to target (e.g. ``"R4"``, ``"R4B"``, or ``"R5"``).
             structure_definition_registry: Pre-built definition registry. A new one
                 is created automatically when omitted.
             structure_map_registry: Pre-built StructureMap registry. A new one is
                 created automatically when omitted.
         """
+        if fhir_release not in SUPPORTED_FHIR_RELEASES:
+            raise FhircraftException(
+                f"Unsupported FHIR release: {fhir_release}. "
+                f"Supported releases: {SUPPORTED_FHIR_RELEASES}"
+            )
         self.fhir_release = fhir_release
         self._engine = FHIRMappingEngine(
             fhir_release=fhir_release,
             structure_definition_registry=structure_definition_registry,
             structure_map_registry=structure_map_registry,
         )
-        self._parser = FHIRMappingLanguageParser()
+        self._parser = FHIRMappingLanguageParser(fhir_release=fhir_release)
 
     # ------------------------------------------------------------------
     # Core mapping operation
@@ -155,7 +163,7 @@ class FHIRStructureMapper:
             MapperParsingError: If the script contains syntax errors.
         """
         try:
-            return self._parser.parse(script, fhir_release=self.fhir_release)
+            return self._parser.parse(script)
         except Exception as e:
             raise MapperParsingError(f"Failed to parse mapping script: {e}") from e
 

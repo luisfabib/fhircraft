@@ -30,7 +30,12 @@ def add_rules_to_basic_map(rules, documentation=None):
 
 @pytest.fixture(scope="module")
 def parser():
-    return FHIRMappingLanguageParser(lexer_class=lambda: FHIRMappingLanguageLexer())
+    return FHIRMappingLanguageParser(fhir_release="R5", lexer_class=lambda: FHIRMappingLanguageLexer())
+
+
+@pytest.fixture(scope="module")
+def r4b_parser():
+    return FHIRMappingLanguageParser(fhir_release="R4B", lexer_class=lambda: FHIRMappingLanguageLexer())
 
 
 # Format: (string, expected_object)
@@ -1158,7 +1163,7 @@ directories = (
 @pytest.mark.filterwarnings("ignore:.*Pydantic serializer warnings.*")
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.parametrize("directory", directories)
-def test_parser_integration(directory, parser):
+def test_parser_integration(directory, r4b_parser):
     with open(
         os.path.join(
             os.path.abspath(EXAMPLES_DIRECTORY), directory, directory + ".map"
@@ -1174,7 +1179,7 @@ def test_parser_integration(directory, parser):
     ) as file:
         expected_StructureMap = json.load(file)
 
-    parsed_map = parser.parse(map_script, fhir_release="R4B").model_dump(
+    parsed_map = r4b_parser.parse(map_script).model_dump(
         exclude=("text", "status", "meta")
     )
     expected_map = R4B_StructureMap.model_validate(expected_StructureMap).model_dump(

@@ -20,7 +20,7 @@ class Package(BaseModel):
         ],
     )
     fhir_version: Optional[str] = Field(
-        None, alias="fhirVersion", description="Package FHIR version", examples=["R4"]
+        None, alias="fhirVersion", description="Package FHIR version", examples=["4.0.0"]
     )
 
 

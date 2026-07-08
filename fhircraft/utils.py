@@ -25,6 +25,8 @@ from dotenv import dotenv_values
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
+FHIRRelease = Literal["DSTU2", "STU3", "R4", "R4B", "R5", "R6"]
+
 # URL regex pattern
 URL_PATTERNS = re.compile(
     r"^(https?|ftp)://"  # Scheme (HTTP, HTTPS, FTP)
@@ -382,7 +384,7 @@ def is_dict_subset(subset: dict, superset: dict) -> bool:
 
 def get_FHIR_release_from_version(
     version: str,
-) -> Literal["DSTU2", "STU3", "R4", "R4B", "R5", "R6"]:
+) -> FHIRRelease:
     # Check format of the version string
     if not re.match(r"^\d+\.\d+\.\d+$", version):
         raise ValueError(f'FHIR version must be in "x.y.z" format, got "{version}"')

@@ -53,7 +53,7 @@ group main(source legacy, target patient: Patient) {
 """
 
 # Create mapper and execute the transformation
-mapper = FHIRStructureMapper()
+mapper = FHIRStructureMapper(fhir_release="R5")
 targets = mapper.map(mapping_script, legacy_patient)
 patient = targets[0]  # Get the transformed Patient resource
 
@@ -110,7 +110,7 @@ group main(source src, target tgt: Patient) {
 source_data = {"surname": "Smith", "sex": "female", "civilStatus": "divorced"}
 
 # Execute the mapping
-mapper = FHIRStructureMapper()
+mapper = FHIRStructureMapper(fhir_release="R5")
 targets = mapper.map(script, source_data)
 
 print(f"Transformed: {targets[0].model_dump(exclude={'meta','resourceType'})}")
@@ -341,7 +341,7 @@ Storing mappings in files separates transformation logic from application code, 
 from fhircraft.utils import load_file
 from fhircraft import FHIRStructureMapper
 
-mapper = FHIRStructureMapper()
+mapper = FHIRStructureMapper(fhir_release="R5")
 
 # Load mapping definition from a local JSON file
 structure_map = load_file("patient-mapping.json")

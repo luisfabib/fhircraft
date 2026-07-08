@@ -1,12 +1,17 @@
+"""
+FHIR Mapping Language Parser
+"""
+
 import logging
 import html
 import datetime
 import os.path
-from typing import Literal
+from typing import Iterator
 
 import ply.yacc
 
 import fhircraft.fhir.path.engine.literals as literals
+from fhircraft import SUPPORTED_FHIR_RELEASES
 from fhircraft.exceptions import MapperParsingError
 from fhircraft.fhir.mapper.lexer import FHIRMappingLanguageLexer
 from fhircraft.fhir.path.parser import FHIRPathParser
@@ -14,7 +19,7 @@ from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
-from fhircraft.utils import ensure_list
+from fhircraft.utils import ensure_list, FHIRRelease
 
 StructureMapUnion = (
     R4_models.StructureMap | R4B_models.StructureMap | R5_models.StructureMap
@@ -25,8 +30,18 @@ __all__ = ["FHIRMappingLanguageParser", "StructureMapUnion", "parse"]
 logger = logging.getLogger(__name__)
 
 
-def parse(string: str) -> StructureMapUnion:
-    return FHIRMappingLanguageParser().parse(string)
+def parse(input_string: str, fhir_release: FHIRRelease) -> StructureMapUnion:
+    """ 
+    Parse a FHIR Mapping Language string into a StructureMap resource.
+    
+    Args:
+        input_string (str): The FHIR Mapping Language string to parse.
+        fhir_release (FHIRRelease): The FHIR release version to use for parsing.
+    
+    Returns:
+        StructureMapUnion: The parsed StructureMap resource.
+    """
+    return FHIRMappingLanguageParser(fhir_release=fhir_release).parse(input_string)
 
 
 
@@ -36,13 +51,24 @@ class FHIRMappingLanguageParser(FHIRPathParser):
     """
 
     tokens = FHIRMappingLanguageLexer.tokens
+    """The list of token names used by the parser. This is required by PLY."""
 
-    def __init__(self, debug=False, lexer_class=None):
+    structure_map: StructureMapUnion
+    """The StructureMap resource being constructed during parsing."""
+
+    def __init__(self, fhir_release: FHIRRelease, debug: bool = False, lexer_class: type | None = None):
         if self.__doc__ is None:
             raise MapperParsingError(
                 "Docstrings have been removed! By design of PLY, "
             )
+        if fhir_release not in SUPPORTED_FHIR_RELEASES:
+            raise MapperParsingError(
+                f"Unsupported FHIR release: {fhir_release}. "
+                f"Supported releases: {SUPPORTED_FHIR_RELEASES}"
+            )
 
+        self.fhir_release = fhir_release
+        self.string = None
         self.debug = debug
         self.lexer_class = (
             lexer_class or FHIRMappingLanguageLexer
@@ -58,7 +84,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         parsing_table_module = "_".join([module_name, start_symbol, "parsetab"])
 
         # Generate the parse table
-        self.parser = ply.yacc.yacc(
+        self.lr_parser = ply.yacc.yacc(
             module=self,
             debug=self.debug,
             tabmodule=parsing_table_module,
@@ -68,7 +94,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
             errorlog=logger,
         )
 
-    def _parse_StructureMapGroupRuleTargetParameter(
+    def _parse_target_parameter(
         self,
         value: (
             str | int | bool | float | datetime.date | datetime.datetime | datetime.time
@@ -199,33 +225,51 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         ) = self._get_model("StructureMapStructure")
 
     def parse(
-        self, string, lexer=None, fhir_release: Literal["R4", "R4B", "R5"] = "R5"
+        self, input_string: str
     ) -> StructureMapUnion:
-        self.string = string
-        self.fhir_release = fhir_release
+        """ 
+        Parse a FHIR Mapping Language string into a StructureMap resource.
+
+        Args:
+            input_string (str): The FHIR Mapping Language string to parse.
+        
+        Returns:
+            StructureMapUnion: The parsed StructureMap resource.
+        """
+        self.input_string = input_string
         self._prepare_models()
         Narrative = self._get_model("Narrative")
         # HTML escape the mapping content to avoid FHIR narrative validation issues
-        escaped_content = html.escape(string)
-        self.structureMap: StructureMapUnion = self.StructureMap.model_construct(
+        escaped_content = html.escape(input_string)
+        # Initialize the StructureMap resource with a Narrative containing the escaped content
+        self.structure_map: StructureMapUnion = self.StructureMap.model_construct(
             text=Narrative(
                 div=f'<div xmlns="http://www.w3.org/1999/xhtml"><pre>{escaped_content}</pre></div>'
             )
         )  # type: ignore
-        return self.parse_token_stream(self.lexer.tokenize(string))
+        return self.parse_token_stream(self.lexer.tokenize(input_string))
 
-    def is_valid(self, string):
+    def is_valid(self, input_string: str) -> bool:
+        """ 
+        Check if the given FHIR Mapping Language string is valid.
+
+        Args:
+            input_string (str): The FHIR Mapping Language string to validate.
+        
+        Returns:
+            bool: True if the string is valid, False otherwise.
+        """
         try:
             try:
-                self.parse(string)
+                self.parse(input_string)
                 return True
             except NotImplementedError:
                 return True
         except MapperParsingError:
             return False
 
-    def parse_token_stream(self, token_iterator):
-        return self.parser.parse(lexer=IteratorToTokenStream(token_iterator))
+    def parse_token_stream(self, token_iterator: Iterator) -> StructureMapUnion:
+        return self.lr_parser.parse(lexer=IteratorToTokenStream(token_iterator))
 
     def _parse_list_tokens(self, tokens: list, comma_separated=False) -> list | None:
         if len(tokens) == 2:
@@ -251,36 +295,38 @@ class FHIRMappingLanguageParser(FHIRPathParser):
                 f'FHIR Mapping Language parser error at EOF "{self.string}"'
             )
         raise MapperParsingError(
-            f'FHIR Mapping Language parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col, t.lineno)}'
+            f'FHIR Mapping Language parser error at {t.lineno}:{t.col}'
+            f' - Invalid token "{t.value}" ({t.type}):'
+            f'\n{_underline_error_in_fhir_path(self.string, t.value, t.col, t.lineno)}'
         )
 
-    def p_mapper_structureMap(self, p):
+    def p_mapper_structure_map(self, p):
         """structureMap : m_structureMap_sections"""
         sections = p[1] or {}
 
         map_id = sections.get("mapId") or {}
-        self.structureMap.url = map_id.get("url")
-        self.structureMap.name = map_id.get("name")
-        self.structureMap.status = "draft"  # Default status
+        self.structure_map.url = map_id.get("url")
+        self.structure_map.name = map_id.get("name")
+        self.structure_map.status = "draft"  # Default status
 
         for attr, value in (sections.get("metadata") or {}).items():
-            setattr(self.structureMap, attr, value)
+            setattr(self.structure_map, attr, value)
 
         if conceptmap := sections.get("conceptmap"):
-            self.structureMap.contained = [conceptmap]  # type: ignore
+            self.structure_map.contained = [conceptmap]  # type: ignore
 
         if structures := sections.get("structures"):
-            self.structureMap.structure = structures
+            self.structure_map.structure = structures
         if imports := sections.get("imports"):
-            self.structureMap.import_ = imports
+            self.structure_map.import_ = imports
         if consts := sections.get("consts"):
-            self.structureMap.const = consts
+            self.structure_map.const = consts
         if groups := sections.get("groups"):
-            self.structureMap.group = groups
+            self.structure_map.group = groups
 
-        p[0] = self.structureMap
+        p[0] = self.structure_map
 
-    def p_mapper_structureMap_sections(self, p):
+    def p_mapper_structure_map_sections(self, p):
         """
         m_structureMap_sections : m_structureMap_sections m_structureMap_section
                                 | m_empty
@@ -309,31 +355,31 @@ class FHIRMappingLanguageParser(FHIRPathParser):
             else:
                 p[0][section_type] = section_value
 
-    def p_mapper_structureMap_section_metadata(self, p):
+    def p_mapper_structure_map_section_metadata(self, p):
         """m_structureMap_section : m_metadata_entry"""
         p[0] = ("metadata", p[1] or {})
 
-    def p_mapper_structureMap_section_mapId(self, p):
+    def p_mapper_structure_map_section_map_id(self, p):
         """m_structureMap_section : m_mapId"""
         p[0] = ("mapId", p[1])
 
-    def p_mapper_structureMap_section_conceptmap(self, p):
+    def p_mapper_structure_map_section_conceptmap(self, p):
         """m_structureMap_section : m_conceptmap"""
         p[0] = ("conceptmap", p[1])
 
-    def p_mapper_structureMap_section_structure(self, p):
+    def p_mapper_structure_map_section_structure(self, p):
         """m_structureMap_section : m_structure"""
         p[0] = ("structures", p[1])
 
-    def p_mapper_structureMap_section_imports(self, p):
+    def p_mapper_structure_map_section_imports(self, p):
         """m_structureMap_section : m_imports"""
         p[0] = ("imports", p[1])
 
-    def p_mapper_structureMap_section_const(self, p):
+    def p_mapper_structure_map_section_const(self, p):
         """m_structureMap_section : m_const"""
         p[0] = ("consts", p[1])
 
-    def p_mapper_structureMap_section_group(self, p):
+    def p_mapper_structure_map_section_group(self, p):
         """m_structureMap_section : m_group"""
         p[0] = ("groups", p[1])
 
@@ -353,7 +399,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         p[0] = p[1]
 
-    def p_mapper_mapId(self, p):
+    def p_mapper_map_id(self, p):
         """
         m_mapId : MAP m_url EQUAL m_identifier
                 | MAP m_url EQUAL STRING
@@ -420,12 +466,12 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         if self.fhir_release == "R4" or self.fhir_release == "R4B":
             p[0] = self.ConceptMapGroupElement(
                 code=p[3],
-                target=[self.ConceptMapGroupElementTarget(code=p[7], equivalence=p[4])],  # type: ignore
+                target=[self.ConceptMapGroupElementTarget(code=p[7], equivalence=p[4])], 
             )
         elif self.fhir_release == "R5":
             p[0] = self.ConceptMapGroupElement(
                 code=p[3],
-                target=[self.ConceptMapGroupElementTarget(code=p[7], relationship=p[4])],  # type: ignore
+                target=[self.ConceptMapGroupElementTarget(code=p[7], relationship=p[4])],
             )
 
     def p_conceptmap_code(self, p):
@@ -470,7 +516,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
             alias=p[3] if len(p) == 6 else None,
         )
 
-    def p_mapper_structureAlias(self, p):
+    def p_mapper_structure_alias(self, p):
         """
         m_structureAlias : ALIAS m_identifier
         """
@@ -497,7 +543,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         if self.fhir_release != "R5":
             raise MapperParsingError(
-                f"StructureMap constants are only supported in FHIR R5 and above!"
+                "StructureMap constants are only supported in FHIR R5 and above!"
             )
         p[0] = self.StructureMapConst(name=p[2], value=str(p[4]))
 
@@ -509,12 +555,12 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         if len(p) == 7:
             # Group type specified
             extends = p[4]
-            typeMode = p[5]
+            type_mode = p[5]
             rules = p[6]
         else:
             # No group type specified
             extends = p[4]
-            typeMode = None
+            type_mode = None
             rules = p[5]
 
         p[0] = self.StructureMapGroup(
@@ -522,7 +568,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
             input=p[3],
             rule=rules,
             extends=extends,
-            typeMode=typeMode,
+            typeMode=type_mode,
         )
 
     def p_mapper_group(self, p):
@@ -532,17 +578,17 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         if len(p) == 6:
             # Group type specified
-            typeMode = p[4]
+            type_mode = p[4]
             rules = p[5]
         else:  # no optional args
-            typeMode = None
+            type_mode = None
             rules = p[4]
 
         p[0] = self.StructureMapGroup(
             name=p[2],
             input=p[3],
             rule=rules,
-            typeMode=typeMode,
+            typeMode=type_mode,
         )
 
     def p_mapper_parameters(self, p):
@@ -575,7 +621,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         p[0] = p[2]
 
-    def p_mapper_inputMode(self, p):
+    def p_mapper_input_mode(self, p):
         """
         m_inputMode : SOURCE
                     | TARGET
@@ -608,7 +654,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
                     | m_rule_list m_rule
         """
         raise MapperParsingError(
-            f"A rule was not properly closed. Did you forget a ';' at the end of a rule?",
+            "A rule was not properly closed. Did you forget a ';' at the end of a rule?",
         )
 
     def p_mapper_rule_list(self, p):
@@ -725,16 +771,16 @@ class FHIRMappingLanguageParser(FHIRPathParser):
                         target = self.StructureMapGroupRuleTarget(
                             context=target_temp_variable,
                             element=subelement,
-                            contextType="variable",  # type: ignore
+                            contextType="variable",
                         )
-                    _rule.rule = _rule.rule or []  # type: ignore
+                    _rule.rule = _rule.rule or []
                     new_rule = self.StructureMapGroupRule(
                         source=[
-                            self.StructureMapGroupRuleSource(context=source_variable)  # type: ignore
+                            self.StructureMapGroupRuleSource(context=source_variable)
                         ],
-                        target=[target],  # type: ignore
+                        target=[target],
                     )
-                    _rule.rule.append(new_rule)  # type: ignore
+                    _rule.rule.append(new_rule)
                     _rule = _rule.rule[-1]
 
             target.variable = data.get("variable")
@@ -821,28 +867,6 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         m_rule_source : m_rule_path m_source_modifiers
         """
 
-        def _parse_old_defaultValue_choice(
-            source: (
-                R4_models.StructureMapGroupRuleSource
-                | R4B_models.StructureMapGroupRuleSource
-            ),
-            value,
-        ):
-            if isinstance(value, str):
-                source.defaultValueString = value
-            elif isinstance(value, int):
-                source.defaultValueInteger = value
-            elif isinstance(value, bool):
-                source.defaultValueBoolean = value
-            elif isinstance(value, float):
-                source.defaultValueDecimal = value
-            elif isinstance(value, datetime.date):
-                source.defaultValueDate = value
-            elif isinstance(value, datetime.datetime):
-                source.defaultValueDateTime = value
-            elif isinstance(value, datetime.time):
-                source.defaultValueTime = value
-
         p[0] = self.StructureMapGroupRuleSource(
             context=p[1].get("context"),
             element=p[1].get("element"),
@@ -862,7 +886,21 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         if self.fhir_release == "R5":
             p[0].defaultValue = p[2].get("default")
         elif self.fhir_release == "R4" or self.fhir_release == "R4B":
-            _parse_old_defaultValue_choice(p[0], p[2].get("default"))
+            default_value =  p[2].get("default")
+            if isinstance(default_value, str):
+                p[0].defaultValueString = default_value
+            elif isinstance(default_value, int):
+                p[0].defaultValueInteger = default_value
+            elif isinstance(default_value, bool):
+                p[0].defaultValueBoolean = default_value
+            elif isinstance(default_value, float):
+                p[0].defaultValueDecimal = default_value
+            elif isinstance(default_value, datetime.date):
+                p[0].defaultValueDate = default_value
+            elif isinstance(default_value, datetime.datetime):
+                p[0].defaultValueDateTime = default_value
+            elif isinstance(default_value, datetime.time):
+                p[0].defaultValueTime = default_value
 
     def p_mapper_source_modifiers(self, p):
         """
@@ -908,26 +946,26 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         p[0] = p[1]
         p[0]["subelements"] = p[0].get("subelements", []) + [p[3]]
 
-    def p_mapper_sourceType(self, p):
+    def p_mapper_source_type(self, p):
         """
         m_sourceType : ':' m_identifier
         """
         p[0] = {"type": p[2]}
 
-    def p_mapper_sourceCardinality(self, p):
+    def p_mapper_source_cardinality(self, p):
         """
         m_sourceCardinality : INTEGER '.' '.' INTEGER
                             | INTEGER '.' '.' '*'
         """
         p[0] = {"min": p[1], "max": p[4]}
 
-    def p_mapper_sourceDefault(self, p):
+    def p_mapper_source_default(self, p):
         """
         m_sourceDefault : DEFAULT '(' m_fhirpath ')'
         """
         p[0] = {"default": p[3]}
 
-    def p_mapper_sourceListMode(self, p):
+    def p_mapper_source_list_mode(self, p):
         """
         m_sourceListMode : FIRST
                          | NOT_FIRST
@@ -943,13 +981,13 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         p[0] = {"variable": p[2]}
 
-    def p_mapper_whereClause(self, p):
+    def p_mapper_where_clause(self, p):
         """
         m_whereClause : WHERE '(' m_fhirpath ')'
         """
         p[0] = {"condition": p[3]}
 
-    def p_mapper_checkClause(self, p):
+    def p_mapper_check_clause(self, p):
         """
         m_checkClause : CHECK '(' m_fhirpath ')'
         """
@@ -1027,7 +1065,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         | m_targetListMode"""
         p[0] = p[1]
 
-    def p_mapper_targetListMode(self, p):
+    def p_mapper_target_list_mode(self, p):
         """
         m_targetListMode : FIRST
                          | SHARE
@@ -1064,7 +1102,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         m_transform_literal : m_literal
         """
-        p[0] = self._parse_StructureMapGroupRuleTargetParameter(p[1])
+        p[0] = self._parse_target_parameter(p[1])
 
     def p_mapper_transform_invocation(self, p):
         """
@@ -1179,7 +1217,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         m_param_literal : m_literal
         """
-        p[0] = self._parse_StructureMapGroupRuleTargetParameter(p[1])
+        p[0] = self._parse_target_parameter(p[1])
 
     def p_mapper_param_id(self, p):
         """
@@ -1187,7 +1225,7 @@ class FHIRMappingLanguageParser(FHIRPathParser):
         """
         p[0] = self.StructureMapGroupRuleTargetParameter(valueId=p[1])
 
-    def p_mapper_fhirPath(self, p):
+    def p_mapper_fhir_path(self, p):
         """
         m_fhirpath : expression
         """
@@ -1281,10 +1319,17 @@ class FHIRMappingLanguageParser(FHIRPathParser):
 
 
 class IteratorToTokenStream:
+    """
+    A simple wrapper around an iterator to provide a token stream interface.
+    """
+
     def __init__(self, iterator):
         self.iterator = iterator
 
     def token(self):
+        """
+        Return the next token from the iterator, or None if the iterator is exhausted.
+        """
         try:
             return next(self.iterator)
         except StopIteration:

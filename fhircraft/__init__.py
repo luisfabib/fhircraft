@@ -18,6 +18,11 @@ Two-tier public API
 
 __version__ = "0.8.3"
 
+from typing import Final, Literal
+
+# ---  Supported FHIR releases  --- 
+SUPPORTED_FHIR_RELEASES: Final = ("R4", "R4B", "R5")
+
 # --- Resource access ---
 from fhircraft.fhir.resources.datatypes import get_fhir_type
 
@@ -60,4 +65,5 @@ __all__ = [
     "load_config_from_env",
     # Utilities
     "get_FHIR_release_from_version",
+    "SUPPORTED_FHIR_RELEASES",
 ]
