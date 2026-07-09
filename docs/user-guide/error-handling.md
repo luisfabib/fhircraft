@@ -1,3 +1,7 @@
+---
+icon: lucide/shield-alert
+---
+
 # Error Handling
 
 This guide shows you how to handle errors raised by Fhircraft. You will learn about the exception hierarchy, understand which exceptions each component raises and why, and write effective error-handling code that makes your FHIR application robust and easy to debug.
@@ -407,7 +411,7 @@ except FileNotFoundError as e:
 | `DefinitionNotFoundError` raised at build time | The required structure definition was not loaded before calling `factory.build()`. Call `factory.register()` or `factory.register_package()` first, then retry the build. |
 | `ValidationError` raised but unclear which field failed | Iterate `e.errors()` and print each entry's `loc`, `type`, and `msg` keys. Types prefixed with `fhir_` identify FHIR invariant violations (e.g. `fhir_dom-6`); all others are Pydantic field-type errors. |
 | FHIR constraint violations appear even on valid-looking data | The resource may be missing optional-but-constrained elements such as narrative text (`dom-6`). Use `disable_constraint('dom-6')` or switch to `validation_mode='lenient'` for that operation. See [Configuring Validation Behavior](configuration.md). |
-| `FHIRPathParsingError` on a seemingly correct expression | Check for unclosed parentheses, mismatched quotes, or unsupported syntax. Validate the expression against the [:material-fire: FHIRPath specification](https://hl7.org/fhirpath/N1/). |
+| `FHIRPathParsingError` on a seemingly correct expression | Check for unclosed parentheses, mismatched quotes, or unsupported syntax. Validate the expression against the [:lucide-flame: FHIRPath specification](https://hl7.org/fhirpath/N1/). |
 | `FHIRPathRuntimeError` from `fhirpath_single()` | The expression matched more than one value. Use `fhirpath_values()` to retrieve all matches, or tighten the expression with a `where()` filter so only one result is returned. |
 | Mapper raises `MapperRegistryNotFoundError` | A `uses` declaration in the mapping script references a StructureDefinition that is not loaded. Register the definition or load the relevant package before running the mapper. |
 | `MapperExecutionError` with no clear cause | Enable verbose logging and inspect intermediate scope state. Break the mapping script into smaller groups to isolate the failing rule. |

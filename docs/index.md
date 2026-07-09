@@ -100,7 +100,7 @@ img.banner {
 *Pythonic FHIR development with type safety and modern tooling*
 
 
-[Get Started :fontawesome-solid-rocket:](quickstart/quickstart.md){ .md-button .md-button--primary }
+[:lucide-rocket: Get Started](quickstart/quickstart.md){ .md-button .md-button--primary }
 
 </div>
 

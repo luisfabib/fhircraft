@@ -1,6 +1,10 @@
+---
+icon: lucide/rocket
+---
+
 # Quick Start
 
-This guide shows you how to create and work with [:material-fire: FHIR](https://hl7.org/fhir/) healthcare data using [:simple-pydantic: Pydantic](https://docs.pydantic.dev/) models in Python. FHIR (Fast Healthcare Interoperability Resources) defines how healthcare systems exchange information. Pydantic uses Python type hints to validate data when you create objects.
+This guide shows you how to create and work with [:lucide-flame: FHIR](https://hl7.org/fhir/) healthcare data using [:simple-pydantic: Pydantic](https://docs.pydantic.dev/) models in Python. FHIR (Fast Healthcare Interoperability Resources) defines how healthcare systems exchange information. Pydantic uses Python type hints to validate data when you create objects.
 
 ## Accessing Built-in FHIR Resources
 
@@ -34,7 +38,7 @@ print(patient.name[0].family)
 
     Checkout these resources for additional information:
         
-    - [:material-fire: FHIR Patient Resource](https://hl7.org/fhir/patient.html)
+    - [:lucide-flame: FHIR Patient Resource](https://hl7.org/fhir/patient.html)
     - [:simple-pydantic: Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)
 
 ## Working with FHIR resources
@@ -63,7 +67,7 @@ json_str = patient.model_dump_json(indent=2) # (1)!
     Checkout these resources for additional information:
 
     - [:simple-pydantic: Pydantic Serialization](https://docs.pydantic.dev/latest/concepts/serialization/)
-    - [:material-fire: FHIR JSON Format](https://hl7.org/fhir/json.html)
+    - [:lucide-flame: FHIR JSON Format](https://hl7.org/fhir/json.html)
 
 ## Querying with FHIRPath
 
@@ -94,13 +98,13 @@ assert is_female == [True] # (2)!
 
     Checkout these resources for additional information:
 
-   - [:material-fire: FHIRPath Specification](https://hl7.org/fhirpath/)
+   - [:lucide-flame: FHIRPath Specification](https://hl7.org/fhirpath/)
 
 ## Working with Profiles
 
 Base FHIR resources are designed to work across all healthcare contexts, but real-world implementations often need additional constraints. FHIR profiles define these constraints - requiring certain fields, restricting values, or adding extensions. When integrating with specific healthcare systems or implementing clinical guidelines, you'll need models that validate against these profiles rather than just the base FHIR specification.
 
-Load [:material-fire: FHIR implementation guides](https://hl7.org/fhir/implementationguide.html) and create specialized resource models:
+Load [:lucide-flame: FHIR implementation guides](https://hl7.org/fhir/implementationguide.html) and create specialized resource models:
 
 ```python
 from fhircraft import FHIRModelFactory
@@ -131,15 +135,15 @@ us_patient = USCorePatient(
 
     Checkout these resources for additional information:
 
-   - [:material-fire: FHIR Profiles](https://hl7.org/fhir/profiling.html)
-   - [:material-fire: US Core Implementation Guide](http://hl7.org/fhir/us/core/)
+   - [:lucide-flame: FHIR Profiles](https://hl7.org/fhir/profiling.html)
+   - [:lucide-flame: US Core Implementation Guide](http://hl7.org/fhir/us/core/)
 
 
 ## Transforming Data with FHIR Mapper
 
 Healthcare organizations often have legacy systems with data in non-FHIR formats. When migrating to FHIR or integrating with FHIR-based systems, you need to transform this data systematically. The FHIR Mapping Language provides a standardized way to define these transformations, making them reproducible and maintainable.
 
-The FHIR Mapper uses the [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html) to transform data between different structures:
+The FHIR Mapper uses the [:lucide-flame: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html) to transform data between different structures:
 
 ```python
 from fhircraft import FHIRStructureMapper
@@ -189,8 +193,8 @@ print(patient.model_dump(exclude={'meta','resourceType'}))
    
     Checkout these resources for additional information:
     
-    - [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html)
-    - [:material-fire: StructureMap Resource](https://hl7.org/fhir/structuremap.html)
+    - [:lucide-flame: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html)
+    - [:lucide-flame: StructureMap Resource](https://hl7.org/fhir/structuremap.html)
 
 
 ## Next Steps
@@ -204,7 +208,7 @@ For more detailed information on specific topics:
 For external documentation:
 
 - **[:simple-pydantic: Pydantic Documentation](https://docs.pydantic.dev/latest/)** - Learn about Pydantic's features
-- **[:material-fire: FHIR Specification](https://hl7.org/fhir/)** - Official FHIR documentation
+- **[:lucide-flame: FHIR Specification](https://hl7.org/fhir/)** - Official FHIR documentation
 
 For community support:
 

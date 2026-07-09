@@ -1,3 +1,7 @@
+---
+icon: lucide/shapes
+---
+
 # Alternative FHIR Python Packages
 
 The FHIR Python ecosystem has several excellent projects, each with its own strengths and focus areas. Fhircraft is one option among many, and we're grateful to be part of this community. If fhircraft doesn't quite fit your needs or you're exploring different approaches, here are some other great projects worth checking out:

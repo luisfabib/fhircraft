@@ -1,10 +1,14 @@
+---
+icon: lucide/table-of-contents
+---
+
 # Overview
 
-Welcome to the Fhircraft user guide. This comprehensive documentation shows you how to work with [:material-fire: FHIR](https://hl7.org/fhir/) healthcare data in Python using type-safe [:simple-pydantic: Pydantic](https://docs.pydantic.dev/) models.
+Welcome to the Fhircraft user guide. This comprehensive documentation shows you how to work with [:lucide-flame: FHIR](https://hl7.org/fhir/) healthcare data in Python using type-safe [:simple-pydantic: Pydantic](https://docs.pydantic.dev/) models.
 
 ---
 
-## :material-map-outline: Quick Navigation
+## Quick Navigation
 
 <div class="grid cards" markdown>
 
@@ -14,7 +18,7 @@ Welcome to the Fhircraft user guide. This comprehensive documentation shows you 
 
     New to Fhircraft? Start here to learn the basics.
 
-    [:octicons-arrow-right-24: Quick Start](../quickstart/quickstart.md)
+    [:lucide-zap: Quick Start](../quickstart/quickstart.md)
 
 -   :simple-pydantic:{ .lg .middle } __FHIR & Pydantic__
 
@@ -44,7 +48,7 @@ Welcome to the Fhircraft user guide. This comprehensive documentation shows you 
 
 ---
 
-## :material-tools: Core Features
+## Core Features
 
 <div class="grid cards" markdown>
 
@@ -84,11 +88,11 @@ Welcome to the Fhircraft user guide. This comprehensive documentation shows you 
 
 ---
 
-## :material-help-circle: Additional Resources
+## Additional Resources
 
 <div class="grid cards" markdown>
 
--   :material-fire:{ .lg .middle } __FHIR Specification__
+-   :lucide-flame:{ .lg .middle } __FHIR Specification__
 
     ---
 

@@ -1,3 +1,7 @@
+---
+icon: lucide/pyramid
+---
+
 # Pydantic Representation of FHIR
 
 This guide explains how Fhircraft transforms FHIR (Fast Healthcare Interoperability Resources) concepts into Python objects using Pydantic models. You'll learn about the technical foundations that make Fhircraft's type-safe, validated FHIR implementation possible, and how to work effectively with the resulting object representations.
@@ -43,7 +47,7 @@ Fhircraft implements FHIR's complete type hierarchy using Python objects. This e
 
 ### Primitive Types  
 
-Fhircraft implements all [:material-fire: FHIR Primitive Types](https://hl7.org/fhir/datatypes.html#primitive) through a **dual-type design**: each primitive type has both a **model class** and a **type alias**.
+Fhircraft implements all [:lucide-flame: FHIR Primitive Types](https://hl7.org/fhir/datatypes.html#primitive) through a **dual-type design**: each primitive type has both a **model class** and a **type alias**.
 
 **Model classes** (uppercase, e.g. `String`, `Boolean`) are the full FHIR representation of a primitive. Each one wraps the raw value in a `.value` attribute and carries the rest of the FHIR element payload—`id`, `extension`, and other metadata—right alongside it. The value is also validated against the FHIR-specified regex for that type, so invalid data is caught early.
 
@@ -123,7 +127,7 @@ Fields annotated with a type alias store their values as the corresponding model
     [`fhircraft.fhir.resources.datatypes.R5.primitive`](../reference/fhir-resources-r5-primitive.md)
 
 ### Complex Types
-FHIR complex types represent structured data with multiple fields—such as addresses, names, and codeable concepts. Unlike primitive types that represent single values, complex types bundle related fields into cohesive data structures. Fhircraft provides Pydantic models for all [:material-fire: FHIR complex types](https://hl7.org/fhir/datatypes.html#complex), ensuring built-in validation, type safety, and seamless integration with the rest of the FHIR ecosystem.
+FHIR complex types represent structured data with multiple fields—such as addresses, names, and codeable concepts. Unlike primitive types that represent single values, complex types bundle related fields into cohesive data structures. Fhircraft provides Pydantic models for all [:lucide-flame: FHIR complex types](https://hl7.org/fhir/datatypes.html#complex), ensuring built-in validation, type safety, and seamless integration with the rest of the FHIR ecosystem.
 
 Each complex type is a reusable component that can appear in multiple resources. For example, `HumanName` can be used in `Patient`, `Practitioner`, and `RelatedPerson` resources, while `Address` appears across numerous resource types. These types maintain consistent structure and validation rules regardless of where they're used, making it easy to work with healthcare data in a standardized way.
 
