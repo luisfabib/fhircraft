@@ -1,3 +1,8 @@
+---
+icon: lucide/drafting-compass
+---
+
+
 ```python exec="on"
 
 import os

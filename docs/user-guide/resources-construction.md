@@ -1,8 +1,12 @@
+---
+icon: lucide/factory
+---
+
 # Constructing Dynamic FHIR Models
 
-This guide shows you how to build custom Pydantic FHIR models from FHIR [:material-fire: Structure Definitions](https://hl7.org/fhir/structuredefinition.html). This is different from using pre-built resource models. You need the factory system when you work with implementation guides like [:material-fire: US Core](https://www.hl7.org/fhir/us/core/), [:material-fire: International Patient Summary](https://hl7.org/fhir/uv/ips/), or your own custom profiles. The factory constructs models that enforce profile-specific requirements beyond base FHIR validation.
+This guide shows you how to build custom Pydantic FHIR models from FHIR [:lucide-flame: Structure Definitions](https://hl7.org/fhir/structuredefinition.html). This is different from using pre-built resource models. You need the factory system when you work with implementation guides like [:lucide-flame: US Core](https://www.hl7.org/fhir/us/core/), [:lucide-flame: International Patient Summary](https://hl7.org/fhir/uv/ips/), or your own custom profiles. The factory constructs models that enforce profile-specific requirements beyond base FHIR validation.
 
-The factory system takes a [:material-fire: Structure Definitions](https://hl7.org/fhir/structuredefinition.html) and generates a [:simple-pydantic: Pydantic model](https://docs.pydantic.dev/latest/concepts/models/) class. The generated model includes all constraints, extensions, and validation rules from the profile. This means you get type safety and automatic validation for your custom FHIR profiles. 
+The factory system takes a [:lucide-flame: Structure Definitions](https://hl7.org/fhir/structuredefinition.html) and generates a [:simple-pydantic: Pydantic model](https://docs.pydantic.dev/latest/concepts/models/) class. The generated model includes all constraints, extensions, and validation rules from the profile. This means you get type safety and automatic validation for your custom FHIR profiles. 
 
 !!! note
 
@@ -19,7 +23,7 @@ The factory supports two construction approaches:
 
 The factory automatically detects which mode to use based on what elements are present in the structure definition. When both snapshot and differential elements exist, the factory prefers differential mode. You can also explicitly specify the construction mode.
 
-See the [:material-fire: FHIR structure definition documentation](https://hl7.org/fhir/structuredefinition.html) for details about snapshot and differential elements.
+See the [:lucide-flame: FHIR structure definition documentation](https://hl7.org/fhir/structuredefinition.html) for details about snapshot and differential elements.
 
 ### Snapshot Mode Construction
 
@@ -334,7 +338,7 @@ patient = CustomPatient(
     #> Created mCODE cancer patient with name: Alice Smith
     ```
 
-See the [:material-fire: FHIR versioning specification](https://hl7.org/fhir/versions.html) for information about version identifiers and the [managing FHIR artifacts](managing-fhir-artifacts.md) guide for details about how the repository resolves canonical URLs.
+See the [:lucide-flame: FHIR versioning specification](https://hl7.org/fhir/versions.html) for information about version identifiers and the [managing FHIR artifacts](managing-fhir-artifacts.md) guide for details about how the repository resolves canonical URLs.
 
 
 ## Model Caching

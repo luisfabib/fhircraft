@@ -1,3 +1,8 @@
+---
+icon: lucide/scale
+---
+
+
 ```python exec="on"
 
 import os

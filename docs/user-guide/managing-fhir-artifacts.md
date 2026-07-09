@@ -1,12 +1,16 @@
+---
+icon: lucide/package
+---
+
 # Managing FHIR Artifacts
 
 This guide shows you how to organize and load FHIR structure definitions and packages from different sources. Building on the resource construction concepts covered earlier, you will learn to work with local files, download published packages, and configure Fhircraft to access multiple definition sources simultaneously.
 
 ## What Are FHIR Artifacts
 
-FHIR artifacts are files that describe the structure and rules for healthcare data. Think of them as blueprints that tell Fhircraft how to validate and organize patient information, lab results, and other medical records. When you build a resource model using Fhircraft, the library needs these artifacts to resolve the core [:material-fire: Structure Definition](https://www.hl7.org/fhir/structuredefinition.html) and any dependent definitions it references. For example, building a patient profiled model requires the patient profile structure definition itself plus any other definitions from which it may derive.
+FHIR artifacts are files that describe the structure and rules for healthcare data. Think of them as blueprints that tell Fhircraft how to validate and organize patient information, lab results, and other medical records. When you build a resource model using Fhircraft, the library needs these artifacts to resolve the core [:lucide-flame: Structure Definition](https://www.hl7.org/fhir/structuredefinition.html) and any dependent definitions it references. For example, building a patient profiled model requires the patient profile structure definition itself plus any other definitions from which it may derive.
 
-Structure definitions are a type of FHIR [:material-fire: Conformance Resource](https://www.hl7.org/fhir/conformance-module.html) that formally defines the data elements, constraints, terminology bindings, and cardinality rules for FHIR resources and data types. The FHIR specification provides [:material-fire: Base Structure Definitions](https://www.hl7.org/fhir/profilelist.html) for all standard resources like, e.g. [:material-fire: Patient](https://www.hl7.org/fhir/patient.html), [:material-fire: Observation](https://www.hl7.org/fhir/observation.html), and [:material-fire: Condition](https://www.hl7.org/fhir/condition.html). These are provided by Fhircraft and do not need to be provided.
+Structure definitions are a type of FHIR [:lucide-flame: Conformance Resource](https://www.hl7.org/fhir/conformance-module.html) that formally defines the data elements, constraints, terminology bindings, and cardinality rules for FHIR resources and data types. The FHIR specification provides [:lucide-flame: Base Structure Definitions](https://www.hl7.org/fhir/profilelist.html) for all standard resources like, e.g. [:lucide-flame: Patient](https://www.hl7.org/fhir/patient.html), [:lucide-flame: Observation](https://www.hl7.org/fhir/observation.html), and [:lucide-flame: Condition](https://www.hl7.org/fhir/condition.html). These are provided by Fhircraft and do not need to be provided.
 
 Artifacts are needed at resource model build time to resolve all these dependencies and create complete, validated models. Once a model is built, all the relevant information is contained within the model itself and the artifacts can be removed from memory. This means you can load artifacts, build your models, and then discard the artifacts to free up resources. The built models remain fully functional because they already contain all the validation rules and structural information they need.
 
@@ -104,9 +108,9 @@ factory.unregister("http://hl7.org/fhir/us/core/StructureDefinition/us-core-pati
 
 ## Working with FHIR Packages
 
-[:material-fire: FHIR packages](https://registry.fhir.org/) are standardized distribution bundles that contain complete sets of structure definitions, value sets, code systems, and other FHIR conformance resources. These packages represent collaborative work by healthcare experts, implementers, and standards bodies to create consistent, interoperable data structures. Rather than building everything from scratch, you can adopt these established standards by loading the appropriate packages.
+[:lucide-flame: FHIR packages](https://registry.fhir.org/) are standardized distribution bundles that contain complete sets of structure definitions, value sets, code systems, and other FHIR conformance resources. These packages represent collaborative work by healthcare experts, implementers, and standards bodies to create consistent, interoperable data structures. Rather than building everything from scratch, you can adopt these established standards by loading the appropriate packages.
 
-Packages solve a practical problem: healthcare interoperability requires many structure definitions to work together consistently. A single patient record might reference dozens of related definitions for names, addresses, identifiers, extensions, and constraints. Packages bundle all these related definitions so you get everything you need in one download. They also handle version compatibility, ensuring that all the definitions within a package work together correctly. The official [:material-fire: FHIR Package Registry](https://registry.fhir.org/) hosts hundreds of published implementation guides and conformance resources. Each package has a unique name following the NPM naming convention and a [semantic version number](https://semver.org/). Popular packages include the [:material-fire: International Patient Summary](https://hl7.org/fhir/uv/ips/) for global interoperability, and [:material-fire: mCODE](https://hl7.org/fhir/us/mcode/) for oncology data. Here is an exemplary collection of FHIR packages:
+Packages solve a practical problem: healthcare interoperability requires many structure definitions to work together consistently. A single patient record might reference dozens of related definitions for names, addresses, identifiers, extensions, and constraints. Packages bundle all these related definitions so you get everything you need in one download. They also handle version compatibility, ensuring that all the definitions within a package work together correctly. The official [:lucide-flame: FHIR Package Registry](https://registry.fhir.org/) hosts hundreds of published implementation guides and conformance resources. Each package has a unique name following the NPM naming convention and a [semantic version number](https://semver.org/). Popular packages include the [:lucide-flame: International Patient Summary](https://hl7.org/fhir/uv/ips/) for global interoperability, and [:lucide-flame: mCODE](https://hl7.org/fhir/us/mcode/) for oncology data. Here is an exemplary collection of FHIR packages:
 
 | Package | Description | Use Case |
 |---------|-------------|----------|
@@ -117,7 +121,7 @@ Packages solve a practical problem: healthcare interoperability requires many st
 | `hl7.fhir.us.mcode` | Minimal Common Oncology Data Elements | Cancer care data |
 | `hl7.fhir.uv.smart-app-launch` | SMART Ascpp Launch | OAuth2-based app authorization |
 
-Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fhir.org`](https://packages.fhir.org/), downloads requested packages (and their dependencies) following the [:material-fire: FHIR NPM Package Specification](https://confluence.hl7.org/display/FHIR/NPM+Package+Specification), extracts the structure definitions, and caches them locally for future use. After the first download, subsequent loads use the cached version, making your application faster and reducing network dependencies.
+Fhircraft connects to the FHIR package registry at [:lucide-flame: `packages.fhir.org`](https://packages.fhir.org/), downloads requested packages (and their dependencies) following the [:lucide-flame: FHIR NPM Package Specification](https://confluence.hl7.org/display/FHIR/NPM+Package+Specification), extracts the structure definitions, and caches them locally for future use. After the first download, subsequent loads use the cached version, making your application faster and reducing network dependencies.
 
 ### Controlling internet access
 
@@ -205,7 +209,7 @@ Disabling internet access is recommended in production and in security-sensitive
 
 ## Canonical URLs
 
-[:material-fire: Canonical URLs](https://www.hl7.org/fhir/references.html#canonical) are globally unique identifiers for FHIR conformance resources, as defined in the FHIR specification. Every structure definition has a canonical URL that identifies it unambiguously, regardless of where the definition file is stored or how it was obtained. This standardization enables interoperability because everyone can refer to the same structure definition using the same identifier. Canonical URLs follow the format of a URI but are not required to be resolvable web addresses, though many are.
+[:lucide-flame: Canonical URLs](https://www.hl7.org/fhir/references.html#canonical) are globally unique identifiers for FHIR conformance resources, as defined in the FHIR specification. Every structure definition has a canonical URL that identifies it unambiguously, regardless of where the definition file is stored or how it was obtained. This standardization enables interoperability because everyone can refer to the same structure definition using the same identifier. Canonical URLs follow the format of a URI but are not required to be resolvable web addresses, though many are.
 
 When you provide a canonical URL to Fhircraft, the library follows a resolution strategy to find the corresponding structure definition. It first checks loaded local files and packages. If the definition is not found locally and internet access is enabled, Fhircraft attempts to download it from the URL. This fallback mechanism means you can reference any published structure definition without manually downloading files, while still benefiting from local caching for better performance.
 
@@ -251,25 +255,25 @@ print(f"Created {len([patient, us_patient])} patient records")
 | Problem | Solution |
 |---------|----------|
 | Fhircraft cannot find a structure definition | Check that the canonical URL matches exactly. Make sure you have loaded the file, package, or enabled internet access. Verify the structure definition file is in the correct format (JSON). |
-| Package download fails | Verify your internet connection. Check that the package name and version are correct. Try loading the package again after a few minutes. Visit the [:material-fire: FHIR Package Registry](https://registry.fhir.org) to confirm the package exists. |
+| Package download fails | Verify your internet connection. Check that the package name and version are correct. Try loading the package again after a few minutes. Visit the [:lucide-flame: FHIR Package Registry](https://registry.fhir.org) to confirm the package exists. |
 | Loading takes a long time | Fhircraft caches downloaded packages after the first use. Subsequent loads will be much faster. Consider loading packages once at application startup rather than repeatedly. |
 | Wrong version of a structure definition is used | Specify the version explicitly in the canonical URL or as a parameter. Check loaded definitions with `list_registered_definitions()` to verify which definitions are registered. Unregister the old definition with `unregister(url)` and re-register the new version, then call `reset_cache()` to force a fresh build. |
 | Running out of memory with many definitions | Unregister individual definitions you no longer need using `unregister(url)`. Load only the packages required for your current task. Clear the entire construction cache with `reset_cache()` when switching between different projects. |
 
 ## Further Resources
 
-* [:material-fire: FHIR Package Registry](https://registry.fhir.org/) - Browse and search for available FHIR packages from the official registry
+* [:lucide-flame: FHIR Package Registry](https://registry.fhir.org/) - Browse and search for available FHIR packages from the official registry
 
-* [:material-fire: FHIR Packages Documentation](https://packages.fhir.org/) - Technical documentation for the FHIR package server and NPM package format
+* [:lucide-flame: FHIR Packages Documentation](https://packages.fhir.org/) - Technical documentation for the FHIR package server and NPM package format
 
-* [:material-fire: FHIR Structure Definitions](https://www.hl7.org/fhir/structuredefinition.html) - Detailed specification for structure definitions and profiling
+* [:lucide-flame: FHIR Structure Definitions](https://www.hl7.org/fhir/structuredefinition.html) - Detailed specification for structure definitions and profiling
 
-* [:material-fire: FHIR Conformance Module](https://www.hl7.org/fhir/conformance-module.html) - Overview of FHIR conformance resources including profiles, extensions, and implementation guides
+* [:lucide-flame: FHIR Conformance Module](https://www.hl7.org/fhir/conformance-module.html) - Overview of FHIR conformance resources including profiles, extensions, and implementation guides
 
-* [:material-fire: US Core Implementation Guide](https://www.hl7.org/fhir/us/core/) - The US national FHIR implementation guide for healthcare data exchange
+* [:lucide-flame: US Core Implementation Guide](https://www.hl7.org/fhir/us/core/) - The US national FHIR implementation guide for healthcare data exchange
 
-* [:material-fire: International Patient Summary](https://hl7.org/fhir/uv/ips/) - Global specification for patient summary documents
+* [:lucide-flame: International Patient Summary](https://hl7.org/fhir/uv/ips/) - Global specification for patient summary documents
 
-* [:material-fire: FHIR Versioning](https://www.hl7.org/fhir/versioning.html) - How FHIR handles versioning of resources and conformance artifacts
+* [:lucide-flame: FHIR Versioning](https://www.hl7.org/fhir/versioning.html) - How FHIR handles versioning of resources and conformance artifacts
 
-* [:material-fire: Canonical References](https://www.hl7.org/fhir/references.html#canonical) - Specification for canonical URL format and versioning syntax
+* [:lucide-flame: Canonical References](https://www.hl7.org/fhir/references.html#canonical) - Specification for canonical URL format and versioning syntax

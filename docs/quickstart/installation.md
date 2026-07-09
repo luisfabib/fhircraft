@@ -1,3 +1,6 @@
+---
+icon: lucide/cloud-download
+---
 
 ## Requirements
 

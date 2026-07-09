@@ -1,10 +1,14 @@
+---
+icon: lucide/bolt
+--- 
+
 # Configuring Validation Behavior
 
 This guide shows you how to control validation rules when working with FHIR resources. You will learn to adjust validation settings globally or for specific operations, allowing you to work with data that does not meet all FHIR constraints while maintaining appropriate safeguards for your use case.
 
 ## Understanding Validation Configuration
 
-When you create FHIR resources with Fhircraft, the library automatically validates them according to FHIR [:material-fire: Conformance rules and Constraints](https://www.hl7.org/fhir/validation.html). These validations ensure data quality and interoperability. However, real-world scenarios sometimes require flexibility. You might receive data from external systems that violate minor constraints that do not affect your application's logic, or you might generate resources programmatically where certain warnings do not apply to your workflow. Furthermore, validation of large and heavily constrained resources can lead to significant overhead.
+When you create FHIR resources with Fhircraft, the library automatically validates them according to FHIR [:lucide-flame: Conformance rules and Constraints](https://www.hl7.org/fhir/validation.html). These validations ensure data quality and interoperability. However, real-world scenarios sometimes require flexibility. You might receive data from external systems that violate minor constraints that do not affect your application's logic, or you might generate resources programmatically where certain warnings do not apply to your workflow. Furthermore, validation of large and heavily constrained resources can lead to significant overhead.
 
 Fhircraft provides configuration controls that let you adjust validation behavior without modifying your resource construction code. You can disable all warnings, switch between strict and lenient modes, or selectively turn off specific constraint checks. The configuration system uses thread-safe context variables, meaning each part of your application can have different validation settings without interfering with other operations running simultaneously.
 
@@ -62,7 +66,7 @@ This pattern is particularly valuable in data processing pipelines where some op
 
 ## Controlling Specific Constraints
 
-FHIR defines numerous [:material-fire: Invariants and Constraints](https://www.hl7.org/fhir/conformance-rules.html#constraints) that validate resource correctness. Each constraint has a unique key like `dom-6`, `ele-1`, or `sdf-0`. Sometimes you need to disable specific constraints that do not apply to your use case while keeping other validations active. For example, resources generated programmatically might not need narrative text, making the `dom-6` constraint inappropriate.
+FHIR defines numerous [:lucide-flame: Invariants and Constraints](https://www.hl7.org/fhir/conformance-rules.html#constraints) that validate resource correctness. Each constraint has a unique key like `dom-6`, `ele-1`, or `sdf-0`. Sometimes you need to disable specific constraints that do not apply to your use case while keeping other validations active. For example, resources generated programmatically might not need narrative text, making the `dom-6` constraint inappropriate.
 
 Disabling constraints by key provides surgical precision. You turn off only the validations that cause problems while maintaining all other data quality checks. This approach is safer than disabling all warnings because it preserves most of the validation safety net:
 
@@ -85,7 +89,7 @@ disable_constraint('dom-6', 'sdf-0', 'ele-1')
 enable_constraint('dom-6')
 ```
 
-Constraint keys are documented in the FHIR specification for each resource type. You can find them in the [:material-fire: StructureDefinition snapshots](https://www.hl7.org/fhir/structuredefinition.html) or in validation error messages when they occur.
+Constraint keys are documented in the FHIR specification for each resource type. You can find them in the [:lucide-flame: StructureDefinition snapshots](https://www.hl7.org/fhir/structuredefinition.html) or in validation error messages when they occur.
 
 ## Choosing Validation Modes
 
@@ -291,5 +295,5 @@ with override_config(terminology_service=MyTerminologyService()):
 | Configuration changes do not persist | Use configure() for global changes, not override_config(). Context managers reset configuration after the block ends. |
 | Different validation behavior in tests versus production | Ensure test suites call reset_config() before each test. Check that environment variables match between environments. |
 | Concurrent operations have wrong validation settings | Verify you are using override_config() context managers to isolate configuration. Avoid modifying global configuration in concurrent code. |
-| Cannot find constraint key to disable | Check validation error messages for constraint keys. Refer to [:material-fire: FHIR StructureDefinition snapshots](https://www.hl7.org/fhir/structuredefinition.html) for resource-specific constraints. |
+| Cannot find constraint key to disable | Check validation error messages for constraint keys. Refer to [:lucide-flame: FHIR StructureDefinition snapshots](https://www.hl7.org/fhir/structuredefinition.html) for resource-specific constraints. |
 

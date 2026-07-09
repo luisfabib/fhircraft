@@ -1,3 +1,7 @@
+---
+icon: lucide/users
+---
+
 # Contributing to Fhircraft
 
 Thank you for your interest in contributing to Fhircraft! This guide provides detailed instructions for setting up your development environment and contributing to both the codebase and documentation. Whether you're fixing bugs, adding features, or improving docs, your help makes Fhircraft better for everyone.

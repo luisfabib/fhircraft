@@ -1,10 +1,14 @@
+---
+icon: lucide/flame
+---
+
 # Working with FHIR Resource Models
 
 This guide shows you how to create, validate, and manipulate FHIR resources using Fhircraft's pre-built models. Building on the FHIR concepts covered earlier, you will learn practical recipes for common tasks like creating patient records, validating data from external systems, and converting between JSON and Python objects.
 
 ## Understanding Resource Models
 
-FHIR defines over 140 different [:material-fire: Resource Types](https://www.hl7.org/fhir/resourcelist.html) like [:material-fire: Patient](https://www.hl7.org/fhir/patient.html), [:material-fire: Observation](https://www.hl7.org/fhir/observation.html), and [:material-fire: Condition](https://www.hl7.org/fhir/condition.html). Each resource type has a specific structure with required fields, optional fields, data types, and validation rules. Manually creating and validating these resources would require extensive code to check every constraint and relationship.
+FHIR defines over 140 different [:lucide-flame: Resource Types](https://www.hl7.org/fhir/resourcelist.html) like [:lucide-flame: Patient](https://www.hl7.org/fhir/patient.html), [:lucide-flame: Observation](https://www.hl7.org/fhir/observation.html), and [:lucide-flame: Condition](https://www.hl7.org/fhir/condition.html). Each resource type has a specific structure with required fields, optional fields, data types, and validation rules. Manually creating and validating these resources would require extensive code to check every constraint and relationship.
 
 Fhircraft provides pre-built [:simple-pydantic: Pydantic models](https://docs.pydantic.dev/latest/concepts/models/) for all standard FHIR resources across all supported releases that subclass the [`FHIRBaseModel`](../reference/fhir-resources-base.md#fhircraft.fhir.resources.base.models.FHIRBaseModel) base class. These models automatically validate data when you create resources, ensuring compliance with FHIR specifications without writing validation code yourself or requiring an external validation service.
 
@@ -91,7 +95,7 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
 
 !!! example "Basic Patient Creation"
 
-    One of the most common healthcare resource is [:material-fire: Patient](https://www.hl7.org/fhir/patient.html), which represents a person receiving care. Creating a basic patient requires only minimal information, though you can add as much detail as your application needs:
+    One of the most common healthcare resource is [:lucide-flame: Patient](https://www.hl7.org/fhir/patient.html), which represents a person receiving care. Creating a basic patient requires only minimal information, though you can add as much detail as your application needs:
 
     ```python
     from fhircraft import get_fhir_type
@@ -122,7 +126,7 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
 
 !!! example "Complete Patient Record Recipe"
 
-    Real patient records contain multiple names, contact methods, addresses, and identifiers. FHIR uses [:material-fire: Complex Types](https://www.hl7.org/fhir/datatypes.html) to represent these rich structures. This recipe shows how to create a comprehensive patient record with all common elements:
+    Real patient records contain multiple names, contact methods, addresses, and identifiers. FHIR uses [:lucide-flame: Complex Types](https://www.hl7.org/fhir/datatypes.html) to represent these rich structures. This recipe shows how to create a comprehensive patient record with all common elements:
 
     ```python
     from fhircraft import get_fhir_type
@@ -442,7 +446,7 @@ The [:simple-pydantic: `model_dump_json`](https://pydantic.dev/docs/validation/l
 
 ### Exporting to XML Recipe
 
-Some healthcare systems require [FHIR XML format](https://www.hl7.org/fhir/xml.html). Fhircraft provides XML serialization with proper FHIR namespace handling through the [`model_dump_xml`](../reference/fhir-resources-base.md/#fhircraft.fhir.resources.base.mixins.xml.FHIRXMLMixin.model_dump_xml) method.
+Some healthcare systems require [FHIR XML format](https://www.hl7.org/fhir/xml.html). Fhircraft provides XML serialization with proper FHIR namespace handling through the [`model_dump_xml`](../reference/fhir-resources-base.md#fhircraft.fhir.resources.base.mixins.xml.FHIRXMLMixin.model_dump_xml) method.
 
 ```python
 # Export to FHIR XML format
@@ -471,14 +475,14 @@ with open("patient.xml", "w") as file:
 
 | Problem | Solution |
 |---------|----------|
-| ValidationError when creating resource | Check error details with `e.errors()`. Verify required fields are present and data types match FHIR specifications. Review [:material-fire: FHIR resource definitions](https://www.hl7.org/fhir/resourcelist.html). |
+| ValidationError when creating resource | Check error details with `e.errors()`. Verify required fields are present and data types match FHIR specifications. Review [:lucide-flame: FHIR resource definitions](https://www.hl7.org/fhir/resourcelist.html). |
 | None values in JSON output | Use `exclude_none=True` parameter in `model_dump_json()` to omit empty fields. This follows FHIR best practices for minimal representation. |
 | Cannot modify resource after creation | Ensure you are assigning to the correct attribute. Validation errors prevent invalid modifications. Check [:simple-pydantic: Pydantic model configuration](https://docs.pydantic.dev/latest/concepts/models/#model-config). |
 | Field not available in autocomplete | Update your IDE configuration to recognize Pydantic models. Install type stubs or use an IDE with Pydantic support like PyCharm or VS Code with Pylance. |
 | JSON parsing fails with valid FHIR | Verify JSON uses correct FHIR structure. Use `model_validate_json()` instead of manual parsing. Check for encoding issues with non-ASCII characters. |
-| Resource fails constraints after modification | Pydantic validates on assignment by default. Modifications must maintain FHIR compliance. Review the [:material-fire: Specific Constraint](https://www.hl7.org/fhir/conformance-rules.html#constraints) that failed. |
+| Resource fails constraints after modification | Pydantic validates on assignment by default. Modifications must maintain FHIR compliance. Review the [:lucide-flame: Specific Constraint](https://www.hl7.org/fhir/conformance-rules.html#constraints) that failed. |
 | Cannot serialize datetime fields | FHIR uses string representations for dates. Use FHIR date format (YYYY-MM-DD) rather than Python datetime objects. Fhircraft handles conversion automatically. |
-| Different behavior across FHIR versions | Each FHIR version has specific rules. Ensure you use the correct version model. Check [:material-fire: FHIR version documentation](https://www.hl7.org/fhir/versions.html) for differences. |
+| Different behavior across FHIR versions | Each FHIR version has specific rules. Ensure you use the correct version model. Check [:lucide-flame: FHIR version documentation](https://www.hl7.org/fhir/versions.html) for differences. |
 
 ## Further Resources
 
@@ -490,12 +494,12 @@ with open("patient.xml", "w") as file:
 
 * [:simple-pydantic: Pydantic Serialization](https://docs.pydantic.dev/latest/concepts/serialization/) - Converting models to JSON, dictionaries, and other formats
 
-* [:material-fire: FHIR Resource List](https://www.hl7.org/fhir/resourcelist.html) - Complete list of FHIR resources with specifications
+* [:lucide-flame: FHIR Resource List](https://www.hl7.org/fhir/resourcelist.html) - Complete list of FHIR resources with specifications
 
-* [:material-fire: FHIR Data Types](https://www.hl7.org/fhir/datatypes.html) - Complex and primitive data types used in FHIR
+* [:lucide-flame: FHIR Data Types](https://www.hl7.org/fhir/datatypes.html) - Complex and primitive data types used in FHIR
 
-* [:material-fire: FHIR Validation](https://www.hl7.org/fhir/validation.html) - How FHIR defines and enforces validation rules
+* [:lucide-flame: FHIR Validation](https://www.hl7.org/fhir/validation.html) - How FHIR defines and enforces validation rules
 
-* [:material-fire: FHIR Conformance Rules](https://www.hl7.org/fhir/conformance-rules.html) - Constraints and invariants that govern FHIR resources
+* [:lucide-flame: FHIR Conformance Rules](https://www.hl7.org/fhir/conformance-rules.html) - Constraints and invariants that govern FHIR resources
 
-* [:material-fire: FHIR Versions](https://www.hl7.org/fhir/versions.html) - Understanding differences between FHIR releases
+* [:lucide-flame: FHIR Versions](https://www.hl7.org/fhir/versions.html) - Understanding differences between FHIR releases

@@ -11,7 +11,7 @@
 # The site_name is shown in the page header and the browser window title
 #
 # Read more: https://zensical.org/docs/setup/basics/#site_name
-site_name = "Fhircraft - Docs"
+site_name = "Fhircraft - Documentation"
 
 # The site_description is included in the HTML head and should contain a
 # meaningful description of the site content for use by search engines.
@@ -56,13 +56,13 @@ nav = [
           { "Quick Start" = "quickstart/quickstart.md" }
     ]},
     { "Fhircraft" = [
-        { "Pydantic Representation of FHIR" = "user-guide/pydantic-representation.md" },
-        { "Working with FHIR Resource Models" = "user-guide/resources-models.md" },
-        { "Managing FHIR Artifacts" = "user-guide/managing-fhir-artifacts.md" },
-        { "Constructing Dynamic FHIR Models" = "user-guide/resources-construction.md" },
-        { "Configuring Validation Behavior" = "user-guide/configuration.md" },
-        { "Querying Data with FHIRPath" = "user-guide/fhirpath.md" },
-        { "Transforming Data with FHIR Mapper" = "user-guide/mapper.md" },
+        { "Pydantic FHIR" = "user-guide/pydantic-representation.md" },
+        { "FHIR Models" = "user-guide/resources-models.md" },
+        { "Management" = "user-guide/managing-fhir-artifacts.md" },
+        { "Factory" = "user-guide/resources-construction.md" },
+        { "Configuration" = "user-guide/configuration.md" },
+        { "FHIRPath" = "user-guide/fhirpath.md" },
+        { "FHIR Mapping" = "user-guide/mapper.md" },
         { "Error Handling" = "user-guide/error-handling.md" }
     ]},
   ]},
@@ -71,7 +71,7 @@ nav = [
     { "Code of Conduct" = "community/code-of-conduct.md" },
     { "Alternatives" = "community/alternatives.md" },
     { "Credits" = "community/credits.md" },
-    { "License" = "license.md" },
+    { "License" = "community/license.md" },
   ]},
   { "Release Notes" = "release-notes.md" },
   { "Reference" = [
@@ -445,32 +445,32 @@ custom_checkbox = true
 [project.plugins.markdown-exec]
 
 
-[project.plugins.mkdocstrings]
-custom_templates = "docs/.overrides"
+# [project.plugins.mkdocstrings]
+# custom_templates = "docs/.overrides"
 
-[project.plugins.mkdocstrings.handlers.python]
-inventories = [
-  "https://docs.python.org/3/objects.inv",
-  "https://docs.pydantic.dev/latest/objects.inv",
-  "https://typing-extensions.readthedocs.io/en/latest/objects.inv"
-]
-paths = ["fhircraft"]
+# [project.plugins.mkdocstrings.handlers.python]
+# inventories = [
+#   "https://docs.python.org/3/objects.inv",
+#   "https://docs.pydantic.dev/latest/objects.inv",
+#   "https://typing-extensions.readthedocs.io/en/latest/objects.inv"
+# ]
+# paths = ["fhircraft"]
 
-[project.plugins.mkdocstrings.handlers.python.options]
-docstring_style = "google"
-inherited_members = false
-show_source = false
-members_order = "source"
-separate_signature = true
-filters = ["!^_"]
-docstring_options.ignore_init_summary = true
-merge_init_into_class = true
-show_root_heading = true
-show_root_full_path = false
-show_signature_annotations = true
-summary = true
-signature_crossrefs = true
-extensions = [
-  { "griffe_fieldz" = { "include_inherited" = true } }
-]
+# [project.plugins.mkdocstrings.handlers.python.options]
+# docstring_style = "google"
+# inherited_members = false
+# show_source = false
+# members_order = "source"
+# separate_signature = true
+# filters = ["!^_"]
+# docstring_options.ignore_init_summary = true
+# merge_init_into_class = true
+# show_root_heading = true
+# show_root_full_path = false
+# show_signature_annotations = true
+# summary = true
+# signature_crossrefs = true
+# extensions = [
+#   { "griffe_fieldz" = { "include_inherited" = true } }
+# ]
 

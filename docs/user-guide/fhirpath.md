@@ -1,6 +1,10 @@
+---
+icon: lucide/astroid
+---
+
 # FHIRPath Querying
 
-This guide covers how to use [:material-fire: FHIRPath](https://hl7.org/fhirpath/N1/) expressions in Fhircraft to query and manipulate FHIR data. FHIRPath provides a standardized way to navigate through FHIR resource structures, similar to XPath for XML documents. Fhircraft implements the [:material-fire: FHIRPath Normative Release (v2.0.0)](https://hl7.org/fhirpath/N1/) as well as the [:material-fire: FHIR-specific add-on](https://www.hl7.org/fhir/fhirpath.html) variables and functions.  
+This guide covers how to use [:lucide-flame: FHIRPath](https://hl7.org/fhirpath/N1/) expressions in Fhircraft to query and manipulate FHIR data. FHIRPath provides a standardized way to navigate through FHIR resource structures, similar to XPath for XML documents. Fhircraft implements the [:lucide-flame: FHIRPath Normative Release (v2.0.0)](https://hl7.org/fhirpath/N1/) as well as the [:lucide-flame: FHIR-specific add-on](https://www.hl7.org/fhir/fhirpath.html) variables and functions.  
 
 ??? abstract "Technical Documentation"
 
@@ -48,9 +52,9 @@ FHIRPath also handles edge cases automatically - missing values, lists of values
 
     Checkout these resources for additional information:
 
-    - [:material-fire: FHIRPath Specification](https://hl7.org/fhirpath/N1/) - Official language specification
-    - [:material-fire: FHIRPath Tutorial](https://hl7.org/fhirpath/N1/#tutorial) - Interactive examples
-    - [:material-fire: FHIR Data Types](https://hl7.org/fhir/datatypes.html) - Understanding FHIR structures
+    - [:lucide-flame: FHIRPath Specification](https://hl7.org/fhirpath/N1/) - Official language specification
+    - [:lucide-flame: FHIRPath Tutorial](https://hl7.org/fhirpath/N1/#tutorial) - Interactive examples
+    - [:lucide-flame: FHIR Data Types](https://hl7.org/fhir/datatypes.html) - Understanding FHIR structures
 
 
 
@@ -227,7 +231,7 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
 
 ## Environment Variables
 
-FHIRPath supports [:material-fire: Environment Variables](https://hl7.org/fhirpath/N1/#environment-variables) that provide context during expression evaluation. Environment variables are prefixed with `%` and usually contain metadata or information from outside the evaluation context.
+FHIRPath supports [:lucide-flame: Environment Variables](https://hl7.org/fhirpath/N1/#environment-variables) that provide context during expression evaluation. Environment variables are prefixed with `%` and usually contain metadata or information from outside the evaluation context.
 
 ### Available Environment Variables
 
@@ -488,7 +492,7 @@ print(patient.fhirpath_single("Patient.id is FHIR.integer"))
 
 ## Terminology Functions
 
-Fhircraft implements the [:material-fire: FHIR-specific FHIRPath terminology functions](https://www.hl7.org/fhir/fhirpath.html#functions) — `memberOf()`, `subsumes()`, and `subsumedBy()`. These functions perform code-system lookups and value-set validation at query time, and they require a terminology service to be configured before they produce results.
+Fhircraft implements the [:lucide-flame: FHIR-specific FHIRPath terminology functions](https://www.hl7.org/fhir/fhirpath.html#functions) — `memberOf()`, `subsumes()`, and `subsumedBy()`. These functions perform code-system lookups and value-set validation at query time, and they require a terminology service to be configured before they produce results.
 
 When no terminology service is present, all three functions return an empty collection rather than raising an error, so existing expressions remain safe in environments where terminology validation is not needed.
 
