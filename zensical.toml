@@ -48,7 +48,7 @@ Copyright &copy; 2024 - 2026 Luis Fábregas-Ibáñez and contributors
 #
 # Read more: https://zensical.org/docs/setup/navigation/
 nav = [
-  { "Fhircraft" = "index.md" },
+  { "Home" = "index.md" },
   { "User Guide" = [
     { "Overview" = "user-guide/overview.md" },
     { "First Steps" = [
