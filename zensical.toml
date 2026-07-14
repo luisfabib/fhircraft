@@ -445,32 +445,32 @@ custom_checkbox = true
 [project.plugins.markdown-exec]
 
 
-# [project.plugins.mkdocstrings]
-# custom_templates = "docs/.overrides"
+[project.plugins.mkdocstrings]
+custom_templates = "docs/.overrides"
 
-# [project.plugins.mkdocstrings.handlers.python]
-# inventories = [
-#   "https://docs.python.org/3/objects.inv",
-#   "https://docs.pydantic.dev/latest/objects.inv",
-#   "https://typing-extensions.readthedocs.io/en/latest/objects.inv"
-# ]
-# paths = ["fhircraft"]
+[project.plugins.mkdocstrings.handlers.python]
+inventories = [
+  "https://docs.python.org/3/objects.inv",
+  "https://docs.pydantic.dev/latest/objects.inv",
+  "https://typing-extensions.readthedocs.io/en/latest/objects.inv"
+]
+paths = ["fhircraft"]
 
-# [project.plugins.mkdocstrings.handlers.python.options]
-# docstring_style = "google"
-# inherited_members = false
-# show_source = false
-# members_order = "source"
-# separate_signature = true
-# filters = ["!^_"]
-# docstring_options.ignore_init_summary = true
-# merge_init_into_class = true
-# show_root_heading = true
-# show_root_full_path = false
-# show_signature_annotations = true
-# summary = true
-# signature_crossrefs = true
-# extensions = [
-#   { "griffe_fieldz" = { "include_inherited" = true } }
-# ]
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+inherited_members = false
+show_source = false
+members_order = "source"
+separate_signature = true
+filters = ["!^_"]
+docstring_options.ignore_init_summary = true
+merge_init_into_class = true
+show_root_heading = true
+show_root_full_path = false
+show_signature_annotations = true
+summary = true
+signature_crossrefs = true
+extensions = [
+  { "griffe_fieldz" = { "include_inherited" = true } }
+]
 
