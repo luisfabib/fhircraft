@@ -398,9 +398,9 @@ def get_FHIR_release_from_version(
         return "STU3"
     elif version_tuple >= (3, 2, 0) and version_tuple <= (4, 0, 1):
         return "R4"
-    elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0):
+    elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0) and version_tuple != (4, 2, 0):
         return "R4B"
-    elif version_tuple >= (4, 2, 0) and version_tuple <= (5, 0, 0):
+    elif version_tuple >= (4, 2, 0) and version_tuple <= (5, 0, 0) and version_tuple != (4, 3, 0):
         return "R5"
     elif version_tuple >= (6, 0, 0):
         return "R6"
