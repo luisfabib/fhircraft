@@ -70,6 +70,7 @@ class StructureDefinitionSnapshot(BackboneElement):
     element: Optional[ListType[ElementDefinition]] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
+        min_length=1,
     )
 
 
