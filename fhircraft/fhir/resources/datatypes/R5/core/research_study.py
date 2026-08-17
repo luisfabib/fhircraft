@@ -49,9 +49,8 @@ class ResearchStudyAssociatedParty(BackboneElement):
         description="Name of associated party",
         default=None,
     )
-    role: Optional[CodeableConcept] = Field(
+    role: CodeableConcept = Field(
         description="sponsor | lead-sponsor | sponsor-investigator | primary-investigator | collaborator | funding-source | general-contact | recruitment-contact | sub-investigator | study-director | study-chair",
-        default=None,
     )
     period: Optional[ListType[Period]] = Field(
         description="When active in the role",
@@ -72,9 +71,8 @@ class ResearchStudyProgressStatus(BackboneElement):
     Status of study with time for that status.
     """
 
-    state: Optional[CodeableConcept] = Field(
+    state: CodeableConcept = Field(
         description="Label for status or state (e.g. recruitment status)",
-        default=None,
     )
     actual: Optional[fhir.boolean] = Field(
         description="Actual if true else anticipated",
@@ -118,9 +116,8 @@ class ResearchStudyComparisonGroup(BackboneElement):
         description="Allows the comparisonGroup for the study and the comparisonGroup for the subject to be linked easily",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Label for study comparisonGroup",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="Categorization of study comparisonGroup",
@@ -231,9 +228,8 @@ class ResearchStudy(DomainResource):
         description="Date the resource last changed",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     primaryPurposeType: Optional[CodeableConcept] = Field(
         description="treatment | prevention | diagnostic | supportive-care | screening | health-services-research | basic-science | device-feasibility",

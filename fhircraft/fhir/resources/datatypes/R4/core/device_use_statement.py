@@ -50,13 +50,11 @@ class DeviceUseStatement(DomainResource):
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | completed | entered-in-error +",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Patient using device",
-        default=None,
     )
     derivedFrom: Optional[ListType[Reference]] = Field(
         description="Supporting information",
@@ -82,9 +80,8 @@ class DeviceUseStatement(DomainResource):
         description="Who made the statement",
         default=None,
     )
-    device: Optional[Reference] = Field(
+    device: Reference = Field(
         description="Reference to device used",
-        default=None,
     )
     reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why device was used",

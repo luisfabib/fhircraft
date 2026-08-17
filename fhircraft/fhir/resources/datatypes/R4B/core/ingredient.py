@@ -32,9 +32,8 @@ class IngredientManufacturer(BackboneElement):
         description="allowed | possible | actual",
         default=None,
     )
-    manufacturer: Optional[Reference] = Field(
+    manufacturer: Reference = Field(
         description="An organization that manufactures this ingredient",
-        default=None,
     )
 
 
@@ -163,9 +162,8 @@ class IngredientSubstance(BackboneElement):
     The substance that comprises this ingredient.
     """
 
-    code: Optional[CodeableReference] = Field(
+    code: CodeableReference = Field(
         description="A code or full resource that represents the ingredient substance",
-        default=None,
     )
     strength: Optional[ListType[IngredientSubstanceStrength]] = Field(
         description="The quantity of substance, per presentation, or per volume or mass, and type of quantity",
@@ -198,18 +196,16 @@ class Ingredient(DomainResource):
         description="An identifier or code by which the ingredient can be referenced",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     for_: Optional[ListType[Reference]] = Field(
         description="The product which this ingredient is a constituent part of",
         default=None,
         alias="for",
     )
-    role: Optional[CodeableConcept] = Field(
+    role: CodeableConcept = Field(
         description="Purpose of the ingredient within the product, e.g. active, inactive",
-        default=None,
     )
     function: Optional[ListType[CodeableConcept]] = Field(
         description="Precise action within the drug product, e.g. antioxidant, alkalizing agent",
@@ -223,9 +219,8 @@ class Ingredient(DomainResource):
         description="An organization that manufactures this ingredient",
         default=None,
     )
-    substance: Optional[IngredientSubstance] = Field(
+    substance: IngredientSubstance = Field(
         description="The substance that comprises this ingredient",
-        default=None,
     )
 
     @model_validator(mode="after")

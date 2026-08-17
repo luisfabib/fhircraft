@@ -93,9 +93,8 @@ class CommunicationRequest(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",

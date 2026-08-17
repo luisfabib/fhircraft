@@ -60,13 +60,11 @@ class ConditionDefinitionPrecondition(BackboneElement):
     An observation that suggests that this condition applies.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="sensitive | specific",
-        default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="code for relevant Observation",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Value of Observation",
@@ -99,13 +97,11 @@ class ConditionDefinitionQuestionnaire(BackboneElement):
     Questionnaire for this condition.
     """
 
-    purpose: Optional[fhir.code] = Field(
+    purpose: fhir.code = Field(
         description="preadmit | diff-diagnosis | outcome",
-        default=None,
     )
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="Specific Questionnaire",
-        default=None,
     )
 
 
@@ -118,9 +114,8 @@ class ConditionDefinitionPlan(BackboneElement):
         description="Use for the plan",
         default=None,
     )
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="The actual plan",
-        default=None,
     )
 
 
@@ -165,9 +160,8 @@ class ConditionDefinition(DomainResource):
         description="Subordinate title of the event definition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -197,9 +191,8 @@ class ConditionDefinition(DomainResource):
         description="Intended jurisdiction for condition definition (if applicable)",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Identification of the condition, problem or diagnosis",
-        default=None,
     )
     severity: Optional[CodeableConcept] = Field(
         description="Subjective severity of condition",

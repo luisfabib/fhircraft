@@ -36,9 +36,8 @@ class RequestOrchestrationActionCondition(BackboneElement):
     An expression that describes applicability criteria, or start/stop conditions for the action.
     """
 
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="applicability | start | stop",
-        default=None,
     )
     expression: Optional[Expression] = Field(
         description="boolean-valued expression",
@@ -89,13 +88,11 @@ class RequestOrchestrationActionRelatedAction(BackboneElement):
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    targetId: Optional[fhir.id_] = Field(
+    targetId: fhir.id_ = Field(
         description="What action this is related to",
-        default=None,
     )
-    relationship: Optional[fhir.code] = Field(
+    relationship: fhir.code = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
-        default=None,
     )
     endRelationship: Optional[fhir.code] = Field(
         description="before | before-start | before-end | concurrent | concurrent-with-start | concurrent-with-end | after | after-start | after-end",
@@ -397,13 +394,11 @@ class RequestOrchestration(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",

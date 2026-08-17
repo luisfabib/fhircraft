@@ -52,17 +52,15 @@ class DeviceMetric(DomainResource):
         description="Instance identifier",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Identity of metric, for example Heart Rate or PEEP Setting",
-        default=None,
     )
     unit: Optional[CodeableConcept] = Field(
         description="Unit of Measure for the Metric",
         default=None,
     )
-    device: Optional[Reference] = Field(
+    device: Reference = Field(
         description="Describes the link to the Device",
-        default=None,
     )
     operationalStatus: Optional[fhir.code] = Field(
         description="on | off | standby | entered-in-error",
@@ -72,9 +70,8 @@ class DeviceMetric(DomainResource):
         description="Color name (from CSS4) or #RRGGBB code",
         default=None,
     )
-    category: Optional[fhir.code] = Field(
+    category: fhir.code = Field(
         description="measurement | setting | calculation | unspecified",
-        default=None,
     )
     measurementFrequency: Optional[Quantity] = Field(
         description="Indicates how often the metric is taken or recorded",

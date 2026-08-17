@@ -107,9 +107,8 @@ class EncounterLocation(BackboneElement):
     List of locations where  the patient has been during this encounter.
     """
 
-    location: Optional[Reference] = Field(
+    location: Reference = Field(
         description="Location the encounter takes place",
-        default=None,
     )
     status: Optional[fhir.code] = Field(
         description="planned | active | reserved | completed",
@@ -137,9 +136,8 @@ class Encounter(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="planned | in-progress | on-hold | discharged | completed | cancelled | discontinued | entered-in-error | unknown",
-        default=None,
     )
     class_: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of patient encounter context - e.g. Inpatient, outpatient",

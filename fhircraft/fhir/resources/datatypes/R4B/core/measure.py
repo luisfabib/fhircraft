@@ -38,9 +38,8 @@ class MeasureGroupPopulation(BackboneElement):
         description="The human readable description of this population criteria",
         default=None,
     )
-    criteria: Optional[Expression] = Field(
+    criteria: Expression = Field(
         description="The criteria that defines this population",
-        default=None,
     )
 
 
@@ -57,9 +56,8 @@ class MeasureGroupStratifierComponent(BackboneElement):
         description="The human readable description of this stratifier component",
         default=None,
     )
-    criteria: Optional[Expression] = Field(
+    criteria: Expression = Field(
         description="Component of how the measure should be stratified",
-        default=None,
     )
 
 
@@ -126,9 +124,8 @@ class MeasureSupplementalData(BackboneElement):
         description="The human readable description of this supplemental data",
         default=None,
     )
-    criteria: Optional[Expression] = Field(
+    criteria: Expression = Field(
         description="Expression describing additional data to be reported",
-        default=None,
     )
 
 
@@ -177,9 +174,8 @@ class Measure(DomainResource):
         description="Subordinate title of the measure",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

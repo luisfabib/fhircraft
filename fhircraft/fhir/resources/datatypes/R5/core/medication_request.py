@@ -141,9 +141,8 @@ class MedicationRequest(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | on-hold | ended | stopped | completed | cancelled | entered-in-error | draft | unknown",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -153,9 +152,8 @@ class MedicationRequest(DomainResource):
         description="When the status was changed",
         default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Grouping or category of medication request",
@@ -169,13 +167,11 @@ class MedicationRequest(DomainResource):
         description="True if patient is to stop taking or not to start taking the medication",
         default=None,
     )
-    medication: Optional[CodeableReference] = Field(
+    medication: CodeableReference = Field(
         description="Medication to be taken",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Individual or group for whom the medication has been requested",
-        default=None,
     )
     informationSource: Optional[ListType[Reference]] = Field(
         description="The person or organization who provided the information about this request, if the source is someone other than the requestor",

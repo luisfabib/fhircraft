@@ -43,9 +43,8 @@ class ConsentVerification(BackboneElement):
     Whether a treatment instruction (e.g. artificial respiration yes or no) was verified with the patient, his/her family or another authorized person.
     """
 
-    verified: Optional[fhir.boolean] = Field(
+    verified: fhir.boolean = Field(
         description="Has been verified",
-        default=None,
     )
     verifiedWith: Optional[Reference] = Field(
         description="Person who verified",
@@ -62,13 +61,11 @@ class ConsentProvisionActor(BackboneElement):
     Who or what is controlled by this rule. Use group to identify a set of actors by some property they share (e.g. 'admitting officers').
     """
 
-    role: Optional[CodeableConcept] = Field(
+    role: CodeableConcept = Field(
         description="How the actor is involved",
-        default=None,
     )
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="Resource for the actor (or group, by role)",
-        default=None,
     )
 
 
@@ -77,13 +74,11 @@ class ConsentProvisionData(BackboneElement):
     The resources controlled by this rule if specific resources are referenced.
     """
 
-    meaning: Optional[fhir.code] = Field(
+    meaning: fhir.code = Field(
         description="instance | related | dependents | authoredby",
-        default=None,
     )
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="The actual data reference",
-        default=None,
     )
 
 
@@ -164,17 +159,14 @@ class Consent(DomainResource):
         description="Identifier for this record (external references)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | proposed | active | rejected | inactive | entered-in-error",
-        default=None,
     )
-    scope: Optional[CodeableConcept] = Field(
+    scope: CodeableConcept = Field(
         description="Which of the four areas this resource covers (extensible)",
-        default=None,
     )
-    category: Optional[ListType[CodeableConcept]] = Field(
+    category: ListType[CodeableConcept] = Field(
         description="Classification of the consent statement - for indexing/retrieval",
-        default=None,
     )
     patient: Optional[Reference] = Field(
         description="Who the consent applies to",

@@ -52,9 +52,8 @@ class ExplanationOfBenefitEvent(BackboneElement):
     Information code for an event with a corresponding date or period.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Specific event",
-        default=None,
     )
     whenDateTime: Optional[fhir.dateTime] = Field(
         description="Occurance date or period",
@@ -102,13 +101,11 @@ class ExplanationOfBenefitCareTeam(BackboneElement):
     The members of the team who provided the products and services.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Order of care team",
-        default=None,
     )
-    provider: Optional[Reference] = Field(
+    provider: Reference = Field(
         description="Practitioner or organization",
-        default=None,
     )
     responsible: Optional[fhir.boolean] = Field(
         description="Indicator of the lead practitioner",
@@ -129,13 +126,11 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Information instance identifier",
-        default=None,
     )
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="Classification of the supplied information",
-        default=None,
     )
     code: Optional[CodeableConcept] = Field(
         description="Type of information",
@@ -223,9 +218,8 @@ class ExplanationOfBenefitDiagnosis(BackboneElement):
     Information about diagnoses relevant to the claim items.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Diagnosis instance identifier",
-        default=None,
     )
     diagnosisCodeableConcept: Optional[CodeableConcept] = Field(
         description="Nature of illness or problem",
@@ -266,9 +260,8 @@ class ExplanationOfBenefitProcedure(BackboneElement):
     Procedures performed on the patient relevant to the billing items with the claim.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Procedure instance identifier",
-        default=None,
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
@@ -313,13 +306,11 @@ class ExplanationOfBenefitInsurance(BackboneElement):
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
 
-    focal: Optional[fhir.boolean] = Field(
+    focal: fhir.boolean = Field(
         description="Coverage to be used for adjudication",
-        default=None,
     )
-    coverage: Optional[Reference] = Field(
+    coverage: Reference = Field(
         description="Insurance information",
-        default=None,
     )
     preAuthRef: Optional[ListType[fhir.string]] = Field(
         description="Prior authorization reference number",
@@ -371,9 +362,8 @@ class ExplanationOfBenefitItemBodySite(BackboneElement):
     Physical location where the service is performed or applies.
     """
 
-    site: Optional[ListType[CodeableReference]] = Field(
+    site: ListType[CodeableReference] = Field(
         description="Location",
-        default=None,
     )
     subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
@@ -409,9 +399,8 @@ class ExplanationOfBenefitItemAdjudication(BackboneElement):
     If this item is a group then the values here are a summary of the adjudication of the detail items. If this item is a simple product or service then this is the result of the adjudication of this item.
     """
 
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="Type of adjudication information",
-        default=None,
     )
     reason: Optional[CodeableConcept] = Field(
         description="Explanation of adjudication outcome",
@@ -478,9 +467,8 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
     Third-tier of goods and services.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Product or service provided",
-        default=None,
     )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
@@ -557,9 +545,8 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
     Second-tier of goods and services.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Product or service provided",
-        default=None,
     )
     traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
@@ -642,9 +629,8 @@ class ExplanationOfBenefitItem(BackboneElement):
     A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Item instance identifier",
-        default=None,
     )
     careTeamSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable care team members",
@@ -805,9 +791,8 @@ class ExplanationOfBenefitAddItemBodySite(BackboneElement):
     Physical location where the service is performed or applies.
     """
 
-    site: Optional[ListType[CodeableReference]] = Field(
+    site: ListType[CodeableReference] = Field(
         description="Location",
-        default=None,
     )
     subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
@@ -1097,13 +1082,11 @@ class ExplanationOfBenefitTotal(BackboneElement):
     Categorized monetary totals for the adjudication.
     """
 
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="Type of adjudication information",
-        default=None,
     )
-    amount: Optional[Money] = Field(
+    amount: Money = Field(
         description="Financial total for the category",
-        default=None,
     )
 
 
@@ -1166,9 +1149,8 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     Benefits Used to date.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Benefit classification",
-        default=None,
     )
     allowedUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Benefits allowed",
@@ -1229,9 +1211,8 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
     Balance by Benefit Category.
     """
 
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="Benefit classification",
-        default=None,
     )
     excluded: Optional[fhir.boolean] = Field(
         description="Excluded from the plan",
@@ -1280,33 +1261,28 @@ class ExplanationOfBenefit(DomainResource):
         description="Number for tracking",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category or discipline",
-        default=None,
     )
     subType: Optional[CodeableConcept] = Field(
         description="More granular claim type",
         default=None,
     )
-    use: Optional[fhir.code] = Field(
+    use: fhir.code = Field(
         description="claim | preauthorization | predetermination",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="The recipient of the products and services",
-        default=None,
     )
     billablePeriod: Optional[Period] = Field(
         description="Relevant time frame for the claim",
         default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Response creation date",
-        default=None,
     )
     enterer: Optional[Reference] = Field(
         description="Author of the claim",
@@ -1372,9 +1348,8 @@ class ExplanationOfBenefit(DomainResource):
         description="Claim response reference",
         default=None,
     )
-    outcome: Optional[fhir.code] = Field(
+    outcome: fhir.code = Field(
         description="queued | complete | error | partial",
-        default=None,
     )
     decision: Optional[CodeableConcept] = Field(
         description="Result of the adjudication",

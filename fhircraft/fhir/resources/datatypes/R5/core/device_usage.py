@@ -30,13 +30,11 @@ class DeviceUsageAdherence(BackboneElement):
     This indicates how or if the device is being used.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="always | never | sometimes",
-        default=None,
     )
-    reason: Optional[ListType[CodeableConcept]] = Field(
+    reason: ListType[CodeableConcept] = Field(
         description="lost | stolen | prescribed | broken | burned | forgot",
-        default=None,
     )
 
 
@@ -57,17 +55,15 @@ class DeviceUsage(DomainResource):
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | completed | not-done | entered-in-error +",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the statement - classifying how the statement is made",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Patient using device",
-        default=None,
     )
     derivedFrom: Optional[ListType[Reference]] = Field(
         description="Supporting information",
@@ -109,9 +105,8 @@ class DeviceUsage(DomainResource):
         description="Who made the statement",
         default=None,
     )
-    device: Optional[CodeableReference] = Field(
+    device: CodeableReference = Field(
         description="code or Reference to device used",
-        default=None,
     )
     reason: Optional[ListType[CodeableReference]] = Field(
         description="Why device was used",

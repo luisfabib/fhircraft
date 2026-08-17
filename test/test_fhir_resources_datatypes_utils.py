@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 import fhircraft.fhir.resources.datatypes.R4.primitive as primitives
-from fhircraft.fhir.resources.datatypes.R4.complex import Coding
+from fhircraft.fhir.resources.datatypes.R4.complex import Coding, CodeableConcept
 from fhircraft.fhir.resources.datatypes.R4.core import Observation
 from fhircraft.fhir.resources.datatypes.utils import (
     is_fhir_primitive_type,
@@ -470,7 +470,14 @@ def test_is_fhir_complex_type(value, fhir_type, expected):
     "value,fhir_type,expected",
     [
         (
-            Observation(valueString="value", id="example"),
+            Observation(
+                valueString="value",
+                id="example",
+                status="final",
+                code=CodeableConcept(
+                    coding=[Coding(code="123", system="http://example.com")]
+                ),
+            ),
             Observation,
             True,
         ),

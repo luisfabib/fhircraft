@@ -13,17 +13,14 @@ class Signature(Element):
 
     _type = "Signature"
 
-    type: Optional[List[Coding]] = Field(
+    type: List[Coding] = Field(
         description="Indication of the reason the entity signed the object(s)",
-        default=None,
     )
-    when: Optional[fhir.instant] = Field(
+    when: fhir.instant = Field(
         description="When the signature was created",
-        default=None,
     )
-    who: Optional[Reference] = Field(
+    who: Reference = Field(
         description="Who signed",
-        default=None,
     )
     onBehalfOf: Optional[Reference] = Field(
         description="The party represented",

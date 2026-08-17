@@ -235,9 +235,8 @@ class MeasureSupplementalData(BackboneElement):
         description="The human readable description of this supplemental data",
         default=None,
     )
-    criteria: Optional[Expression] = Field(
+    criteria: Expression = Field(
         description="Expression describing additional data to be reported",
-        default=None,
     )
 
 
@@ -282,9 +281,8 @@ class Measure(DomainResource):
         description="Subordinate title of the measure",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

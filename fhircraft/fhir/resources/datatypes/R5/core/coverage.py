@@ -28,9 +28,8 @@ class CoveragePaymentBy(BackboneElement):
     Link to the paying party and optionally what specifically they will be responsible to pay.
     """
 
-    party: Optional[Reference] = Field(
+    party: Reference = Field(
         description="Parties performing self-payment",
-        default=None,
     )
     responsibility: Optional[fhir.string] = Field(
         description="Party\u0027s responsibility",
@@ -42,13 +41,11 @@ class CoverageClass(BackboneElement):
     A suite of underwriter specific classifiers.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of class such as \u0027group\u0027 or \u0027plan\u0027",
-        default=None,
     )
-    value: Optional[Identifier] = Field(
+    value: Identifier = Field(
         description="Value associated with the type",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="Human readable description of the type and value",
@@ -60,9 +57,8 @@ class CoverageCostToBeneficiaryException(BackboneElement):
     A suite of codes indicating exceptions or reductions to patient costs and their effective periods.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Exception category",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="The effective period of the exception",
@@ -136,13 +132,11 @@ class Coverage(DomainResource):
         description="Business identifier(s) for this coverage",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="insurance | self-pay | other",
-        default=None,
     )
     paymentBy: Optional[ListType[CoveragePaymentBy]] = Field(
         description="Self-pay parties and responsibility",
@@ -164,9 +158,8 @@ class Coverage(DomainResource):
         description="ID assigned to the subscriber",
         default=None,
     )
-    beneficiary: Optional[Reference] = Field(
+    beneficiary: Reference = Field(
         description="Plan beneficiary",
-        default=None,
     )
     dependent: Optional[fhir.string] = Field(
         description="Dependent number",

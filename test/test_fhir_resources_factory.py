@@ -1180,7 +1180,13 @@ def test_factory__construct_diff_min_cardinality(factory: FHIRModelFactory):
 
     # Test valid dataset
     assert (
-        mock_resource.model_validate({"id": "test", "created": "2023-01-01"})
+        mock_resource.model_validate(
+            {
+                "id": "test",
+                "created": "2023-01-01",
+                "code": {"coding": [{"system": "http://example.org", "code": "test"}]},
+            }
+        )
         is not None
     ), "Valid dataset did not validate correctly"
     # Test invalid dataset
@@ -1434,11 +1440,23 @@ def test_construct_diff_type_choice_element(factory: FHIRModelFactory):
     assert hasattr(mock_resource, "value")
 
     # Test valid data with string
-    instance = mock_resource.model_validate({"valueString": "test"})
+    instance = mock_resource.model_validate(
+        {
+            "valueString": "test",
+            "status": "final",
+            "code": {"coding": [{"system": "http://example.org", "code": "test"}]},
+        }
+    )
     assert instance.value == "test"  # type: ignore
 
     with pytest.raises(ValidationError):
-        mock_resource.model_validate({"valueInteger": 2})
+        mock_resource.model_validate(
+            {
+                "valueInteger": 2,
+                "status": "final",
+                "code": {"coding": [{"system": "http://example.org", "code": "test"}]},
+            }
+        )
 
 
 def test_construct_diff_nested_backbone_element(factory: FHIRModelFactory):

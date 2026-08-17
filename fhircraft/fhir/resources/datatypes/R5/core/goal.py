@@ -125,9 +125,8 @@ class Goal(DomainResource):
         description="External Ids for this goal",
         default=None,
     )
-    lifecycleStatus: Optional[fhir.code] = Field(
+    lifecycleStatus: fhir.code = Field(
         description="proposed | planned | accepted | active | on-hold | completed | cancelled | entered-in-error | rejected",
-        default=None,
     )
     achievementStatus: Optional[CodeableConcept] = Field(
         description="in-progress | improving | worsening | no-change | achieved | sustaining | not-achieved | no-progress | not-attainable",
@@ -145,13 +144,11 @@ class Goal(DomainResource):
         description="high-priority | medium-priority | low-priority",
         default=None,
     )
-    description: Optional[CodeableConcept] = Field(
+    description: CodeableConcept = Field(
         description="code or text describing goal",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who this goal is intended for",
-        default=None,
     )
     startDate: Optional[fhir.date_] = Field(
         description="When goal pursuit begins",

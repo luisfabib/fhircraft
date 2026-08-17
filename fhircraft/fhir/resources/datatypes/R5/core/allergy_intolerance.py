@@ -35,9 +35,8 @@ class AllergyIntoleranceParticipant(BackboneElement):
         description="Type of involvement",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who or what participated in the activities related to the allergy or intolerance",
-        default=None,
     )
 
 
@@ -50,9 +49,8 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Specific substance or pharmaceutical product considered to be responsible for event",
         default=None,
     )
-    manifestation: Optional[ListType[CodeableReference]] = Field(
+    manifestation: ListType[CodeableReference] = Field(
         description="Clinical symptoms/signs associated with the Event",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="Description of the event as a whole",
@@ -113,9 +111,8 @@ class AllergyIntolerance(DomainResource):
         description="code that identifies the allergy or intolerance",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who the allergy or intolerance is for",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter when the allergy or intolerance was asserted",

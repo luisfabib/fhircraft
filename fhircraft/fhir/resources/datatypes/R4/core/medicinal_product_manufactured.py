@@ -42,17 +42,15 @@ class MedicinalProductManufactured(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    manufacturedDoseForm: Optional[CodeableConcept] = Field(
+    manufacturedDoseForm: CodeableConcept = Field(
         description="Dose form as manufactured and before any transformation into the pharmaceutical product",
-        default=None,
     )
     unitOfPresentation: Optional[CodeableConcept] = Field(
         description="The \u201creal world\u201d units in which the quantity of the manufactured item is described",
         default=None,
     )
-    quantity: Optional[Quantity] = Field(
+    quantity: Quantity = Field(
         description='The quantity or "count number" of the manufactured item',
-        default=None,
     )
     manufacturer: Optional[ListType[Reference]] = Field(
         description='Manufacturer of the item (Note that this should be named "manufacturer" but it currently causes technical issues)',

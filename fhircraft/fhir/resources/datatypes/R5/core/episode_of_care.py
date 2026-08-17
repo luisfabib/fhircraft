@@ -27,13 +27,11 @@ class EpisodeOfCareStatusHistory(BackboneElement):
     The history of statuses that the EpisodeOfCare has been through (without requiring processing the history of the resource).
     """
 
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
-        default=None,
     )
-    period: Optional[Period] = Field(
+    period: Period = Field(
         description="Duration the EpisodeOfCare was in the specified status",
-        default=None,
     )
 
 class EpisodeOfCareReason(BackboneElement):
@@ -77,9 +75,8 @@ class EpisodeOfCare(DomainResource):
         description="Business Identifier(s) relevant for this EpisodeOfCare",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="planned | waitlist | active | onhold | finished | cancelled | entered-in-error",
-        default=None,
     )
     statusHistory: Optional[ListType[EpisodeOfCareStatusHistory]] = Field(
         description="Past list of status codes (the current status may be included to cover the start date of the status)",
@@ -97,9 +94,8 @@ class EpisodeOfCare(DomainResource):
         description="The list of medical conditions that were addressed during the episode of care",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="The patient who is the focus of this episode of care",
-        default=None,
     )
     managingOrganization: Optional[Reference] = Field(
         description="Organization that assumes responsibility for care coordination",

@@ -29,9 +29,8 @@ class StructureDefinitionMapping(BackboneElement):
     An external specification that the content is mapped to.
     """
 
-    identity: Optional[fhir.id_] = Field(
+    identity: fhir.id_ = Field(
         description="Internal id when this mapping is used",
-        default=None,
     )
     uri: Optional[fhir.uri] = Field(
         description="Identifies what this mapping refers to",
@@ -52,13 +51,11 @@ class StructureDefinitionContext(BackboneElement):
     Identifies the types of resource or data type elements to which the extension can be applied. For more guidance on using the 'context' element, see the [defining extensions page](https://hl7.org/fhir/R5/defining-extensions.html#context).
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="fhirpath | element | extension",
-        default=None,
     )
-    expression: Optional[fhir.string] = Field(
+    expression: fhir.string = Field(
         description="Where the extension can be used in instances",
-        default=None,
     )
 
 
@@ -67,9 +64,8 @@ class StructureDefinitionSnapshot(BackboneElement):
     A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.
     """
 
-    element: Optional[ListType[ElementDefinition]] = Field(
+    element: ListType[ElementDefinition] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
-        default=None,
     )
 
 
@@ -78,9 +74,8 @@ class StructureDefinitionDifferential(BackboneElement):
     A differential view is expressed relative to the base StructureDefinition - a statement of differences that it applies.
     """
 
-    element: Optional[ListType[ElementDefinition]] = Field(
+    element: ListType[ElementDefinition] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
-        default=None,
     )
 
 
@@ -93,9 +88,8 @@ class StructureDefinition(DomainResource):
     _type = "StructureDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
 
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="canonical identifier for this structure definition, represented as a URI (globally unique)",
-        default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure definition",
@@ -113,17 +107,15 @@ class StructureDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this structure definition (computer friendly)",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Name for this structure definition (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -177,13 +169,11 @@ class StructureDefinition(DomainResource):
         description="External specification that the content is mapped to",
         default=None,
     )
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="primitive-type | complex-type | resource | logical",
-        default=None,
     )
-    abstract: Optional[fhir.boolean] = Field(
+    abstract: fhir.boolean = Field(
         description="Whether the structure is abstract",
-        default=None,
     )
     context: Optional[ListType[StructureDefinitionContext]] = Field(
         description="If an extension, where it can be used in instances",
@@ -193,9 +183,8 @@ class StructureDefinition(DomainResource):
         description="FHIRPath invariants - when the extension can be used",
         default=None,
     )
-    type: Optional[fhir.uri] = Field(
+    type: fhir.uri = Field(
         description="Type defined or constrained by this structure",
-        default=None,
     )
     baseDefinition: Optional[fhir.canonical] = Field(
         description="Definition that this type is constrained/specialized from",

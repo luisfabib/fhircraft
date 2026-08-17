@@ -29,17 +29,14 @@ class ExampleScenarioActor(BackboneElement):
     A system or person who shares or receives an instance within the scenario.
     """
 
-    key: Optional[fhir.string] = Field(
+    key: fhir.string = Field(
         description="ID or acronym of the actor",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="person | system",
-        default=None,
     )
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Label for actor when rendering",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="Details about actor",
@@ -52,13 +49,11 @@ class ExampleScenarioInstanceVersion(BackboneElement):
     Represents the instance as it was at a specific time-point.
     """
 
-    key: Optional[fhir.string] = Field(
+    key: fhir.string = Field(
         description="ID or acronym of the version",
-        default=None,
     )
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Label for instance version",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="Details about version",
@@ -75,9 +70,8 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
     References to other instances that can be found within this instance (e.g. the observations contained in a bundle).
     """
 
-    instanceReference: Optional[fhir.string] = Field(
+    instanceReference: fhir.string = Field(
         description="Key of contained instance",
-        default=None,
     )
     versionReference: Optional[fhir.string] = Field(
         description="Key of contained instance version",
@@ -90,13 +84,11 @@ class ExampleScenarioInstance(BackboneElement):
     A single data collection that is shared as part of the scenario.
     """
 
-    key: Optional[fhir.string] = Field(
+    key: fhir.string = Field(
         description="ID or acronym of the instance",
-        default=None,
     )
-    structureType: Optional[Coding] = Field(
+    structureType: Coding = Field(
         description="Data structure for example",
-        default=None,
     )
     structureVersion: Optional[fhir.string] = Field(
         description="E.g. 4.0.1",
@@ -110,9 +102,8 @@ class ExampleScenarioInstance(BackboneElement):
         description="Rules instance adheres to",
         default=None,
     )
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Label for instance",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the instance",
@@ -174,9 +165,8 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         description="Kind of action",
         default=None,
     )
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Label for step",
-        default=None,
     )
     initiator: Optional[fhir.string] = Field(
         description="Who starts the operation",
@@ -213,9 +203,8 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
     Indicates an alternative step that can be taken instead of the sub-process, scenario or operation.  E.g. to represent non-happy-path/exceptional/atypical circumstances.
     """
 
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Label for alternative",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="Human-readable description of option",
@@ -263,9 +252,8 @@ class ExampleScenarioProcess(BackboneElement):
     A group of operations that represents a significant step within a scenario.
     """
 
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Label for procss",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="Human-friendly description of the process",
@@ -322,9 +310,8 @@ class ExampleScenario(DomainResource):
         description="Name for this example scenario (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

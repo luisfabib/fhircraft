@@ -34,9 +34,8 @@ class MessageHeaderDestination(BackboneElement):
         description="Particular delivery destination within the destination",
         default=None,
     )
-    endpoint: Optional[fhir.url] = Field(
+    endpoint: fhir.url = Field(
         description="Actual destination address or id",
-        default=None,
     )
     receiver: Optional[Reference] = Field(
         description='Intended "real-world" recipient for the data',
@@ -65,9 +64,8 @@ class MessageHeaderSource(BackboneElement):
         description="Human contact for problems",
         default=None,
     )
-    endpoint: Optional[fhir.url] = Field(
+    endpoint: fhir.url = Field(
         description="Actual message source address or id",
-        default=None,
     )
 
 
@@ -76,13 +74,11 @@ class MessageHeaderResponse(BackboneElement):
     Information about the message that this message is a response to.  Only present if this message is a response.
     """
 
-    identifier: Optional[fhir.id_] = Field(
+    identifier: fhir.id_ = Field(
         description="id_ of original message",
-        default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="ok | transient-error | fatal-error",
-        default=None,
     )
     details: Optional[Reference] = Field(
         description="Specific list of hints/warnings/errors",
@@ -135,9 +131,8 @@ class MessageHeader(DomainResource):
         description="The source of the decision",
         default=None,
     )
-    source: Optional[MessageHeaderSource] = Field(
+    source: MessageHeaderSource = Field(
         description="Message source application",
-        default=None,
     )
     responsible: Optional[Reference] = Field(
         description="Final responsibility for event",

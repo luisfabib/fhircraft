@@ -35,9 +35,8 @@ class PaymentReconciliationDetail(BackboneElement):
         description="Business identifier of the prior payment detail",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category of payment",
-        default=None,
     )
     request: Optional[Reference] = Field(
         description="Request giving rise to the payment",
@@ -109,17 +108,15 @@ class PaymentReconciliation(DomainResource):
         description="Business Identifier for a payment reconciliation",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="Period covered",
         default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Creation date",
-        default=None,
     )
     paymentIssuer: Optional[Reference] = Field(
         description="Party generating payment",
@@ -141,13 +138,11 @@ class PaymentReconciliation(DomainResource):
         description="Disposition message",
         default=None,
     )
-    paymentDate: Optional[fhir.date_] = Field(
+    paymentDate: fhir.date_ = Field(
         description="When payment issued",
-        default=None,
     )
-    paymentAmount: Optional[Money] = Field(
+    paymentAmount: Money = Field(
         description="Total amount of Payment",
-        default=None,
     )
     paymentIdentifier: Optional[Identifier] = Field(
         description="Business identifier for the payment",

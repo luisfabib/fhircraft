@@ -29,9 +29,8 @@ class GroupCharacteristic(BackboneElement):
     Identifies traits whose presence r absence is shared by members of the group.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Kind of characteristic",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Value held by characteristic",
@@ -53,9 +52,8 @@ class GroupCharacteristic(BackboneElement):
         description="Value held by characteristic",
         default=None,
     )
-    exclude: Optional[fhir.boolean] = Field(
+    exclude: fhir.boolean = Field(
         description="Group includes or excludes",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="Period over which characteristic is tested",
@@ -84,9 +82,8 @@ class GroupMember(BackboneElement):
     Identifies the resource instances that are members of the group.
     """
 
-    entity: Optional[Reference] = Field(
+    entity: Reference = Field(
         description="Reference to the group member",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="Period member belonged to the group",
@@ -115,13 +112,11 @@ class Group(DomainResource):
         description="Whether this group\u0027s record is in active use",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="person | animal | practitioner | device | careteam | healthcareservice | location | organization | relatedperson | specimen",
-        default=None,
     )
-    membership: Optional[fhir.code] = Field(
+    membership: fhir.code = Field(
         description="definitional | enumerated",
-        default=None,
     )
     code: Optional[CodeableConcept] = Field(
         description="Kind of Group members",

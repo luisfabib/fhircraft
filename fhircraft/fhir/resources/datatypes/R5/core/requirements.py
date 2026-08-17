@@ -29,9 +29,8 @@ class RequirementsStatement(BackboneElement):
     The actual statement of requirement, in markdown format.
     """
 
-    key: Optional[fhir.id_] = Field(
+    key: fhir.id_ = Field(
         description="Key that identifies this statement",
-        default=None,
     )
     label: Optional[fhir.string] = Field(
         description="Short Human label for this statement",
@@ -45,9 +44,8 @@ class RequirementsStatement(BackboneElement):
         description="Set to true if requirements statement is conditional",
         default=None,
     )
-    requirement: Optional[fhir.markdown] = Field(
+    requirement: fhir.markdown = Field(
         description="The actual requirement",
-        default=None,
     )
     derivedFrom: Optional[fhir.string] = Field(
         description="Another statement this clarifies/restricts ([url#]key)",
@@ -108,9 +106,8 @@ class Requirements(DomainResource):
         description="Name for this Requirements (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

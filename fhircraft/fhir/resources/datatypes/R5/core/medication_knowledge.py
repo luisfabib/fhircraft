@@ -36,13 +36,11 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     Associated or related medications. For example, if the medication is a branded product (e.g. Crestor), this is the Therapeutic Moeity (e.g. Rosuvastatin) or if this is a generic medication (e.g. Rosuvastatin), this would link to a branded product (e.g. Crestor.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category of medicationKnowledge",
-        default=None,
     )
-    reference: Optional[ListType[Reference]] = Field(
+    reference: ListType[Reference] = Field(
         description="Associated documentation about the associated medication knowledge",
-        default=None,
     )
 
 
@@ -70,9 +68,8 @@ class MedicationKnowledgeCost(BackboneElement):
         description="The date range for which the cost is effective",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="The category of the cost information",
-        default=None,
     )
     source: Optional[fhir.string] = Field(
         description="The source or owner for the price information",
@@ -124,13 +121,11 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElemen
     Dosage for the medication for the specific guidelines.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category of dosage for a medication",
-        default=None,
     )
-    dosage: Optional[ListType[Dosage]] = Field(
+    dosage: ListType[Dosage] = Field(
         description="Dosage for the medication for the specific guidelines",
-        default=None,
     )
 
 
@@ -141,9 +136,8 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
     Characteristics of the patient that are relevant to the administration guidelines (for example, height, weight, gender, etc.).
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Categorization of specific characteristic that is relevant to the administration guideline",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="The specific characteristic",
@@ -226,9 +220,8 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
     Categorization of the medication within a formulary or classification system.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="The type of category for the medication (for example, therapeutic classification, therapeutic sub-classification)",
-        default=None,
     )
     sourceString: Optional[fhir.string] = Field(
         description="The source of the classification",
@@ -323,9 +316,8 @@ class MedicationKnowledgeStorageGuidelineEnvironmentalSetting(BackboneElement):
     Describes a setting/value on the environment for the adequate storage of the medication and other substances.  Environment settings may involve temperature, humidity, or exposure to light.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Categorization of the setting",
-        default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Value of the setting",
@@ -387,13 +379,11 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     Specifies if changes are allowed when dispensing a medication from a regulatory perspective.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Specifies the type of substitution allowed",
-        default=None,
     )
-    allowed: Optional[fhir.boolean] = Field(
+    allowed: fhir.boolean = Field(
         description="Specifies if regulation allows for changes in the medication when dispensing",
-        default=None,
     )
 
 
@@ -402,9 +392,8 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     The maximum number of units of the medication that can be dispensed in a period.
     """
 
-    quantity: Optional[Quantity] = Field(
+    quantity: Quantity = Field(
         description="The maximum number of units of the medication that can be dispensed",
-        default=None,
     )
     period: Optional[Duration] = Field(
         description="The period that applies to the maximum number of units",
@@ -417,9 +406,8 @@ class MedicationKnowledgeRegulatory(BackboneElement):
     Regulatory information about a medication.
     """
 
-    regulatoryAuthority: Optional[Reference] = Field(
+    regulatoryAuthority: Reference = Field(
         description="Specifies the authority of the regulation",
-        default=None,
     )
     substitution: Optional[ListType[MedicationKnowledgeRegulatorySubstitution]] = Field(
         description="Specifies if changes are allowed when dispensing a medication from a regulatory perspective",
@@ -440,9 +428,8 @@ class MedicationKnowledgeDefinitionalIngredient(BackboneElement):
     Identifies a particular constituent of interest in the product.
     """
 
-    item: Optional[CodeableReference] = Field(
+    item: CodeableReference = Field(
         description="Substances contained in the medication",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="A code that defines the type of ingredient, active, base, etc",

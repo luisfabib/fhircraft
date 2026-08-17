@@ -321,7 +321,7 @@ def test__validate_FHIR_element_constraint__skip_mode_returns_value(mock_fhirpat
 def test__validate_FHIR_element_constraint__disabled_constraint_returns_value(
     mock_fhirpath,
 ):
-    with override_config(disabled_fhir_constraints=frozenset({"key-1"})):
+    with override_config(disabled_fhir_constraints=("key-1",)):
         result = _validate_FHIR_element_constraint(
             "value", Mock(), "expr", "Human", "key-1", "error"
         )

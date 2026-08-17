@@ -21,9 +21,8 @@ class UsageContext(Element):
 
     _type = "UsageContext"
 
-    code: Optional[Coding] = Field(
+    code: Coding = Field(
         description="Type of context being specified",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Value that defines the context",

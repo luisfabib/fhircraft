@@ -55,9 +55,8 @@ class ActorDefinition(DomainResource):
         description="Name for this actor definition (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -99,9 +98,8 @@ class ActorDefinition(DomainResource):
         description="Copyright holder and year(s)",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="person | system",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="Functionality associated with the actor",

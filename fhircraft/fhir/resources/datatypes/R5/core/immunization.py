@@ -32,9 +32,8 @@ class ImmunizationPerformer(BackboneElement):
         description="What type of performance was done",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Individual or organization who was performing",
-        default=None,
     )
 
 class ImmunizationProgramEligibility(BackboneElement):
@@ -42,13 +41,11 @@ class ImmunizationProgramEligibility(BackboneElement):
     Indicates a patient's eligibility for a funding program.
     """
 
-    program: Optional[CodeableConcept] = Field(
+    program: CodeableConcept = Field(
         description="The program that eligibility is declared for",
-        default=None,
     )
-    programStatus: Optional[CodeableConcept] = Field(
+    programStatus: CodeableConcept = Field(
         description="The patient\u0027s eligibility status for the program",
-        default=None,
     )
 
 class ImmunizationReaction(BackboneElement):
@@ -86,9 +83,8 @@ class ImmunizationProtocolApplied(BackboneElement):
         description="Vaccine preventatable disease being targeted",
         default=None,
     )
-    doseNumber: Optional[fhir.string] = Field(
+    doseNumber: fhir.string = Field(
         description="Dose number within series",
-        default=None,
     )
     seriesDoses: Optional[fhir.string] = Field(
         description="Recommended number of doses for immunity",
@@ -112,17 +108,15 @@ class Immunization(DomainResource):
         description="Authority that the immunization event is based on",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="completed | entered-in-error | not-done",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
     )
-    vaccineCode: Optional[CodeableConcept] = Field(
+    vaccineCode: CodeableConcept = Field(
         description="Vaccine administered",
-        default=None,
     )
     administeredProduct: Optional[CodeableReference] = Field(
         description="Product that was administered",
@@ -140,9 +134,8 @@ class Immunization(DomainResource):
         description="Vaccine expiration date",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who was immunized",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter immunization was part of",

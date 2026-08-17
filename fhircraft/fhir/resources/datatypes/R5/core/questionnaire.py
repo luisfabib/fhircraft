@@ -32,13 +32,11 @@ class QuestionnaireItemEnableWhen(BackboneElement):
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
     """
 
-    question: Optional[fhir.string] = Field(
+    question: fhir.string = Field(
         description="The linkId of question that determines whether item is enabled/disabled",
-        default=None,
     )
-    operator: Optional[fhir.code] = Field(
+    operator: fhir.code = Field(
         description="exists | = | != | \u003e | \u003c | \u003e= | \u003c=",
-        default=None,
     )
     answerBoolean: Optional[fhir.boolean] = Field(
         description="Value for question comparison based on operator",
@@ -256,9 +254,8 @@ class QuestionnaireItem(BackboneElement):
     A particular question, question grouping or display text that is part of the questionnaire.
     """
 
-    linkId: Optional[fhir.string] = Field(
+    linkId: fhir.string = Field(
         description="Unique id for item in questionnaire",
-        default=None,
     )
     definition: Optional[fhir.uri] = Field(
         description="ElementDefinition - details for the item",
@@ -276,9 +273,8 @@ class QuestionnaireItem(BackboneElement):
         description="Primary text for the item",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="group | display | boolean | decimal | integer | date | dateTime +",
-        default=None,
     )
     enableWhen: Optional[ListType[QuestionnaireItemEnableWhen]] = Field(
         description="Only allow data when",
@@ -371,9 +367,8 @@ class Questionnaire(DomainResource):
         description="Based on Questionnaire",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

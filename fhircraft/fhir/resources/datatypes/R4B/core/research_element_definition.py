@@ -216,9 +216,8 @@ class ResearchElementDefinition(DomainResource):
         description="Subordinate title of the ResearchElementDefinition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -312,17 +311,15 @@ class ResearchElementDefinition(DomainResource):
         description="Logic used by the ResearchElementDefinition",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="population | exposure | outcome",
-        default=None,
     )
     variableType: Optional[fhir.code] = Field(
         description="dichotomous | continuous | descriptive",
         default=None,
     )
-    characteristic: Optional[ListType[ResearchElementDefinitionCharacteristic]] = Field(
+    characteristic: ListType[ResearchElementDefinitionCharacteristic] = Field(
         description="What defines the members of the research element",
-        default=None,
     )
 
     @property

@@ -69,9 +69,8 @@ class EventDefinition(DomainResource):
         description="Subordinate title of the event definition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -157,9 +156,8 @@ class EventDefinition(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    trigger: Optional[ListType[TriggerDefinition]] = Field(
+    trigger: ListType[TriggerDefinition] = Field(
         description='"when" the event occurs (multiple = \u0027or\u0027)',
-        default=None,
     )
 
     @property

@@ -36,9 +36,8 @@ class ListEntry(BackboneElement):
         description="When item added to list",
         default=None,
     )
-    item: Optional[Reference] = Field(
+    item: Reference = Field(
         description="Actual entry",
-        default=None,
     )
 
 
@@ -67,13 +66,11 @@ class List(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="current | retired | entered-in-error",
-        default=None,
     )
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="working | snapshot | changes",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Descriptive name for the list",

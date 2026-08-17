@@ -324,9 +324,8 @@ class SubstanceSpecificationName(BackboneElement):
     Names applicable to this substance.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="The actual name",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="Name type",

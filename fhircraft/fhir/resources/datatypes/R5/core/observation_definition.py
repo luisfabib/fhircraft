@@ -141,9 +141,8 @@ class ObservationDefinitionComponent(BackboneElement):
     Some observations have multiple component observations, expressed as separate code value pairs.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of observation",
-        default=None,
     )
     permittedDataType: Optional[ListType[fhir.code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
@@ -198,9 +197,8 @@ class ObservationDefinition(DomainResource):
         description="Name for this ObservationDefinition (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="If for testing purposes, not real usage",
@@ -274,9 +272,8 @@ class ObservationDefinition(DomainResource):
         description="General type of observation",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of observation",
-        default=None,
     )
     permittedDataType: Optional[ListType[fhir.code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",

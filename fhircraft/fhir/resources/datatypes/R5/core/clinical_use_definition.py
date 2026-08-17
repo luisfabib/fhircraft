@@ -29,13 +29,11 @@ class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
     Information about the use of the medicinal product in relation to other therapies described as part of the contraindication.
     """
 
-    relationshipType: Optional[CodeableConcept] = Field(
+    relationshipType: CodeableConcept = Field(
         description="The type of relationship between the product indication/contraindication and another therapy",
-        default=None,
     )
-    treatment: Optional[CodeableReference] = Field(
+    treatment: CodeableReference = Field(
         description="Reference to a specific medication, substance etc. as part of an indication or contraindication",
-        default=None,
     )
 
 
@@ -255,9 +253,8 @@ class ClinicalUseDefinition(DomainResource):
         description="Business identifier for this issue",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="indication | contraindication | interaction | undesirable-effect | warning",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description='A categorisation of the issue, primarily for dividing warnings into subject heading areas such as "Pregnancy", "Overdose"',

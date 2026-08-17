@@ -26,9 +26,8 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
     Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product.
     """
 
-    presentation: Optional[Ratio] = Field(
+    presentation: Ratio = Field(
         description="The quantity of substance in the unit of presentation, or in the volume (or mass) of the single pharmaceutical product or manufactured item",
-        default=None,
     )
     presentationLowLimit: Optional[Ratio] = Field(
         description="A lower limit for the quantity of substance in the unit of presentation. For use when there is a range of strengths, this is the lower limit, with the presentation attribute becoming the upper limit",
@@ -65,13 +64,11 @@ class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
     A specified substance that comprises this ingredient.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="The specified substance",
-        default=None,
     )
-    group: Optional[CodeableConcept] = Field(
+    group: CodeableConcept = Field(
         description="The group of specified substance, e.g. group 1 to 4",
-        default=None,
     )
     confidentiality: Optional[CodeableConcept] = Field(
         description="Confidentiality level of the specified substance as the ingredient",
@@ -96,9 +93,8 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         description="Relevant reference substance",
         default=None,
     )
-    strength: Optional[Ratio] = Field(
+    strength: Ratio = Field(
         description="Strength expressed in terms of a reference substance",
-        default=None,
     )
     strengthLowLimit: Optional[Ratio] = Field(
         description="Strength expressed in terms of a reference substance",
@@ -156,9 +152,8 @@ class MedicinalProductIngredientSubstance(BackboneElement):
     The ingredient substance.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="The ingredient substance",
-        default=None,
     )
     strength: Optional[ListType[MedicinalProductIngredientSubstanceStrength]] = Field(
         description="Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product",
@@ -193,9 +188,8 @@ class MedicinalProductIngredient(DomainResource):
         description="Identifier for the ingredient",
         default=None,
     )
-    role: Optional[CodeableConcept] = Field(
+    role: CodeableConcept = Field(
         description="Ingredient role e.g. Active ingredient, excipient",
-        default=None,
     )
     allergenicIndicator: Optional[fhir.boolean] = Field(
         description="If the ingredient is a known or suspected allergen",

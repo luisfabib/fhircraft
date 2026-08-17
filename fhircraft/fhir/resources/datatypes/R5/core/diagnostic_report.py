@@ -29,13 +29,11 @@ class DiagnosticReportSupportingInfo(BackboneElement):
     This backbone element contains supporting information that was used in the creation of the report not included in the results already included in the report.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Supporting information role code",
-        default=None,
     )
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="Supporting information reference",
-        default=None,
     )
 
 
@@ -48,9 +46,8 @@ class DiagnosticReportMedia(BackboneElement):
         description="Comment about the image or data (e.g. explanation)",
         default=None,
     )
-    link: Optional[Reference] = Field(
+    link: Reference = Field(
         description="Reference to the image or data source",
-        default=None,
     )
 
 
@@ -71,17 +68,15 @@ class DiagnosticReport(DomainResource):
         description="What was requested",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | partial | preliminary | modified | final | amended | corrected | appended | cancelled | entered-in-error | unknown",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Service category",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Name/code for this diagnostic report",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="The subject of the report - usually, but not always, the patient",

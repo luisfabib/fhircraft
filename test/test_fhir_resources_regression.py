@@ -213,7 +213,11 @@ def test_regression_issue_258(factory):
                 {
                     "id": "Observation.category",
                     "path": "Observation.category",
-                    "slicing": {"discriminator": [{"type": "value", "path": "coding"}]},
+                    "slicing": {
+                        "discriminator": [{"type": "value", "path": "coding"}],
+                        "ordered": False,
+                        "rules": "open",
+                    },
                 },
                 {
                     "id": "Observation.category:slice",
@@ -310,6 +314,7 @@ def test_regression_issue_111(factory):
         "fhirVersion": "5.0.0",
         "kind": "resource",
         "abstract": False,
+        "status": "draft",
         "type": "Procedure",
         "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Procedure",
         "derivation": "constraint",
@@ -400,7 +405,19 @@ def test_regression_issue_111(factory):
     # -----------------------------------------------------------------------
     # Valid instance assembles without errors
     # -----------------------------------------------------------------------
-    instance = model()
+    instance = model(
+        status="completed",
+        subject={"reference": "Patient/123"},
+        code={
+            "coding": [
+                {
+                    "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl",
+                    "code": "C93304",
+                    "display": "Tumor Board Review",
+                }
+            ]
+        },
+    )
     assert isinstance(instance, model)
 
 

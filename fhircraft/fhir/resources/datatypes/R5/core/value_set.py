@@ -43,9 +43,8 @@ class ValueSetComposeIncludeConceptDesignation(BackboneElement):
         description="Additional ways how this designation would be used",
         default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The text value for this designation",
-        default=None,
     )
 
 
@@ -54,9 +53,8 @@ class ValueSetComposeIncludeConcept(BackboneElement):
     Specifies a concept to be included or excluded.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="code or expression from system",
-        default=None,
     )
     display: Optional[fhir.string] = Field(
         description="Text to display for this code for this value set in this valueset",
@@ -73,18 +71,15 @@ class ValueSetComposeIncludeFilter(BackboneElement):
     Select concepts by specifying a matching criterion based on the properties (including relationships) defined by the system, or on filters defined by the system. If multiple filters are specified within the include, they SHALL all be true.
     """
 
-    property_: Optional[fhir.code] = Field(
+    property_: fhir.code = Field(
         description="A property/filter defined by the code system",
-        default=None,
         alias="property",
     )
-    op: Optional[fhir.code] = Field(
+    op: fhir.code = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists",
-        default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="code from the system, or regex criteria, or boolean value for exists",
-        default=None,
     )
 
 
@@ -163,9 +158,8 @@ class ValueSetCompose(BackboneElement):
         description="Whether inactive codes are in the value set",
         default=None,
     )
-    include: Optional[ListType[ValueSetComposeInclude]] = Field(
+    include: ListType[ValueSetComposeInclude] = Field(
         description="Include one or more codes from a code system or other value set(s)",
-        default=None,
     )
     exclude: Optional[ListType[ValueSetComposeExclude]] = Field(
         description="Explicitly exclude codes from a code system or other value sets",
@@ -183,9 +177,8 @@ class ValueSetExpansionParameter(BackboneElement):
     A parameter that controlled the expansion process. These parameters may be used by users of expanded value sets to check whether the expansion is suitable for a particular purpose, or to pick the correct expansion.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name as assigned by the client or server",
-        default=None,
     )
     valueString: Optional[fhir.string] = Field(
         description="Value of the named parameter",
@@ -246,9 +239,8 @@ class ValueSetExpansionProperty(BackboneElement):
     A property defines an additional slot through which additional information can be provided about a concept.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Identifies the property on the concepts, and when referred to in operations",
-        default=None,
     )
     uri: Optional[fhir.uri] = Field(
         description="Formal identifier for the property",
@@ -285,9 +277,8 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
     A subproperty value for this concept.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Reference to ValueSet.expansion.property.code",
-        default=None,
     )
     valueCode: Optional[fhir.code] = Field(
         description="Value of the subproperty for this concept",
@@ -348,9 +339,8 @@ class ValueSetExpansionContainsProperty(BackboneElement):
     A property value for this concept.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Reference to ValueSet.expansion.property.code",
-        default=None,
     )
     valueCode: Optional[fhir.code] = Field(
         description="Value of the property for this concept",
@@ -469,9 +459,8 @@ class ValueSetExpansion(BackboneElement):
         description="Opaque urls for paging through expansion results",
         default=None,
     )
-    timestamp: Optional[fhir.dateTime] = Field(
+    timestamp: fhir.dateTime = Field(
         description="time ValueSet expansion happened",
-        default=None,
     )
     total: Optional[fhir.integer] = Field(
         description="Total number of codes in the expansion",
@@ -548,9 +537,8 @@ class ValueSet(DomainResource):
         description="Name for this value set (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

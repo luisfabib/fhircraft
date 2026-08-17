@@ -22,9 +22,8 @@ class TriggerDefinition(DataType):
 
     _type = "TriggerDefinition"
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="Name or URI that identifies the event",

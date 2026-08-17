@@ -33,9 +33,8 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Specific substance or pharmaceutical product considered to be responsible for event",
         default=None,
     )
-    manifestation: Optional[ListType[CodeableConcept]] = Field(
+    manifestation: ListType[CodeableConcept] = Field(
         description="Clinical symptoms/signs associated with the Event",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="Description of the event as a whole",
@@ -108,9 +107,8 @@ class AllergyIntolerance(DomainResource):
         description="code that identifies the allergy or intolerance",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who the sensitivity is for",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter when the allergy or intolerance was asserted",

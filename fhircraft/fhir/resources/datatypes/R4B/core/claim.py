@@ -49,9 +49,8 @@ class ClaimPayee(BackboneElement):
     The party to be reimbursed for cost of the products and services according to the terms of the policy.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category of recipient",
-        default=None,
     )
     party: Optional[Reference] = Field(
         description="Recipient reference",
@@ -64,13 +63,11 @@ class ClaimCareTeam(BackboneElement):
     The members of the team who provided the products and services.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Order of care team",
-        default=None,
     )
-    provider: Optional[Reference] = Field(
+    provider: Reference = Field(
         description="Practitioner or organization",
-        default=None,
     )
     responsible: Optional[fhir.boolean] = Field(
         description="Indicator of the lead practitioner",
@@ -91,13 +88,11 @@ class ClaimSupportingInfo(BackboneElement):
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Information instance identifier",
-        default=None,
     )
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="Classification of the supplied information",
-        default=None,
     )
     code: Optional[CodeableConcept] = Field(
         description="Type of information",
@@ -174,9 +169,8 @@ class ClaimDiagnosis(BackboneElement):
     Information about diagnoses relevant to the claim items.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Diagnosis instance identifier",
-        default=None,
     )
     diagnosisCodeableConcept: Optional[CodeableConcept] = Field(
         description="Nature of illness or problem",
@@ -221,9 +215,8 @@ class ClaimProcedure(BackboneElement):
     Procedures performed on the patient relevant to the billing items with the claim.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Procedure instance identifier",
-        default=None,
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
@@ -268,21 +261,18 @@ class ClaimInsurance(BackboneElement):
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Insurance instance identifier",
-        default=None,
     )
-    focal: Optional[fhir.boolean] = Field(
+    focal: fhir.boolean = Field(
         description="Coverage to be used for adjudication",
-        default=None,
     )
     identifier: Optional[Identifier] = Field(
         description="Pre-assigned Claim number",
         default=None,
     )
-    coverage: Optional[Reference] = Field(
+    coverage: Reference = Field(
         description="Insurance information",
-        default=None,
     )
     businessArrangement: Optional[fhir.string] = Field(
         description="Additional provider contract number",
@@ -303,9 +293,8 @@ class ClaimAccident(BackboneElement):
     Details of an accident which resulted in injuries which required the products and services listed in the claim.
     """
 
-    date: Optional[fhir.date_] = Field(
+    date: fhir.date_ = Field(
         description="When the incident occurred",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="The nature of the accident",
@@ -342,9 +331,8 @@ class ClaimItemDetailSubDetail(BackboneElement):
     A claim detail line. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Item instance identifier",
-        default=None,
     )
     revenue: Optional[CodeableConcept] = Field(
         description="Revenue or cost center code",
@@ -354,9 +342,8 @@ class ClaimItemDetailSubDetail(BackboneElement):
         description="Benefit classification",
         default=None,
     )
-    productOrService: Optional[CodeableConcept] = Field(
+    productOrService: CodeableConcept = Field(
         description="Billing, service, product, or drug code",
-        default=None,
     )
     modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
@@ -393,9 +380,8 @@ class ClaimItemDetail(BackboneElement):
     A claim detail line. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Item instance identifier",
-        default=None,
     )
     revenue: Optional[CodeableConcept] = Field(
         description="Revenue or cost center code",
@@ -405,9 +391,8 @@ class ClaimItemDetail(BackboneElement):
         description="Benefit classification",
         default=None,
     )
-    productOrService: Optional[CodeableConcept] = Field(
+    productOrService: CodeableConcept = Field(
         description="Billing, service, product, or drug code",
-        default=None,
     )
     modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
@@ -448,9 +433,8 @@ class ClaimItem(BackboneElement):
     A claim line. Either a simple  product or service or a 'group' of details which can each be a simple items or groups of sub-details.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Item instance identifier",
-        default=None,
     )
     careTeamSequence: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable careTeam members",
@@ -476,9 +460,8 @@ class ClaimItem(BackboneElement):
         description="Benefit classification",
         default=None,
     )
-    productOrService: Optional[CodeableConcept] = Field(
+    productOrService: CodeableConcept = Field(
         description="Billing, service, product, or drug code",
-        default=None,
     )
     modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
@@ -603,33 +586,28 @@ class Claim(DomainResource):
         description="Business Identifier for claim",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category or discipline",
-        default=None,
     )
     subType: Optional[CodeableConcept] = Field(
         description="More granular claim type",
         default=None,
     )
-    use: Optional[fhir.code] = Field(
+    use: fhir.code = Field(
         description="claim | preauthorization | predetermination",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="The recipient of the products and services",
-        default=None,
     )
     billablePeriod: Optional[Period] = Field(
         description="Relevant time frame for the claim",
         default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Resource creation date",
-        default=None,
     )
     enterer: Optional[Reference] = Field(
         description="Author of the claim",
@@ -639,13 +617,11 @@ class Claim(DomainResource):
         description="Target",
         default=None,
     )
-    provider: Optional[Reference] = Field(
+    provider: Reference = Field(
         description="Party responsible for the claim",
-        default=None,
     )
-    priority: Optional[CodeableConcept] = Field(
+    priority: CodeableConcept = Field(
         description="Desired processing ugency",
-        default=None,
     )
     fundsReserve: Optional[CodeableConcept] = Field(
         description="For whom to reserve funds",
@@ -691,9 +667,8 @@ class Claim(DomainResource):
         description="Clinical procedures performed",
         default=None,
     )
-    insurance: Optional[ListType[ClaimInsurance]] = Field(
+    insurance: ListType[ClaimInsurance] = Field(
         description="Patient insurance information",
-        default=None,
     )
     accident: Optional[ClaimAccident] = Field(
         description="Details of the event",

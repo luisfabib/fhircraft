@@ -21,9 +21,8 @@ class Expression(Element):
         description="Short name assigned to expression for reuse",
         default=None,
     )
-    language: Optional[fhir.code] = Field(
+    language: fhir.code = Field(
         description="text/cql | text/fhirpath | application/x-fhir-query | text/cql-identifier | text/cql-expression | etc.",
-        default=None,
     )
     expression: Optional[fhir.string] = Field(
         description="Expression in specified language",

@@ -57,9 +57,8 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
         description="Identifier for this procedure",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of procedure",
-        default=None,
     )
     datePeriod: Optional[Period] = Field(
         description="Date of procedure",

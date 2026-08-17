@@ -33,9 +33,8 @@ class ProvenanceAgent(BackboneElement):
         description="What the agents role was",
         default=None,
     )
-    who: Optional[Reference] = Field(
+    who: Reference = Field(
         description="Who participated",
-        default=None,
     )
     onBehalfOf: Optional[Reference] = Field(
         description="Who the agent is representing",
@@ -69,13 +68,11 @@ class ProvenanceEntity(BackboneElement):
     An entity used in this activity.
     """
 
-    role: Optional[fhir.code] = Field(
+    role: fhir.code = Field(
         description="derivation | revision | quotation | source | removal",
-        default=None,
     )
-    what: Optional[Reference] = Field(
+    what: Reference = Field(
         description="Identity of entity",
-        default=None,
     )
     agent: Optional[ListType[ProvenanceEntityAgent]] = Field(
         description="Entity is attributed to this agent",
@@ -103,9 +100,8 @@ class Provenance(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    target: Optional[ListType[Reference]] = Field(
+    target: ListType[Reference] = Field(
         description="Target Reference(s) (usually version specific)",
-        default=None,
     )
     occurredPeriod: Optional[Period] = Field(
         description="When the activity occurred",
@@ -115,9 +111,8 @@ class Provenance(DomainResource):
         description="When the activity occurred",
         default=None,
     )
-    recorded: Optional[fhir.instant] = Field(
+    recorded: fhir.instant = Field(
         description="When the activity was recorded / updated",
-        default=None,
     )
     policy: Optional[ListType[fhir.uri]] = Field(
         description="Policy or plan the activity was defined by",
@@ -135,9 +130,8 @@ class Provenance(DomainResource):
         description="Activity that occurred",
         default=None,
     )
-    agent: Optional[ListType[ProvenanceAgent]] = Field(
+    agent: ListType[ProvenanceAgent] = Field(
         description="Actor involved",
-        default=None,
     )
     entity: Optional[ListType[ProvenanceEntity]] = Field(
         description="An entity used in this activity",

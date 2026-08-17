@@ -29,9 +29,8 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
     General characteristics of this item.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="A code expressing the type of characteristic",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="A value for the characteristic",
@@ -175,9 +174,8 @@ class ManufacturedItemDefinitionComponent(BackboneElement):
     Physical parts of the manufactured item, that it is intrisically made from. This is distinct from the ingredients that are part of its chemical makeup.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Defining type of the component e.g. shell, layer, ink",
-        default=None,
     )
     function: Optional[ListType[CodeableConcept]] = Field(
         description="The function of this component within the item e.g. delivers active ingredient, masks taste",
@@ -218,17 +216,15 @@ class ManufacturedItemDefinition(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="A descriptive name applied to this item",
         default=None,
     )
-    manufacturedDoseForm: Optional[CodeableConcept] = Field(
+    manufacturedDoseForm: CodeableConcept = Field(
         description="Dose form as manufactured (before any necessary transformation)",
-        default=None,
     )
     unitOfPresentation: Optional[CodeableConcept] = Field(
         description="The \u201creal-world\u201d units in which the quantity of the item is described",

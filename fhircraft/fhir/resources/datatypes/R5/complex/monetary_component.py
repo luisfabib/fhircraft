@@ -19,9 +19,8 @@ class MonetaryComponent(DataType):
 
     _type = "MonetaryComponent"
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="base | surcharge | deduction | discount | tax | informational",
-        default=None,
     )
     code: Optional[CodeableConcept] = Field(
         description="Codes may be used to differentiate between kinds of taxes, surcharges, discounts etc.",

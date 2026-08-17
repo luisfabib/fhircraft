@@ -107,9 +107,8 @@ class DeviceRequest(DomainResource):
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
         default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
@@ -119,9 +118,8 @@ class DeviceRequest(DomainResource):
         description="True if the request is to stop or not to start using the device",
         default=None,
     )
-    code: Optional[CodeableReference] = Field(
+    code: CodeableReference = Field(
         description="Device requested",
-        default=None,
     )
     quantity: Optional[fhir.integer] = Field(
         description="Quantity of devices to supply",
@@ -131,9 +129,8 @@ class DeviceRequest(DomainResource):
         description="Device details",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Focus of request",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter motivating request",

@@ -36,17 +36,14 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
     """
 
-    deviceIdentifier: Optional[fhir.string] = Field(
+    deviceIdentifier: fhir.string = Field(
         description="The identifier that is to be associated with every Device that references this DeviceDefintiion for the issuer and jurisdiction provided in the DeviceDefinition.udiDeviceIdentifier",
-        default=None,
     )
-    issuer: Optional[fhir.uri] = Field(
+    issuer: fhir.uri = Field(
         description="The organization that assigns the identifier algorithm",
-        default=None,
     )
-    jurisdiction: Optional[fhir.uri] = Field(
+    jurisdiction: fhir.uri = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
-        default=None,
     )
     marketDistribution: Optional[
         ListType["DeviceDefinitionUdiDeviceIdentifierMarketDistribution"]
@@ -60,21 +57,17 @@ class DeviceDefinitionRegulatoryIdentifier(BackboneElement):
     Identifier associated with the regulatory documentation (certificates, technical documentation, post-market surveillance documentation and reports) of a set of device models sharing the same intended purpose, risk class and essential design and manufacturing characteristics. One example is the Basic UDI-DI in Europe.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="basic | master | license",
-        default=None,
     )
-    deviceIdentifier: Optional[fhir.string] = Field(
+    deviceIdentifier: fhir.string = Field(
         description="The identifier itself",
-        default=None,
     )
-    issuer: Optional[fhir.uri] = Field(
+    issuer: fhir.uri = Field(
         description="The organization that issued this identifier",
-        default=None,
     )
-    jurisdiction: Optional[fhir.uri] = Field(
+    jurisdiction: fhir.uri = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
-        default=None,
     )
 
 class DeviceDefinitionDeviceName(BackboneElement):
@@ -82,13 +75,11 @@ class DeviceDefinitionDeviceName(BackboneElement):
     The name or names of the device as given by the manufacturer.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="A name that is used to refer to the device",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="registered-name | user-friendly-name | patient-reported-name",
-        default=None,
     )
 
 class DeviceDefinitionClassification(BackboneElement):
@@ -96,9 +87,8 @@ class DeviceDefinitionClassification(BackboneElement):
     What kind of device or device system this is.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="A classification or risk class of the device model",
-        default=None,
     )
     justification: Optional[ListType[RelatedArtifact]] = Field(
         description="Further information qualifying this classification of the device model",
@@ -114,9 +104,8 @@ class DeviceDefinitionConformsTo(BackboneElement):
         description="Describes the common type of the standard, specification, or formal guidance",
         default=None,
     )
-    specification: Optional[CodeableConcept] = Field(
+    specification: CodeableConcept = Field(
         description="Identifies the standard, specification, or formal guidance that the device adheres to the Device Specification type",
-        default=None,
     )
     version: Optional[ListType[fhir.string]] = Field(
         description="The specific form or variant of the standard, specification or formal guidance",
@@ -132,9 +121,8 @@ class DeviceDefinitionHasPart(BackboneElement):
     A device that is part (for example a component) of the present device.
     """
 
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="Reference to the part",
-        default=None,
     )
     count: Optional[fhir.integer] = Field(
         description="Number of occurrences of the part",
@@ -160,13 +148,11 @@ class DeviceDefinitionUdiDeviceIdentifierMarketDistribution(BackboneElement):
     Indicates where and when the device is available on the market.
     """
 
-    marketPeriod: Optional[Period] = Field(
+    marketPeriod: Period = Field(
         description="Begin and end dates for the commercial distribution of the device",
-        default=None,
     )
-    subJurisdiction: Optional[fhir.uri] = Field(
+    subJurisdiction: fhir.uri = Field(
         description="National state or territory where the device is commercialized",
-        default=None,
     )
 
 class DeviceDefinitionPackagingUdiDeviceIdentifier(BackboneElement):
@@ -238,9 +224,8 @@ class DeviceDefinitionVersion(BackboneElement):
         description="The hardware or software module of the device to which the version applies",
         default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The version text",
-        default=None,
     )
 
 class DeviceDefinitionProperty(BackboneElement):
@@ -248,9 +233,8 @@ class DeviceDefinitionProperty(BackboneElement):
     Static or essentially fixed characteristics or features of this kind of device that are otherwise not captured in more specific attributes, e.g., time or timing attributes, resolution, accuracy, and physical attributes.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="code that specifies the property being represented",
-        default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Value of the property",
@@ -310,13 +294,11 @@ class DeviceDefinitionLink(BackboneElement):
     An associated device, attached to, used with, communicating with or linking a previous or new device model to the focal device.
     """
 
-    relation: Optional[Coding] = Field(
+    relation: Coding = Field(
         description="The type indicates the relationship of the related device to the device instance",
-        default=None,
     )
-    relatedDevice: Optional[CodeableReference] = Field(
+    relatedDevice: CodeableReference = Field(
         description="A reference to the linked device",
-        default=None,
     )
 
 class DeviceDefinitionMaterial(BackboneElement):
@@ -324,9 +306,8 @@ class DeviceDefinitionMaterial(BackboneElement):
     A substance used to create the material(s) of which the device is made.
     """
 
-    substance: Optional[CodeableConcept] = Field(
+    substance: CodeableConcept = Field(
         description="A relevant substance that the device contains, may contain, or is made of",
-        default=None,
     )
     alternate: Optional[fhir.boolean] = Field(
         description="Indicates an alternative material of the device",
@@ -376,17 +357,15 @@ class DeviceDefinitionCorrectiveAction(BackboneElement):
     Tracking of latest field safety corrective action.
     """
 
-    recall: Optional[fhir.boolean] = Field(
+    recall: fhir.boolean = Field(
         description="Whether the corrective action was a recall",
-        default=None,
     )
     scope: Optional[fhir.code] = Field(
         description="model | lot-numbers | serial-numbers",
         default=None,
     )
-    period: Optional[Period] = Field(
+    period: Period = Field(
         description="Start and end dates of the  corrective action",
-        default=None,
     )
 
 class DeviceDefinitionChargeItem(BackboneElement):
@@ -394,13 +373,11 @@ class DeviceDefinitionChargeItem(BackboneElement):
     Billing code or reference associated with the device.
     """
 
-    chargeItemCode: Optional[CodeableReference] = Field(
+    chargeItemCode: CodeableReference = Field(
         description="The code or reference for the charge item",
-        default=None,
     )
-    count: Optional[Quantity] = Field(
+    count: Quantity = Field(
         description="Coefficient applicable to the billing code",
-        default=None,
     )
     effectivePeriod: Optional[Period] = Field(
         description="A specific time period in which this charge item applies",

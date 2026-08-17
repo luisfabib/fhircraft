@@ -63,9 +63,8 @@ class PatientCommunication(BackboneElement):
     A language which may be used to communicate with the patient about his or her health.
     """
 
-    language: Optional[CodeableConcept] = Field(
+    language: CodeableConcept = Field(
         description="The language which can be used to communicate with the patient about his or her health",
-        default=None,
     )
     preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
@@ -77,13 +76,11 @@ class PatientLink(BackboneElement):
     Link to another patient resource that concerns the same actual patient.
     """
 
-    other: Optional[Reference] = Field(
+    other: Reference = Field(
         description="The other patient or related person resource that the link refers to",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="replaced-by | replaces | refer | seealso",
-        default=None,
     )
 
 class Patient(DomainResource):

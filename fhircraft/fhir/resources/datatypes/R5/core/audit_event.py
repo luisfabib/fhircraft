@@ -30,9 +30,8 @@ class AuditEventOutcome(BackboneElement):
     Indicates whether the event succeeded or failed. A free text descripiton can be given in outcome.text.
     """
 
-    code: Optional[Coding] = Field(
+    code: Coding = Field(
         description="Whether the event succeeded or failed",
-        default=None,
     )
     detail: Optional[ListType[CodeableConcept]] = Field(
         description="Additional outcome detail",
@@ -53,9 +52,8 @@ class AuditEventAgent(BackboneElement):
         description="Agent role in the event",
         default=None,
     )
-    who: Optional[Reference] = Field(
+    who: Reference = Field(
         description="Identifier of who",
-        default=None,
     )
     requestor: Optional[fhir.boolean] = Field(
         description="Whether user is initiator",
@@ -112,9 +110,8 @@ class AuditEventSource(BackboneElement):
         description="Logical source location within the enterprise",
         default=None,
     )
-    observer: Optional[Reference] = Field(
+    observer: Reference = Field(
         description="The identity of source detecting the event",
-        default=None,
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of source where event originated",
@@ -127,9 +124,8 @@ class AuditEventEntityDetail(BackboneElement):
     Tagged value pairs for conveying additional information about the entity.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Name of the property",
-        default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Property value",
@@ -312,9 +308,8 @@ class AuditEvent(DomainResource):
         description="Type/identifier of event",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Specific type of event",
-        default=None,
     )
     action: Optional[fhir.code] = Field(
         description="Type of action performed during the event",
@@ -332,9 +327,8 @@ class AuditEvent(DomainResource):
         description="When the activity occurred",
         default=None,
     )
-    recorded: Optional[fhir.instant] = Field(
+    recorded: fhir.instant = Field(
         description="time when the event was recorded",
-        default=None,
     )
     outcome: Optional[AuditEventOutcome] = Field(
         description="Whether the event succeeded or failed",
@@ -356,13 +350,11 @@ class AuditEvent(DomainResource):
         description="Encounter within which this event occurred or which the event is tightly associated",
         default=None,
     )
-    agent: Optional[ListType[AuditEventAgent]] = Field(
+    agent: ListType[AuditEventAgent] = Field(
         description="Actor involved in the event",
-        default=None,
     )
-    source: Optional[AuditEventSource] = Field(
+    source: AuditEventSource = Field(
         description="Audit Event Reporter",
-        default=None,
     )
     entity: Optional[ListType[AuditEventEntity]] = Field(
         description="Data or objects used",

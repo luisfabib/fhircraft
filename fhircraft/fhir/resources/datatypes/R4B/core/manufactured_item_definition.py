@@ -26,9 +26,8 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
     General characteristics of this item.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="A code expressing the type of characteristic",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="A value for the characteristic",
@@ -94,13 +93,11 @@ class ManufacturedItemDefinition(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
-    manufacturedDoseForm: Optional[CodeableConcept] = Field(
+    manufacturedDoseForm: CodeableConcept = Field(
         description="Dose form as manufactured (before any necessary transformation)",
-        default=None,
     )
     unitOfPresentation: Optional[CodeableConcept] = Field(
         description="The \u201creal world\u201d units in which the quantity of the item is described",

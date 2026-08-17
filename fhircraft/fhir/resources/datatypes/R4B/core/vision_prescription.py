@@ -26,13 +26,11 @@ class VisionPrescriptionLensSpecificationPrism(BackboneElement):
     Allows for adjustment on two axis.
     """
 
-    amount: Optional[fhir.decimal] = Field(
+    amount: fhir.decimal = Field(
         description="Amount of adjustment",
-        default=None,
     )
-    base: Optional[fhir.code] = Field(
+    base: fhir.code = Field(
         description="up | down | in | out",
-        default=None,
     )
 
 class VisionPrescriptionLensSpecification(BackboneElement):
@@ -40,13 +38,11 @@ class VisionPrescriptionLensSpecification(BackboneElement):
     Contain the details of  the individual lens specifications and serves as the authorization for the fullfillment by certified professionals.
     """
 
-    product: Optional[CodeableConcept] = Field(
+    product: CodeableConcept = Field(
         description="Product to be supplied",
-        default=None,
     )
-    eye: Optional[fhir.code] = Field(
+    eye: fhir.code = Field(
         description="right | left",
-        default=None,
     )
     sphere: Optional[fhir.decimal] = Field(
         description="Power of the lens",
@@ -122,31 +118,25 @@ class VisionPrescription(DomainResource):
         description="Business Identifier for vision prescription",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Response creation date",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who prescription is for",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Created during encounter / admission / stay",
         default=None,
     )
-    dateWritten: Optional[fhir.dateTime] = Field(
+    dateWritten: fhir.dateTime = Field(
         description="When prescription was authorized",
-        default=None,
     )
-    prescriber: Optional[Reference] = Field(
+    prescriber: Reference = Field(
         description="Who authorized the vision prescription",
-        default=None,
     )
-    lensSpecification: Optional[ListType[VisionPrescriptionLensSpecification]] = Field(
+    lensSpecification: ListType[VisionPrescriptionLensSpecification] = Field(
         description="Vision lens authorization",
-        default=None,
     )

@@ -102,13 +102,11 @@ class SupplyRequest(DomainResource):
         description="The patient for who the supply request is for",
         default=None,
     )
-    item: Optional[CodeableReference] = Field(
+    item: CodeableReference = Field(
         description="Medication, Substance, or Device requested to be supplied",
-        default=None,
     )
-    quantity: Optional[Quantity] = Field(
+    quantity: Quantity = Field(
         description="The requested amount of the item indicated",
-        default=None,
     )
     parameter: Optional[ListType[SupplyRequestParameter]] = Field(
         description="Ordered item details",

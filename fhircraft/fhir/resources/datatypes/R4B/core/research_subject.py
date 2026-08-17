@@ -43,21 +43,18 @@ class ResearchSubject(DomainResource):
         description="Business Identifier for research subject in a study",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="Start and end of participation",
         default=None,
     )
-    study: Optional[Reference] = Field(
+    study: Reference = Field(
         description="Study subject is part of",
-        default=None,
     )
-    individual: Optional[Reference] = Field(
+    individual: Reference = Field(
         description="Who is part of study",
-        default=None,
     )
     assignedArm: Optional[fhir.string] = Field(
         description="What path should be followed",

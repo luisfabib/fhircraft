@@ -34,9 +34,8 @@ class OrganizationQualification(BackboneElement):
         description="An identifier for this qualification for the organization",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Coded representation of the qualification",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="Period during which the qualification is valid",

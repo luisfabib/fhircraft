@@ -33,9 +33,8 @@ class InvoiceParticipant(BackboneElement):
         description="Type of involvement in creation of this Invoice",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Individual who was involved",
-        default=None,
     )
 
 class InvoiceLineItem(BackboneElement):
@@ -113,9 +112,8 @@ class Invoice(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | issued | balanced | cancelled | entered-in-error",
-        default=None,
     )
     cancelledReason: Optional[fhir.string] = Field(
         description="Reason for cancellation of this Invoice",

@@ -50,21 +50,17 @@ class Slot(DomainResource):
         description="The style of appointment or patient that may be booked in the slot (not service type)",
         default=None,
     )
-    schedule: Optional[Reference] = Field(
+    schedule: Reference = Field(
         description="The schedule resource that this slot defines an interval of status information",
-        default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="busy | free | busy-unavailable | busy-tentative | entered-in-error",
-        default=None,
     )
-    start: Optional[fhir.instant] = Field(
+    start: fhir.instant = Field(
         description="Date/time that the slot is to begin",
-        default=None,
     )
-    end: Optional[fhir.instant] = Field(
+    end: fhir.instant = Field(
         description="Date/time that the slot is to conclude",
-        default=None,
     )
     overbooked: Optional[fhir.boolean] = Field(
         description="This slot has already been overbooked, appointments are unlikely to be accepted for this time",

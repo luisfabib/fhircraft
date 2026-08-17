@@ -131,17 +131,15 @@ class MedicationRequest(DomainResource):
         description="External ids for this request",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | on-hold | cancelled | completed | entered-in-error | stopped | draft | unknown",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
         default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of medication usage",
@@ -171,9 +169,8 @@ class MedicationRequest(DomainResource):
         description="Medication to be taken",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who or group medication request is for",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter created as part of encounter/admission/stay",

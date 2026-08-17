@@ -28,9 +28,8 @@ class MedicinalProductPharmaceuticalCharacteristics(BackboneElement):
     Characteristics e.g. a products onset of action.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="A coded characteristic",
-        default=None,
     )
     status: Optional[CodeableConcept] = Field(
         description="The status of characteristic e.g. assigned or pending",
@@ -45,13 +44,11 @@ class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawal
     A species specific time during which consumption of animal product is not appropriate.
     """
 
-    tissue: Optional[CodeableConcept] = Field(
+    tissue: CodeableConcept = Field(
         description="Coded expression for the type of tissue for which the withdrawal period applues, e.g. meat, milk",
-        default=None,
     )
-    value: Optional[Quantity] = Field(
+    value: Quantity = Field(
         description="A value for the time",
-        default=None,
     )
     supportingInformation: Optional[fhir.string] = Field(
         description="Extra information about the withdrawal period",
@@ -64,9 +61,8 @@ class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies(BackboneE
     A species for which this route applies.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Coded expression for the species",
-        default=None,
     )
     withdrawalPeriod: Optional[
         ListType[
@@ -83,9 +79,8 @@ class MedicinalProductPharmaceuticalRouteOfAdministration(BackboneElement):
     The path by which the pharmaceutical product is taken into or makes contact with the body.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Coded expression for the route",
-        default=None,
     )
     firstDose: Optional[Quantity] = Field(
         description="The first dose (dose quantity) administered in humans can be specified, for a product under investigation, using a numerical value and its unit of measurement",
@@ -142,9 +137,8 @@ class MedicinalProductPharmaceutical(DomainResource):
         description="An identifier for the pharmaceutical medicinal product",
         default=None,
     )
-    administrableDoseForm: Optional[CodeableConcept] = Field(
+    administrableDoseForm: CodeableConcept = Field(
         description="The administrable dose form, after necessary reconstitution",
-        default=None,
     )
     unitOfPresentation: Optional[CodeableConcept] = Field(
         description="Todo",

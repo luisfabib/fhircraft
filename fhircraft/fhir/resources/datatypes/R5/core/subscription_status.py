@@ -24,9 +24,8 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
     Detailed information about events relevant to this subscription notification.
     """
 
-    eventNumber: Optional[fhir.integer64] = Field(
+    eventNumber: fhir.integer64 = Field(
         description="Sequencing index of this event",
-        default=None,
     )
     timestamp: Optional[fhir.instant] = Field(
         description="The instant this event occurred",
@@ -54,9 +53,8 @@ class SubscriptionStatus(DomainResource):
         description="requested | active | error | off | entered-in-error",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="handshake | heartbeat | event-notification | query-status | query-event",
-        default=None,
     )
     eventsSinceSubscriptionStart: Optional[fhir.integer64] = Field(
         description="Events since the Subscription was created",
@@ -66,9 +64,8 @@ class SubscriptionStatus(DomainResource):
         description="Detailed information about any events relevant to this notification",
         default=None,
     )
-    subscription: Optional[Reference] = Field(
+    subscription: Reference = Field(
         description="Reference to the Subscription responsible for this notification",
-        default=None,
     )
     topic: Optional[fhir.canonical] = Field(
         description="Reference to the SubscriptionTopic this notification relates to",

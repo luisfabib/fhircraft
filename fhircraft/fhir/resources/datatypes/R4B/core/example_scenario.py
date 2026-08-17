@@ -24,13 +24,11 @@ class ExampleScenarioActor(BackboneElement):
     Actor participating in the resource.
     """
 
-    actorId: Optional[fhir.string] = Field(
+    actorId: fhir.string = Field(
         description="ID or acronym of the actor",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="person | entity",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="The name of the actor as shown in the page",
@@ -47,13 +45,11 @@ class ExampleScenarioInstanceVersion(BackboneElement):
     A specific version of the resource.
     """
 
-    versionId: Optional[fhir.string] = Field(
+    versionId: fhir.string = Field(
         description="The identifier of a specific version of a resource",
-        default=None,
     )
-    description: Optional[fhir.markdown] = Field(
+    description: fhir.markdown = Field(
         description="The description of the resource version",
-        default=None,
     )
 
 
@@ -62,9 +58,8 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
     Resources contained in the instance (e.g. the observations contained in a bundle).
     """
 
-    resourceId: Optional[fhir.string] = Field(
+    resourceId: fhir.string = Field(
         description="Each resource contained in the instance",
-        default=None,
     )
     versionId: Optional[fhir.string] = Field(
         description="A specific version of a resource contained in the instance",
@@ -77,13 +72,11 @@ class ExampleScenarioInstance(BackboneElement):
     Each resource and each version that is present in the workflow.
     """
 
-    resourceId: Optional[fhir.string] = Field(
+    resourceId: fhir.string = Field(
         description="The id of the resource for referencing",
-        default=None,
     )
-    resourceType: Optional[fhir.string] = Field(
+    resourceType: fhir.string = Field(
         description="The type of the resource",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="A short name for the resource instance",
@@ -125,9 +118,8 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
     Each interaction or action.
     """
 
-    number: Optional[fhir.string] = Field(
+    number: fhir.string = Field(
         description="The sequential number of the interaction",
-        default=None,
     )
     type: Optional[fhir.string] = Field(
         description="The type of operation - CRUD",
@@ -172,9 +164,8 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
     Indicates an alternative step that can be taken instead of the operations on the base step in exceptional/atypical circumstances.
     """
 
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Label for alternative",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="A human-readable description of each option",
@@ -214,9 +205,8 @@ class ExampleScenarioProcess(BackboneElement):
     Each major process - a group of operations.
     """
 
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="The diagram title of the group of operations",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="A longer description of the group of operations",
@@ -273,9 +263,8 @@ class ExampleScenario(DomainResource):
         description="Name for this example scenario (computer friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

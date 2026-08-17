@@ -29,9 +29,8 @@ class AdverseEventParticipant(BackboneElement):
         description="Type of involvement",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who was involved in the adverse event or the potential adverse event",
-        default=None,
     )
 
 
@@ -226,13 +225,11 @@ class AdverseEvent(DomainResource):
         description="Business identifier for the event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="in-progress | completed | entered-in-error | unknown",
-        default=None,
     )
-    actuality: Optional[fhir.code] = Field(
+    actuality: fhir.code = Field(
         description="actual | potential",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="wrong-patient | procedure-mishap | medication-mishap | device | unsafe-physical-environment | hospital-aquired-infection | wrong-body-site",
@@ -242,9 +239,8 @@ class AdverseEvent(DomainResource):
         description="Event or incident that occurred or was averted",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Subject impacted by event",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="The Encounter associated with the start of the AdverseEvent",

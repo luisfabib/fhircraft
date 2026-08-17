@@ -27,17 +27,15 @@ class MessageDefinitionFocus(BackboneElement):
     Identifies the resource (or resources) that are being addressed by the event.  For example, the Encounter for an admit message or two Account records for a merge.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Type of resource",
-        default=None,
     )
     profile: Optional[fhir.canonical] = Field(
         description="Profile that must be adhered to by focus",
         default=None,
     )
-    min: Optional[fhir.unsignedInt] = Field(
+    min: fhir.unsignedInt = Field(
         description="Minimum number of focuses of this type",
-        default=None,
     )
     max: Optional[fhir.string] = Field(
         description="Maximum number of focuses of this type",
@@ -50,9 +48,8 @@ class MessageDefinitionAllowedResponse(BackboneElement):
     Indicates what types of messages may be sent as an application-level response to this message.
     """
 
-    message: Optional[fhir.canonical] = Field(
+    message: fhir.canonical = Field(
         description="Reference to allowed message definition response",
-        default=None,
     )
     situation: Optional[fhir.markdown] = Field(
         description="When should this response be used",
@@ -105,17 +102,15 @@ class MessageDefinition(DomainResource):
         description="Takes the place of",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[fhir.dateTime] = Field(
+    date: fhir.dateTime = Field(
         description="Date last changed",
-        default=None,
     )
     publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",

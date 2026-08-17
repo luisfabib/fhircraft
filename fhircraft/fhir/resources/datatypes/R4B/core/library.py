@@ -71,17 +71,15 @@ class Library(DomainResource):
         description="Subordinate title of the library",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="logic-library | model-definition | asset-collection | module-definition",
-        default=None,
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
         description="Type of individual the library content is focused on",

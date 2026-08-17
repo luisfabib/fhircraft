@@ -193,17 +193,15 @@ class GenomicStudy(DomainResource):
         description="Identifiers for this genomic study",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | available | cancelled | entered-in-error | unknown",
-        default=None,
     )
     type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of the study (e.g., Familial variant segregation, Functional variation detection, or Gene expression profiling)",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="The primary subject of the genomic study",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="The healthcare event with which this genomics study is associated",

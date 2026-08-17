@@ -185,9 +185,8 @@ class EvidenceVariable(DomainResource):
         description="Subordinate title of the EvidenceVariable",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
@@ -261,9 +260,8 @@ class EvidenceVariable(DomainResource):
         description="dichotomous | continuous | descriptive",
         default=None,
     )
-    characteristic: Optional[ListType[EvidenceVariableCharacteristic]] = Field(
+    characteristic: ListType[EvidenceVariableCharacteristic] = Field(
         description="What defines the members of the evidence element",
-        default=None,
     )
 
     @model_validator(mode="after")

@@ -116,9 +116,8 @@ class QuestionnaireResponseItem(BackboneElement):
     A group or question item from the original questionnaire for which answers are provided.
     """
 
-    linkId: Optional[fhir.string] = Field(
+    linkId: fhir.string = Field(
         description="Pointer to specific item from Questionnaire",
-        default=None,
     )
     definition: Optional[fhir.uri] = Field(
         description="ElementDefinition - details for the item",
@@ -159,13 +158,11 @@ class QuestionnaireResponse(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    questionnaire: Optional[fhir.canonical] = Field(
+    questionnaire: fhir.canonical = Field(
         description="canonical URL of Questionnaire being answered",
-        default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="in-progress | completed | amended | entered-in-error | stopped",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="The subject of the questions",

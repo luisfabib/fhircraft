@@ -26,9 +26,8 @@ class DeviceAssociationOperation(BackboneElement):
     The details about the device when it is in use to describe its operation.
     """
 
-    status: Optional[CodeableConcept] = Field(
+    status: CodeableConcept = Field(
         description="Device operational condition",
-        default=None,
     )
     operator: Optional[ListType[Reference]] = Field(
         description="The individual performing the action enabled by the device",
@@ -52,17 +51,15 @@ class DeviceAssociation(DomainResource):
         description="Instance identifier",
         default=None,
     )
-    device: Optional[Reference] = Field(
+    device: Reference = Field(
         description="Reference to the devices associated with the patient or group",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Describes the relationship between the device and subject",
         default=None,
     )
-    status: Optional[CodeableConcept] = Field(
+    status: CodeableConcept = Field(
         description="implanted | explanted | attached | entered-in-error | unknown",
-        default=None,
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="The reasons given for the current association status",

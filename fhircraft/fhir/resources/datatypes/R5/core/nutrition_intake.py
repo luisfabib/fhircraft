@@ -31,13 +31,11 @@ class NutritionIntakeConsumedItem(BackboneElement):
     What food or fluid product or item was consumed.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="The type of food or fluid product",
-        default=None,
     )
-    nutritionProduct: Optional[CodeableReference] = Field(
+    nutritionProduct: CodeableReference = Field(
         description="code that identifies the food or fluid product that was consumed",
-        default=None,
     )
     schedule: Optional[Timing] = Field(
         description="Scheduled frequency of consumption",
@@ -66,13 +64,11 @@ class NutritionIntakeIngredientLabel(BackboneElement):
     Total nutrient amounts for the whole meal, product, serving, etc.
     """
 
-    nutrient: Optional[CodeableReference] = Field(
+    nutrient: CodeableReference = Field(
         description="Total nutrient consumed",
-        default=None,
     )
-    amount: Optional[Quantity] = Field(
+    amount: Quantity = Field(
         description="Total amount of nutrient consumed",
-        default=None,
     )
 
 
@@ -85,9 +81,8 @@ class NutritionIntakePerformer(BackboneElement):
         description="Type of performer",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who performed the intake",
-        default=None,
     )
 
 
@@ -120,9 +115,8 @@ class NutritionIntake(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
-        default=None,
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for current status",
@@ -132,9 +126,8 @@ class NutritionIntake(DomainResource):
         description="code representing an overall type of nutrition intake",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who is/was consuming the food or fluid",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter associated with NutritionIntake",
@@ -160,9 +153,8 @@ class NutritionIntake(DomainResource):
         description="Person or organization that provided the information about the consumption of this food or fluid",
         default=None,
     )
-    consumedItem: Optional[ListType[NutritionIntakeConsumedItem]] = Field(
+    consumedItem: ListType[NutritionIntakeConsumedItem] = Field(
         description="What food or fluid product or item was consumed",
-        default=None,
     )
     ingredientLabel: Optional[ListType[NutritionIntakeIngredientLabel]] = Field(
         description="Total nutrient for the whole meal, product, serving",

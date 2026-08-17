@@ -32,9 +32,8 @@ class ImagingStudySeriesPerformer(BackboneElement):
         description="Type of performance",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who performed the series",
-        default=None,
     )
 
 class ImagingStudySeriesInstance(BackboneElement):
@@ -42,13 +41,11 @@ class ImagingStudySeriesInstance(BackboneElement):
     A single SOP instance within the series, e.g. an image, or presentation state.
     """
 
-    uid: Optional[fhir.id_] = Field(
+    uid: fhir.id_ = Field(
         description="DICOM SOP Instance UID",
-        default=None,
     )
-    sopClass: Optional[Coding] = Field(
+    sopClass: Coding = Field(
         description="DICOM class type",
-        default=None,
     )
     number: Optional[fhir.unsignedInt] = Field(
         description="The number of this instance in the series",
@@ -64,17 +61,15 @@ class ImagingStudySeries(BackboneElement):
     Each study has one or more series of images or other content.
     """
 
-    uid: Optional[fhir.id_] = Field(
+    uid: fhir.id_ = Field(
         description="DICOM Series Instance UID for the series",
-        default=None,
     )
     number: Optional[fhir.unsignedInt] = Field(
         description="Numeric identifier of this series",
         default=None,
     )
-    modality: Optional[CodeableConcept] = Field(
+    modality: CodeableConcept = Field(
         description="The modality used for this series",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="A short human readable summary of the series",
@@ -126,17 +121,15 @@ class ImagingStudy(DomainResource):
         description="Identifiers for the whole study",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | available | cancelled | entered-in-error | unknown",
-        default=None,
     )
     modality: Optional[ListType[CodeableConcept]] = Field(
         description="All of the distinct values for series\u0027 modalities",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who or what is the subject of the study",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter with which this imaging study is associated",

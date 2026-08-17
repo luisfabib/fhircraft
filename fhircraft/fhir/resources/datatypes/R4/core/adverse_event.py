@@ -46,9 +46,8 @@ class AdverseEventSuspectEntity(BackboneElement):
     Describes the entity that is suspected to have caused the adverse event.
     """
 
-    instance: Optional[Reference] = Field(
+    instance: Reference = Field(
         description="Refers to the specific entity that caused the adverse event",
-        default=None,
     )
     causality: Optional[ListType[AdverseEventSuspectEntityCausality]] = Field(
         description="Information on the possible cause of the event",
@@ -80,9 +79,8 @@ class AdverseEvent(DomainResource):
         description="Business identifier for the event",
         default=None,
     )
-    actuality: Optional[fhir.code] = Field(
+    actuality: fhir.code = Field(
         description="actual | potential",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="product-problem | product-quality | product-use-error | wrong-dose | incorrect-prescribing-information | wrong-technique | wrong-route-of-administration | wrong-rate | wrong-duration | wrong-time | expired-drug | medical-device-use-error | problem-different-manufacturer | unsafe-physical-environment",
@@ -92,9 +90,8 @@ class AdverseEvent(DomainResource):
         description="Type of the event itself in relation to the subject",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Subject impacted by event",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter created as part of",
