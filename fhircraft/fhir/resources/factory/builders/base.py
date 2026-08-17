@@ -283,13 +283,13 @@ class Builder(ABC):
                 default = node.fixed
             elif node.pattern is not None:
                 default = node.pattern
-            else:
+            elif not node.is_required or node.is_polymorphic_type:
                 default = None
 
         effective_is_array = (
             node.base_is_array if node.base_is_array is not None else node.is_array
         )
-        if effective_is_array and default is not None:
+        if effective_is_array and default not in [None, PydanticUndefined]:
             default = ensure_list(default)
 
         annotation = type
@@ -298,7 +298,7 @@ class Builder(ABC):
 
         if node.is_prohibited:
             annotation = None
-        else:
+        elif not node.is_required or node.is_polymorphic_type:
             annotation = Optional[annotation]
 
         return FieldInformation(

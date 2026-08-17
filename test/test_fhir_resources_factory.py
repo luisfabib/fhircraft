@@ -1171,9 +1171,9 @@ def test_factory__construct_diff_min_cardinality(factory: FHIRModelFactory):
     element = mock_resource.model_fields.get("id")
     assert element is not None, "Profiled element field not found in model fields"
     assert (
-        element.annotation == Optional[str]
+        element.annotation == str
     ), "Profiled element field does not have correct type annotation"
-
+    assert element.is_required(), "Profiled element field is not marked as required"
     # Assert metadata
     element_metadata = element.metadata
     assert element_metadata is not None, "No metadata found for profiled element"

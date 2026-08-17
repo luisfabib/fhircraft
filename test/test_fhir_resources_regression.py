@@ -137,10 +137,8 @@ def test_regression_issue_255(factory):
     # -----------------------------------------------------------------------
     from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept
 
-    code_annotation = model.model_fields["code"].annotation
-    # annotation is Optional[ProfileExampleCode] i.e. Union[ProfileExampleCode, None]
-    code_model = next(a for a in get_args(code_annotation) if a is not type(None))
-
+    code_model = model.model_fields["code"].annotation
+    assert code_model is not None
     assert code_model.__name__ == "ProfileExampleCode"
     assert issubclass(code_model, CodeableConcept)
     assert "coding" in code_model.model_fields
@@ -286,13 +284,13 @@ def test_regression_issue_258(factory):
     # Pattern validator rejects non-matching instances at runtime
     # -----------------------------------------------------------------------
     with pytest.raises(pydantic.ValidationError):
-        slice_model(coding=[{"system": "http://wrong.org", "code": "WRONG"}])
+        slice_model(coding=[{"system": "http://wrong.org", "code": "WRONG"}])  # type: ignore
 
     # -----------------------------------------------------------------------
     # Valid instance assembles without errors
     # -----------------------------------------------------------------------
     instance = slice_model(
-        coding=[
+        coding=[  # type: ignore
             Coding(
                 system="http://example.org", code="12345-6", display="Fixed Category"
             )
@@ -486,8 +484,8 @@ def test_regression_issue_263(factory):
     # -----------------------------------------------------------------------
     # VitalspanelCode – backbone for Observation.code
     # -----------------------------------------------------------------------
-    code_annotation = model.model_fields["code"].annotation
-    code_model = next(a for a in get_args(code_annotation) if a is not type(None))
+    code_model = model.model_fields["code"].annotation
+    assert code_model is not None
     assert issubclass(code_model, CodeableConcept)
     assert "coding" in code_model.model_fields
 
@@ -521,15 +519,15 @@ def test_regression_issue_263(factory):
     # Fixed-value validators reject wrong values at runtime
     # -----------------------------------------------------------------------
     with pytest.raises(pydantic.ValidationError):
-        slice_model(system="http://wrong.org", code="85353-1")
+        slice_model(system="http://wrong.org", code="85353-1")  # type: ignore
 
     with pytest.raises(pydantic.ValidationError):
-        slice_model(system="http://loinc.org", code="WRONG")
+        slice_model(system="http://loinc.org", code="WRONG")  # type: ignore
 
     # -----------------------------------------------------------------------
     # Valid instance assembles without errors
     # -----------------------------------------------------------------------
-    instance = slice_model(system="http://loinc.org", code="85353-1")
+    instance = slice_model(system="http://loinc.org", code="85353-1")  # type: ignore
     assert instance.system == "http://loinc.org"
     assert instance.code == "85353-1"
 
@@ -544,7 +542,7 @@ def test_regression_issue_262():
     from fhircraft.fhir.resources.validators import validate_element_constraint
 
     class ExamplePatientName(HumanName):
-        family: Optional[String] = Field(
+        family: Optional[String] = Field(  # type: ignore
             description="(USCDI) Family name (often called \u0027Surname\u0027)",
             default=None,
         )
@@ -560,7 +558,7 @@ def test_regression_issue_262():
                 profile=["http://example.org/fhir/StructureDefinition/example"]
             ),
         )
-        name: Optional[List[ExamplePatientName]] = Field(
+        name: Optional[List[ExamplePatientName]] = Field(  # type: ignore
             description="(USCDI) A name associated with the patient",
             default=None,
         )
@@ -664,12 +662,11 @@ def test_regression_issue_265(factory):
     # category field is Optional[List[CodeableConcept]] – no slice model
     # -----------------------------------------------------------------------
     category_annotation = model.model_fields["category"].annotation
-    list_type = next(a for a in get_args(category_annotation) if a is not type(None))
-    item_type = get_args(list_type)[0]
+    item_type = get_args(category_annotation)[0]
     assert item_type is CodeableConcept
 
     # No FHIRSliceModel subclasses should appear anywhere in the field annotation
-    all_args = get_args(list_type)
+    all_args = get_args(category_annotation)
     for arg in all_args:
         if isinstance(arg, type):
             assert not issubclass(
@@ -795,8 +792,7 @@ def test_regression_issue_266(factory):
     ext_annotation = model.model_fields["extension"].annotation
     list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
     annotated_item = get_args(list_type)[0]
-    union_type = get_args(annotated_item)[0]
-    union_members = get_args(union_type)
+    union_members = get_args(annotated_item)
 
     grade_ext_model = next(
         m
@@ -978,9 +974,8 @@ def test_regression_issue_279(factory):
     # -----------------------------------------------------------------------
     # MyConditionClinicalStatus – backbone for Condition.clinicalStatus
     # -----------------------------------------------------------------------
-    cs_annotation = model.model_fields["clinicalStatus"].annotation
-    cs_model = next(a for a in get_args(cs_annotation) if a is not type(None))
-
+    cs_model = model.model_fields["clinicalStatus"].annotation
+    assert cs_model is not None
     assert cs_model.__name__ == "MyConditionClinicalStatus"
     assert issubclass(cs_model, CodeableConcept)
     assert "extension" in cs_model.model_fields
@@ -1152,8 +1147,7 @@ def test_regression_issue_278(factory):
     ext_annotation = model.model_fields["extension"].annotation
     list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
     annotated_item = get_args(list_type)[0]
-    union_type = get_args(annotated_item)[0]
-    union_members = get_args(union_type)
+    union_members = get_args(annotated_item)
 
     ext_model = next(
         m
@@ -1295,9 +1289,8 @@ def test_regression_issue_331__narrowing_cardinality_preserves_list_type(factory
 
     # The annotation must still be Optional[List[...]], not Optional[CodeableConcept]
     annotation = model.model_fields["category"].annotation
-    inner = next(a for a in get_args(annotation) if a is not type(None))
     assert (
-        get_origin(inner) is list
+        get_origin(annotation) is list
     ), f"Expected List[...] annotation for narrowed field, got {annotation}"
 
     # A bare dict (not a list) is invalid for both base and profiled model
@@ -1359,9 +1352,7 @@ def test_regression_issue_333__backbone_element_differential_uses_specific_type(
     from typing import get_args
 
     annotation = model.model_fields["referenceRange"].annotation
-    # Unwrap Optional[List[X]] → X
-    inner_list = next(a for a in get_args(annotation) if a is not type(None))
-    item_type = get_args(inner_list)[0]
+    item_type = get_args(annotation)[0]
 
     assert item_type is ObservationReferenceRange
 
@@ -1522,11 +1513,10 @@ def test_regression_issue_335__extension_slice_on_complex_type_field(factory):
 
     # Observation.code should be a CodeableConcept subclass
     code_annotation = model.model_fields["code"].annotation
-    code_type = next(a for a in get_args(code_annotation) if a is not type(None))
-    assert issubclass(code_type, CodeableConcept)
+    assert issubclass(code_annotation, CodeableConcept)
 
     # code.extension must be a sliced union containing the MySlice model
-    ext_annotation = code_type.model_fields["extension"].annotation
+    ext_annotation = code_annotation.model_fields["extension"].annotation
     list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
     annotated_item = get_args(list_type)[0]
     union_type = get_args(annotated_item)[0]

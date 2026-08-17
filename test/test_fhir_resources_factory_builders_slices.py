@@ -92,7 +92,6 @@ def make_entry_node(
     pattern=None,
     constraints=None,
     default_value=None,
-    is_prohibited: bool = False,
 ):
     node = MagicMock(name="mock-entry-node")
     node.name = name
@@ -109,7 +108,8 @@ def make_entry_node(
     node.pattern = pattern
     node.default_value = default_value
     node.slicing_rules = slicing_rules
-    node.is_prohibited = is_prohibited
+    node.is_prohibited = max_cardinality == 0
+    node.is_required = min_cardinality > 0
     node.max_length = None
     node.min_value = None
     node.max_value = None
@@ -270,8 +270,10 @@ def test_build__field_description_is_definition_short(
     assert build.fields[0].description == "Category of observation"
 
 
-def test_build__field_annotation_is_annotated(builder: Builder, index, assembler):
-    node = make_entry_node()
+def test_build__optional_field_annotation_is_annotated(
+    builder: Builder, index, assembler
+):
+    node = make_entry_node(min_cardinality=0)
     build = builder.build(node, index)
     origin = get_origin(build.fields[0].annotation)
     assert origin is Union
