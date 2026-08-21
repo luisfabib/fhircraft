@@ -42,6 +42,7 @@
       ],
       "rule": [
         {
+          "name": "rule-a",
           "source": [
             {
               "context": "src",
@@ -63,7 +64,8 @@
             }
           ]
         }
-      ]
+      ],
+      "typeMode": "none"
     },
     {
       "name": "abContent",
@@ -82,6 +84,7 @@
       ],
       "rule": [
         {
+          "name": "rule-b",
           "source": [
             {
               "context": "src",

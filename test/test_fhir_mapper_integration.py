@@ -73,13 +73,12 @@ def test_resolve_mapping_from_dict(engine):
 def test_resolve_mapping_from_existing(engine):
     """Test that an existing StructureMap instance is accepted directly."""
     original = StructureMap.model_construct(
-        name="TestMap", url="http://example.org/test"
+        name="TestMap", url="http://example.org/test", group=[]
     )
     assert isinstance(original, StructureMap)
 
     groups = engine.list_groups(original)
     assert groups == []
-
 
 
 def test_list_groups(engine):
@@ -199,6 +198,7 @@ def test_implicit_evaluate_context(engine):
     source_data = {"id": "A123-45-678"}
 
     mapping_script = """
+    map "http://example.org" = 'Example'
     uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
     group main(source src, target tgt: Patient) {
@@ -224,6 +224,8 @@ def test_variables_as_transform_arguments(engine):
     map "http://example.org" = 'Example'
     uses "http://hl7.org/fhir/StructureDefinition/Condition" as target
     group main(source src, target tgt: Condition) {
+        src as s -> tgt.clinicalStatus = cc("active", "http://terminology.hl7.org/CodeSystem/condition-clinical", "Active"), 
+               tgt.subject.reference = "Patient/123";
         src.coded as c -> tgt then {
             c.code as code, c.system as system, c.display as display -> tgt.code = cc(code, system, display);
         };
@@ -276,10 +278,14 @@ def test_constants_assignment(engine, constant, expected_type, expected_value):
     """Test using constants with special characters. Issue #213"""
 
     mapping_script = f"""
+    map "http://example.org" = 'Example'
     uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
     let MYCONST = {constant};
     group main(source src, target tgt: Patient) {{
-        MYCONST -> tgt.extension.value{expected_type};
+        src as s -> tgt.extension as ex then {{
+            src -> ex.url = "http://example.org/extension"; 
+            MYCONST -> ex.value{expected_type};
+        }};
     }}
     """
     result = engine.map(mapping_script, {})

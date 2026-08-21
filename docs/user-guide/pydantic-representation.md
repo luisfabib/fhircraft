@@ -173,32 +173,47 @@ FHIR resources map to Pydantic models that reflect the complete FHIR specificati
 
 ### Field Cardinality
 
-FHIR's cardinality rules (min..max) translate to Python type annotations:
+FHIR's cardinality rules (`min..max`) translate directly to Python type annotations. Both the **minimum** and the **maximum** cardinality influence how a field is declared:
 
-| Max | Python Type              | Description    |
-| --- | ------------------------ | -------------- |
-| 1   | `Optional[<type>]`       | A single value |
-| *   | `Optional[List[<type>]]` | A list value   |
+| Min | Max | Python annotation              | Default   | Description                             |
+| --- | --- | ------------------------------ | --------- | --------------------------------------- |
+| 0   | 1   | `Optional[<type>]`             | `None`    | Optional single value                   |
+| 1   | 1   | `<type>`                       | —         | Required single value                   |
+| 0   | `*` | `Optional[List[<type>]]`       | `None`    | Optional list                           |
+| 1   | `*` | `List[<type>]`                 | —         | Required list (at least one item)       |
 
-For list-type elements, the length of the list is constrained by the minimal and maximal cardinality of the element using the Pydantic  `Field(max_length=..., min_length=...)` constraints.
+When the maximum cardinality is greater than 1, the list length is additionally constrained via Pydantic's `Field(min_length=..., max_length=...)`.
+
+!!! info "Type-choice elements (`[x]`) are always optional"
+    Polymorphic elements whose FHIR path ends with `[x]` (e.g. `Observation.value[x]`) generate one field per allowed type variant. Each variant field is always declared `Optional` regardless of the element's minimum cardinality, because the single-variant constraint is enforced by a model validator rather than by Pydantic's required-field mechanism.
 
 ```python
+class MyResource(FHIRBaseModel):
 
-class MyPatient(FHIRBaseModel):    
-    
-    # Cardinality 0..1 
+    # Cardinality 0..1  →  Optional, defaults to None
     active: Optional[boolean] = Field(default=None)
-    
-    # Cardinality 1..2
-    name: Optional[List[HumanName]] = Field(default=None, max_length=3)
-    
-    # Cardinality 1..*
-    identifier: Optional[List[Identifier]] = Field(default=None)
-```
 
-!!! info "Cardinality and requiredness in FHIR"
-    
-    In FHIR, a minimal cardinality of `1` does not necessarily mean the element is required; it only restricts the element to a single value if present. As a result, all resource fields in Fhircraft Pydantic models are optional by default, and requiredness is enforced through FHIR invariants when applicable.
+    # Cardinality 1..1  →  Required, no default
+    status: code = Field(description="active | inactive")
+
+    # Cardinality 0..*  →  Optional list, defaults to None
+    note: Optional[List[str]] = Field(default=None)
+
+    # Cardinality 1..*  →  Required list, no default
+    name: List[HumanName] = Field(description="A name associated with the patient")
+
+    # Cardinality 1..3  →  Required list with upper bound
+    identifier: List[Identifier] = Field(description="An identifier for this patient", max_length=3)
+
+    # Type-choice element (always Optional even when min=1)
+    value: Optional[Quantity] = Field(default=None)
+    valueString: Optional[string] = Field(default=None)
+
+assert not MyResource.model_fields["active"].is_required()
+assert MyResource.model_fields["status"].is_required()
+assert not MyResource.model_fields["note"].is_required()
+assert MyResource.model_fields["name"].is_required()
+```
 
 
 ### Type Choice Elements

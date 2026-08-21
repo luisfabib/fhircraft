@@ -12,8 +12,19 @@ from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
 )
 
 
-def add_rules_to_basic_map(rules, documentation=None):
+@pytest.fixture(scope="module")
+def map_init():
+    return "map 'http://example.org' = 'ExampleMap'"
+
+
+def construct_structure_map(**kwargs):
     return StructureMap.model_construct(
+        name="ExampleMap", url="http://example.org", **kwargs
+    )
+
+
+def add_rules_to_basic_map(rules, documentation=None):
+    return construct_structure_map(
         group=[
             StructureMapGroup(
                 documentation=documentation,
@@ -24,58 +35,51 @@ def add_rules_to_basic_map(rules, documentation=None):
                 ],
                 rule=rules,
             )
-        ]
+        ],
     )
 
 
 @pytest.fixture(scope="module")
 def parser():
-    return FHIRMappingLanguageParser(fhir_release="R5", lexer_class=lambda: FHIRMappingLanguageLexer())
+    return FHIRMappingLanguageParser(
+        fhir_release="R5", lexer_class=FHIRMappingLanguageLexer
+    )
 
 
 @pytest.fixture(scope="module")
 def r4b_parser():
-    return FHIRMappingLanguageParser(fhir_release="R4B", lexer_class=lambda: FHIRMappingLanguageLexer())
+    return FHIRMappingLanguageParser(
+        fhir_release="R4B", lexer_class=FHIRMappingLanguageLexer
+    )
 
 
 # Format: (string, expected_object)
 parser_test_cases = (
     # ----------------- METADATA DECLARATION  -----------------
     (
-        """/// id = 'example-meta'""",
-        StructureMap.model_construct(id="example-meta"),
+        """
+        /// id = 'example-meta'
+        """,
+        construct_structure_map(id="example-meta"),
     ),
     (
         """/// title = 'Example map'""",
-        StructureMap.model_construct(title="Example map"),
+        construct_structure_map(title="Example map"),
     ),
     (
         """/// description = 'A test map'""",
-        StructureMap.model_construct(description="A test map"),
-    ),
-    # ----------------- MAP DECLARATION  -----------------
-    (
-        """map 'http://example.org' = 'map'""",
-        StructureMap.model_construct(name="map", url="http://example.org"),
-    ),
-    (
-        """/// title = 'Example map'""",
-        StructureMap.model_construct(title="Example map"),
-    ),
-    (
-        """/// name = 'ExampleMap'""",
-        StructureMap.model_construct(name="ExampleMap"),
+        construct_structure_map(description="A test map"),
     ),
     # ----------------- STRUCTURE DECLARATION  -----------------
     (
         """uses 'http://example.org' as source""",
-        StructureMap.model_construct(
+        construct_structure_map(
             structure=[StructureMapStructure(url="http://example.org", mode="source")]
         ),
     ),
     (
         """uses 'http://example.org' alias example as source""",
-        StructureMap.model_construct(
+        construct_structure_map(
             structure=[
                 StructureMapStructure(
                     url="http://example.org", mode="source", alias="example"
@@ -88,7 +92,7 @@ parser_test_cases = (
         // Just a comment 
         uses 'http://example.org' as source
         """,
-        StructureMap.model_construct(
+        construct_structure_map(
             structure=[
                 StructureMapStructure(
                     url="http://example.org",
@@ -103,7 +107,7 @@ parser_test_cases = (
         uses 'http://example.org' as queried
         uses 'http://example.org' as produced
         """,
-        StructureMap.model_construct(
+        construct_structure_map(
             structure=[
                 StructureMapStructure(url="http://example.org", mode="target"),
                 StructureMapStructure(url="http://example.org", mode="queried"),
@@ -114,7 +118,7 @@ parser_test_cases = (
     (
         """uses 'http://example.org' as source
         uses 'http://another.org' alias another as target""",
-        StructureMap.model_construct(
+        construct_structure_map(
             structure=[
                 StructureMapStructure(url="http://example.org", mode="source"),
                 StructureMapStructure(
@@ -126,53 +130,49 @@ parser_test_cases = (
     # ----------------- IMPORTS DECLARATION  -----------------
     (
         """imports 'http://example.org'""",
-        StructureMap.model_construct(import_=["http://example.org"]),
+        construct_structure_map(import_=["http://example.org"]),
     ),
     (
         """
         // Just a comment
         imports 'http://example1.org' \n imports 'http://example2.org'""",
-        StructureMap.model_construct(
-            import_=["http://example1.org", "http://example2.org"]
-        ),
+        construct_structure_map(import_=["http://example1.org", "http://example2.org"]),
     ),
     (
         """
         imports 'http://example.org'
         imports 'http://another.org'
         imports 'http://third.org'""",
-        StructureMap.model_construct(
+        construct_structure_map(
             import_=["http://example.org", "http://another.org", "http://third.org"]
         ),
     ),
     # ----------------- CONSTANT DECLARATION  -----------------
     (
         """let myConst = 12;""",
-        StructureMap.model_construct(
-            const=[StructureMapConst(name="myConst", value="12")]
-        ),
+        construct_structure_map(const=[StructureMapConst(name="myConst", value="12")]),
     ),
     (
         """let myConst = 'string';""",
-        StructureMap.model_construct(
+        construct_structure_map(
             const=[StructureMapConst(name="myConst", value="'string'")]
         ),
     ),
     (
         """let myConst = 'urn:oid:2.16.756.5.32';""",
-        StructureMap.model_construct(
+        construct_structure_map(
             const=[StructureMapConst(name="myConst", value="'urn:oid:2.16.756.5.32'")]
         ),
     ),
     (
         """let myConst = a.b.substring(1, 2);""",
-        StructureMap.model_construct(
+        construct_structure_map(
             const=[StructureMapConst(name="myConst", value="a.b.substring(1, 2)")]
         ),
     ),
     (
         """let myConst1 = 1; \n let myConst2 = 2;""",
-        StructureMap.model_construct(
+        construct_structure_map(
             const=[
                 StructureMapConst(name="myConst1", value="1"),
                 StructureMapConst(name="myConst2", value="2"),
@@ -185,7 +185,7 @@ parser_test_cases = (
         let const2 = 'foo';
         let const3 = true;
         """,
-        StructureMap.model_construct(
+        construct_structure_map(
             const=[
                 StructureMapConst(name="const1", value="42"),
                 StructureMapConst(name="const2", value="'foo'"),
@@ -196,7 +196,7 @@ parser_test_cases = (
     # ----------------- GROUPS DECLARATION  -----------------
     (
         """group mapExample(source src, target tgt){}""",
-        StructureMap.model_construct(
+        construct_structure_map(
             group=[
                 StructureMapGroup(
                     name="mapExample",
@@ -211,7 +211,7 @@ parser_test_cases = (
     ),
     (
         """group mapExample(source src: typeA, target tgt: typeB){}""",
-        StructureMap.model_construct(
+        construct_structure_map(
             group=[
                 StructureMapGroup(
                     name="mapExample",
@@ -226,7 +226,7 @@ parser_test_cases = (
     ),
     (
         """group mapExample(source src, target tgt) extends mapBase {}""",
-        StructureMap.model_construct(
+        construct_structure_map(
             group=[
                 StructureMapGroup(
                     name="mapExample",
@@ -242,7 +242,7 @@ parser_test_cases = (
     ),
     (
         """group mapExample(source src, target tgt) <<type+>> {}""",
-        StructureMap.model_construct(
+        construct_structure_map(
             group=[
                 StructureMapGroup(
                     name="mapExample",
@@ -258,7 +258,7 @@ parser_test_cases = (
     ),
     (
         """group mapExample(source src, target tgt) extends mapBase <<type+>> {}""",
-        StructureMap.model_construct(
+        construct_structure_map(
             group=[
                 StructureMapGroup(
                     name="mapExample",
@@ -803,7 +803,7 @@ parser_test_cases = (
     ),
     (
         """group mapExample(source src, target tgt) extends baseGroup <<types>> {}""",
-        StructureMap.model_construct(
+        construct_structure_map(
             group=[
                 StructureMapGroup(
                     name="mapExample",
@@ -1075,8 +1075,10 @@ parser_test_cases = (
 
 
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
-def test_parser(parser, string, expected_object):
-    parsed_map = parser.parse(string).model_dump(exclude=("text", "status", "meta"))
+def test_parser(parser, map_init, string, expected_object):
+    parsed_map = parser.parse(map_init + string).model_dump(
+        exclude=("text", "status", "meta")
+    )
     expected_map = expected_object.model_dump(exclude=("text", "status", "meta"))
     if parsed_map != expected_map:
         print("\nParsed:\n---------------------------")
@@ -1098,24 +1100,22 @@ def test_parser(parser, string, expected_object):
 )
 def test_parser_declarations_ordering(parser, s1, s2, s3, s4, s5):
     statements = {
-        "map": "map 'http://example.org/map' = 'map'",
-        "uses": "uses 'http://example.org' as target",
-        "imports": "imports 'http://example.org'",
+        "map": "map 'http://example.org' = 'ExampleMap'",
+        "uses": "uses 'http://example.org/target' as target",
+        "imports": "imports 'http://example.org/import'",
         "let": "let testconst = 'foo';",
         "group": "group mapExample(source src, target tgt){}",
     }
     parsed_map = parser.parse(
         "\n".join(statements[stmt] for stmt in (s1, s2, s3, s4, s5))
     ).model_dump(exclude=("text", "status", "meta"))
-    expected_map = StructureMap.model_construct(
-        name="map",
-        url="http://example.org/map",
+    expected_map = construct_structure_map(
         const=[
             StructureMapConst(name="testconst", value="'foo'"),
         ],
-        import_=["http://example.org"],
+        import_=["http://example.org/import"],
         structure=[
-            StructureMapStructure(url="http://example.org", mode="target"),
+            StructureMapStructure(url="http://example.org/target", mode="target"),
         ],
         group=[
             StructureMapGroup(
