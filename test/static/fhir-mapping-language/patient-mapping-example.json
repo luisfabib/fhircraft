@@ -5,6 +5,7 @@
       ]
    },
    "text": {
+      "status": "generated",
       "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n/// url = \"http://example.org/legacy/map\"\n/// name = \"Legacy Patient to FHIR Patient\"\n\nuses \"http://hl7.org/fhir/StructureDefinition/Patient\" as target\n\ngroup main(source legacy, target patient: Patient) {\n    legacy -> patient.name as name then {\n        legacy.firstName -> name.given;\n        legacy.lastName -> name.family;\n    };\n    legacy.dob -> patient.birthDate;\n    legacy.sex where($this = 'F') -> patient.gender = \"female\";\n    legacy.sex where($this = 'M') -> patient.gender = \"male\";\n}\n</div>"
    },
    "url": "http://example.org/legacy/map",

@@ -107,9 +107,8 @@ class Condition(DomainResource):
         description="Anatomical location, if relevant",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who has the condition?",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter created as part of",

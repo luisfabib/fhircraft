@@ -25,9 +25,8 @@ class AccountCoverage(BackboneElement):
     The party(s) that are responsible for covering the payment of this account, and what order should they be applied to the account.
     """
 
-    coverage: Optional[Reference] = Field(
+    coverage: Reference = Field(
         description="The party(s), such as insurances, that may contribute to the payment of this account",
-        default=None,
     )
     priority: Optional[fhir.positiveInt] = Field(
         description="The priority of the coverage in the context of this account",
@@ -39,9 +38,8 @@ class AccountGuarantor(BackboneElement):
     The parties responsible for balancing the account if other payment options fall short.
     """
 
-    party: Optional[Reference] = Field(
+    party: Reference = Field(
         description="Responsible entity",
-        default=None,
     )
     onHold: Optional[fhir.boolean] = Field(
         description="Credit or other hold applied",
@@ -77,9 +75,8 @@ class Account(DomainResource):
         description="Account number",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | inactive | entered-in-error | on-hold | unknown",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="E.g. patient, expense, depreciation",

@@ -25,17 +25,14 @@ class GraphDefinitionLinkTargetCompartment(BackboneElement):
     Compartment Consistency Rules.
     """
 
-    use: Optional[fhir.code] = Field(
+    use: fhir.code = Field(
         description="condition | requirement",
-        default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Patient | Encounter | RelatedPerson | Practitioner | Device",
-        default=None,
     )
-    rule: Optional[fhir.code] = Field(
+    rule: fhir.code = Field(
         description="identical | matching | different | custom",
-        default=None,
     )
     expression: Optional[fhir.string] = Field(
         description="Custom rule, as a FHIRPath expression",
@@ -52,9 +49,8 @@ class GraphDefinitionLinkTarget(BackboneElement):
     Potential target for the link.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="Type of resource this link refers to",
-        default=None,
     )
     params: Optional[fhir.string] = Field(
         description="Criteria for reverse lookup",
@@ -134,13 +130,11 @@ class GraphDefinition(DomainResource):
         description="Business version of the graph definition",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this graph definition (computer friendly)",
-        default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -174,9 +168,8 @@ class GraphDefinition(DomainResource):
         description="Why this graph definition is defined",
         default=None,
     )
-    start: Optional[fhir.code] = Field(
+    start: fhir.code = Field(
         description="Type of resource at which the graph starts",
-        default=None,
     )
     profile: Optional[fhir.canonical] = Field(
         description="Profile on base resource",

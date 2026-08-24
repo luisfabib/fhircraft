@@ -37,9 +37,8 @@ class PractitionerQualification(BackboneElement):
         description="An identifier for this qualification for the practitioner",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Coded representation of the qualification",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="Period during which the qualification is valid",
@@ -58,9 +57,8 @@ class PractitionerCommunication(BackboneElement):
     The `PractitionerRole.communication` property should be used for publishing the languages that a practitioner is able to communicate with patients (on a per Organization/Role basis).
     """
 
-    language: Optional[CodeableConcept] = Field(
+    language: CodeableConcept = Field(
         description="The language code used to communicate with the practitioner",
-        default=None,
     )
     preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",

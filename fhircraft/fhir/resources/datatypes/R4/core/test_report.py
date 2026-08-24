@@ -24,13 +24,11 @@ class TestReportParticipant(BackboneElement):
     A participant in the test execution, either the execution engine, a client, or a server.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="test-engine | client | server",
-        default=None,
     )
-    uri: Optional[fhir.uri] = Field(
+    uri: fhir.uri = Field(
         description="The uri of the participant. An absolute URL is preferred",
-        default=None,
     )
     display: Optional[fhir.string] = Field(
         description="The display name of the participant",
@@ -43,9 +41,8 @@ class TestReportSetupActionOperation(BackboneElement):
     The operation performed.
     """
 
-    result: Optional[fhir.code] = Field(
+    result: fhir.code = Field(
         description="pass | skip | fail | warning | error",
-        default=None,
     )
     message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
@@ -62,9 +59,8 @@ class TestReportSetupActionAssert(BackboneElement):
     The results of the assertion performed on the previous operations.
     """
 
-    result: Optional[fhir.code] = Field(
+    result: fhir.code = Field(
         description="pass | skip | fail | warning | error",
-        default=None,
     )
     message: Optional[fhir.markdown] = Field(
         description="A message associated with the result",
@@ -97,9 +93,8 @@ class TestReportSetup(BackboneElement):
     The results of the series of required setup operations before the tests were executed.
     """
 
-    action: Optional[ListType[TestReportSetupAction]] = Field(
+    action: ListType[TestReportSetupAction] = Field(
         description="A setup operation or assert that was executed",
-        default=None,
     )
 
 
@@ -170,9 +165,8 @@ class TestReportTest(BackboneElement):
         description="Tracking/reporting short description of the test",
         default=None,
     )
-    action: Optional[ListType[TestReportTestAction]] = Field(
+    action: ListType[TestReportTestAction] = Field(
         description="A test operation or assert that was performed",
-        default=None,
     )
 
 
@@ -181,9 +175,8 @@ class TestReportTeardownAction(BackboneElement):
     The teardown action will only contain an operation.
     """
 
-    operation: Optional[TestReportSetupActionOperation] = Field(
+    operation: TestReportSetupActionOperation = Field(
         description="The teardown operation performed",
-        default=None,
     )
 
 
@@ -192,9 +185,8 @@ class TestReportTeardown(BackboneElement):
     The results of the series of operations required to clean up after all the tests were executed (successfully or otherwise).
     """
 
-    action: Optional[ListType[TestReportTeardownAction]] = Field(
+    action: ListType[TestReportTeardownAction] = Field(
         description="One or more teardown operations performed",
-        default=None,
     )
 
 
@@ -227,17 +219,14 @@ class TestReport(DomainResource):
         description="Informal name of the executed TestScript",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="completed | in-progress | waiting | stopped | entered-in-error",
-        default=None,
     )
-    testScript: Optional[Reference] = Field(
+    testScript: Reference = Field(
         description="Reference to the  version-specific TestScript that was executed to produce this TestReport",
-        default=None,
     )
-    result: Optional[fhir.code] = Field(
+    result: fhir.code = Field(
         description="pass | fail | pending",
-        default=None,
     )
     score: Optional[fhir.decimal] = Field(
         description="The final score (percentage of tests passed) resulting from the execution of the TestScript",

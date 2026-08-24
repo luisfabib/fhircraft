@@ -54,9 +54,8 @@ class Schedule(DomainResource):
         description="Human-readable label",
         default=None,
     )
-    actor: Optional[ListType[Reference]] = Field(
+    actor: ListType[Reference] = Field(
         description="Resource(s) that availability information is being provided for",
-        default=None,
     )
     planningHorizon: Optional[Period] = Field(
         description="Period of time covered by schedule",

@@ -24,13 +24,11 @@ class OperationOutcomeIssue(BackboneElement):
     An error, warning, or information message that results from a system action.
     """
 
-    severity: Optional[fhir.code] = Field(
+    severity: fhir.code = Field(
         description="fatal | error | warning | information | success",
-        default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Error or warning code",
-        default=None,
     )
     details: Optional[CodeableConcept] = Field(
         description="Additional details about the error",
@@ -59,7 +57,6 @@ class OperationOutcome(DomainResource):
     _type = "OperationOutcome"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/OperationOutcome"
 
-    issue: Optional[ListType[OperationOutcomeIssue]] = Field(
+    issue: ListType[OperationOutcomeIssue] = Field(
         description="A single issue associated with the action",
-        default=None,
     )

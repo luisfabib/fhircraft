@@ -73,9 +73,8 @@ class Evidence(DomainResource):
         description="Subordinate title of the Evidence",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
@@ -145,9 +144,8 @@ class Evidence(DomainResource):
         description="Additional documentation, citations, etc.",
         default=None,
     )
-    exposureBackground: Optional[Reference] = Field(
+    exposureBackground: Reference = Field(
         description="What population?",
-        default=None,
     )
     exposureVariant: Optional[ListType[Reference]] = Field(
         description="What exposure?",

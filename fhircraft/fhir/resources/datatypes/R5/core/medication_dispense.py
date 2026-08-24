@@ -33,9 +33,8 @@ class MedicationDispensePerformer(BackboneElement):
         description="Who performed the dispense and what they did",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Individual who was performing",
-        default=None,
     )
 
 class MedicationDispenseSubstitution(BackboneElement):
@@ -43,9 +42,8 @@ class MedicationDispenseSubstitution(BackboneElement):
     Indicates whether or not substitution was made as part of the dispense.  In some cases, substitution will be expected but does not happen, in other cases substitution is not expected but does happen.  This block explains what substitution did or did not happen and why.  If nothing is specified, substitution was not done.
     """
 
-    wasSubstituted: Optional[fhir.boolean] = Field(
+    wasSubstituted: fhir.boolean = Field(
         description="Whether a substitution was or was not performed on the dispense",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="code signifying whether a different drug was dispensed from what was prescribed",
@@ -81,9 +79,8 @@ class MedicationDispense(DomainResource):
         description="Event that dispense is part of",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
-        default=None,
     )
     notPerformedReason: Optional[CodeableReference] = Field(
         description="Why a dispense was not performed",
@@ -97,13 +94,11 @@ class MedicationDispense(DomainResource):
         description="Type of medication dispense",
         default=None,
     )
-    medication: Optional[CodeableReference] = Field(
+    medication: CodeableReference = Field(
         description="What medication was supplied",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who the dispense is for",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter associated with event",

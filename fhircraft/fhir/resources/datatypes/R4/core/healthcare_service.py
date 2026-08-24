@@ -66,9 +66,8 @@ class HealthcareServiceNotAvailable(BackboneElement):
     The HealthcareService is not available during this period of time due to the provided reason.
     """
 
-    description: Optional[fhir.string] = Field(
+    description: fhir.string = Field(
         description="Reason presented to the user explaining why time not available",
-        default=None,
     )
     during: Optional[Period] = Field(
         description="Service not available from this date",

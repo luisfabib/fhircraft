@@ -233,25 +233,21 @@ class NutritionOrder(DomainResource):
         description="Instantiates protocol or definition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="The person who requires the diet, formula or nutritional supplement",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="The encounter associated with this nutrition order",
         default=None,
     )
-    dateTime: Optional[fhir.dateTime] = Field(
+    dateTime: fhir.dateTime = Field(
         description="Date and time the nutrition order was requested",
-        default=None,
     )
     orderer: Optional[Reference] = Field(
         description="Who ordered the diet, formula or nutritional supplement",

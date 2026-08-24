@@ -61,9 +61,8 @@ class GuidanceResponse(DomainResource):
         description="What guidance was requested",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="success | data-requested | data-required | in-progress | failure | entered-in-error",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="Patient the request was performed for",

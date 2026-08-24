@@ -46,13 +46,11 @@ class Endpoint(DomainResource):
         description="Identifies this endpoint across multiple systems",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | suspended | error | off | entered-in-error | test",
-        default=None,
     )
-    connectionType: Optional[Coding] = Field(
+    connectionType: Coding = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="A name that this endpoint can be identified by",
@@ -70,17 +68,15 @@ class Endpoint(DomainResource):
         description="Interval the endpoint is expected to be operational",
         default=None,
     )
-    payloadType: Optional[ListType[CodeableConcept]] = Field(
+    payloadType: ListType[CodeableConcept] = Field(
         description="The type of content that may be used at this endpoint (e.g. XDS Discharge summaries)",
-        default=None,
     )
     payloadMimeType: Optional[ListType[fhir.code]] = Field(
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    address: Optional[fhir.url] = Field(
+    address: fhir.url = Field(
         description="The technical base address for connecting to this endpoint",
-        default=None,
     )
     header: Optional[ListType[fhir.string]] = Field(
         description="Usage depends on the channel type",

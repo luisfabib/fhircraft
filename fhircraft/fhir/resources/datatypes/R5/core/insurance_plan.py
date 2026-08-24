@@ -45,9 +45,8 @@ class InsurancePlanCoverageBenefit(BackboneElement):
     Specific benefits under this type of coverage.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of benefit",
-        default=None,
     )
     requirement: Optional[fhir.string] = Field(
         description="Referral requirements",
@@ -64,17 +63,15 @@ class InsurancePlanCoverage(BackboneElement):
     Details about the coverage offered by the insurance product.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of coverage",
-        default=None,
     )
     network: Optional[ListType[Reference]] = Field(
         description="What networks provide coverage",
         default=None,
     )
-    benefit: Optional[ListType[InsurancePlanCoverageBenefit]] = Field(
+    benefit: ListType[InsurancePlanCoverageBenefit] = Field(
         description="List of benefits",
-        default=None,
     )
 
 
@@ -106,9 +103,8 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
     List of the costs associated with a specific benefit.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of cost",
-        default=None,
     )
     applicability: Optional[CodeableConcept] = Field(
         description="in-network | out-of-network | other",
@@ -129,9 +125,8 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
     List of the specific benefits under this category of benefit.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of specific benefit",
-        default=None,
     )
     cost: Optional[ListType[InsurancePlanPlanSpecificCostBenefitCost]] = Field(
         description="List of the costs",
@@ -144,9 +139,8 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
     Costs associated with the coverage provided by the product.
     """
 
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="General category of benefit",
-        default=None,
     )
     benefit: Optional[ListType[InsurancePlanPlanSpecificCostBenefit]] = Field(
         description="Benefits list",

@@ -28,13 +28,11 @@ class StructureMapStructure(BackboneElement):
     A structure definition used by this map. The structure definition may describe instances that are converted, or the instances that are produced.
     """
 
-    url: Optional[fhir.canonical] = Field(
+    url: fhir.canonical = Field(
         description="canonical reference to structure definition",
-        default=None,
     )
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="source | queried | target | produced",
-        default=None,
     )
     alias: Optional[fhir.string] = Field(
         description="Name for type in this map",
@@ -66,17 +64,15 @@ class StructureMapGroupInput(BackboneElement):
     A name assigned to an instance of data. The instance must be provided when the mapping is invoked.
     """
 
-    name: Optional[fhir.id_] = Field(
+    name: fhir.id_ = Field(
         description="Name for this instance of data",
-        default=None,
     )
     type: Optional[fhir.string] = Field(
         description="Type for this instance of data",
         default=None,
     )
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="source | target",
-        default=None,
     )
     documentation: Optional[fhir.string] = Field(
         description="Documentation for this instance of data",
@@ -89,9 +85,8 @@ class StructureMapGroupRuleSource(BackboneElement):
     Source inputs to the mapping.
     """
 
-    context: Optional[fhir.id_] = Field(
+    context: fhir.id_ = Field(
         description="Type or variable this rule applies to",
-        default=None,
     )
     min: Optional[fhir.integer] = Field(
         description="Specified minimum cardinality",
@@ -303,13 +298,11 @@ class StructureMapGroupRuleDependent(BackboneElement):
     Which other rules to apply in the context of this rule.
     """
 
-    name: Optional[fhir.id_] = Field(
+    name: fhir.id_ = Field(
         description="Name of a rule or group to apply",
-        default=None,
     )
-    parameter: Optional[ListType[StructureMapGroupRuleDependentParameter]] = Field(
+    parameter: ListType[StructureMapGroupRuleDependentParameter] = Field(
         description="Parameter to pass to the rule or group",
-        default=None,
     )
 
 
@@ -322,9 +315,8 @@ class StructureMapGroupRule(BackboneElement):
         description="Name of the rule for internal references",
         default=None,
     )
-    source: Optional[ListType[StructureMapGroupRuleSource]] = Field(
+    source: ListType[StructureMapGroupRuleSource] = Field(
         description="Source inputs to the mapping",
-        default=None,
     )
     target: Optional[ListType[StructureMapGroupRuleTarget]] = Field(
         description="Content to create because of this mapping rule",
@@ -349,9 +341,8 @@ class StructureMapGroup(BackboneElement):
     Organizes the mapping into managable chunks for human review/ease of maintenance.
     """
 
-    name: Optional[fhir.id_] = Field(
+    name: fhir.id_ = Field(
         description="Human-readable label",
-        default=None,
     )
     extends: Optional[fhir.id_] = Field(
         description="Another group that this group adds rules to",
@@ -365,9 +356,8 @@ class StructureMapGroup(BackboneElement):
         description="Additional description/explanation for group",
         default=None,
     )
-    input: Optional[ListType[StructureMapGroupInput]] = Field(
+    input: ListType[StructureMapGroupInput] = Field(
         description="Named instance provided when invoking the map",
-        default=None,
     )
     rule: Optional[ListType[StructureMapGroupRule]] = Field(
         description="Transform Rule from source to target",
@@ -384,9 +374,8 @@ class StructureMap(DomainResource):
     _type = "StructureMap"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureMap"
 
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="canonical identifier for this structure map, represented as a URI (globally unique)",
-        default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure map",
@@ -404,17 +393,15 @@ class StructureMap(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this structure map (computer friendly)",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Name for this structure map (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -469,9 +456,8 @@ class StructureMap(DomainResource):
         description="Definition of the constant value used in the map rules",
         default=None,
     )
-    group: Optional[ListType[StructureMapGroup]] = Field(
+    group: ListType[StructureMapGroup] = Field(
         description="Named sections for reader convenience",
-        default=None,
     )
 
     @property

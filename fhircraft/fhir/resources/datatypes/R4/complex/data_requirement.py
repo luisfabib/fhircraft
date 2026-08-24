@@ -91,13 +91,11 @@ class DataRequirementSort(BackboneElement):
 
     _type = "BackboneElement"
 
-    path: Optional[fhir.string] = Field(
+    path: fhir.string = Field(
         description="The name of the attribute to perform the sort",
-        default=None,
     )
-    direction: Optional[fhir.code] = Field(
+    direction: fhir.code = Field(
         description="The direction of the sort, ascending or descending",
-        default=None,
     )
 
 
@@ -108,9 +106,8 @@ class DataRequirement(Element):
 
     _type = "DataRequirement"
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="The type of the required data",
-        default=None,
     )
     profile: Optional[List[fhir.canonical]] = Field(
         description="The profile of the required data",

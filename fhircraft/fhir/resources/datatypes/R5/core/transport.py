@@ -75,9 +75,8 @@ class TransportInput(BackboneElement):
     Additional information that may be needed in the execution of the transport.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Label for the input",
-        default=None,
     )
     valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Content to use in performing the transport",
@@ -373,9 +372,8 @@ class TransportOutput(BackboneElement):
     Outputs produced by the Transport.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Label for output",
-        default=None,
     )
     valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Result of output",
@@ -707,9 +705,8 @@ class Transport(DomainResource):
         description="Reason for current status",
         default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="unknown | proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
@@ -788,13 +785,11 @@ class Transport(DomainResource):
         description="Information produced as part of transport",
         default=None,
     )
-    requestedLocation: Optional[Reference] = Field(
+    requestedLocation: Reference = Field(
         description="The desired location",
-        default=None,
     )
-    currentLocation: Optional[Reference] = Field(
+    currentLocation: Reference = Field(
         description="The entity current location",
-        default=None,
     )
     reason: Optional[CodeableReference] = Field(
         description="Why transport is needed",

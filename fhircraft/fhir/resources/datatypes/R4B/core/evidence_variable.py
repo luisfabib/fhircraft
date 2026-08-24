@@ -201,9 +201,8 @@ class EvidenceVariable(DomainResource):
         description="Subordinate title of the EvidenceVariable",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="Date last changed",

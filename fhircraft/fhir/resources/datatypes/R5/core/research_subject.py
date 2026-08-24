@@ -64,9 +64,8 @@ class ResearchSubject(DomainResource):
         description="Business Identifier for research subject in a study",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     progress: Optional[ListType[ResearchSubjectProgress]] = Field(
         description="Subject status",
@@ -76,13 +75,11 @@ class ResearchSubject(DomainResource):
         description="Start and end of participation",
         default=None,
     )
-    study: Optional[Reference] = Field(
+    study: Reference = Field(
         description="Study subject is part of",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who or what is part of study",
-        default=None,
     )
     assignedComparisonGroup: Optional[fhir.id_] = Field(
         description="What path should be followed",

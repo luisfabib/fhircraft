@@ -22,9 +22,8 @@ class SubscriptionChannel(BackboneElement):
     Details where to send notifications when resources are received that meet the criteria.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="rest-hook | websocket | email | sms | message",
-        default=None,
     )
     endpoint: Optional[fhir.url] = Field(
         description="Where the channel points to",
@@ -60,9 +59,8 @@ class Subscription(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="requested | active | error | off",
-        default=None,
     )
     contact: Optional[ListType[ContactPoint]] = Field(
         description="Contact details for source (e.g. troubleshooting)",
@@ -72,19 +70,16 @@ class Subscription(DomainResource):
         description="When to automatically delete the subscription",
         default=None,
     )
-    reason: Optional[fhir.string] = Field(
+    reason: fhir.string = Field(
         description="Description of why this subscription was created",
-        default=None,
     )
-    criteria: Optional[fhir.string] = Field(
+    criteria: fhir.string = Field(
         description="Rule for server push",
-        default=None,
     )
     error: Optional[fhir.string] = Field(
         description="Latest error note",
         default=None,
     )
-    channel: Optional[SubscriptionChannel] = Field(
+    channel: SubscriptionChannel = Field(
         description="The channel on which to report matches to the criteria",
-        default=None,
     )

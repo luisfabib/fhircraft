@@ -49,13 +49,11 @@ class Endpoint(DomainResource):
         description="Identifies this endpoint across multiple systems",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | suspended | error | off | entered-in-error | test",
-        default=None,
     )
-    connectionType: Optional[ListType[CodeableConcept]] = Field(
+    connectionType: ListType[CodeableConcept] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="A name that this endpoint can be identified by",
@@ -85,9 +83,8 @@ class Endpoint(DomainResource):
         description="Set of payloads that are provided by this endpoint",
         default=None,
     )
-    address: Optional[fhir.url] = Field(
+    address: fhir.url = Field(
         description="The technical base address for connecting to this endpoint",
-        default=None,
     )
     header: Optional[ListType[fhir.string]] = Field(
         description="Usage depends on the channel type",

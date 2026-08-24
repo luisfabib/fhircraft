@@ -112,9 +112,8 @@ class SubstanceDefinitionProperty(BackboneElement):
     General specifications for this substance.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="A code expressing the type of property",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="A value for the property",
@@ -173,9 +172,8 @@ class SubstanceDefinitionMolecularWeight(BackboneElement):
         description="Type of molecular weight e.g. exact, average, weight average",
         default=None,
     )
-    amount: Optional[Quantity] = Field(
+    amount: Quantity = Field(
         description="Used to capture quantitative values for a variety of elements",
-        default=None,
     )
 
 
@@ -313,9 +311,8 @@ class SubstanceDefinitionName(BackboneElement):
     Names applicable to this substance.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="The actual name",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="Name type e.g. \u0027systematic\u0027,  \u0027scientific, \u0027brand\u0027",
@@ -372,9 +369,8 @@ class SubstanceDefinitionRelationship(BackboneElement):
         description="A pointer to another substance, as a resource or a representational code",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description='For example "salt to parent", "active moiety"',
-        default=None,
     )
     isDefining: Optional[fhir.boolean] = Field(
         description="For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible relationships",

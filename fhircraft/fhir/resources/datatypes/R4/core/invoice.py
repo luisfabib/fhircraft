@@ -31,9 +31,8 @@ class InvoiceParticipant(BackboneElement):
         description="Type of involvement in creation of this Invoice",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Individual who was involved",
-        default=None,
     )
 
 
@@ -42,9 +41,8 @@ class InvoiceLineItemPriceComponent(BackboneElement):
     The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice as to how the prices have been calculated.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="base | surcharge | deduction | discount | tax | informational",
-        default=None,
     )
     code: Optional[CodeableConcept] = Field(
         description="code identifying the specific component",
@@ -147,9 +145,8 @@ class Invoice(DomainResource):
         description="Business Identifier for item",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | issued | balanced | cancelled | entered-in-error",
-        default=None,
     )
     cancelledReason: Optional[fhir.string] = Field(
         description="Reason for cancellation of this Invoice",

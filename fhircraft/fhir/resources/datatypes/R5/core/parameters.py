@@ -50,9 +50,8 @@ class ParametersParameter(BackboneElement):
     A parameter passed to or received from the operation.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name from the definition",
-        default=None,
     )
     valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="If parameter is a data type",

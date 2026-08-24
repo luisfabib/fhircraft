@@ -1171,16 +1171,22 @@ def test_factory__construct_diff_min_cardinality(factory: FHIRModelFactory):
     element = mock_resource.model_fields.get("id")
     assert element is not None, "Profiled element field not found in model fields"
     assert (
-        element.annotation == Optional[str]
+        element.annotation == str
     ), "Profiled element field does not have correct type annotation"
-
+    assert element.is_required(), "Profiled element field is not marked as required"
     # Assert metadata
     element_metadata = element.metadata
     assert element_metadata is not None, "No metadata found for profiled element"
 
     # Test valid dataset
     assert (
-        mock_resource.model_validate({"id": "test", "created": "2023-01-01"})
+        mock_resource.model_validate(
+            {
+                "id": "test",
+                "created": "2023-01-01",
+                "code": {"coding": [{"system": "http://example.org", "code": "test"}]},
+            }
+        )
         is not None
     ), "Valid dataset did not validate correctly"
     # Test invalid dataset
@@ -1434,11 +1440,23 @@ def test_construct_diff_type_choice_element(factory: FHIRModelFactory):
     assert hasattr(mock_resource, "value")
 
     # Test valid data with string
-    instance = mock_resource.model_validate({"valueString": "test"})
+    instance = mock_resource.model_validate(
+        {
+            "valueString": "test",
+            "status": "final",
+            "code": {"coding": [{"system": "http://example.org", "code": "test"}]},
+        }
+    )
     assert instance.value == "test"  # type: ignore
 
     with pytest.raises(ValidationError):
-        mock_resource.model_validate({"valueInteger": 2})
+        mock_resource.model_validate(
+            {
+                "valueInteger": 2,
+                "status": "final",
+                "code": {"coding": [{"system": "http://example.org", "code": "test"}]},
+            }
+        )
 
 
 def test_construct_diff_nested_backbone_element(factory: FHIRModelFactory):

@@ -13,17 +13,15 @@ class SampledData(DataType):
 
     _type = "SampledData"
 
-    origin: Optional[Quantity] = Field(
+    origin: Quantity = Field(
         description="Zero value and units",
-        default=None,
     )
     interval: Optional[fhir.decimal] = Field(
         description="Number of intervalUnits between samples",
         default=None,
     )
-    intervalUnit: Optional[fhir.code] = Field(
+    intervalUnit: fhir.code = Field(
         description="The measurement unit of the interval between samples",
-        default=None,
     )
     factor: Optional[fhir.decimal] = Field(
         description="Multiply data by this before adding to origin",
@@ -37,9 +35,8 @@ class SampledData(DataType):
         description="Upper limit of detection",
         default=None,
     )
-    dimensions: Optional[fhir.positiveInt] = Field(
+    dimensions: fhir.positiveInt = Field(
         description="Number of sample points at each time point",
-        default=None,
     )
     codeMap: Optional[fhir.canonical] = Field(
         description="Defines the codes used in the data",

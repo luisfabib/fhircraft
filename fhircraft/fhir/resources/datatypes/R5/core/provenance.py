@@ -35,9 +35,8 @@ class ProvenanceAgent(BackboneElement):
         description="What the agents role was",
         default=None,
     )
-    who: Optional[Reference] = Field(
+    who: Reference = Field(
         description="The agent that participated in the event",
-        default=None,
     )
     onBehalfOf: Optional[Reference] = Field(
         description="The agent that delegated",
@@ -71,13 +70,11 @@ class ProvenanceEntity(BackboneElement):
     An entity used in this activity.
     """
 
-    role: Optional[fhir.code] = Field(
+    role: fhir.code = Field(
         description="revision | quotation | source | instantiates | removal",
-        default=None,
     )
-    what: Optional[Reference] = Field(
+    what: Reference = Field(
         description="Identity of entity",
-        default=None,
     )
     agent: Optional[ListType[ProvenanceEntityAgent]] = Field(
         description="Entity is attributed to this agent",
@@ -93,9 +90,8 @@ class Provenance(DomainResource):
     _type = "Provenance"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Provenance"
 
-    target: Optional[ListType[Reference]] = Field(
+    target: ListType[Reference] = Field(
         description="Target Reference(s) (usually version specific)",
-        default=None,
     )
     occurredPeriod: Optional[Period] = Field(
         description="When the activity occurred",
@@ -137,9 +133,8 @@ class Provenance(DomainResource):
         description="Encounter within which this event occurred or which the event is tightly associated",
         default=None,
     )
-    agent: Optional[ListType[ProvenanceAgent]] = Field(
+    agent: ListType[ProvenanceAgent] = Field(
         description="Actor involved",
-        default=None,
     )
     entity: Optional[ListType[ProvenanceEntity]] = Field(
         description="An entity used in this activity",

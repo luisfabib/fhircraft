@@ -34,21 +34,18 @@ class Flag(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | inactive | entered-in-error",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Clinical, administrative, etc",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Coded or textual message to display to user",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who/What is flag about?",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="time period when flag is active",

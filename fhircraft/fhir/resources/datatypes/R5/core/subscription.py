@@ -30,9 +30,8 @@ class SubscriptionFilterBy(BackboneElement):
         description="Allowed Resource (reference to definition) for this Subscription filter",
         default=None,
     )
-    filterParameter: Optional[fhir.string] = Field(
+    filterParameter: fhir.string = Field(
         description="Filter label defined in SubscriptionTopic",
-        default=None,
     )
     comparator: Optional[fhir.code] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
@@ -42,9 +41,8 @@ class SubscriptionFilterBy(BackboneElement):
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="Literal value or resource path",
-        default=None,
     )
 
 class SubscriptionParameter(BackboneElement):
@@ -52,13 +50,11 @@ class SubscriptionParameter(BackboneElement):
     Channel-dependent information to send as part of the notification (e.g., HTTP Headers).
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name (key) of the parameter",
-        default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="Value of the parameter to use or pass through",
-        default=None,
     )
 
 class Subscription(DomainResource):
@@ -78,13 +74,11 @@ class Subscription(DomainResource):
         description="Human readable name for this subscription",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="requested | active | error | off | entered-in-error",
-        default=None,
     )
-    topic: Optional[fhir.canonical] = Field(
+    topic: fhir.canonical = Field(
         description="Reference to the subscription topic being subscribed to",
-        default=None,
     )
     contact: Optional[ListType[ContactPoint]] = Field(
         description="Contact details for source (e.g. troubleshooting)",
@@ -106,9 +100,8 @@ class Subscription(DomainResource):
         description="Criteria for narrowing the subscription topic stream",
         default=None,
     )
-    channelType: Optional[Coding] = Field(
+    channelType: Coding = Field(
         description="Channel type for notifications",
-        default=None,
     )
     endpoint: Optional[fhir.url] = Field(
         description="Where the channel points to",

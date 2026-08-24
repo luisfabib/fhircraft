@@ -14,9 +14,8 @@ class RelatedArtifact(Element):
 
     _type = "RelatedArtifact"
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of",
-        default=None,
     )
     label: Optional[fhir.string] = Field(
         description="Short label",

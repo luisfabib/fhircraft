@@ -145,9 +145,8 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Type of intended specimen",
         default=None,
     )
-    preference: Optional[fhir.code] = Field(
+    preference: fhir.code = Field(
         description="preferred | alternate",
-        default=None,
     )
     container: Optional[SpecimenDefinitionTypeTestedContainer] = Field(
         description="The specimen\u0027s container",

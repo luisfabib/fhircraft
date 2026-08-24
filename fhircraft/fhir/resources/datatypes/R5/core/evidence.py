@@ -41,9 +41,8 @@ class EvidenceVariableDefinition(BackboneElement):
         description="Footnotes and/or explanatory notes",
         default=None,
     )
-    variableRole: Optional[CodeableConcept] = Field(
+    variableRole: CodeableConcept = Field(
         description="population | subpopulation | exposure | referenceExposure | measuredVariable | confounder",
-        default=None,
     )
     observed: Optional[Reference] = Field(
         description="Definition of the actual variable related to the statistic(s)",
@@ -126,9 +125,8 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
     A variable adjusted for in the adjusted analysis.
     """
 
-    variableDefinition: Optional[Reference] = Field(
+    variableDefinition: Reference = Field(
         description="Description of the variable",
-        default=None,
     )
     handling: Optional[fhir.code] = Field(
         description="continuous | dichotomous | ordinal | polychotomous",
@@ -188,9 +186,8 @@ class EvidenceStatisticModelCharacteristic(BackboneElement):
     A component of the method to generate the statistic.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Model specification",
-        default=None,
     )
     value: Optional[Quantity] = Field(
         description="Numerical value to complete model specification",
@@ -333,9 +330,8 @@ class Evidence(DomainResource):
         description="Citation for this evidence",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -409,9 +405,8 @@ class Evidence(DomainResource):
         description="Footnotes and/or explanatory notes",
         default=None,
     )
-    variableDefinition: Optional[ListType[EvidenceVariableDefinition]] = Field(
+    variableDefinition: ListType[EvidenceVariableDefinition] = Field(
         description="Evidence variable such as population, exposure, or outcome",
-        default=None,
     )
     synthesisType: Optional[CodeableConcept] = Field(
         description="The method to combine studies",

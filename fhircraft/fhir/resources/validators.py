@@ -288,10 +288,10 @@ def validate_FHIR_element_pattern(
         _element.model_dump() if isinstance(_element, FHIRBaseModel) else _element
     )
     _pattern = pattern.model_dump() if isinstance(pattern, FHIRBaseModel) else pattern
-    if (isinstance(pattern, dict) and not is_dict_subset(_pattern, _element)) or (
-        not isinstance(pattern, dict) and _element != _pattern
+    if (isinstance(_pattern, dict) and not is_dict_subset(_pattern, _element)) or (
+        not isinstance(_pattern, dict) and _element != _pattern
     ):
-        error = f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2) if isinstance(pattern, FHIRBaseModel) else pattern}"
+        error = f"Value does not fulfill pattern:\n{_pattern if not isinstance(pattern, FHIRBaseModel) else pattern.model_dump_json(indent=2)}"
         if config.validation_mode == "lenient":
             warnings.warn(str(error), FhirValidationWarning, stacklevel=2)
         else:

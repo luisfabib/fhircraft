@@ -110,9 +110,8 @@ class TestPlanTestCaseTestData(BackboneElement):
     The test data used in the test case.
     """
 
-    type: Optional[Coding] = Field(
+    type: Coding = Field(
         description="The type of test data description, e.g. \u0027synthea\u0027",
-        default=None,
     )
     content: Optional[Reference] = Field(
         description="The actual test resources when they exist",
@@ -231,9 +230,8 @@ class TestPlan(DomainResource):
         description="Name for this test plan (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

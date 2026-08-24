@@ -17,9 +17,8 @@ class ParameterDefinition(Element):
         description="Name used to access the parameter value",
         default=None,
     )
-    use: Optional[fhir.code] = Field(
+    use: fhir.code = Field(
         description="in | out",
-        default=None,
     )
     min: Optional[fhir.integer] = Field(
         description="Minimum cardinality",
@@ -33,9 +32,8 @@ class ParameterDefinition(Element):
         description="A brief description of the parameter",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="What type of value",
-        default=None,
     )
     profile: Optional[fhir.canonical] = Field(
         description="What profile the value is expected to be",

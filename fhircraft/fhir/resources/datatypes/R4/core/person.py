@@ -27,9 +27,8 @@ class PersonLink(BackboneElement):
     Link to a resource that concerns the same actual person.
     """
 
-    target: Optional[Reference] = Field(
+    target: Reference = Field(
         description="The resource to which this actual person is associated",
-        default=None,
     )
     assurance: Optional[fhir.code] = Field(
         description="level1 | level2 | level3 | level4",

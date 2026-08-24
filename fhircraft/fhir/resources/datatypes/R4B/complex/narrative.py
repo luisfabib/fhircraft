@@ -13,13 +13,11 @@ class Narrative(Element):
 
     _type = "Narrative"
 
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="generated | extensions | additional | empty",
-        default=None,
     )
-    div: Optional[str] = Field(
+    div: str = Field(
         description="Limited xhtml content",
-        default=None,
     )
 
     @model_validator(mode="after")

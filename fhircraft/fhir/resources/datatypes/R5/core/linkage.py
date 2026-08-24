@@ -23,13 +23,11 @@ class LinkageItem(BackboneElement):
     Identifies which record considered as the reference to the same real-world occurrence as well as how the items should be evaluated within the collection of linked items.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="source | alternate | historical",
-        default=None,
     )
-    resource: Optional[Reference] = Field(
+    resource: Reference = Field(
         description="Resource being linked",
-        default=None,
     )
 
 class Linkage(DomainResource):
@@ -49,9 +47,8 @@ class Linkage(DomainResource):
         description="Who is responsible for linkages",
         default=None,
     )
-    item: Optional[ListType[LinkageItem]] = Field(
+    item: ListType[LinkageItem] = Field(
         description="Item to be linked",
-        default=None,
     )
 
     @model_validator(mode="after")

@@ -68,7 +68,6 @@ class BodyStructure(DomainResource):
         description="Attached images",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who this is about",
-        default=None,
     )

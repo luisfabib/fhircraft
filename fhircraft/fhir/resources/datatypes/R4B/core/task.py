@@ -71,9 +71,8 @@ class TaskInput(BackboneElement):
     Additional information that may be needed in the execution of the task.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Label for the input",
-        default=None,
     )
     valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Content to use in performing the task",
@@ -349,9 +348,8 @@ class TaskOutput(BackboneElement):
     Outputs produced by the Task.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Label for output",
-        default=None,
     )
     valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Result of output",
@@ -667,9 +665,8 @@ class Task(DomainResource):
         description="Composite task",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | requested | received | accepted | +",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -679,9 +676,8 @@ class Task(DomainResource):
         description='E.g. "Specimen collected", "IV prepped"',
         default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="unknown | proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",

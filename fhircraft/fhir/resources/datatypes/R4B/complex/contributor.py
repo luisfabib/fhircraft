@@ -13,13 +13,11 @@ class Contributor(Element):
 
     _type = "Contributor"
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="author | editor | reviewer | endorser",
-        default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Who contributed the content",
-        default=None,
     )
     contact: Optional[List[ContactDetail]] = Field(
         description="Contact details of the contributor",

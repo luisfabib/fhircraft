@@ -35,9 +35,8 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
     Defines the characteristic using both a type and value[x] elements.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Expresses the type of characteristic",
-        default=None,
     )
     method: Optional[ListType[CodeableConcept]] = Field(
         description="Method for how the characteristic value was determined",
@@ -105,17 +104,15 @@ class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
     Defines the characteristic as a combination of two or more characteristics.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="all-of | any-of | at-least | at-most | statistical | net-effect | dataset",
-        default=None,
     )
     threshold: Optional[fhir.positiveInt] = Field(
         description='Provides the value of "n" when "at-least" or "at-most" codes are used',
         default=None,
     )
-    characteristic: Optional[ListType["EvidenceVariableCharacteristic"]] = Field(
+    characteristic: ListType["EvidenceVariableCharacteristic"] = Field(
         description="A defining factor of the characteristic",
-        default=None,
     )
 
 
@@ -363,9 +360,8 @@ class EvidenceVariable(DomainResource):
         description="Title for use in informal contexts",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

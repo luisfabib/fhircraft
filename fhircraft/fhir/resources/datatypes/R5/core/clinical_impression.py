@@ -50,9 +50,8 @@ class ClinicalImpression(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -62,9 +61,8 @@ class ClinicalImpression(DomainResource):
         description="Why/how the assessment was performed",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Patient or group assessed",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="The Encounter during which this ClinicalImpression was created",

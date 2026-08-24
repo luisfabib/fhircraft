@@ -15,13 +15,11 @@ class SampledData(Element):
 
     _type = "SampledData"
 
-    origin: Optional[Quantity] = Field(
+    origin: Quantity = Field(
         description="Zero value and units",
-        default=None,
     )
-    period: Optional[fhir.decimal] = Field(
+    period: fhir.decimal = Field(
         description="Number of milliseconds between samples",
-        default=None,
     )
     factor: Optional[fhir.decimal] = Field(
         description="Multiply data by this before adding to origin",
@@ -35,9 +33,8 @@ class SampledData(Element):
         description="Upper limit of detection",
         default=None,
     )
-    dimensions: Optional[fhir.positiveInt] = Field(
+    dimensions: fhir.positiveInt = Field(
         description="Number of sample points at each time point",
-        default=None,
     )
     data: Optional[fhir.string] = Field(
         description='decimal values with spaces, or "E" | "U" | "L"',

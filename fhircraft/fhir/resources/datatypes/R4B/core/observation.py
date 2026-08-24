@@ -94,9 +94,8 @@ class ObservationComponent(BackboneElement):
     Some observations have multiple component observations.  These component observations are expressed as separate code value pairs that share the same attributes.  Examples include systolic and diastolic component observations for blood pressure measurement and multiple component observations for genetics observations.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of component observation (code / type)",
-        default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Actual component result",
@@ -217,17 +216,15 @@ class Observation(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | preliminary | final | amended +",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of  type of observation",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of observation (code / type)",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="Who and/or what the observation is about",

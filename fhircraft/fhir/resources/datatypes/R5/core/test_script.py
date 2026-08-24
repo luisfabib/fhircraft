@@ -29,13 +29,11 @@ class TestScriptOrigin(BackboneElement):
     An abstract server used in operations within this test script in the origin element.
     """
 
-    index: Optional[fhir.integer] = Field(
+    index: fhir.integer = Field(
         description="The index of the abstract origin server starting at 1",
-        default=None,
     )
-    profile: Optional[Coding] = Field(
+    profile: Coding = Field(
         description="FHIR-Client | FHIR-SDC-FormFiller",
-        default=None,
     )
     url: Optional[fhir.url] = Field(
         description="The url path of the origin server",
@@ -48,13 +46,11 @@ class TestScriptDestination(BackboneElement):
     An abstract server used in operations within this test script in the destination element.
     """
 
-    index: Optional[fhir.integer] = Field(
+    index: fhir.integer = Field(
         description="The index of the abstract destination server starting at 1",
-        default=None,
     )
-    profile: Optional[Coding] = Field(
+    profile: Coding = Field(
         description="FHIR-Server | FHIR-SDC-FormManager | FHIR-SDC-FormReceiver | FHIR-SDC-FormProcessor",
-        default=None,
     )
     url: Optional[fhir.url] = Field(
         description="The url path of the destination server",
@@ -67,9 +63,8 @@ class TestScriptMetadataLink(BackboneElement):
     A link to the FHIR specification that this test is covering.
     """
 
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="URL to the specification",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="Short description",
@@ -82,13 +77,11 @@ class TestScriptMetadataCapability(BackboneElement):
     Capabilities that must exist and are assumed to function correctly on the FHIR server being tested.
     """
 
-    required: Optional[fhir.boolean] = Field(
+    required: fhir.boolean = Field(
         description="Are the capabilities required?",
-        default=None,
     )
-    validated: Optional[fhir.boolean] = Field(
+    validated: fhir.boolean = Field(
         description="Are the capabilities validated?",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="The expected capabilities of the server",
@@ -106,9 +99,8 @@ class TestScriptMetadataCapability(BackboneElement):
         description="Links to the FHIR specification",
         default=None,
     )
-    capabilities: Optional[fhir.canonical] = Field(
+    capabilities: fhir.canonical = Field(
         description="Required Capability Statement",
-        default=None,
     )
 
 
@@ -121,9 +113,8 @@ class TestScriptMetadata(BackboneElement):
         description="Links to the FHIR specification",
         default=None,
     )
-    capability: Optional[ListType[TestScriptMetadataCapability]] = Field(
+    capability: ListType[TestScriptMetadataCapability] = Field(
         description="Capabilities  that are assumed to function correctly on the FHIR server being tested",
-        default=None,
     )
 
 
@@ -132,9 +123,8 @@ class TestScriptScope(BackboneElement):
     The scope indicates a conformance artifact that is tested by the test(s) within this test case and the expectation of the test outcome(s) as well as the intended test phase inclusion.
     """
 
-    artifact: Optional[fhir.canonical] = Field(
+    artifact: fhir.canonical = Field(
         description="The specific conformance artifact being tested",
-        default=None,
     )
     conformance: Optional[CodeableConcept] = Field(
         description="required | optional | strict",
@@ -151,13 +141,11 @@ class TestScriptFixture(BackboneElement):
     Fixture in the test script - by reference (uri). All fixtures are required for the test script to execute.
     """
 
-    autocreate: Optional[fhir.boolean] = Field(
+    autocreate: fhir.boolean = Field(
         description="Whether or not to implicitly create the fixture during setup",
-        default=None,
     )
-    autodelete: Optional[fhir.boolean] = Field(
+    autodelete: fhir.boolean = Field(
         description="Whether or not to implicitly delete the fixture during teardown",
-        default=None,
     )
     resource: Optional[Reference] = Field(
         description="Reference of the resource",
@@ -170,9 +158,8 @@ class TestScriptVariable(BackboneElement):
     Variable is set based either on element value in response body or on header field value in the response headers.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Descriptive name for this variable",
-        default=None,
     )
     defaultValue: Optional[fhir.string] = Field(
         description="Default, hard-coded, or user-defined value for this variable",
@@ -237,9 +224,8 @@ class TestScriptSetupActionOperation(BackboneElement):
         description="Server responding to the request",
         default=None,
     )
-    encodeRequestUrl: Optional[fhir.boolean] = Field(
+    encodeRequestUrl: fhir.boolean = Field(
         description="Whether or not to send the request url in encoded format",
-        default=None,
     )
     method: Optional[fhir.code] = Field(
         description="delete | get | options | patch | post | put | head",
@@ -366,9 +352,8 @@ class TestScriptSetupActionAssert(BackboneElement):
         description="Fixture id_ of source expression or headerField",
         default=None,
     )
-    stopTestOnFail: Optional[fhir.boolean] = Field(
+    stopTestOnFail: fhir.boolean = Field(
         description="If this assert fails, will the current test execution stop?",
-        default=None,
     )
     validateProfileId: Optional[fhir.id_] = Field(
         description="Profile id_ of validation profile reference",
@@ -378,9 +363,8 @@ class TestScriptSetupActionAssert(BackboneElement):
         description="The value to compare to",
         default=None,
     )
-    warningOnly: Optional[fhir.boolean] = Field(
+    warningOnly: fhir.boolean = Field(
         description="Will this assert produce a warning only on error?",
-        default=None,
     )
     requirement: Optional[ListType["TestScriptSetupActionAssertRequirement"]] = Field(
         description="Links or references to the testing requirements",
@@ -409,9 +393,8 @@ class TestScriptSetup(BackboneElement):
     A series of required setup operations before tests are executed.
     """
 
-    action: Optional[ListType[TestScriptSetupAction]] = Field(
+    action: ListType[TestScriptSetupAction] = Field(
         description="A setup operation or assert to perform",
-        default=None,
     )
 
 
@@ -420,13 +403,11 @@ class TestScriptSetupActionOperationRequestHeader(BackboneElement):
     Header elements would be used to set HTTP headers.
     """
 
-    field: Optional[fhir.string] = Field(
+    field: fhir.string = Field(
         description="HTTP header field name",
-        default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="HTTP headerfield value",
-        default=None,
     )
 
 
@@ -674,9 +655,8 @@ class TestScriptTest(BackboneElement):
         description="Tracking/reporting short description of the test",
         default=None,
     )
-    action: Optional[ListType[TestScriptTestAction]] = Field(
+    action: ListType[TestScriptTestAction] = Field(
         description="A test operation or assert to perform",
-        default=None,
     )
 
 
@@ -685,9 +665,8 @@ class TestScriptTeardownAction(BackboneElement):
     The teardown action will only contain an operation.
     """
 
-    operation: Optional[TestScriptSetupActionOperation] = Field(
+    operation: TestScriptSetupActionOperation = Field(
         description="The teardown operation to perform",
-        default=None,
     )
 
 
@@ -696,9 +675,8 @@ class TestScriptTeardown(BackboneElement):
     A series of operations required to clean up after all the tests are executed (successfully or otherwise).
     """
 
-    action: Optional[ListType[TestScriptTeardownAction]] = Field(
+    action: ListType[TestScriptTeardownAction] = Field(
         description="One or more teardown operations to perform",
-        default=None,
     )
 
 
@@ -731,17 +709,15 @@ class TestScript(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this test script (computer friendly)",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Name for this test script (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

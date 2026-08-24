@@ -28,9 +28,8 @@ class EncounterHistoryLocation(BackboneElement):
     The location of the patient at this point in the encounter, the multiple cardinality permits de-normalizing the levels of the location hierarchy, such as site/ward/room/bed.
     """
 
-    location: Optional[Reference] = Field(
+    location: Reference = Field(
         description="Location the encounter takes place",
-        default=None,
     )
     form: Optional[CodeableConcept] = Field(
         description="The physical type of the location (usually the level in the location hierarchy - bed, room, ward, virtual etc.)",
@@ -54,13 +53,11 @@ class EncounterHistory(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="planned | in-progress | on-hold | discharged | completed | cancelled | discontinued | entered-in-error | unknown",
-        default=None,
     )
-    class_: Optional[CodeableConcept] = Field(
+    class_: CodeableConcept = Field(
         description="Classification of patient encounter",
-        default=None,
         alias="class",
     )
     type: Optional[ListType[CodeableConcept]] = Field(

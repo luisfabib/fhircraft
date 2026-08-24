@@ -31,9 +31,8 @@ class CompositionAttester(BackboneElement):
     A participant who has attested to the accuracy of the composition/document.
     """
 
-    mode: Optional[CodeableConcept] = Field(
+    mode: CodeableConcept = Field(
         description="personal | professional | legal | official",
-        default=None,
     )
     time: Optional[fhir.dateTime] = Field(
         description="When the composition was attested",
@@ -124,13 +123,11 @@ class Composition(DomainResource):
         description="An explicitly assigned identifer of a variation of the content in the Composition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
-        default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Kind of composition (LOINC if possible)",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of Composition",
@@ -144,25 +141,22 @@ class Composition(DomainResource):
         description="Context of the Composition",
         default=None,
     )
-    date: Optional[fhir.dateTime] = Field(
+    date: fhir.dateTime = Field(
         description="Composition editing time",
-        default=None,
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    author: Optional[ListType[Reference]] = Field(
+    author: ListType[Reference] = Field(
         description="Who and/or what authored the composition",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="Name for this Composition (computer friendly)",
         default=None,
     )
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Human Readable name/title",
-        default=None,
     )
     note: Optional[ListType[Annotation]] = Field(
         description="For any additional notes",

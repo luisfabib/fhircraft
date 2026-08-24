@@ -44,13 +44,11 @@ class ImagingSelectionInstanceImageRegion2D(BackboneElement):
        If the parent imagingSelection.instance contains a subset element of type frame, the image region applies to all frames in the subset list.
     """
 
-    regionType: Optional[fhir.code] = Field(
+    regionType: fhir.code = Field(
         description="point | polyline | interpolated | circle | ellipse",
-        default=None,
     )
-    coordinate: Optional[ListType[fhir.decimal]] = Field(
+    coordinate: ListType[fhir.decimal] = Field(
         description="Specifies the coordinates that define the image region",
-        default=None,
     )
 
 
@@ -59,13 +57,11 @@ class ImagingSelectionInstanceImageRegion3D(BackboneElement):
     Each imaging selection might includes a 3D image region, specified by a region type and a set of 3D coordinates.
     """
 
-    regionType: Optional[fhir.code] = Field(
+    regionType: fhir.code = Field(
         description="point | multipoint | polyline | polygon | ellipse | ellipsoid",
-        default=None,
     )
-    coordinate: Optional[ListType[fhir.decimal]] = Field(
+    coordinate: ListType[fhir.decimal] = Field(
         description="Specifies the coordinates that define the image region",
-        default=None,
     )
 
 
@@ -74,9 +70,8 @@ class ImagingSelectionInstance(BackboneElement):
     Each imaging selection includes one or more selected DICOM SOP instances.
     """
 
-    uid: Optional[fhir.id_] = Field(
+    uid: fhir.id_ = Field(
         description="DICOM SOP Instance UID",
-        default=None,
     )
     number: Optional[fhir.unsignedInt] = Field(
         description="DICOM Instance Number",
@@ -113,9 +108,8 @@ class ImagingSelection(DomainResource):
         description="Business Identifier for Imaging Selection",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="available | entered-in-error | unknown",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="Subject of the selected instances",
@@ -137,9 +131,8 @@ class ImagingSelection(DomainResource):
         description="Classifies the imaging selection",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Imaging Selection purpose text or code",
-        default=None,
     )
     studyUid: Optional[fhir.id_] = Field(
         description="DICOM Study Instance UID",

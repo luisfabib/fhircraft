@@ -30,9 +30,8 @@ class ClaimResponseItemAdjudication(BackboneElement):
     If this item is a group then the values here are a summary of the adjudication of the detail items. If this item is a simple product or service then this is the result of the adjudication of this item.
     """
 
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="Type of adjudication information",
-        default=None,
     )
     reason: Optional[CodeableConcept] = Field(
         description="Explanation of adjudication outcome",
@@ -76,9 +75,8 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
     A sub-detail adjudication of a simple product or service.
     """
 
-    subDetailSequence: Optional[fhir.positiveInt] = Field(
+    subDetailSequence: fhir.positiveInt = Field(
         description="Claim sub-detail instance identifier",
-        default=None,
     )
     noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
@@ -95,17 +93,15 @@ class ClaimResponseItemDetail(BackboneElement):
     A claim detail. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
     """
 
-    detailSequence: Optional[fhir.positiveInt] = Field(
+    detailSequence: fhir.positiveInt = Field(
         description="Claim detail instance identifier",
-        default=None,
     )
     noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
-    adjudication: Optional[ListType[ClaimResponseItemDetailAdjudication]] = Field(
+    adjudication: ListType[ClaimResponseItemDetailAdjudication] = Field(
         description="Detail level adjudication details",
-        default=None,
     )
     subDetail: Optional[ListType[ClaimResponseItemDetailSubDetail]] = Field(
         description="Adjudication for claim sub-details",
@@ -118,17 +114,15 @@ class ClaimResponseItem(BackboneElement):
     A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
     """
 
-    itemSequence: Optional[fhir.positiveInt] = Field(
+    itemSequence: fhir.positiveInt = Field(
         description="Claim item instance identifier",
-        default=None,
     )
     noteNumber: Optional[ListType[fhir.positiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
-    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
+    adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Adjudication details",
-        default=None,
     )
     detail: Optional[ListType[ClaimResponseItemDetail]] = Field(
         description="Adjudication for claim details",
@@ -141,9 +135,8 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
     The third-tier service adjudications for payor added services.
     """
 
-    productOrService: Optional[CodeableConcept] = Field(
+    productOrService: CodeableConcept = Field(
         description="Billing, service, product, or drug code",
-        default=None,
     )
     modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
@@ -169,9 +162,8 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Applicable note numbers",
         default=None,
     )
-    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
+    adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Added items detail adjudication",
-        default=None,
     )
 
 
@@ -180,9 +172,8 @@ class ClaimResponseAddItemDetail(BackboneElement):
     The second-tier service adjudications for payor added services.
     """
 
-    productOrService: Optional[CodeableConcept] = Field(
+    productOrService: CodeableConcept = Field(
         description="Billing, service, product, or drug code",
-        default=None,
     )
     modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
@@ -208,9 +199,8 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Applicable note numbers",
         default=None,
     )
-    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
+    adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Added items detail adjudication",
-        default=None,
     )
     subDetail: Optional[ListType[ClaimResponseAddItemDetailSubDetail]] = Field(
         description="Insurer added line items",
@@ -239,9 +229,8 @@ class ClaimResponseAddItem(BackboneElement):
         description="Authorized providers",
         default=None,
     )
-    productOrService: Optional[CodeableConcept] = Field(
+    productOrService: CodeableConcept = Field(
         description="Billing, service, product, or drug code",
-        default=None,
     )
     modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
@@ -299,9 +288,8 @@ class ClaimResponseAddItem(BackboneElement):
         description="Applicable note numbers",
         default=None,
     )
-    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
+    adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Added items adjudication",
-        default=None,
     )
     detail: Optional[ListType[ClaimResponseAddItemDetail]] = Field(
         description="Insurer added line details",
@@ -346,13 +334,11 @@ class ClaimResponseTotal(BackboneElement):
     Categorized monetary totals for the adjudication.
     """
 
-    category: Optional[CodeableConcept] = Field(
+    category: CodeableConcept = Field(
         description="Type of adjudication information",
-        default=None,
     )
-    amount: Optional[Money] = Field(
+    amount: Money = Field(
         description="Financial total for the category",
-        default=None,
     )
 
 
@@ -361,9 +347,8 @@ class ClaimResponsePayment(BackboneElement):
     Payment details for the adjudication of the claim.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Partial or complete payment",
-        default=None,
     )
     adjustment: Optional[Money] = Field(
         description="Payment adjustment for non-claim issues",
@@ -377,9 +362,8 @@ class ClaimResponsePayment(BackboneElement):
         description="Expected date of payment",
         default=None,
     )
-    amount: Optional[Money] = Field(
+    amount: Money = Field(
         description="Payable amount after adjustment",
-        default=None,
     )
     identifier: Optional[Identifier] = Field(
         description="Business identifier for the payment",
@@ -400,9 +384,8 @@ class ClaimResponseProcessNote(BackboneElement):
         description="display | print | printoper",
         default=None,
     )
-    text: Optional[fhir.string] = Field(
+    text: fhir.string = Field(
         description="Note explanatory text",
-        default=None,
     )
     language: Optional[CodeableConcept] = Field(
         description="Language of the text",
@@ -415,17 +398,14 @@ class ClaimResponseInsurance(BackboneElement):
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Insurance instance identifier",
-        default=None,
     )
-    focal: Optional[fhir.boolean] = Field(
+    focal: fhir.boolean = Field(
         description="Coverage to be used for adjudication",
-        default=None,
     )
-    coverage: Optional[Reference] = Field(
+    coverage: Reference = Field(
         description="Insurance information",
-        default=None,
     )
     businessArrangement: Optional[fhir.string] = Field(
         description="Additional provider contract number",
@@ -454,9 +434,8 @@ class ClaimResponseError(BackboneElement):
         description="Subdetail sequence number",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Error code detailing processing issues",
-        default=None,
     )
 
 
@@ -485,33 +464,27 @@ class ClaimResponse(DomainResource):
         description="Business Identifier for a claim response",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="More granular claim type",
-        default=None,
     )
     subType: Optional[CodeableConcept] = Field(
         description="More granular claim type",
         default=None,
     )
-    use: Optional[fhir.code] = Field(
+    use: fhir.code = Field(
         description="claim | preauthorization | predetermination",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="The recipient of the products and services",
-        default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Response creation date",
-        default=None,
     )
-    insurer: Optional[Reference] = Field(
+    insurer: Reference = Field(
         description="Party responsible for reimbursement",
-        default=None,
     )
     requestor: Optional[Reference] = Field(
         description="Party responsible for the claim",
@@ -521,9 +494,8 @@ class ClaimResponse(DomainResource):
         description="id_ of resource triggering adjudication",
         default=None,
     )
-    outcome: Optional[fhir.code] = Field(
+    outcome: fhir.code = Field(
         description="queued | complete | error | partial",
-        default=None,
     )
     disposition: Optional[fhir.string] = Field(
         description="Disposition Message",

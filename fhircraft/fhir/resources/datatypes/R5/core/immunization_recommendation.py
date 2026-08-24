@@ -26,13 +26,11 @@ class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
     Vaccine date recommendations.  For example, earliest date to administer, latest date to administer, etc.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of date",
-        default=None,
     )
-    value: Optional[fhir.dateTime] = Field(
+    value: fhir.dateTime = Field(
         description="Recommended date",
-        default=None,
     )
 
 
@@ -53,9 +51,8 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Vaccine which is contraindicated to fulfill the recommendation",
         default=None,
     )
-    forecastStatus: Optional[CodeableConcept] = Field(
+    forecastStatus: CodeableConcept = Field(
         description="Vaccine recommendation status",
-        default=None,
     )
     forecastReason: Optional[ListType[CodeableConcept]] = Field(
         description="Vaccine administration status reason",
@@ -108,22 +105,19 @@ class ImmunizationRecommendation(DomainResource):
         description="Business identifier",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who this profile is for",
-        default=None,
     )
-    date: Optional[fhir.dateTime] = Field(
+    date: fhir.dateTime = Field(
         description="Date recommendation(s) created",
-        default=None,
     )
     authority: Optional[Reference] = Field(
         description="Who is responsible for protocol",
         default=None,
     )
-    recommendation: Optional[ListType[ImmunizationRecommendationRecommendation]] = (
+    recommendation: ListType[ImmunizationRecommendationRecommendation] = (
         Field(
             description="Vaccine administration recommendations",
-            default=None,
         )
     )
 

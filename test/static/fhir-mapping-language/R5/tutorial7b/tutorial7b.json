@@ -55,7 +55,8 @@
             }
           ]
         }
-      ]
+      ],
+      "typeMode": "none"
     },
     {
       "name": "abContent",
@@ -93,7 +94,8 @@
             }
           ]
         }
-      ]
+      ],
+      "typeMode": "none"
     }
   ]
 }

@@ -26,9 +26,8 @@ class Annotation(Element):
         description="When the annotation was made",
         default=None,
     )
-    text: Optional[fhir.markdown] = Field(
+    text: fhir.markdown = Field(
         description="The annotation  - text content (as markdown)",
-        default=None,
     )
 
     @model_validator(mode="after")

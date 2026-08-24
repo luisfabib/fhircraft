@@ -55,9 +55,8 @@ class Media(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="Classification of media as image, video, or audio",
@@ -127,9 +126,8 @@ class Media(DomainResource):
         description="Length in seconds (audio / video)",
         default=None,
     )
-    content: Optional[Attachment] = Field(
+    content: Attachment = Field(
         description="Actual Media - reference or data",
-        default=None,
     )
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the media",

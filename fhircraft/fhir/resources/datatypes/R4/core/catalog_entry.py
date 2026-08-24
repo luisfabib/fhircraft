@@ -25,13 +25,11 @@ class CatalogEntryRelatedEntry(BackboneElement):
     Used for example, to point to a substance, or to a device used to administer a medication.
     """
 
-    relationtype: Optional[fhir.code] = Field(
+    relationtype: fhir.code = Field(
         description="triggers | is-replaced-by",
-        default=None,
     )
-    item: Optional[Reference] = Field(
+    item: Reference = Field(
         description="The reference to the related item",
-        default=None,
     )
 
 class CatalogEntry(DomainResource):
@@ -63,13 +61,11 @@ class CatalogEntry(DomainResource):
         description="The type of item - medication, device, service, protocol or other",
         default=None,
     )
-    orderable: Optional[fhir.boolean] = Field(
+    orderable: fhir.boolean = Field(
         description="Whether the entry represents an orderable item",
-        default=None,
     )
-    referencedItem: Optional[Reference] = Field(
+    referencedItem: Reference = Field(
         description="The item that is being defined",
-        default=None,
     )
     additionalIdentifier: Optional[ListType[Identifier]] = Field(
         description="Any additional identifier(s) for the catalog item, in the same granularity or concept",

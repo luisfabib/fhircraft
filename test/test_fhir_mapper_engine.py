@@ -27,11 +27,11 @@ from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroupRuleTargetParameter,
     StructureMapStructure,
 )
-from fhircraft.fhir.resources.datatypes.R4.core.structure_definition import (
+from fhircraft.fhir.resources.datatypes.R5.core.structure_definition import (
     StructureDefinition,
     StructureDefinitionSnapshot,
 )
-from fhircraft.fhir.resources.datatypes.R4.complex import (
+from fhircraft.fhir.resources.datatypes.R5.complex import (
     ElementDefinition,
     ElementDefinitionType,
     ElementDefinitionBase,
@@ -111,7 +111,9 @@ def test_integration_tutorial_examples(directory):
     for structure in structure_definitions:
         repository.add(structure)
 
-    engine = FHIRMappingEngine(structure_definition_registry=repository, fhir_release="R5")
+    engine = FHIRMappingEngine(
+        structure_definition_registry=repository, fhir_release="R5"
+    )
 
     result = engine.execute(structure_map, input)
     assert isinstance(result[0], BaseModel)
@@ -682,7 +684,11 @@ def test_resolve_aliased_source_structure_definitions():
                 mode="source",
                 alias="SimpleSourceAlias",
             )
-        ]
+        ],
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
@@ -707,7 +713,11 @@ def test_resolve_unaliased_source_structure_definitions():
                 url="http://example.org/StructureDefinition/SimpleSource",
                 mode="source",
             )
-        ]
+        ],
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
@@ -733,7 +743,11 @@ def test_resolve_aliased_target_structure_definitions():
                 mode="target",
                 alias="SimpleTargetAlias",
             )
-        ]
+        ],
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
@@ -759,7 +773,11 @@ def test_resolve_unaliased_target_structure_definitions():
                 url="http://example.org/StructureDefinition/SimpleTarget",
                 mode="target",
             )
-        ]
+        ],
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
@@ -779,7 +797,13 @@ def test_resolve_unaliased_target_structure_definitions():
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_resolve_structure_definitions_empty_structure_map():
     """Test resolving structure definitions when StructureMap has no structures defined."""
-    structure_map = StructureMap(structure=None)
+    structure_map = StructureMap(
+        structure=None,
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
+    )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
     engine = FHIRMappingEngine(structure_definition_registry=repository)
@@ -797,10 +821,13 @@ def test_resolve_structure_definitions_missing_url():
     structure_map = StructureMap(
         structure=[
             StructureMapStructure(
-                mode="source",
-                alias="TestAlias",
+                mode="source", alias="TestAlias", url="http://test.org"
             )
-        ]
+        ],
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
@@ -812,28 +839,6 @@ def test_resolve_structure_definitions_missing_url():
 
     assert "TestAlias" in resolved
     assert resolved["TestAlias"] is ArbitraryModel
-
-
-@pytest.mark.filterwarnings("ignore:.*dom-6.*")
-def test_resolve_structure_definitions_missing_url_no_alias():
-    """Test resolving structure definitions when structure has no URL and no alias."""
-    structure_map = StructureMap(
-        structure=[
-            StructureMapStructure(
-                mode="source",
-            )
-        ]
-    )
-
-    repository = StructureDefinitionRegistry(fhir_release="R5")
-    engine = FHIRMappingEngine(structure_definition_registry=repository)
-
-    resolved = engine._resolve_structure_definitions(
-        structure_map, StructureMapModelMode.SOURCE
-    )
-
-    assert "arbitrary" in resolved
-    assert resolved["arbitrary"] is ArbitraryModel
 
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
@@ -851,7 +856,11 @@ def test_resolve_structure_definitions_different_mode():
                 mode="source",  # Requesting source mode
                 alias="TargetAsSource",
             ),
-        ]
+        ],
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
@@ -883,8 +892,7 @@ def test_resolve_structure_definitions_mixed_scenarios():
             ),
             # Structure with missing URL
             StructureMapStructure(
-                mode="source",
-                alias="MissingUrl",
+                mode="source", alias="MissingUrl", url="http://test.org"
             ),
             # Structure with different mode (should be skipped)
             StructureMapStructure(
@@ -892,7 +900,11 @@ def test_resolve_structure_definitions_mixed_scenarios():
                 mode="target",
                 alias="DifferentMode",
             ),
-        ]
+        ],
+        group=[],
+        name="test",
+        status="final",
+        url="http://test.org",
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")

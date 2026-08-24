@@ -26,18 +26,16 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     A set of additional dependencies for this mapping to hold. This mapping is only applicable if the specified element can be resolved, and it has the specified value.
     """
 
-    property_: Optional[fhir.uri] = Field(
+    property_: fhir.uri = Field(
         description="Reference to property mapping depends on",
-        default=None,
         alias="property",
     )
     system: Optional[fhir.canonical] = Field(
         description="code System (if necessary)",
         default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="Value of the referenced element",
-        default=None,
     )
     display: Optional[fhir.string] = Field(
         description="Display for the code (if value is a code)",
@@ -82,9 +80,8 @@ class ConceptMapGroupElementTarget(BackboneElement):
         description="Display for the code",
         default=None,
     )
-    equivalence: Optional[fhir.code] = Field(
+    equivalence: fhir.code = Field(
         description="relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint",
-        default=None,
     )
     comment: Optional[fhir.string] = Field(
         description="Description of status/issues in mapping",
@@ -124,9 +121,8 @@ class ConceptMapGroupUnmapped(BackboneElement):
     What to do when there is no mapping for the source concept. "Unmapped" does not include codes that are unmatched, and the unmapped element is ignored in a code is specified to have equivalence = unmatched.
     """
 
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="provided | fixed | other-map",
-        default=None,
     )
     code: Optional[fhir.code] = Field(
         description="Fixed code when mode = fixed",
@@ -163,9 +159,8 @@ class ConceptMapGroup(BackboneElement):
         description="Specific version of the  code system",
         default=None,
     )
-    element: Optional[ListType[ConceptMapGroupElement]] = Field(
+    element: ListType[ConceptMapGroupElement] = Field(
         description="Mappings for a concept from the source set",
-        default=None,
     )
     unmapped: Optional[ConceptMapGroupUnmapped] = Field(
         description="What to do when there is no mapping for the source concept",
@@ -214,9 +209,8 @@ class ConceptMap(DomainResource):
         description="Name for this concept map (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

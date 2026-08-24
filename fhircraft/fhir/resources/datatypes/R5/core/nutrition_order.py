@@ -307,21 +307,18 @@ class NutritionOrder(DomainResource):
         description="Composite Request ID",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who requires the diet, formula or nutritional supplement",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="The encounter associated with this nutrition order",
@@ -331,9 +328,8 @@ class NutritionOrder(DomainResource):
         description="Information to support fulfilling of the nutrition order",
         default=None,
     )
-    dateTime: Optional[fhir.dateTime] = Field(
+    dateTime: fhir.dateTime = Field(
         description="Date and time the nutrition order was requested",
-        default=None,
     )
     orderer: Optional[Reference] = Field(
         description="Who ordered the diet, formula or nutritional supplement",

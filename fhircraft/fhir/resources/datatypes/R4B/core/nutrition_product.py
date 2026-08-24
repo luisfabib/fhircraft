@@ -45,9 +45,8 @@ class NutritionProductIngredient(BackboneElement):
     Ingredients contained in this product.
     """
 
-    item: Optional[CodeableReference] = Field(
+    item: CodeableReference = Field(
         description="The ingredient contained in the product",
-        default=None,
     )
     amount: Optional[ListType[Ratio]] = Field(
         description="The amount of ingredient that is in the product",
@@ -60,9 +59,8 @@ class NutritionProductProductCharacteristic(BackboneElement):
     Specifies descriptive properties of the nutrition product.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="code specifying the type of characteristic",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="The value of the characteristic",
@@ -161,9 +159,8 @@ class NutritionProduct(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | inactive | entered-in-error",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="A category or class of the nutrition product (halal, kosher, gluten free, vegan, etc)",

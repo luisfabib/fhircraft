@@ -27,13 +27,11 @@ class EncounterStatusHistory(BackboneElement):
     The status history permits the encounter resource to contain the status history without needing to read through the historical versions of the resource, or even have the server store them.
     """
 
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="planned | arrived | triaged | in-progress | onleave | finished | cancelled +",
-        default=None,
     )
-    period: Optional[Period] = Field(
+    period: Period = Field(
         description="The time that the episode was in the specified status",
-        default=None,
     )
 
 class EncounterClassHistory(BackboneElement):
@@ -41,14 +39,12 @@ class EncounterClassHistory(BackboneElement):
     The class history permits the tracking of the encounters transitions without needing to go  through the resource history.  This would be used for a case where an admission starts of as an emergency encounter, then transitions into an inpatient scenario. Doing this and not restarting a new encounter ensures that any lab/diagnostic results can more easily follow the patient and not require re-processing and not get lost or cancelled during a kind of discharge from emergency to inpatient.
     """
 
-    class_: Optional[Coding] = Field(
+    class_: Coding = Field(
         description="inpatient | outpatient | ambulatory | emergency +",
-        default=None,
         alias="class",
     )
-    period: Optional[Period] = Field(
+    period: Period = Field(
         description="The time that the episode was in the specified class",
-        default=None,
     )
 
 class EncounterParticipant(BackboneElement):
@@ -74,9 +70,8 @@ class EncounterDiagnosis(BackboneElement):
     The list of diagnosis relevant to this encounter.
     """
 
-    condition: Optional[Reference] = Field(
+    condition: Reference = Field(
         description="The diagnosis or procedure relevant to the encounter",
-        default=None,
     )
     use: Optional[CodeableConcept] = Field(
         description="Role that this diagnosis has within the encounter (e.g. admission, billing, discharge \u2026)",
@@ -134,9 +129,8 @@ class EncounterLocation(BackboneElement):
     List of locations where  the patient has been during this encounter.
     """
 
-    location: Optional[Reference] = Field(
+    location: Reference = Field(
         description="Location the encounter takes place",
-        default=None,
     )
     status: Optional[fhir.code] = Field(
         description="planned | active | reserved | completed",
@@ -176,17 +170,15 @@ class Encounter(DomainResource):
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="planned | arrived | triaged | in-progress | onleave | finished | cancelled +",
-        default=None,
     )
     statusHistory: Optional[ListType[EncounterStatusHistory]] = Field(
         description="List of past encounter statuses",
         default=None,
     )
-    class_: Optional[Coding] = Field(
+    class_: Coding = Field(
         description="Classification of patient encounter",
-        default=None,
         alias="class",
     )
     classHistory: Optional[ListType[EncounterClassHistory]] = Field(

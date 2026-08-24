@@ -31,9 +31,8 @@ class ConceptMapProperty(BackboneElement):
     A property defines a slot through which additional information can be provided about a map from source -> target.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Identifies the property on the mappings, and when referred to in the $translate operation",
-        default=None,
     )
     uri: Optional[fhir.uri] = Field(
         description="Formal identifier for the property",
@@ -43,9 +42,8 @@ class ConceptMapProperty(BackboneElement):
         description="Why the property is defined, and/or what it conveys",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="Coding | string | integer | boolean | dateTime | decimal | code",
-        default=None,
     )
     system: Optional[fhir.canonical] = Field(
         description="The CodeSystem from which code values come",
@@ -58,9 +56,8 @@ class ConceptMapAdditionalAttribute(BackboneElement):
     An additionalAttribute defines an additional data element found in the source or target data model where the data will come from or be mapped to. Some mappings are based on data in addition to the source data element, where codes in multiple fields are combined to a single field (or vice versa).
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Identifies this additional attribute through this resource",
-        default=None,
     )
     uri: Optional[fhir.uri] = Field(
         description="Formal identifier for the data element referred to in this attribte",
@@ -70,9 +67,8 @@ class ConceptMapAdditionalAttribute(BackboneElement):
         description="Why the additional attribute is defined, and/or what the data element it refers to is",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="code | Coding | string | boolean | Quantity",
-        default=None,
     )
 
 
@@ -81,9 +77,8 @@ class ConceptMapGroupElementTargetProperty(BackboneElement):
     A property value for this source -> target mapping.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Reference to ConceptMap.property.code",
-        default=None,
     )
     valueCoding: Optional[Coding] = Field(
         description="Value of the property for this concept",
@@ -144,9 +139,8 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     A set of additional dependencies for this mapping to hold. This mapping is only applicable if the specified data attribute can be resolved, and it has the specified value.
     """
 
-    attribute: Optional[fhir.code] = Field(
+    attribute: fhir.code = Field(
         description="A reference to a mapping attribute defined in ConceptMap.additionalAttribute",
-        default=None,
     )
     valueCode: Optional[fhir.code] = Field(
         description="Value of the referenced data element",
@@ -258,9 +252,8 @@ class ConceptMapGroupElementTarget(BackboneElement):
         description="Identifies the set of target concepts",
         default=None,
     )
-    relationship: Optional[fhir.code] = Field(
+    relationship: fhir.code = Field(
         description="related-to | equivalent | source-is-narrower-than-target | source-is-broader-than-target | not-related-to",
-        default=None,
     )
     comment: Optional[fhir.string] = Field(
         description="Description of status/issues in mapping",
@@ -313,9 +306,8 @@ class ConceptMapGroupUnmapped(BackboneElement):
     What to do when there is no mapping to a target concept from the source concept and ConceptMap.group.element.noMap is not true. This provides the "default" to be applied when there is no target concept mapping specified or the expansion of ConceptMap.group.element.target.valueSet is empty.
     """
 
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="use-source-code | fixed | other-map",
-        default=None,
     )
     code: Optional[fhir.code] = Field(
         description="Fixed code when mode = fixed",
@@ -352,9 +344,8 @@ class ConceptMapGroup(BackboneElement):
         description="Target system that the concepts are to be mapped to",
         default=None,
     )
-    element: Optional[ListType[ConceptMapGroupElement]] = Field(
+    element: ListType[ConceptMapGroupElement] = Field(
         description="Mappings for a concept from the source set",
-        default=None,
     )
     unmapped: Optional[ConceptMapGroupUnmapped] = Field(
         description="What to do when there is no mapping target for the source concept and ConceptMap.group.element.noMap is not true",
@@ -399,9 +390,8 @@ class ConceptMap(DomainResource):
         description="Name for this concept map (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

@@ -107,9 +107,8 @@ class MolecularSequenceRelative(BackboneElement):
     A sequence defined relative to another sequence.
     """
 
-    coordinateSystem: Optional[CodeableConcept] = Field(
+    coordinateSystem: CodeableConcept = Field(
         description="Ways of identifying nucleotides or amino acids within a sequence",
-        default=None,
     )
     ordinalPosition: Optional[fhir.integer] = Field(
         description="Indicates the order in which the sequence should be considered when putting multiple \u0027relative\u0027 elements together",

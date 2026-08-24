@@ -26,9 +26,8 @@ class CompositionAttester(BackboneElement):
     A participant who has attested to the accuracy of the composition/document.
     """
 
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="personal | professional | legal | official",
-        default=None,
     )
     time: Optional[fhir.dateTime] = Field(
         description="When the composition was attested",
@@ -45,9 +44,8 @@ class CompositionRelatesTo(BackboneElement):
     Relationships that this composition has with other compositions or documents that already exist.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="replaces | transforms | signs | appends",
-        default=None,
     )
     targetIdentifier: Optional[Identifier] = Field(
         description="Target of the relationship",
@@ -166,13 +164,11 @@ class Composition(DomainResource):
         description="Version-independent identifier for the Composition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preliminary | final | amended | entered-in-error",
-        default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Kind of composition (LOINC if possible)",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of Composition",
@@ -186,17 +182,14 @@ class Composition(DomainResource):
         description="Context of the Composition",
         default=None,
     )
-    date: Optional[fhir.dateTime] = Field(
+    date: fhir.dateTime = Field(
         description="Composition editing time",
-        default=None,
     )
-    author: Optional[ListType[Reference]] = Field(
+    author: ListType[Reference] = Field(
         description="Who and/or what authored the composition",
-        default=None,
     )
-    title: Optional[fhir.string] = Field(
+    title: fhir.string = Field(
         description="Human Readable name/title",
-        default=None,
     )
     confidentiality: Optional[fhir.code] = Field(
         description="As defined by affinity domain",

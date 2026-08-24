@@ -34,13 +34,11 @@ class DeviceUdiCarrier(BackboneElement):
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
     """
 
-    deviceIdentifier: Optional[fhir.string] = Field(
+    deviceIdentifier: fhir.string = Field(
         description="Mandatory fixed portion of UDI",
-        default=None,
     )
-    issuer: Optional[fhir.uri] = Field(
+    issuer: fhir.uri = Field(
         description="UDI Issuing Organization",
-        default=None,
     )
     jurisdiction: Optional[fhir.uri] = Field(
         description="Regional UDI authority",
@@ -65,13 +63,11 @@ class DeviceName(BackboneElement):
     This represents the manufacturer's name of the device as provided by the device, from a UDI label, or by a person describing the Device.  This typically would be used when a person provides the name(s) or when the device represents one of the names available from DeviceDefinition.
     """
 
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The term that names the device",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="registered-name | user-friendly-name | patient-reported-name",
-        default=None,
     )
     display: Optional[fhir.boolean] = Field(
         description="The preferred device name",
@@ -96,9 +92,8 @@ class DeviceVersion(BackboneElement):
         description="The date the version was installed on the device",
         default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The version text",
-        default=None,
     )
 
 
@@ -111,9 +106,8 @@ class DeviceConformsTo(BackboneElement):
         description="Describes the common type of the standard, specification, or formal guidance.  communication | performance | measurement",
         default=None,
     )
-    specification: Optional[CodeableConcept] = Field(
+    specification: CodeableConcept = Field(
         description="Identifies the standard, specification, or formal guidance that the device adheres to",
-        default=None,
     )
     version: Optional[fhir.string] = Field(
         description="Specific form or variant of the standard",
@@ -126,9 +120,8 @@ class DeviceProperty(BackboneElement):
     Static or essentially fixed characteristics or features of the device (e.g., time or timing attributes, resolution, accuracy, intended use or instructions for use, and physical attributes) that are not otherwise captured in more specific attributes.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="code that specifies the property being represented",
-        default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Value of the property",

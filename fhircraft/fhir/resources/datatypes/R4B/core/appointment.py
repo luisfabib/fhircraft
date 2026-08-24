@@ -37,9 +37,8 @@ class AppointmentParticipant(BackboneElement):
         description="required | optional | information-only",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="accepted | declined | tentative | needs-action",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="Participation period of the actor",
@@ -71,9 +70,8 @@ class Appointment(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist",
-        default=None,
     )
     cancelationReason: Optional[CodeableConcept] = Field(
         description="The coded reason for the appointment being cancelled",
@@ -147,9 +145,8 @@ class Appointment(DomainResource):
         description="The service request this appointment is allocated to assess",
         default=None,
     )
-    participant: Optional[ListType[AppointmentParticipant]] = Field(
+    participant: ListType[AppointmentParticipant] = Field(
         description="Participants involved in appointment",
-        default=None,
     )
     requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",

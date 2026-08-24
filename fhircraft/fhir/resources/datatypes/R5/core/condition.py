@@ -35,9 +35,8 @@ class ConditionParticipant(BackboneElement):
         description="Type of involvement",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who or what participated in the activities related to the condition",
-        default=None,
     )
 
 
@@ -73,9 +72,8 @@ class Condition(DomainResource):
         description="External Ids for this condition",
         default=None,
     )
-    clinicalStatus: Optional[CodeableConcept] = Field(
+    clinicalStatus: CodeableConcept = Field(
         description="active | recurrence | relapse | inactive | remission | resolved | unknown",
-        default=None,
     )
     verificationStatus: Optional[CodeableConcept] = Field(
         description="unconfirmed | provisional | differential | confirmed | refuted | entered-in-error",
@@ -97,9 +95,8 @@ class Condition(DomainResource):
         description="Anatomical location, if relevant",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who has the condition?",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="The Encounter during which this Condition was created",

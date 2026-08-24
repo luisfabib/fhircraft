@@ -60,9 +60,8 @@ class Schedule(DomainResource):
         description="Type of specialty needed",
         default=None,
     )
-    actor: Optional[ListType[Reference]] = Field(
+    actor: ListType[Reference] = Field(
         description="Resource(s) that availability information is being provided for",
-        default=None,
     )
     planningHorizon: Optional[Period] = Field(
         description="Period of time covered by schedule",

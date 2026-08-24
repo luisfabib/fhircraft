@@ -30,9 +30,8 @@ class RelatedPersonCommunication(BackboneElement):
     A language which may be used to communicate with the related person about the patient's health.
     """
 
-    language: Optional[CodeableConcept] = Field(
+    language: CodeableConcept = Field(
         description="The language which can be used to communicate with the related person about the patient\u0027s health",
-        default=None,
     )
     preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
@@ -56,9 +55,8 @@ class RelatedPerson(DomainResource):
         description="Whether this related person\u0027s record is in active use",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="The patient this person is related to",
-        default=None,
     )
     relationship: Optional[ListType[CodeableConcept]] = Field(
         description="The relationship of the related person to the patient",

@@ -26,9 +26,8 @@ class CompartmentDefinitionResource(BackboneElement):
     Information about how a resource is related to the compartment.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Name of resource type",
-        default=None,
     )
     param: Optional[ListType[fhir.string]] = Field(
         description="Search Parameter Name, or chained parameters",
@@ -57,9 +56,8 @@ class CompartmentDefinition(DomainResource):
     _type = "CompartmentDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CompartmentDefinition"
 
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="canonical identifier for this compartment definition, represented as a URI (globally unique)",
-        default=None,
     )
     version: Optional[fhir.string] = Field(
         description="Business version of the compartment definition",
@@ -73,17 +71,15 @@ class CompartmentDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this compartment definition (computer friendly)",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Name for this compartment definition (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -113,13 +109,11 @@ class CompartmentDefinition(DomainResource):
         description="Why this compartment definition is defined",
         default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Patient | Encounter | RelatedPerson | Practitioner | Device | EpisodeOfCare",
-        default=None,
     )
-    search: Optional[fhir.boolean] = Field(
+    search: fhir.boolean = Field(
         description="Whether the search syntax is supported",
-        default=None,
     )
     resource: Optional[ListType[CompartmentDefinitionResource]] = Field(
         description="How a resource is related to the compartment",

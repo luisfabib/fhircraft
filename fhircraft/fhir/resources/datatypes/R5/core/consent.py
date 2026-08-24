@@ -45,9 +45,8 @@ class ConsentVerification(BackboneElement):
     Whether a treatment instruction (e.g. artificial respiration: yes or no) was verified with the patient, his/her family or another authorized person.
     """
 
-    verified: Optional[fhir.boolean] = Field(
+    verified: fhir.boolean = Field(
         description="Has been verified",
-        default=None,
     )
     verificationType: Optional[CodeableConcept] = Field(
         description="Business case of verification",
@@ -87,13 +86,11 @@ class ConsentProvisionData(BackboneElement):
     The resources controlled by this provision if specific resources are referenced.
     """
 
-    meaning: Optional[fhir.code] = Field(
+    meaning: fhir.code = Field(
         description="instance | related | dependents | authoredby",
-        default=None,
     )
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="The actual data reference",
-        default=None,
     )
 
 
@@ -161,9 +158,8 @@ class Consent(DomainResource):
         description="Identifier for this record (external references)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | inactive | not-done | entered-in-error | unknown",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of the consent statement - for indexing/retrieval",

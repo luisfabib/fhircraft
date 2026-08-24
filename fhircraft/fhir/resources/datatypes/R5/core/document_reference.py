@@ -30,9 +30,8 @@ class DocumentReferenceAttester(BackboneElement):
     A participant who has authenticated the accuracy of the document.
     """
 
-    mode: Optional[CodeableConcept] = Field(
+    mode: CodeableConcept = Field(
         description="personal | professional | legal | official",
-        default=None,
     )
     time: Optional[fhir.dateTime] = Field(
         description="When the document was attested",
@@ -49,13 +48,11 @@ class DocumentReferenceRelatesTo(BackboneElement):
     Relationships that this document has with other document references that already exist.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="The relationship type with another document",
-        default=None,
     )
-    target: Optional[Reference] = Field(
+    target: Reference = Field(
         description="Target of the relationship",
-        default=None,
     )
 
 
@@ -99,9 +96,8 @@ class DocumentReferenceContent(BackboneElement):
     The document and format referenced.  If there are multiple content element repetitions, these must all represent the same document in different format, or attachment metadata.
     """
 
-    attachment: Optional[Attachment] = Field(
+    attachment: Attachment = Field(
         description="Where to access the document",
-        default=None,
     )
     profile: Optional[ListType[DocumentReferenceContentProfile]] = Field(
         description="Content profile rules for the document",
@@ -130,9 +126,8 @@ class DocumentReference(DomainResource):
         description="Procedure that caused this media to be created",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="current | superseded | entered-in-error",
-        default=None,
     )
     docStatus: Optional[fhir.code] = Field(
         description="registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown",
@@ -206,9 +201,8 @@ class DocumentReference(DomainResource):
         description="Document security-tags",
         default=None,
     )
-    content: Optional[ListType[DocumentReferenceContent]] = Field(
+    content: ListType[DocumentReferenceContent] = Field(
         description="Document referenced",
-        default=None,
     )
 
     @model_validator(mode="after")

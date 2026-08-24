@@ -30,9 +30,8 @@ class ImmunizationPerformer(BackboneElement):
         description="What type of performance was done",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Individual or organization who was performing",
-        default=None,
     )
 
 class ImmunizationEducation(BackboneElement):
@@ -166,21 +165,18 @@ class Immunization(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="completed | entered-in-error | not-done",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason not done",
         default=None,
     )
-    vaccineCode: Optional[CodeableConcept] = Field(
+    vaccineCode: CodeableConcept = Field(
         description="Vaccine product administered",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who was immunized",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter immunization was part of",

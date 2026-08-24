@@ -108,9 +108,8 @@ class ObservationDefinition(DomainResource):
         description="Category of observation",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of observation (code / type)",
-        default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this ObservationDefinition instance",

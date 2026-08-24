@@ -43,9 +43,8 @@ class AppointmentResponse(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    appointment: Optional[Reference] = Field(
+    appointment: Reference = Field(
         description="Appointment this response relates to",
-        default=None,
     )
     start: Optional[fhir.instant] = Field(
         description="time from appointment, or requested new start time",
@@ -63,9 +62,8 @@ class AppointmentResponse(DomainResource):
         description="Person, Location, HealthcareService, or Device",
         default=None,
     )
-    participantStatus: Optional[fhir.code] = Field(
+    participantStatus: fhir.code = Field(
         description="accepted | declined | tentative | needs-action",
-        default=None,
     )
     comment: Optional[fhir.string] = Field(
         description="Additional comments",

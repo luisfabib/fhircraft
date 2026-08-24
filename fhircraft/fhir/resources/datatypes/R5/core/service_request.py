@@ -33,9 +33,8 @@ class ServiceRequestOrderDetailParameter(BackboneElement):
     The parameter details for the service being requested.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="The detail of the order being requested",
-        default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The value for the order detail",
@@ -100,9 +99,8 @@ class ServiceRequestOrderDetail(BackboneElement):
         description="The context of the order details by reference",
         default=None,
     )
-    parameter: Optional[ListType[ServiceRequestOrderDetailParameter]] = Field(
+    parameter: ListType[ServiceRequestOrderDetailParameter] = Field(
         description="The parameter details for the service being requested",
-        default=None,
     )
 
 
@@ -170,13 +168,11 @@ class ServiceRequest(DomainResource):
         description="Composite Request ID",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | directive | order +",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of service",
@@ -210,9 +206,8 @@ class ServiceRequest(DomainResource):
         description="Service amount",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Individual or Entity the service is ordered for",
-        default=None,
     )
     focus: Optional[ListType[Reference]] = Field(
         description="What the service request is about, when it is not about the subject of record",

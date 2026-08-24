@@ -36,9 +36,8 @@ class ChargeItemPerformer(BackboneElement):
         description="What type of performance was done",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Individual who was performing",
-        default=None,
     )
 
 
@@ -63,21 +62,18 @@ class ChargeItem(DomainResource):
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="planned | billable | not-billable | aborted | billed | entered-in-error | unknown",
-        default=None,
     )
     partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced ChargeItem",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="A code that identifies the charge, like a billing code",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Individual service was done for/to",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter associated with this ChargeItem",

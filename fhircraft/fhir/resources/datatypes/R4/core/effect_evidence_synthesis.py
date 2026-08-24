@@ -61,9 +61,8 @@ class EffectEvidenceSynthesisResultsByExposure(BackboneElement):
         description="Variant exposure states",
         default=None,
     )
-    riskEvidenceSynthesis: Optional[Reference] = Field(
+    riskEvidenceSynthesis: Reference = Field(
         description="Risk evidence synthesis",
-        default=None,
     )
 
 
@@ -205,9 +204,8 @@ class EffectEvidenceSynthesis(DomainResource):
         description="Name for this effect evidence synthesis (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
@@ -285,21 +283,17 @@ class EffectEvidenceSynthesis(DomainResource):
         description="Type of study",
         default=None,
     )
-    population: Optional[Reference] = Field(
+    population: Reference = Field(
         description="What population?",
-        default=None,
     )
-    exposure: Optional[Reference] = Field(
+    exposure: Reference = Field(
         description="What exposure?",
-        default=None,
     )
-    exposureAlternative: Optional[Reference] = Field(
+    exposureAlternative: Reference = Field(
         description="What comparison exposure?",
-        default=None,
     )
-    outcome: Optional[Reference] = Field(
+    outcome: Reference = Field(
         description="What outcome?",
-        default=None,
     )
     sampleSize: Optional[EffectEvidenceSynthesisSampleSize] = Field(
         description="What sample size was involved?",

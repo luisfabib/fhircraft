@@ -25,9 +25,8 @@ class MedicinalProductIndicationOtherTherapy(BackboneElement):
     Information about the use of the medicinal product in relation to other therapies described as part of the indication.
     """
 
-    therapyRelationshipType: Optional[CodeableConcept] = Field(
+    therapyRelationshipType: CodeableConcept = Field(
         description="The type of relationship between the medicinal product indication or contraindication and another therapy",
-        default=None,
     )
     medicationCodeableConcept: Optional[CodeableConcept] = Field(
         description="Reference to a specific medication (active substance, medicinal product or class of products) as part of an indication or contraindication",

@@ -98,9 +98,8 @@ class VerificationResultValidator(BackboneElement):
     Information about the entity validating information.
     """
 
-    organization: Optional[Reference] = Field(
+    organization: Reference = Field(
         description="Reference to the organization validating information",
-        default=None,
     )
     identityCertificate: Optional[fhir.string] = Field(
         description="A digital identity certificate associated with the validator",
@@ -132,9 +131,8 @@ class VerificationResult(DomainResource):
         description="none | initial | periodic",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="attested | validated | in-process | req-revalid | val-fail | reval-fail | entered-in-error",
-        default=None,
     )
     statusDate: Optional[fhir.dateTime] = Field(
         description="When the validation status was updated",

@@ -63,9 +63,8 @@ class DeviceMetric(DomainResource):
         description="Instance identifier",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Identity of metric, for example Heart Rate or PEEP Setting",
-        default=None,
     )
     unit: Optional[CodeableConcept] = Field(
         description="Unit of Measure for the Metric",
@@ -87,9 +86,8 @@ class DeviceMetric(DomainResource):
         description="black | red | green | yellow | blue | magenta | cyan | white",
         default=None,
     )
-    category: Optional[fhir.code] = Field(
+    category: fhir.code = Field(
         description="measurement | setting | calculation | unspecified",
-        default=None,
     )
     measurementPeriod: Optional[Timing] = Field(
         description="Describes the measurement repetition time",

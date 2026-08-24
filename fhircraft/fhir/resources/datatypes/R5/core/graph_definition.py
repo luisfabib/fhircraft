@@ -28,17 +28,15 @@ class GraphDefinitionNode(BackboneElement):
     Potential target for the link.
     """
 
-    nodeId: Optional[fhir.id_] = Field(
+    nodeId: fhir.id_ = Field(
         description="Internal ID - target for link references",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="Why this node is specified",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="Type of resource this link refers to",
-        default=None,
     )
     profile: Optional[fhir.canonical] = Field(
         description="Profile for the target resource",
@@ -51,17 +49,14 @@ class GraphDefinitionLinkCompartment(BackboneElement):
     Compartment Consistency Rules.
     """
 
-    use: Optional[fhir.code] = Field(
+    use: fhir.code = Field(
         description="where | requires",
-        default=None,
     )
-    rule: Optional[fhir.code] = Field(
+    rule: fhir.code = Field(
         description="identical | matching | different | custom",
-        default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Patient | Encounter | RelatedPerson | Practitioner | Device | EpisodeOfCare",
-        default=None,
     )
     expression: Optional[fhir.string] = Field(
         description="Custom rule, as a FHIRPath expression",
@@ -90,9 +85,8 @@ class GraphDefinitionLink(BackboneElement):
         description="Maximum occurrences for this link",
         default=None,
     )
-    sourceId: Optional[fhir.id_] = Field(
+    sourceId: fhir.id_ = Field(
         description="Source Node for this link",
-        default=None,
     )
     path: Optional[fhir.string] = Field(
         description="Path in the resource that contains the link",
@@ -102,9 +96,8 @@ class GraphDefinitionLink(BackboneElement):
         description="Which slice (if profiled)",
         default=None,
     )
-    targetId: Optional[fhir.id_] = Field(
+    targetId: fhir.id_ = Field(
         description="Target Node for this link",
-        default=None,
     )
     params: Optional[fhir.string] = Field(
         description="Criteria for reverse lookup",
@@ -145,17 +138,15 @@ class GraphDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this graph definition (computer friendly)",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Name for this graph definition (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

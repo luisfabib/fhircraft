@@ -28,9 +28,8 @@ class CoverageEligibilityResponseEvent(BackboneElement):
     Information code for an event with a corresponding date or period.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Specific event",
-        default=None,
     )
     whenDateTime: Optional[fhir.dateTime] = Field(
         description="Occurance date or period",
@@ -63,9 +62,8 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
     Benefits used to date.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Benefit classification",
-        default=None,
     )
     allowedUnsignedInt: Optional[fhir.unsignedInt] = Field(
         description="Benefits allowed",
@@ -195,9 +193,8 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
     Financial instruments for reimbursement for the health care products and services.
     """
 
-    coverage: Optional[Reference] = Field(
+    coverage: Reference = Field(
         description="Insurance information",
-        default=None,
     )
     inforce: Optional[fhir.boolean] = Field(
         description="Coverage inforce indicator",
@@ -218,9 +215,8 @@ class CoverageEligibilityResponseError(BackboneElement):
     Errors encountered during the processing of the request.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Error code detailing processing issues",
-        default=None,
     )
     expression: Optional[ListType[fhir.string]] = Field(
         description="FHIRPath of element(s) related to issue",
@@ -243,17 +239,14 @@ class CoverageEligibilityResponse(DomainResource):
         description="Business Identifier for coverage eligiblity request",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
-    purpose: Optional[ListType[fhir.code]] = Field(
+    purpose: ListType[fhir.code] = Field(
         description="auth-requirements | benefits | discovery | validation",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Intended recipient of products and services",
-        default=None,
     )
     event: Optional[ListType[CoverageEligibilityResponseEvent]] = Field(
         description="Event information",
@@ -267,29 +260,25 @@ class CoverageEligibilityResponse(DomainResource):
         description="Estimated date or dates of service",
         default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Response creation date",
-        default=None,
     )
     requestor: Optional[Reference] = Field(
         description="Party responsible for the request",
         default=None,
     )
-    request: Optional[Reference] = Field(
+    request: Reference = Field(
         description="Eligibility request reference",
-        default=None,
     )
-    outcome: Optional[fhir.code] = Field(
+    outcome: fhir.code = Field(
         description="queued | complete | error | partial",
-        default=None,
     )
     disposition: Optional[fhir.string] = Field(
         description="Disposition Message",
         default=None,
     )
-    insurer: Optional[Reference] = Field(
+    insurer: Reference = Field(
         description="Coverage issuer",
-        default=None,
     )
     insurance: Optional[ListType[CoverageEligibilityResponseInsurance]] = Field(
         description="Patient insurance information",

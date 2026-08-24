@@ -59,13 +59,11 @@ class DeviceDeviceName(BackboneElement):
     This represents the manufacturer's name of the device as provided by the device, from a UDI label, or by a person describing the Device.  This typically would be used when a person provides the name(s) or when the device represents one of the names available from DeviceDefinition.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="The name that identifies the device",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="udi-label-name | user-friendly-name | patient-reported-name | manufacturer-name | model-name | other",
-        default=None,
     )
 
 
@@ -74,9 +72,8 @@ class DeviceSpecialization(BackboneElement):
     The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication.
     """
 
-    systemType: Optional[CodeableConcept] = Field(
+    systemType: CodeableConcept = Field(
         description="The standard that is used to operate and communicate",
-        default=None,
     )
     version: Optional[fhir.string] = Field(
         description="The version of the standard that is used to operate and communicate",
@@ -97,9 +94,8 @@ class DeviceVersion(BackboneElement):
         description="A single component of the device version",
         default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The version text",
-        default=None,
     )
 
 
@@ -108,9 +104,8 @@ class DeviceProperty(BackboneElement):
     The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
-        default=None,
     )
     valueQuantity: Optional[ListType[Quantity]] = Field(
         description="Property value as a quantity",

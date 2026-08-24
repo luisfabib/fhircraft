@@ -76,13 +76,11 @@ class CarePlan(DomainResource):
         description="Part of referenced CarePlan",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | order | option | directive",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of plan",
@@ -96,9 +94,8 @@ class CarePlan(DomainResource):
         description="Summary of nature of plan",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who the care plan is for",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="The Encounter during which this CarePlan was created",

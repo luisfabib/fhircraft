@@ -33,9 +33,8 @@ class ContractContentDefinition(BackboneElement):
     Precusory content developed with a focus and intent of supporting the formation a Contract instance, which may be associated with and transformable into a Contract.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Content structure and use",
-        default=None,
     )
     subType: Optional[CodeableConcept] = Field(
         description="Detailed Content Type Definition",
@@ -49,9 +48,8 @@ class ContractContentDefinition(BackboneElement):
         description="When published",
         default=None,
     )
-    publicationStatus: Optional[fhir.code] = Field(
+    publicationStatus: fhir.code = Field(
         description="amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated",
-        default=None,
     )
     copyright: Optional[fhir.markdown] = Field(
         description="Publication Ownership",
@@ -68,9 +66,8 @@ class ContractTermSecurityLabel(BackboneElement):
         description="Link to Security Labels",
         default=None,
     )
-    classification: Optional[Coding] = Field(
+    classification: Coding = Field(
         description="Confidentiality Protection",
-        default=None,
     )
     category: Optional[ListType[Coding]] = Field(
         description="Applicable Policy",
@@ -87,13 +84,11 @@ class ContractTermOfferParty(BackboneElement):
     Offer Recipient.
     """
 
-    reference: Optional[ListType[Reference]] = Field(
+    reference: ListType[Reference] = Field(
         description="Referenced entity",
-        default=None,
     )
-    role: Optional[CodeableConcept] = Field(
+    role: CodeableConcept = Field(
         description="Participant engagement type",
-        default=None,
     )
 
 
@@ -486,9 +481,8 @@ class ContractTermActionSubject(BackboneElement):
     Entity of the action.
     """
 
-    reference: Optional[ListType[Reference]] = Field(
+    reference: ListType[Reference] = Field(
         description="Entity of the action",
-        default=None,
     )
     role: Optional[CodeableConcept] = Field(
         description="Role type of the agent",
@@ -505,25 +499,22 @@ class ContractTermAction(BackboneElement):
         description="True if the term prohibits the  action",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type or form of the action",
-        default=None,
     )
     subject: Optional[ListType[ContractTermActionSubject]] = Field(
         description="Entity of the action",
         default=None,
     )
-    intent: Optional[CodeableConcept] = Field(
+    intent: CodeableConcept = Field(
         description="Purpose for the Contract Term Action",
-        default=None,
     )
     linkId: Optional[ListType[fhir.string]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    status: Optional[CodeableConcept] = Field(
+    status: CodeableConcept = Field(
         description="State of the action",
-        default=None,
     )
     context: Optional[Reference] = Field(
         description="Episode associated with action",
@@ -652,9 +643,8 @@ class ContractTerm(BackboneElement):
         description="Protection for the Term",
         default=None,
     )
-    offer: Optional[ContractTermOffer] = Field(
+    offer: ContractTermOffer = Field(
         description="Context of the Contract term",
-        default=None,
     )
     asset: Optional[ListType[ContractTermAsset]] = Field(
         description="Contract Term Asset List",
@@ -691,17 +681,14 @@ class ContractSigner(BackboneElement):
     Parties with legal standing in the Contract, including the principal parties, the grantor(s) and grantee(s), which are any person or organization bound by the contract, and any ancillary parties, which facilitate the execution of the contract such as a notary or witness.
     """
 
-    type: Optional[Coding] = Field(
+    type: Coding = Field(
         description="Contract Signatory Role",
-        default=None,
     )
-    party: Optional[Reference] = Field(
+    party: Reference = Field(
         description="Contract Signatory Party",
-        default=None,
     )
-    signature: Optional[ListType[Signature]] = Field(
+    signature: ListType[Signature] = Field(
         description="Contract Documentation Signature",
-        default=None,
     )
 
 
