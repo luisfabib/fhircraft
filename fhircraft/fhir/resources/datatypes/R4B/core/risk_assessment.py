@@ -127,9 +127,8 @@ class RiskAssessment(DomainResource):
         description="Part of this occurrence",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | preliminary | final | amended +",
-        default=None,
     )
     method: Optional[CodeableConcept] = Field(
         description="Evaluation mechanism",
@@ -139,9 +138,8 @@ class RiskAssessment(DomainResource):
         description="Type of assessment",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who/what does assessment apply to?",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Where was assessment performed?",

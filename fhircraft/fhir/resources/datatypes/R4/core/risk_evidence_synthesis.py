@@ -186,9 +186,8 @@ class RiskEvidenceSynthesis(DomainResource):
         description="Name for this risk evidence synthesis (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="Date last changed",
@@ -266,17 +265,15 @@ class RiskEvidenceSynthesis(DomainResource):
         description="Type of study",
         default=None,
     )
-    population: Optional[Reference] = Field(
+    population: Reference = Field(
         description="What population?",
-        default=None,
     )
     exposure: Optional[Reference] = Field(
         description="What exposure?",
         default=None,
     )
-    outcome: Optional[Reference] = Field(
+    outcome: Reference = Field(
         description="What outcome?",
-        default=None,
     )
     sampleSize: Optional[RiskEvidenceSynthesisSampleSize] = Field(
         description="What sample size was involved?",

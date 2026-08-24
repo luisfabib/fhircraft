@@ -36,9 +36,8 @@ class MedicinalProductDefinitionContact(BackboneElement):
         description="Allows the contact to be classified, for example QPPV, Pharmacovigilance Enquiry Information",
         default=None,
     )
-    contact: Optional[Reference] = Field(
+    contact: Reference = Field(
         description="A product specific contact, person (in a role), or an organization",
-        default=None,
     )
 
 
@@ -47,13 +46,11 @@ class MedicinalProductDefinitionNamePart(BackboneElement):
     Coding words or phrases of the name.
     """
 
-    part: Optional[fhir.string] = Field(
+    part: fhir.string = Field(
         description="A fragment of a product name",
-        default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Identifying type for this part of the name (e.g. strength part)",
-        default=None,
     )
 
 
@@ -62,17 +59,15 @@ class MedicinalProductDefinitionNameUsage(BackboneElement):
     Country and jurisdiction where the name applies, and associated language.
     """
 
-    country: Optional[CodeableConcept] = Field(
+    country: CodeableConcept = Field(
         description="Country code for where this name applies",
-        default=None,
     )
     jurisdiction: Optional[CodeableConcept] = Field(
         description="Jurisdiction code for where this name applies",
         default=None,
     )
-    language: Optional[CodeableConcept] = Field(
+    language: CodeableConcept = Field(
         description="Language code for this name",
-        default=None,
     )
 
 
@@ -81,9 +76,8 @@ class MedicinalProductDefinitionName(BackboneElement):
     The product's name, including full name and possibly coded parts.
     """
 
-    productName: Optional[fhir.string] = Field(
+    productName: fhir.string = Field(
         description="The full product name",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="Type of product name, such as rINN, BAN, Proprietary, Non-Proprietary",
@@ -104,9 +98,8 @@ class MedicinalProductDefinitionCrossReference(BackboneElement):
     Reference to another product, e.g. for linking authorised to investigational product, or a virtual product.
     """
 
-    product: Optional[CodeableReference] = Field(
+    product: CodeableReference = Field(
         description="Reference to another product, e.g. for linking authorised to investigational product",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="The type of relationship, for instance branded to generic or virtual to actual product",
@@ -142,9 +135,8 @@ class MedicinalProductDefinitionCharacteristic(BackboneElement):
     Allows the key product features to be recorded, such as "sugar free", "modified release", "parallel import".
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="A code expressing the type of characteristic",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="A value for the characteristic",
@@ -311,9 +303,8 @@ class MedicinalProductDefinition(DomainResource):
         description="A code that this product is known by, within some formal terminology",
         default=None,
     )
-    name: Optional[ListType[MedicinalProductDefinitionName]] = Field(
+    name: ListType[MedicinalProductDefinitionName] = Field(
         description="The product\u0027s name, including full name and possibly coded parts",
-        default=None,
     )
     crossReference: Optional[ListType[MedicinalProductDefinitionCrossReference]] = (
         Field(

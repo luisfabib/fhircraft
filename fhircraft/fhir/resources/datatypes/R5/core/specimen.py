@@ -31,13 +31,11 @@ class SpecimenFeature(BackboneElement):
     A physical feature or landmark on a specimen, highlighted for context by the collector of the specimen (e.g. surgeon), that identifies the type of feature as well as its meaning (e.g. the red ink indicating the resection margin of the right lobe of the excised prostate tissue or wire loop at radiologically suspected tumor location).
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Highlighted feature",
-        default=None,
     )
-    description: Optional[fhir.string] = Field(
+    description: fhir.string = Field(
         description="Information about the feature",
-        default=None,
     )
 
 
@@ -172,9 +170,8 @@ class SpecimenContainer(BackboneElement):
     The container holding the specimen.  The recursive nature of containers; i.e. blood in tube in tray in rack is not addressed here.
     """
 
-    device: Optional[Reference] = Field(
+    device: Reference = Field(
         description="Device resource for the container",
-        default=None,
     )
     location: Optional[Reference] = Field(
         description="Where the container is",

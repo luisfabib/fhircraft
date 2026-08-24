@@ -29,9 +29,8 @@ class AdministrableProductDefinitionProperty(BackboneElement):
     Characteristics e.g. a product's onset of action.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="A code expressing the type of characteristic",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="A value for the characteristic",
@@ -88,13 +87,11 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
     A species specific time during which consumption of animal product is not appropriate.
     """
 
-    tissue: Optional[CodeableConcept] = Field(
+    tissue: CodeableConcept = Field(
         description="The type of tissue for which the withdrawal period applies, e.g. meat, milk",
-        default=None,
     )
-    value: Optional[Quantity] = Field(
+    value: Quantity = Field(
         description="A value for the time",
-        default=None,
     )
     supportingInformation: Optional[fhir.string] = Field(
         description="Extra information about the withdrawal period",
@@ -107,9 +104,8 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneE
     A species for which this route applies.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Coded expression for the species",
-        default=None,
     )
     withdrawalPeriod: Optional[
         ListType[
@@ -126,9 +122,8 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
     The path by which the product is taken into or makes contact with the body. In some regions this is referred to as the licenced or approved route. RouteOfAdministration cannot be used when the 'formOf' product already uses MedicinalProductDefinition.route (and vice versa).
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Coded expression for the route",
-        default=None,
     )
     firstDose: Optional[Quantity] = Field(
         description="The first dose (dose quantity) administered can be specified for the product",
@@ -185,9 +180,8 @@ class AdministrableProductDefinition(DomainResource):
         description="An identifier for the administrable product",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     formOf: Optional[ListType[Reference]] = Field(
         description="References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product",

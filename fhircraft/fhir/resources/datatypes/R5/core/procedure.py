@@ -36,9 +36,8 @@ class ProcedurePerformer(BackboneElement):
         description="Type of performance",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who performed the procedure",
-        default=None,
     )
     onBehalfOf: Optional[Reference] = Field(
         description="Organization the device or practitioner was acting for",
@@ -59,9 +58,8 @@ class ProcedureFocalDevice(BackboneElement):
         description="Kind of change to device",
         default=None,
     )
-    manipulated: Optional[Reference] = Field(
+    manipulated: Reference = Field(
         description="Device that was changed",
-        default=None,
     )
 
 
@@ -94,9 +92,8 @@ class Procedure(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -110,9 +107,8 @@ class Procedure(DomainResource):
         description="Identification of the procedure",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Individual or entity the procedure was performed on",
-        default=None,
     )
     focus: Optional[Reference] = Field(
         description="Who is the target of the procedure when it is not the subject of record only",

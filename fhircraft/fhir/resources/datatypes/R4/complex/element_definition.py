@@ -53,13 +53,11 @@ class ElementDefinitionSlicingDiscriminator(Element):
 
     _type = "ElementDefinitionSlicingDiscriminator"
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="value | exists | pattern | type | profile",
-        default=None,
     )
-    path: Optional[fhir.string] = Field(
+    path: fhir.string = Field(
         description="Path to element value",
-        default=None,
     )
 
 
@@ -82,9 +80,8 @@ class ElementDefinitionSlicing(Element):
         description="If elements must be in same order as slices",
         default=None,
     )
-    rules: Optional[fhir.code] = Field(
+    rules: fhir.code = Field(
         description="closed | open | openAtEnd",
-        default=None,
     )
 
 
@@ -95,17 +92,14 @@ class ElementDefinitionBase(Element):
 
     _type = "ElementDefinitionBase"
 
-    path: Optional[fhir.string] = Field(
+    path: fhir.string = Field(
         description="Path that identifies the base element",
-        default=None,
     )
-    min: Optional[fhir.unsignedInt] = Field(
+    min: fhir.unsignedInt = Field(
         description="Min cardinality of the base element",
-        default=None,
     )
-    max: Optional[fhir.string] = Field(
+    max: fhir.string = Field(
         description="Max cardinality of the base element",
-        default=None,
     )
 
 
@@ -116,9 +110,8 @@ class ElementDefinitionType(Element):
 
     _type = "ElementDefinitionType"
 
-    code: Optional[fhir.uri] = Field(
+    code: fhir.uri = Field(
         description="Data type or Resource (reference to definition)",
-        default=None,
     )
     profile: Optional[List[fhir.canonical]] = Field(
         description="Profiles (StructureDefinition or IG) - one must apply",
@@ -145,9 +138,8 @@ class ElementDefinitionExample(Element):
 
     _type = "ElementDefinitionExample"
 
-    label: Optional[fhir.string] = Field(
+    label: fhir.string = Field(
         description="Describes the purpose of this example",
-        default=None,
     )
     valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Value of Example (one of allowed types)",
@@ -426,21 +418,18 @@ class ElementDefinitionConstraint(Element):
 
     _type = "ElementDefinitionConstraint"
 
-    key: Optional[fhir.id_] = Field(
+    key: fhir.id_ = Field(
         description="Target of \u0027condition\u0027 reference above",
-        default=None,
     )
     requirements: Optional[fhir.string] = Field(
         description="Why this constraint is necessary or appropriate",
         default=None,
     )
-    severity: Optional[fhir.code] = Field(
+    severity: fhir.code = Field(
         description="error | warning",
-        default=None,
     )
-    human: Optional[fhir.string] = Field(
+    human: fhir.string = Field(
         description="Human description of constraint",
-        default=None,
     )
     expression: Optional[fhir.string] = Field(
         description="FHIRPath expression of constraint",
@@ -463,9 +452,8 @@ class ElementDefinitionBinding(Element):
 
     _type = "ElementDefinitionBinding"
 
-    strength: Optional[fhir.code] = Field(
+    strength: fhir.code = Field(
         description="required | extensible | preferred | example",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="Human explanation of the value set",
@@ -484,17 +472,15 @@ class ElementDefinitionMapping(Element):
 
     _type = "ElementDefinitionMapping"
 
-    identity: Optional[fhir.id_] = Field(
+    identity: fhir.id_ = Field(
         description="Reference to mapping declaration",
-        default=None,
     )
     language: Optional[fhir.code] = Field(
         description="Computable language of mapping",
         default=None,
     )
-    map: Optional[fhir.string] = Field(
+    map: fhir.string = Field(
         description="Details of the mapping",
-        default=None,
     )
     comment: Optional[fhir.string] = Field(
         description="Comments about the mapping or its use",
@@ -509,9 +495,8 @@ class ElementDefinition(BackboneElement):
 
     _type = "ElementDefinition"
 
-    path: Optional[fhir.string] = Field(
+    path: fhir.string = Field(
         description="Path of the element in the hierarchy of elements",
-        default=None,
     )
     representation: Optional[List[fhir.code]] = Field(
         description="xmlAttr | xmlText | typeAttr | cdaText | xhtml",

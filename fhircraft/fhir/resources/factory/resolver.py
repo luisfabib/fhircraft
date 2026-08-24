@@ -163,9 +163,7 @@ class SnapshotResolver:
             parent_index = self._resolve_base_chain(parent_sd)
 
             if sd.differential and sd.differential.element:
-                if not all(
-                    [e is not None for e in sd.differential.element]
-                ):
+                if not all([e is not None for e in sd.differential.element]):
                     raise FactoryDefinitionResolutionError(
                         f"StructureDefinition {sd.name or sd.url} differential.element contains None"
                     )
@@ -517,6 +515,8 @@ class SnapshotResolver:
                 "base": (
                     node.definition.base
                     if node.definition.base is not None
+                    and base_node.definition.min is not None
+                    and base_node.definition.max is not None
                     else {
                         "path": base_node.path,
                         "min": base_node.definition.min,

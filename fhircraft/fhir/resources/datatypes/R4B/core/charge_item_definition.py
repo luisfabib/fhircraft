@@ -69,9 +69,8 @@ class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
     The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the prices have been calculated.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="base | surcharge | deduction | discount | tax | informational",
-        default=None,
     )
     code: Optional[CodeableConcept] = Field(
         description="code identifying the specific component",
@@ -127,9 +126,8 @@ class ChargeItemDefinition(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="canonical identifier for this charge item definition, represented as a URI (globally unique)",
-        default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the charge item definition",
@@ -155,9 +153,8 @@ class ChargeItemDefinition(DomainResource):
         description="Completed or terminated request(s) whose function is taken by this new request",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

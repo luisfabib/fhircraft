@@ -46,9 +46,8 @@ class AppointmentParticipant(BackboneElement):
         description="The participant is required to attend (optional when false)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="accepted | declined | tentative | needs-action",
-        default=None,
     )
 
 class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
@@ -106,9 +105,8 @@ class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
         description="Indicates which day of the week the appointment should occur",
         default=None,
     )
-    monthInterval: Optional[fhir.positiveInt] = Field(
+    monthInterval: fhir.positiveInt = Field(
         description="Recurs every nth month",
-        default=None,
     )
 
 class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
@@ -116,9 +114,8 @@ class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
     Information about yearly recurring appointments.
     """
 
-    yearInterval: Optional[fhir.positiveInt] = Field(
+    yearInterval: fhir.positiveInt = Field(
         description="Recurs every nth year",
-        default=None,
     )
 
 class AppointmentRecurrenceTemplate(BackboneElement):
@@ -130,9 +127,8 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="The timezone of the occurrences",
         default=None,
     )
-    recurrenceType: Optional[CodeableConcept] = Field(
+    recurrenceType: CodeableConcept = Field(
         description="The frequency of the recurrence",
-        default=None,
     )
     lastOccurrenceDate: Optional[fhir.date_] = Field(
         description="The date when the recurrence should end",
@@ -180,9 +176,8 @@ class Appointment(DomainResource):
         description="External Ids for this item",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist",
-        default=None,
     )
     cancellationReason: Optional[CodeableConcept] = Field(
         description="The coded reason for the appointment being cancelled",
@@ -289,9 +284,8 @@ class Appointment(DomainResource):
         description="The patient or group associated with the appointment",
         default=None,
     )
-    participant: Optional[ListType[AppointmentParticipant]] = Field(
+    participant: ListType[AppointmentParticipant] = Field(
         description="Participants involved in appointment",
-        default=None,
     )
     recurrenceId: Optional[fhir.positiveInt] = Field(
         description="The sequence number in the recurrence",

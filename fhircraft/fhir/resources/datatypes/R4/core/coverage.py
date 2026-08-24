@@ -27,13 +27,11 @@ class CoverageClass(BackboneElement):
     A suite of underwriter specific classifiers.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of class such as \u0027group\u0027 or \u0027plan\u0027",
-        default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="Value associated with the type",
-        default=None,
     )
     name: Optional[fhir.string] = Field(
         description="Human readable description of the type and value",
@@ -45,9 +43,8 @@ class CoverageCostToBeneficiaryException(BackboneElement):
     A suite of codes indicating exceptions or reductions to patient costs and their effective periods.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Exception category",
-        default=None,
     )
     period: Optional[Period] = Field(
         description="The effective period of the exception",
@@ -117,9 +114,8 @@ class Coverage(DomainResource):
         description="Business Identifier for the coverage",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="Coverage category such as medical or accident",
@@ -137,9 +133,8 @@ class Coverage(DomainResource):
         description="ID assigned to the subscriber",
         default=None,
     )
-    beneficiary: Optional[Reference] = Field(
+    beneficiary: Reference = Field(
         description="Plan beneficiary",
-        default=None,
     )
     dependent: Optional[fhir.string] = Field(
         description="Dependent number",
@@ -153,9 +148,8 @@ class Coverage(DomainResource):
         description="Coverage start and end dates",
         default=None,
     )
-    payor: Optional[ListType[Reference]] = Field(
+    payor: ListType[Reference] = Field(
         description="Issuer of the policy",
-        default=None,
     )
     class_: Optional[ListType[CoverageClass]] = Field(
         description="Additional coverage classifications",

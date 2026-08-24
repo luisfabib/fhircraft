@@ -340,22 +340,3 @@ def test_resolve__multiple_structures_same_mode_all_returned():
     assert "Pat" in result
     assert "Obs" in result
     assert len(result) == 2
-
-
-def test_resolve__missing_url_logs_warning_and_uses_alias():
-    """A structure with no URL logs a warning and stores ArbitraryModel under the alias."""
-    engine = FHIRMappingEngine()
-    sm = _sm_structs([StructureMapStructure(mode="source", alias="NoUrl")])
-    with pytest.warns(Warning, match="missing URL"):
-        result = engine._resolve_structure_definitions(sm, StructureMapModelMode.SOURCE)
-    assert result["NoUrl"] is ArbitraryModel
-
-
-def test_resolve__missing_url_no_alias_uses_arbitrary_key():
-    """A structure with no URL and no alias falls back to the key 'arbitrary'."""
-    engine = FHIRMappingEngine()
-    sm = _sm_structs([StructureMapStructure(mode="source")])
-    with pytest.warns(Warning, match="missing URL"):
-        result = engine._resolve_structure_definitions(sm, StructureMapModelMode.SOURCE)
-    assert "arbitrary" in result
-    assert result["arbitrary"] is ArbitraryModel

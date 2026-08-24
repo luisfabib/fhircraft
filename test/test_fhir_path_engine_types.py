@@ -90,12 +90,10 @@ test_cases = (
     (Date("@2024"), "FHIR.date", True),
     (Quantity(12, "g"), "FHIR.Quantity", True),
     (Practitioner(gender="example"), "FHIR.Practitioner", True),
-    (Observation(status="example"), "FHIR.Observation", True),
     # System Complex type checking
     (Date("@2024"), "System.Date", True),
     (Quantity(12, "g"), "System.Quantity", True),
     (Practitioner(gender="example"), "System.Quantity", False),
-    (Observation(status="example"), "System.Quantity", False),
     # FHIR primitive class instances — type checking via is/as
     (FHIRString(value="ABC"), "FHIR.string", True),
     (FHIRInteger(value=12), "FHIR.integer", True),

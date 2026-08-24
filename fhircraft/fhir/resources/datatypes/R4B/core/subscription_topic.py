@@ -58,9 +58,8 @@ class SubscriptionTopicResourceTrigger(BackboneElement):
         description="Text representation of the resource trigger",
         default=None,
     )
-    resource: Optional[fhir.uri] = Field(
+    resource: fhir.uri = Field(
         description="Data Type or Resource (reference to definition) for this trigger definition",
-        default=None,
     )
     supportedInteraction: Optional[ListType[fhir.code]] = Field(
         description="create | update | delete",
@@ -85,13 +84,11 @@ class SubscriptionTopicEventTrigger(BackboneElement):
         description="Text representation of the event trigger",
         default=None,
     )
-    event: Optional[CodeableConcept] = Field(
+    event: CodeableConcept = Field(
         description="Event which can trigger a notification from the SubscriptionTopic",
-        default=None,
     )
-    resource: Optional[fhir.uri] = Field(
+    resource: fhir.uri = Field(
         description="Data Type or Resource (reference to definition) for this trigger definition",
-        default=None,
     )
 
 
@@ -108,9 +105,8 @@ class SubscriptionTopicCanFilterBy(BackboneElement):
         description="URL of the triggering Resource that this filter applies to",
         default=None,
     )
-    filterParameter: Optional[fhir.string] = Field(
+    filterParameter: fhir.string = Field(
         description="Human-readable and computation-friendly name for a filter parameter usable by subscriptions on this topic, via Subscription.filterBy.filterParameter",
-        default=None,
     )
     filterDefinition: Optional[fhir.uri] = Field(
         description="canonical URL for a filterParameter definition",
@@ -127,9 +123,8 @@ class SubscriptionTopicNotificationShape(BackboneElement):
     List of properties to describe the shape (e.g., resources) included in notifications from this Subscription Topic.
     """
 
-    resource: Optional[fhir.uri] = Field(
+    resource: fhir.uri = Field(
         description="URL of the Resource that is the focus (main) resource in a notification shape",
-        default=None,
     )
     include: Optional[ListType[fhir.string]] = Field(
         description="Include directives, rooted in the resource for this shape",
@@ -162,9 +157,8 @@ class SubscriptionTopic(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="canonical identifier for this subscription topic definition, represented as a URI (globally unique)",
-        default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for this subscription topic",
@@ -182,9 +176,8 @@ class SubscriptionTopic(DomainResource):
         description="Based on FHIR protocol or definition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="If for testing purposes, not real usage",

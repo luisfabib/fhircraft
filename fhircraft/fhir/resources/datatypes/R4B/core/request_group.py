@@ -33,9 +33,8 @@ class RequestGroupActionCondition(BackboneElement):
     An expression that describes applicability criteria, or start/stop conditions for the action.
     """
 
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="applicability | start | stop",
-        default=None,
     )
     expression: Optional[Expression] = Field(
         description="boolean-valued expression",
@@ -48,13 +47,11 @@ class RequestGroupActionRelatedAction(BackboneElement):
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    actionId: Optional[fhir.id_] = Field(
+    actionId: fhir.id_ = Field(
         description="What action this is related to",
-        default=None,
     )
-    relationship: Optional[fhir.code] = Field(
+    relationship: fhir.code = Field(
         description="before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end",
-        default=None,
     )
     offsetDuration: Optional[Duration] = Field(
         description="time offset for the relationship",
@@ -246,13 +243,11 @@ class RequestGroup(DomainResource):
         description="Composite request this is part of",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     priority: Optional[fhir.code] = Field(
         description="routine | urgent | asap | stat",

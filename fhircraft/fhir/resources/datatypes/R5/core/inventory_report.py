@@ -33,13 +33,11 @@ class InventoryReportInventoryListingItem(BackboneElement):
         description="The inventory category or classification of the items being reported",
         default=None,
     )
-    quantity: Optional[Quantity] = Field(
+    quantity: Quantity = Field(
         description="The quantity of the item or items being reported",
-        default=None,
     )
-    item: Optional[CodeableReference] = Field(
+    item: CodeableReference = Field(
         description="The code or reference to the item type",
-        default=None,
     )
 
 class InventoryReportInventoryListing(BackboneElement):
@@ -77,13 +75,11 @@ class InventoryReport(DomainResource):
         description="Business identifier for the report",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | requested | active | entered-in-error",
-        default=None,
     )
-    countType: Optional[fhir.code] = Field(
+    countType: fhir.code = Field(
         description="snapshot | difference",
-        default=None,
     )
     operationType: Optional[CodeableConcept] = Field(
         description="addition | subtraction",
@@ -93,9 +89,8 @@ class InventoryReport(DomainResource):
         description="The reason for this count - regular count, ad-hoc count, new arrivals, etc",
         default=None,
     )
-    reportedDateTime: Optional[fhir.dateTime] = Field(
+    reportedDateTime: fhir.dateTime = Field(
         description="When the report has been submitted",
-        default=None,
     )
     reporter: Optional[Reference] = Field(
         description="Who submits the report",

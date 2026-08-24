@@ -32,9 +32,8 @@ class DeviceDispensePerformer(BackboneElement):
         description="Who performed the dispense and what they did",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Individual who was performing",
-        default=None,
     )
 
 class DeviceDispense(DomainResource):
@@ -58,9 +57,8 @@ class DeviceDispense(DomainResource):
         description="The bigger event that this dispense is a part of",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown",
-        default=None,
     )
     statusReason: Optional[CodeableReference] = Field(
         description="Why a dispense was or was not performed",
@@ -70,13 +68,11 @@ class DeviceDispense(DomainResource):
         description="Type of device dispense",
         default=None,
     )
-    device: Optional[CodeableReference] = Field(
+    device: CodeableReference = Field(
         description="What device was supplied",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who the dispense is for",
-        default=None,
     )
     receiver: Optional[Reference] = Field(
         description="Who collected the device or where the medication was delivered",

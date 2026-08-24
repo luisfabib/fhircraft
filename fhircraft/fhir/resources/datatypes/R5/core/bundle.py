@@ -20,13 +20,11 @@ class BundleLink(BackboneElement):
     A series of links that provide context to this bundle.
     """
 
-    relation: Optional[fhir.code] = Field(
+    relation: fhir.code = Field(
         description="See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1",
-        default=None,
     )
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="Reference details for the link",
-        default=None,
     )
 
 
@@ -65,13 +63,11 @@ class BundleEntryRequest(BackboneElement):
     Additional information about how this entry should be processed as part of a transaction or batch.  For history, it shows how the entry was processed to create the version contained in the entry.
     """
 
-    method: Optional[fhir.code] = Field(
+    method: fhir.code = Field(
         description="GET | HEAD | POST | PUT | DELETE | PATCH",
-        default=None,
     )
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="URL for HTTP equivalent of this entry",
-        default=None,
     )
     ifNoneMatch: Optional[fhir.string] = Field(
         description="For managing cache validation",
@@ -96,9 +92,8 @@ class BundleEntryResponse(BackboneElement):
     Indicates the results of processing the corresponding 'request' entry in the batch or transaction being responded to or what the results of an operation where when returning history.
     """
 
-    status: Optional[fhir.string] = Field(
+    status: fhir.string = Field(
         description="Status response code (text optional)",
-        default=None,
     )
     location: Optional[fhir.uri] = Field(
         description="The location (if the operation returns a location)",
@@ -162,9 +157,8 @@ class Bundle(Resource):
         description="Persistent identifier for the bundle",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="document | message | transaction | transaction-response | batch | batch-response | history | searchset | collection | subscription-notification",
-        default=None,
     )
     timestamp: Optional[fhir.instant] = Field(
         description="When the bundle was assembled",

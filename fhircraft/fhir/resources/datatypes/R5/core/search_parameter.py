@@ -28,13 +28,11 @@ class SearchParameterComponent(BackboneElement):
     Used to define the parts of a composite search parameter.
     """
 
-    definition: Optional[fhir.canonical] = Field(
+    definition: fhir.canonical = Field(
         description="Defines how the part works",
-        default=None,
     )
-    expression: Optional[fhir.string] = Field(
+    expression: fhir.string = Field(
         description="Subexpression relative to main expression",
-        default=None,
     )
 
 
@@ -47,9 +45,8 @@ class SearchParameter(DomainResource):
     _type = "SearchParameter"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SearchParameter"
 
-    url: Optional[fhir.uri] = Field(
+    url: fhir.uri = Field(
         description="canonical identifier for this search parameter, represented as a URI (globally unique)",
-        default=None,
     )
     identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the search parameter (business identifier)",
@@ -67,9 +64,8 @@ class SearchParameter(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this search parameter (computer friendly)",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Name for this search parameter (human friendly)",
@@ -79,9 +75,8 @@ class SearchParameter(DomainResource):
         description="Original definition for the search parameter",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -99,9 +94,8 @@ class SearchParameter(DomainResource):
         description="Contact details for the publisher",
         default=None,
     )
-    description: Optional[fhir.markdown] = Field(
+    description: fhir.markdown = Field(
         description="Natural language description of the search parameter",
-        default=None,
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -123,17 +117,14 @@ class SearchParameter(DomainResource):
         description="Copyright holder and year(s)",
         default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Recommended name for parameter in search url",
-        default=None,
     )
-    base: Optional[ListType[fhir.code]] = Field(
+    base: ListType[fhir.code] = Field(
         description="The resource type(s) this search parameter applies to",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
-        default=None,
     )
     expression: Optional[fhir.string] = Field(
         description="FHIRPath expression that extracts the values",

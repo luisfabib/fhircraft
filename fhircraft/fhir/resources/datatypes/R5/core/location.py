@@ -30,13 +30,11 @@ class LocationPosition(BackboneElement):
     The absolute geographic location of the Location, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
     """
 
-    longitude: Optional[fhir.decimal] = Field(
+    longitude: fhir.decimal = Field(
         description="Longitude with WGS84 datum",
-        default=None,
     )
-    latitude: Optional[fhir.decimal] = Field(
+    latitude: fhir.decimal = Field(
         description="Latitude with WGS84 datum",
-        default=None,
     )
     altitude: Optional[fhir.decimal] = Field(
         description="Altitude with WGS84 datum",

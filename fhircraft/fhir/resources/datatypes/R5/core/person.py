@@ -29,9 +29,8 @@ class PersonCommunication(BackboneElement):
     A language which may be used to communicate with the person about his or her health.
     """
 
-    language: Optional[CodeableConcept] = Field(
+    language: CodeableConcept = Field(
         description="The language which can be used to communicate with the person about his or her health",
-        default=None,
     )
     preferred: Optional[fhir.boolean] = Field(
         description="Language preference indicator",
@@ -43,9 +42,8 @@ class PersonLink(BackboneElement):
     Link to a resource that concerns the same actual person.
     """
 
-    target: Optional[Reference] = Field(
+    target: Reference = Field(
         description="The resource to which this actual person is associated",
-        default=None,
     )
     assurance: Optional[fhir.code] = Field(
         description="level1 | level2 | level3 | level4",

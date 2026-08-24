@@ -44,9 +44,8 @@ class Basic(DomainResource):
         description="Business identifier",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Kind of Resource",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="Identifies the focus of this resource",

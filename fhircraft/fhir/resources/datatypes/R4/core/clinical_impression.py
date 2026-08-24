@@ -27,9 +27,8 @@ class ClinicalImpressionInvestigation(BackboneElement):
     One or more sets of investigations (signs, symptoms, etc.). The actual grouping of investigations varies greatly depending on the type and context of the assessment. These investigations may include data generated during the assessment process, or data previously generated and recorded that is pertinent to the outcomes.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="A name/code for the set",
-        default=None,
     )
     item: Optional[ListType[Reference]] = Field(
         description="Record of a specific investigation",
@@ -81,9 +80,8 @@ class ClinicalImpression(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="in-progress | completed | entered-in-error",
-        default=None,
     )
     statusReason: Optional[CodeableConcept] = Field(
         description="Reason for current status",
@@ -97,9 +95,8 @@ class ClinicalImpression(DomainResource):
         description="Why/how the assessment was performed",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Patient or group assessed",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter created as part of",

@@ -31,9 +31,8 @@ class BiologicallyDerivedProductDispensePerformer(BackboneElement):
         description="Identifies the function of the performer during the dispense",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who performed the action",
-        default=None,
     )
 
 class BiologicallyDerivedProductDispense(DomainResource):
@@ -59,21 +58,18 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Short description",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="preparation | in-progress | allocated | issued | unfulfilled | returned | entered-in-error | unknown",
-        default=None,
     )
     originRelationshipType: Optional[CodeableConcept] = Field(
         description="Relationship between the donor and intended recipient",
         default=None,
     )
-    product: Optional[Reference] = Field(
+    product: Reference = Field(
         description="The BiologicallyDerivedProduct that is dispensed",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="The intended recipient of the dispensed product",
-        default=None,
     )
     matchStatus: Optional[CodeableConcept] = Field(
         description="Indicates the type of matching associated with the dispense",

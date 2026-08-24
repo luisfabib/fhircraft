@@ -5,7 +5,7 @@ uses "http://hl7.org/fhir/StructureDefinition/tutorial-left-9" alias TLeft as so
 uses "http://hl7.org/fhir/StructureDefinition/tutorial-right-9" alias TRight as target
 
 group tutorial(source src : TLeft, target tgt : TRight) {
-  src.i as i where (src.m < 2) -> tgt.j = i;
-  src.i as i where (src.m >= 2) -> tgt.k = i;
+  src.i as i where (src.m < 2) -> tgt.j = i "rule-a";
+  src.i as i where (src.m >= 2) -> tgt.k = i "rule-b";
 }
 

@@ -34,13 +34,11 @@ class ObservationTriggeredBy(BackboneElement):
     Identifies the observation(s) that triggered the performance of this observation.
     """
 
-    observation: Optional[Reference] = Field(
+    observation: Reference = Field(
         description="Triggering observation",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="reflex | repeat | re-run",
-        default=None,
     )
     reason: Optional[fhir.string] = Field(
         description="Reason that the observation was triggered",
@@ -123,9 +121,8 @@ class ObservationComponent(BackboneElement):
     Some observations have multiple component observations.  These component observations are expressed as separate code value pairs that share the same attributes.  Examples include systolic and diastolic component observations for blood pressure measurement and multiple component observations for genetics observations.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of component observation (code / type)",
-        default=None,
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Actual component result",
@@ -256,17 +253,15 @@ class Observation(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | preliminary | final | amended +",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of  type of observation",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of observation (code / type)",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="Who and/or what the observation is about",

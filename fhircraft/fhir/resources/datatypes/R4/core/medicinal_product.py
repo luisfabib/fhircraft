@@ -27,13 +27,11 @@ class MedicinalProductNameNamePart(BackboneElement):
     Coding words or phrases of the name.
     """
 
-    part: Optional[fhir.string] = Field(
+    part: fhir.string = Field(
         description="A fragment of a product name",
-        default=None,
     )
-    type: Optional[Coding] = Field(
+    type: Coding = Field(
         description="Idenifying type for this part of the name (e.g. strength part)",
-        default=None,
     )
 
 
@@ -42,17 +40,15 @@ class MedicinalProductNameCountryLanguage(BackboneElement):
     Country where the name applies.
     """
 
-    country: Optional[CodeableConcept] = Field(
+    country: CodeableConcept = Field(
         description="Country code for where this name applies",
-        default=None,
     )
     jurisdiction: Optional[CodeableConcept] = Field(
         description="Jurisdiction code for where this name applies",
         default=None,
     )
-    language: Optional[CodeableConcept] = Field(
+    language: CodeableConcept = Field(
         description="Language code for this name",
-        default=None,
     )
 
 
@@ -61,9 +57,8 @@ class MedicinalProductName(BackboneElement):
     The product's name, including full name and possibly coded parts.
     """
 
-    productName: Optional[fhir.string] = Field(
+    productName: fhir.string = Field(
         description="The full product name",
-        default=None,
     )
     namePart: Optional[ListType[MedicinalProductNameNamePart]] = Field(
         description="Coding words or phrases of the name",
@@ -246,9 +241,8 @@ class MedicinalProduct(DomainResource):
         description="Clinical trials or studies that this product is involved in",
         default=None,
     )
-    name: Optional[ListType[MedicinalProductName]] = Field(
+    name: ListType[MedicinalProductName] = Field(
         description="The product\u0027s name, including full name and possibly coded parts",
-        default=None,
     )
     crossReference: Optional[ListType[Identifier]] = Field(
         description="Reference to another product, e.g. for linking authorised to investigational product",

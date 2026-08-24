@@ -28,9 +28,8 @@ class BodyStructureIncludedStructure(BackboneElement):
     The anatomical location(s) or region(s) of the specimen, lesion, or body structure.
     """
 
-    structure: Optional[CodeableConcept] = Field(
+    structure: CodeableConcept = Field(
         description="code that represents the included structure",
-        default=None,
     )
     laterality: Optional[CodeableConcept] = Field(
         description="code that represents the included structure laterality",
@@ -142,9 +141,8 @@ class BodyStructure(DomainResource):
         description="Kind of Structure",
         default=None,
     )
-    includedStructure: Optional[ListType[BodyStructureIncludedStructure]] = Field(
+    includedStructure: ListType[BodyStructureIncludedStructure] = Field(
         description="Included anatomic location(s)",
-        default=None,
     )
     excludedStructure: Optional[ListType[BodyStructureExcludedStructure]] = Field(
         description="Excluded anatomic locations(s)",
@@ -158,7 +156,6 @@ class BodyStructure(DomainResource):
         description="Attached images",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who this is about",
-        default=None,
     )

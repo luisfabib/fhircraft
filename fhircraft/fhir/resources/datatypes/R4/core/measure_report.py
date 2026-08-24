@@ -46,13 +46,11 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
     A stratifier component value.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="What stratifier component of the group",
-        default=None,
     )
-    value: Optional[CodeableConcept] = Field(
+    value: CodeableConcept = Field(
         description="The stratum component value, e.g. male",
-        default=None,
     )
 
 
@@ -163,17 +161,14 @@ class MeasureReport(DomainResource):
         description="Additional identifier for the MeasureReport",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="complete | pending | error",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="individual | subject-list | summary | data-collection",
-        default=None,
     )
-    measure: Optional[fhir.canonical] = Field(
+    measure: fhir.canonical = Field(
         description="What measure was calculated",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="What individual(s) the report is for",
@@ -187,9 +182,8 @@ class MeasureReport(DomainResource):
         description="Who is reporting the data",
         default=None,
     )
-    period: Optional[Period] = Field(
+    period: Period = Field(
         description="What period the report covers",
-        default=None,
     )
     improvementNotation: Optional[CodeableConcept] = Field(
         description="increase | decrease",

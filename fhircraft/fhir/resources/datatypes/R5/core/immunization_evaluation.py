@@ -33,13 +33,11 @@ class ImmunizationEvaluation(DomainResource):
         description="Business identifier",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="completed | entered-in-error",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Who this evaluation is for",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="Date evaluation was performed",
@@ -49,17 +47,14 @@ class ImmunizationEvaluation(DomainResource):
         description="Who is responsible for publishing the recommendations",
         default=None,
     )
-    targetDisease: Optional[CodeableConcept] = Field(
+    targetDisease: CodeableConcept = Field(
         description="The vaccine preventable disease schedule being evaluated",
-        default=None,
     )
-    immunizationEvent: Optional[Reference] = Field(
+    immunizationEvent: Reference = Field(
         description="Immunization being evaluated",
-        default=None,
     )
-    doseStatus: Optional[CodeableConcept] = Field(
+    doseStatus: CodeableConcept = Field(
         description="Status of the dose relative to published recommendations",
-        default=None,
     )
     doseStatusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason why the doese is considered valid, invalid or some other status",

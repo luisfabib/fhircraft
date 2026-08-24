@@ -59,9 +59,8 @@ class AuditEventAgent(BackboneElement):
         description="Human friendly name for the agent",
         default=None,
     )
-    requestor: Optional[fhir.boolean] = Field(
+    requestor: fhir.boolean = Field(
         description="Whether user is initiator",
-        default=None,
     )
     location: Optional[Reference] = Field(
         description="Where",
@@ -93,9 +92,8 @@ class AuditEventSource(BackboneElement):
         description="Logical source location within the enterprise",
         default=None,
     )
-    observer: Optional[Reference] = Field(
+    observer: Reference = Field(
         description="The identity of source detecting the event",
-        default=None,
     )
     type: Optional[ListType[Coding]] = Field(
         description="The type of source where event originated",
@@ -107,9 +105,8 @@ class AuditEventEntityDetail(BackboneElement):
     Tagged value pairs for conveying additional information about the entity.
     """
 
-    type: Optional[fhir.string] = Field(
+    type: fhir.string = Field(
         description="Name of the property",
-        default=None,
     )
     valueString: Optional[fhir.string] = Field(
         description="Property value",
@@ -199,9 +196,8 @@ class AuditEvent(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    type: Optional[Coding] = Field(
+    type: Coding = Field(
         description="Type/identifier of event",
-        default=None,
     )
     subtype: Optional[ListType[Coding]] = Field(
         description="More specific type/id for the event",
@@ -215,9 +211,8 @@ class AuditEvent(DomainResource):
         description="When the activity occurred",
         default=None,
     )
-    recorded: Optional[fhir.instant] = Field(
+    recorded: fhir.instant = Field(
         description="time when the event was recorded",
-        default=None,
     )
     outcome: Optional[fhir.code] = Field(
         description="Whether the event succeeded or failed",
@@ -231,13 +226,11 @@ class AuditEvent(DomainResource):
         description="The purposeOfUse of the event",
         default=None,
     )
-    agent: Optional[ListType[AuditEventAgent]] = Field(
+    agent: ListType[AuditEventAgent] = Field(
         description="Actor involved in the event",
-        default=None,
     )
-    source: Optional[AuditEventSource] = Field(
+    source: AuditEventSource = Field(
         description="Audit Event Reporter",
-        default=None,
     )
     entity: Optional[ListType[AuditEventEntity]] = Field(
         description="Data or objects used",

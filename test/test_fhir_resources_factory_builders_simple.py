@@ -2,6 +2,7 @@ from typing import List, Optional
 from unittest.mock import MagicMock, patch
 from typing import get_args
 
+from pydantic_core import PydanticUndefined
 import pytest
 from pydantic.aliases import AliasChoices
 
@@ -16,7 +17,6 @@ from fhircraft.fhir.resources.factory.builders.base import (
 )
 from fhircraft.fhir.resources.factory.builders.simple import SimpleFieldBuilder
 from fhircraft.exceptions import FactoryTypeResolutionError
-
 
 # ---------------------------------------------------------------------------
 # Helpers & fixtures
@@ -45,7 +45,6 @@ def make_node(
     constraints=None,
     default_value=None,
     path: str | None = None,
-    is_prohibited: bool = False,
 ):
     node = MagicMock()
     node.name = name
@@ -61,9 +60,11 @@ def make_node(
     node.fixed = fixed
     node.pattern = pattern
     node.default_value = default_value
+    node.is_polymorphic_type = len(node.types) > 1
     node.definition.constraint = constraints or []
     node.base_is_array = base_is_array
-    node.is_prohibited = is_prohibited
+    node.is_required = min_cardinality > 0
+    node.is_prohibited = max_cardinality == 0
     node.max_length = None
     node.min_value = None
     node.max_value = None
@@ -177,24 +178,50 @@ def test_build__normal_name_has_no_validation_alias(builder: Builder, index):
     assert build.fields[0].validation_alias is None
 
 
-def test_build__non_array_annotation_is_optional(builder: Builder, index):
+def test_build__non_array_optional_annotation_is_optional_type(builder: Builder, index):
     node = make_node(
         "status",
         type_codes=["CodeableConcept"],
         is_array=False,
         base_is_array=False,
+        min_cardinality=0,
         max_cardinality=1,
     )
     ti = make_type_info(r4_complex.CodeableConcept, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
     assert result.fields[0].annotation == Optional[r4_complex.CodeableConcept]
+    assert result.fields[0].default == None
 
 
-def test_build__array_annotation_is_optional_list(builder: Builder, index):
-    node = make_node("name", type_codes=["HumanName"], is_array=True)
+def test_build__non_array_required_annotation_is_type(builder: Builder, index):
+    node = make_node(
+        "status",
+        type_codes=["CodeableConcept"],
+        is_array=False,
+        base_is_array=False,
+        min_cardinality=1,
+        max_cardinality=1,
+    )
+    ti = make_type_info(r4_complex.CodeableConcept, "complex-type")
+    with patch.object(builder, "resolve_type", return_value=ti):
+        result = builder.build(node, index)
+    assert result.fields[0].annotation == r4_complex.CodeableConcept
+    assert result.fields[0].default == PydanticUndefined
+
+
+def test_build__array_optional_annotation_is_optional_list(builder: Builder, index):
+    node = make_node("name", type_codes=["HumanName"], is_array=True, min_cardinality=0)
     result = builder.build(node, index)
     assert result.fields[0].annotation == Optional[List[r4_complex.HumanName]]
+    assert result.fields[0].default == None
+
+
+def test_build__array_required_annotation_is_list(builder: Builder, index):
+    node = make_node("name", type_codes=["HumanName"], is_array=True, min_cardinality=1)
+    result = builder.build(node, index)
+    assert result.fields[0].annotation == List[r4_complex.HumanName]
+    assert result.fields[0].default == PydanticUndefined
 
 
 def test_build__two_types_annotation_contains_both_types(builder: Builder, index):

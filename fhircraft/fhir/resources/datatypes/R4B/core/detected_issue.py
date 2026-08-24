@@ -41,9 +41,8 @@ class DetectedIssueMitigation(BackboneElement):
     Indicates an action that has been taken or is committed to reduce or eliminate the likelihood of the risk identified by the detected issue from manifesting.  Can also reflect an observation of known mitigating factors that may reduce/eliminate the need for any action.
     """
 
-    action: Optional[CodeableConcept] = Field(
+    action: CodeableConcept = Field(
         description="What mitigation?",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="Date committed",
@@ -80,9 +79,8 @@ class DetectedIssue(DomainResource):
         description="Unique id for the detected issue",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | preliminary | final | amended +",
-        default=None,
     )
     code: Optional[CodeableConcept] = Field(
         description="Issue Category, e.g. drug-drug, duplicate therapy, etc.",

@@ -56,9 +56,8 @@ class MedicationStatement(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | completed | entered-in-error | intended | stopped | on-hold | unknown | not-taken",
-        default=None,
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for current status",
@@ -76,9 +75,8 @@ class MedicationStatement(DomainResource):
         description="What medication was taken",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who is/was taking  the medication",
-        default=None,
     )
     context: Optional[Reference] = Field(
         description="Encounter / Episode associated with MedicationStatement",

@@ -62,9 +62,8 @@ class DocumentManifest(DomainResource):
         description="Other identifiers for the manifest",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="current | superseded | entered-in-error",
-        default=None,
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of document set",
@@ -94,9 +93,8 @@ class DocumentManifest(DomainResource):
         description="Human-readable description (title)",
         default=None,
     )
-    content: Optional[ListType[Reference]] = Field(
+    content: ListType[Reference] = Field(
         description="Items in manifest",
-        default=None,
     )
     related: Optional[ListType[DocumentManifestRelated]] = Field(
         description="Related things",

@@ -31,9 +31,8 @@ class DiagnosticReportMedia(BackboneElement):
         description="Comment about the image (e.g. explanation)",
         default=None,
     )
-    link: Optional[Reference] = Field(
+    link: Reference = Field(
         description="Reference to the image source",
-        default=None,
     )
 
 
@@ -66,17 +65,15 @@ class DiagnosticReport(DomainResource):
         description="What was requested",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="registered | partial | preliminary | final +",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Service category",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Name/code for this diagnostic report",
-        default=None,
     )
     subject: Optional[Reference] = Field(
         description="The subject of the report - usually, but not always, the patient",

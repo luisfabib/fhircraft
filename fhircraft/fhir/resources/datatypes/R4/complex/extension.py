@@ -50,9 +50,8 @@ class Extension(Element):
 
     _type = "Extension"
 
-    url: Optional[str] = Field(
+    url: str = Field(
         description="identifies the meaning of the extension",
-        default=None,
     )
     valueBase64Binary: Optional[fhir.base64Binary] = Field(
         description="Value of extension",

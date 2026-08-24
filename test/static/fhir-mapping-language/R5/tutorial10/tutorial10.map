@@ -6,9 +6,9 @@ uses "http://hl7.org/fhir/StructureDefinition/tutorial-right-10" alias TRight as
 uses "http://hl7.org/fhir/StructureDefinition/tutorial-rightinner-10" alias TRightInner as target
 
 group tutorial(source src : TLeft, target tgt : TRight) {
-  src.aa as a -> tgt.aa = a;
+  src.aa as a -> tgt.aa = a "rule-a";
 }
 
 group abContent(source src : TLeftInner, target tgt : TRightInner) <<types>> {
-  src.ab as b -> tgt.ab = b;
+  src.ab as b -> tgt.ab = b "rule-b";
 }

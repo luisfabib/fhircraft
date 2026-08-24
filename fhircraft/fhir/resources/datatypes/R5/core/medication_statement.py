@@ -31,9 +31,8 @@ class MedicationStatementAdherence(BackboneElement):
     Indicates whether the medication is or is not being consumed or administered.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Type of adherence",
-        default=None,
     )
     reason: Optional[CodeableConcept] = Field(
         description="Details of the reason for the current use of the medication",
@@ -60,21 +59,18 @@ class MedicationStatement(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="recorded | entered-in-error | draft",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of medication statement",
         default=None,
     )
-    medication: Optional[CodeableReference] = Field(
+    medication: CodeableReference = Field(
         description="What medication was taken",
-        default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who is/was taking  the medication",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter associated with MedicationStatement",

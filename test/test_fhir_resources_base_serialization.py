@@ -39,7 +39,9 @@ def test_serialize_as_json__primitive__only_value():
 
 
 def test_serialize_as_json__primitive__only_extension():
-    primitive = String(extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore
+    primitive = String(
+        extension=[Extension(url="http://example.com", valueString="example")]
+    )
     data = primitive._serialize_as_json("valueString")
     assert data == {
         "_valueString": {
@@ -74,7 +76,10 @@ def test_serialize_as_json__primitive__model_dump_json():
 
 
 def test_serialize_as_json__primitive__value_and_extension():
-    primitive = String(value="Hello world", extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore
+    primitive = String(
+        value="Hello world",
+        extension=[Extension(url="http://example.com", valueString="example")],
+    )
     data = primitive._serialize_as_json("valueString")
     assert data == {
         "valueString": "Hello world",
@@ -99,7 +104,7 @@ def test_serialize_as_json__list_of_primitives__with_shadow():
     instance = HumanName(
         given=[
             String(value="Alice"),
-            String(  # type: ignore
+            String(
                 value="Marie",
                 extension=[Extension(url="http://example.com", valueString="example")],
             ),
@@ -116,7 +121,9 @@ def test_serialize_as_json__list_of_primitives__with_shadow():
 def test_serialize_as_json__list_of_primitives__extension_only_suppresses_value_key():
     instance = HumanName(
         given=[
-            String(extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore,
+            String(
+                extension=[Extension(url="http://example.com", valueString="example")]
+            ),
         ]
     )
     data = json.loads(instance.model_dump_json())
@@ -134,7 +141,7 @@ def test_serialize_as_json__list_of_primitives__extension_only_suppresses_value_
 def test_serialize_as_json__complex__model_dump():
     concept = CodeableConcept(
         coding=[Coding(code="C123", system="http://example.com")],
-        text="Example Code",  # type: ignore
+        text="Example Code",
     )
     data = concept.model_dump()
     assert data["coding"] == [{"code": "C123", "system": "http://example.com"}]
@@ -160,7 +167,11 @@ def test_serialize_as_json__complex__model_dump_json():
 
 
 def test_serialize_as_json__resource__includes_resource_type():
-    instance = Observation(valueString=String(value="John"))
+    instance = Observation(
+        valueString=String(value="John"),
+        status="final",
+        code=CodeableConcept(coding=[Coding(code="123", system="http://example.com")]),
+    )
     data = json.loads(instance.model_dump_json())
     assert data["resourceType"] == "Observation"
     assert data["valueString"] == "John"
@@ -179,7 +190,9 @@ def test_serialize_as_xml__primitive__only_value():
 
 
 def test_serialize_as_xml__primitive__only_extension():
-    primitive = String(extension=[Extension(url="http://example.com", valueString="example")])  # type: ignore
+    primitive = String(
+        extension=[Extension(url="http://example.com", valueString="example")]
+    )
     element = primitive._serialize_as_xml("valueString")
     assert "valueString" in element.tag
     assert (extension := element.find("extension", XMLNS)) is not None
@@ -211,7 +224,7 @@ def test_serialize_as_xml__primitive__boolean_false():
 
 
 def test_serialize_as_xml__primitive__value_and_extension():
-    primitive = String(  # type: ignore
+    primitive = String(
         value="Hello",
         extension=[Extension(url="http://example.com", valueString="example")],
     )
@@ -343,7 +356,7 @@ def test_serialize_as_xml__complex__nested_complex_type():
                 code="official", system="http://terminology.hl7.org/CodeSystem/v2-0203"
             )
         ],
-        text="Official Identifier",  # type: ignore
+        text="Official Identifier",
     )
     element = concept._serialize_as_xml("type")
     assert "type" in element.tag
@@ -527,7 +540,11 @@ def test_model_validate_xml__resource__observation():
 
 
 def test_serialize_as_xml__resource__element_tag_is_type():
-    instance = Observation(valueString=String(value="John"))
+    instance = Observation(
+        valueString=String(value="John"),
+        status="final",
+        code=CodeableConcept(coding=[Coding(code="123", system="http://example.com")]),
+    )
     element = instance._serialize_as_xml(instance._type)
     assert "Observation" in element.tag
     assert (name_el := element.find("valueString", XMLNS)) is not None
@@ -535,7 +552,11 @@ def test_serialize_as_xml__resource__element_tag_is_type():
 
 
 def test_serialize_as_xml__resource__model_dump_xml_includes_xmlns():
-    instance = Observation(valueString=String(value="John"))
+    instance = Observation(
+        valueString=String(value="John"),
+        status="final",
+        code=CodeableConcept(coding=[Coding(code="123", system="http://example.com")]),
+    )
     xml_str = instance.model_dump_xml()
     assert 'xmlns="http://hl7.org/fhir"' in xml_str
     assert "<Observation" in xml_str
@@ -571,8 +592,17 @@ def test_xml_roundtrip__observation__status_and_code():
 def test_xml_roundtrip__observation__polymorphic_value_string():
     """Type-choice field (valueString) round-trips correctly through XML."""
     original = Observation(
-        status=Code(value="final"),
+        status="final",
         valueString=String(value="72 kg"),
+        code=CodeableConcept(
+            coding=[
+                Coding(
+                    system="http://loinc.org",
+                    code=Code(value="29463-7"),
+                    display=String(value="Body Weight"),
+                )
+            ]
+        ),
     )
     xml_str = original.model_dump_xml()
     parsed = Observation.model_validate_xml(xml_str)
@@ -588,10 +618,10 @@ def test_xml_roundtrip__observation__list_of_codings():
         status=Code(value="preliminary"),
         code=CodeableConcept(
             coding=[
-                Coding(system="http://loinc.org", code=Code(value="29463-7")),
+                Coding(system="http://loinc.org", code="29463-7"),
                 Coding(
                     system="http://snomed.info/sct",
-                    code=Code(value="27113001"),
+                    code="27113001",
                 ),
             ]
         ),
@@ -612,6 +642,15 @@ def test_xml_roundtrip__observation__primitive_with_extension():
         status=Code(
             value="final",
             extension=[Extension(url="http://example.org/status-note", valueString="confirmed")],  # type: ignore
+        ),
+        code=CodeableConcept(
+            coding=[
+                Coding(
+                    system="http://example.org",
+                    code="1234",
+                    display="Example",
+                )
+            ]
         ),
     )
     xml_str = original.model_dump_xml()
@@ -649,6 +688,14 @@ def test_extension__resource_field_extension_survives_json_roundtrip():
             value="final",
             extension=[Extension(url="http://example.org/note", valueString="Checked")],  # type: ignore
         ),
+        code=CodeableConcept(
+            coding=[
+                Coding(
+                    system="http://example.org",
+                    code="1234",
+                )
+            ]
+        ),
     )
     data = json.loads(obs.model_dump_json())
     assert "_status" in data
@@ -662,10 +709,11 @@ def test_extension__resource_field_extension_survives_json_roundtrip():
 
 def test_extension__nested_extensions_preserved_in_json_roundtrip():
     """An extension that itself carries child extensions round-trips through JSON."""
-    inner = Extension(url="http://example.org/inner", valueString="inner-value")  # type: ignore
-    outer = Extension(url="http://example.org/outer", extension=[inner])  # type: ignore
+    inner = Extension(url="http://example.org/inner", valueString="inner-value")
+    outer = Extension(url="http://example.org/outer", extension=[inner])
     obs = Observation(
-        status=Code(value="final", extension=[outer]),  # type: ignore
+        status=Code(value="final", extension=[outer]),
+        code=CodeableConcept(coding=[Coding(code="123", system="http://example.com")]),
     )
     data = json.loads(obs.model_dump_json())
     restored = Observation.model_validate(data)
@@ -683,9 +731,11 @@ def test_extension__resource_level_extension_list():
     """Top-level resource extensions are serialised and deserialised correctly."""
     obs = Observation(
         extension=[
-            Extension(url="http://example.org/ext1", valueBoolean=Boolean(value=True)),  # type: ignore
-            Extension(url="http://example.org/ext2", valueString="hello"),  # type: ignore
-        ]
+            Extension(url="http://example.org/ext1", valueBoolean=Boolean(value=True)),
+            Extension(url="http://example.org/ext2", valueString="hello"),
+        ],
+        status="final",
+        code=CodeableConcept(coding=[Coding(code="123", system="http://example.com")]),
     )
     data = json.loads(obs.model_dump_json())
     assert "extension" in data

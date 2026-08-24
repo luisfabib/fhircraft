@@ -33,9 +33,8 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
     Characteristic.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Characteristic code",
-        default=None,
     )
     valueReference: Optional[Reference] = Field(
         description="Characteristic value",
@@ -126,13 +125,11 @@ class EvidenceReportRelatesTo(BackboneElement):
     Relationships that this composition has with other compositions or documents that already exist.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="replaces | amends | appends | transforms | replacedWith | amendedWith | appendedWith | transformedWith",
-        default=None,
     )
-    target: Optional[EvidenceReportRelatesToTarget] = Field(
+    target: EvidenceReportRelatesToTarget = Field(
         description="Target of the relationship",
-        default=None,
     )
 
 
@@ -204,9 +201,8 @@ class EvidenceReport(DomainResource):
         description="canonical identifier for this EvidenceReport, represented as a globally unique URI",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
@@ -240,9 +236,8 @@ class EvidenceReport(DomainResource):
         description="Link, description or reference to artifact associated with the report",
         default=None,
     )
-    subject: Optional[EvidenceReportSubject] = Field(
+    subject: EvidenceReportSubject = Field(
         description="Focus of the report",
-        default=None,
     )
     publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",

@@ -25,21 +25,18 @@ class CodeSystemFilter(BackboneElement):
     A filter that can be used in a value set compose statement when selecting concepts using a filter.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="code that identifies the filter",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="How or why the filter is used",
         default=None,
     )
-    operator: Optional[ListType[fhir.code]] = Field(
+    operator: ListType[fhir.code] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | exists",
-        default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="What to use for the value",
-        default=None,
     )
 
 
@@ -48,9 +45,8 @@ class CodeSystemProperty(BackboneElement):
     A property defines an additional slot through which additional information can be provided about a concept.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Identifies the property on the concepts, and when referred to in operations",
-        default=None,
     )
     uri: Optional[fhir.uri] = Field(
         description="Formal identifier for the property",
@@ -60,9 +56,8 @@ class CodeSystemProperty(BackboneElement):
         description="Why the property is defined, and/or what it conveys",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="code | Coding | string | integer | boolean | dateTime | decimal",
-        default=None,
     )
 
 
@@ -80,9 +75,8 @@ class CodeSystemConceptDesignation(BackboneElement):
         description="Details how this designation would be used",
         default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The text value for this designation",
-        default=None,
     )
 
 
@@ -91,9 +85,8 @@ class CodeSystemConceptProperty(BackboneElement):
     A property value for this concept.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Reference to CodeSystem.property.code",
-        default=None,
     )
     valueCode: Optional[fhir.code] = Field(
         description="Value of the property for this concept",
@@ -154,9 +147,8 @@ class CodeSystemConcept(BackboneElement):
     Concepts that are in the code system. The concept definitions are inherently hierarchical, but the definitions must be consulted to determine what the meanings of the hierarchical relationships are.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="code that identifies concept",
-        default=None,
     )
     display: Optional[fhir.string] = Field(
         description="Text to display to the user",
@@ -222,9 +214,8 @@ class CodeSystem(DomainResource):
         description="Name for this code system (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -282,9 +273,8 @@ class CodeSystem(DomainResource):
         description="If definitions are not stable",
         default=None,
     )
-    content: Optional[fhir.code] = Field(
+    content: fhir.code = Field(
         description="not-present | example | fragment | complete | supplement",
-        default=None,
     )
     supplements: Optional[fhir.canonical] = Field(
         description="canonical URL of code System this adds designations and properties to",

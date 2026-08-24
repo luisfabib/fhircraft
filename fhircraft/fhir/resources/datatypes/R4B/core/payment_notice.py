@@ -44,9 +44,8 @@ class PaymentNotice(DomainResource):
         description="Business Identifier for the payment noctice",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
     request: Optional[Reference] = Field(
         description="Request reference",
@@ -56,17 +55,15 @@ class PaymentNotice(DomainResource):
         description="Response reference",
         default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Creation date",
-        default=None,
     )
     provider: Optional[Reference] = Field(
         description="Responsible practitioner",
         default=None,
     )
-    payment: Optional[Reference] = Field(
+    payment: Reference = Field(
         description="Payment reference",
-        default=None,
     )
     paymentDate: Optional[fhir.date_] = Field(
         description="Payment or clearing date",
@@ -76,13 +73,11 @@ class PaymentNotice(DomainResource):
         description="Party being paid",
         default=None,
     )
-    recipient: Optional[Reference] = Field(
+    recipient: Reference = Field(
         description="Party being notified",
-        default=None,
     )
-    amount: Optional[Money] = Field(
+    amount: Money = Field(
         description="Monetary amount of the payment",
-        default=None,
     )
     paymentStatus: Optional[CodeableConcept] = Field(
         description="Issued or cleared Status of the payment",

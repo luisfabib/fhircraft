@@ -118,13 +118,11 @@ class MessageHeaderResponse(BackboneElement):
     Information about the message that this message is a response to.  Only present if this message is a response.
     """
 
-    identifier: Optional[Identifier] = Field(
+    identifier: Identifier = Field(
         description="Bundle.identifier of original message",
-        default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="ok | transient-error | fatal-error",
-        default=None,
     )
     details: Optional[Reference] = Field(
         description="Specific list of hints/warnings/errors",
@@ -161,9 +159,8 @@ class MessageHeader(DomainResource):
         description="The source of the decision",
         default=None,
     )
-    source: Optional[MessageHeaderSource] = Field(
+    source: MessageHeaderSource = Field(
         description="Message source application",
-        default=None,
     )
     responsible: Optional[Reference] = Field(
         description="Final responsibility for event",

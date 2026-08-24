@@ -71,9 +71,8 @@ class BiologicallyDerivedProductProperty(BackboneElement):
     A property that is specific to this BiologicallyDerviedProduct instance.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="code that specifies the property",
-        default=None,
     )
     valueBoolean: Optional[fhir.boolean] = Field(
         description="Property values",

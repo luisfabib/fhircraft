@@ -30,17 +30,14 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
     """
 
-    deviceIdentifier: Optional[fhir.string] = Field(
+    deviceIdentifier: fhir.string = Field(
         description="The identifier that is to be associated with every Device that references this DeviceDefintiion for the issuer and jurisdication porvided in the DeviceDefinition.udiDeviceIdentifier",
-        default=None,
     )
-    issuer: Optional[fhir.uri] = Field(
+    issuer: fhir.uri = Field(
         description="The organization that assigns the identifier algorithm",
-        default=None,
     )
-    jurisdiction: Optional[fhir.uri] = Field(
+    jurisdiction: fhir.uri = Field(
         description="The jurisdiction to which the deviceIdentifier applies",
-        default=None,
     )
 
 
@@ -49,13 +46,11 @@ class DeviceDefinitionDeviceName(BackboneElement):
     A name given to the device to identify it.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="The name of the device",
-        default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="udi-label-name | user-friendly-name | patient-reported-name | manufacturer-name | model-name | other",
-        default=None,
     )
 
 
@@ -64,9 +59,8 @@ class DeviceDefinitionSpecialization(BackboneElement):
     The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication.
     """
 
-    systemType: Optional[fhir.string] = Field(
+    systemType: fhir.string = Field(
         description="The standard that is used to operate and communicate",
-        default=None,
     )
     version: Optional[fhir.string] = Field(
         description="The version of the standard that is used to operate and communicate",
@@ -79,9 +73,8 @@ class DeviceDefinitionCapability(BackboneElement):
     Device capabilities.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of capability",
-        default=None,
     )
     description: Optional[ListType[CodeableConcept]] = Field(
         description="Description of capability",
@@ -94,9 +87,8 @@ class DeviceDefinitionProperty(BackboneElement):
     The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
-        default=None,
     )
     valueQuantity: Optional[ListType[Quantity]] = Field(
         description="Property value as a quantity",
@@ -113,9 +105,8 @@ class DeviceDefinitionMaterial(BackboneElement):
     A substance used to create the material(s) of which the device is made.
     """
 
-    substance: Optional[CodeableConcept] = Field(
+    substance: CodeableConcept = Field(
         description="The substance",
-        default=None,
     )
     alternate: Optional[fhir.boolean] = Field(
         description="Indicates an alternative material of the device",

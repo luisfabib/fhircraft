@@ -280,7 +280,7 @@ Observation = get_fhir_type("Observation", "R5")
 
 with override_config(terminology_service=MyTerminologyService()):
     # All FHIRPath evaluations in this block use the staging service
-    result = Observation(code={"coding":[{"code":"LP-12292"}]}).fhirpath_single(
+    result = Observation(status="final", code={"coding":[{"code":"LP-12292"}]}).fhirpath_single(
         "Observation.code.memberOf('http://example.org/ValueSet/LabCodes')"
     )
 

@@ -72,9 +72,8 @@ class Substance(DomainResource):
         description="Unique identifier",
         default=None,
     )
-    instance: Optional[fhir.boolean] = Field(
+    instance: fhir.boolean = Field(
         description="Is this an instance of a substance or a kind of one",
-        default=None,
     )
     status: Optional[fhir.code] = Field(
         description="active | inactive | entered-in-error",
@@ -84,9 +83,8 @@ class Substance(DomainResource):
         description="What class/type of substance this is",
         default=None,
     )
-    code: Optional[CodeableReference] = Field(
+    code: CodeableReference = Field(
         description="What substance this is",
-        default=None,
     )
     description: Optional[fhir.markdown] = Field(
         description="Textual description of the substance, comments",

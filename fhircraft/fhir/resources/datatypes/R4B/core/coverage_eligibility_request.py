@@ -27,13 +27,11 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
 
-    sequence: Optional[fhir.positiveInt] = Field(
+    sequence: fhir.positiveInt = Field(
         description="Information instance identifier",
-        default=None,
     )
-    information: Optional[Reference] = Field(
+    information: Reference = Field(
         description="Data to be provided",
-        default=None,
     )
     appliesToAll: Optional[fhir.boolean] = Field(
         description="Applies to all items",
@@ -49,9 +47,8 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         description="Applicable coverage",
         default=None,
     )
-    coverage: Optional[Reference] = Field(
+    coverage: Reference = Field(
         description="Insurance information",
-        default=None,
     )
     businessArrangement: Optional[fhir.string] = Field(
         description="Additional provider contract number",
@@ -161,21 +158,18 @@ class CoverageEligibilityRequest(DomainResource):
         description="Business Identifier for coverage eligiblity request",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
     priority: Optional[CodeableConcept] = Field(
         description="Desired processing priority",
         default=None,
     )
-    purpose: Optional[ListType[fhir.code]] = Field(
+    purpose: ListType[fhir.code] = Field(
         description="auth-requirements | benefits | discovery | validation",
-        default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Intended recipient of products and services",
-        default=None,
     )
     servicedDate: Optional[fhir.date_] = Field(
         description="Estimated date or dates of service",
@@ -185,9 +179,8 @@ class CoverageEligibilityRequest(DomainResource):
         description="Estimated date or dates of service",
         default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Creation date",
-        default=None,
     )
     enterer: Optional[Reference] = Field(
         description="Author",
@@ -197,9 +190,8 @@ class CoverageEligibilityRequest(DomainResource):
         description="Party responsible for the request",
         default=None,
     )
-    insurer: Optional[Reference] = Field(
+    insurer: Reference = Field(
         description="Coverage issuer",
-        default=None,
     )
     facility: Optional[Reference] = Field(
         description="Servicing facility",

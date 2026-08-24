@@ -41,13 +41,11 @@ class PermissionRuleDataResource(BackboneElement):
     Explicit FHIR Resource references.
     """
 
-    meaning: Optional[fhir.code] = Field(
+    meaning: fhir.code = Field(
         description="instance | related | dependents | authoredby",
-        default=None,
     )
-    reference: Optional[Reference] = Field(
+    reference: Reference = Field(
         description="The actual data reference",
-        default=None,
     )
 
 class PermissionRuleData(BackboneElement):
@@ -121,9 +119,8 @@ class Permission(DomainResource):
     _type = "Permission"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Permission"
 
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | entered-in-error | draft | rejected",
-        default=None,
     )
     asserter: Optional[Reference] = Field(
         description="The person or entity that asserts the permission",
@@ -141,9 +138,8 @@ class Permission(DomainResource):
         description="The asserted justification for using the data",
         default=None,
     )
-    combining: Optional[fhir.code] = Field(
+    combining: fhir.code = Field(
         description="deny-overrides | permit-overrides | ordered-deny-overrides | ordered-permit-overrides | deny-unless-permit | permit-unless-deny",
-        default=None,
     )
     rule: Optional[ListType[PermissionRule]] = Field(
         description="Constraints to the Permission",

@@ -13,7 +13,6 @@ from fhircraft.fhir.resources.factory.builders.backbone import BackboneFieldBuil
 from fhircraft.fhir.resources.factory.builders.base import Build
 from fhircraft.fhir.resources.datatypes.R4B import Coding
 
-
 # ---------------------------------------------------------------------------
 # Helpers & fixtures
 # ---------------------------------------------------------------------------
@@ -44,6 +43,7 @@ def make_node(
     min_value=None,
     max_value=None,
     is_prohibited: bool = False,
+    is_required: bool = False,
 ):
     node = MagicMock(name="mock-node")
     node.name = name
@@ -57,6 +57,7 @@ def make_node(
     node.pattern = pattern
     node.default_value = default_value
     node.definition.constraint = constraints or []
+    node.is_required = is_required
     node.max_length = max_length
     node.min_value = min_value
     node.max_value = max_value

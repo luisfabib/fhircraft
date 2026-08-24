@@ -32,9 +32,8 @@ class MedicationAdministrationPerformer(BackboneElement):
         description="Type of performance",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who performed the medication administration",
-        default=None,
     )
 
 class MedicationAdministrationDosage(BackboneElement):
@@ -120,9 +119,8 @@ class MedicationAdministration(DomainResource):
         description="Part of referenced event",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown",
-        default=None,
     )
     statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason administration not performed",
@@ -140,9 +138,8 @@ class MedicationAdministration(DomainResource):
         description="What was administered",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Who received medication",
-        default=None,
     )
     context: Optional[Reference] = Field(
         description="Encounter or Episode of Care administered as part of",

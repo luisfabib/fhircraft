@@ -36,9 +36,8 @@ class ActivityDefinitionParticipant(BackboneElement):
     Indicates who should participate in performing the action described.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="patient | practitioner | related-person | device",
-        default=None,
     )
     role: Optional[CodeableConcept] = Field(
         description="E.g. Nurse, Surgeon, Parent, etc.",
@@ -51,13 +50,11 @@ class ActivityDefinitionDynamicValue(BackboneElement):
     Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the request resource that would contain the result.
     """
 
-    path: Optional[fhir.string] = Field(
+    path: fhir.string = Field(
         description="The path to the element to be set dynamically",
-        default=None,
     )
-    expression: Optional[Expression] = Field(
+    expression: Expression = Field(
         description="An expression that provides the dynamic value for the customization",
-        default=None,
     )
 
 
@@ -106,9 +103,8 @@ class ActivityDefinition(DomainResource):
         description="Subordinate title of the activity definition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

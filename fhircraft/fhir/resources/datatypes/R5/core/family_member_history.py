@@ -35,9 +35,8 @@ class FamilyMemberHistoryParticipant(BackboneElement):
         description="Type of involvement",
         default=None,
     )
-    actor: Optional[Reference] = Field(
+    actor: Reference = Field(
         description="Who or what participated in the activities related to the family member history",
-        default=None,
     )
 
 
@@ -46,9 +45,8 @@ class FamilyMemberHistoryCondition(BackboneElement):
     The significant Conditions (or condition) that the family member had. This is a repeating section to allow a system to represent more than one condition per resource, though there is nothing stopping multiple resources - one per condition.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Condition suffered by relation",
-        default=None,
     )
     outcome: Optional[CodeableConcept] = Field(
         description="deceased | permanent disability | etc",
@@ -101,9 +99,8 @@ class FamilyMemberHistoryProcedure(BackboneElement):
     The significant Procedures (or procedure) that the family member had. This is a repeating section to allow a system to represent more than one procedure per resource, though there is nothing stopping multiple resources - one per procedure.
     """
 
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="Procedures performed on the related person",
-        default=None,
     )
     outcome: Optional[CodeableConcept] = Field(
         description="What happened following the procedure",
@@ -176,17 +173,15 @@ class FamilyMemberHistory(DomainResource):
         description="Instantiates external protocol or definition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="partial | completed | entered-in-error | health-unknown",
-        default=None,
     )
     dataAbsentReason: Optional[CodeableConcept] = Field(
         description="subject-unknown | withheld | unable-to-obtain | deferred",
         default=None,
     )
-    patient: Optional[Reference] = Field(
+    patient: Reference = Field(
         description="Patient history is about",
-        default=None,
     )
     date: Optional[fhir.dateTime] = Field(
         description="When history was recorded or last updated",
@@ -200,9 +195,8 @@ class FamilyMemberHistory(DomainResource):
         description="The family member described",
         default=None,
     )
-    relationship: Optional[CodeableConcept] = Field(
+    relationship: CodeableConcept = Field(
         description="Relationship to the subject",
-        default=None,
     )
     sex: Optional[CodeableConcept] = Field(
         description="male | female | other | unknown",

@@ -84,9 +84,8 @@ class PackagedProductDefinitionPackageProperty(BackboneElement):
     General characteristics of this item.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="A code expressing the type of characteristic",
-        default=None,
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="A value for the characteristic",
@@ -137,9 +136,8 @@ class PackagedProductDefinitionPackageContainedItem(BackboneElement):
     The item(s) within the packaging.
     """
 
-    item: Optional[CodeableReference] = Field(
+    item: CodeableReference = Field(
         description="The actual item(s) of medication, as manufactured, or a device, or other medically related item (food, biologicals, raw materials, medical fluids, gases etc.), as contained in the package",
-        default=None,
     )
     amount: Optional[Quantity] = Field(
         description="The number of this type of item within this packaging",

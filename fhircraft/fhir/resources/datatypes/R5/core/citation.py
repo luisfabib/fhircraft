@@ -37,9 +37,8 @@ class CitationSummary(BackboneElement):
         description="Format for display of the citation summary",
         default=None,
     )
-    text: Optional[fhir.markdown] = Field(
+    text: fhir.markdown = Field(
         description="The human-readable display of the citation summary",
-        default=None,
     )
 
 
@@ -63,17 +62,15 @@ class CitationStatusDate(BackboneElement):
     The state or status of the citation record paired with an effective date or period for that state.
     """
 
-    activity: Optional[CodeableConcept] = Field(
+    activity: CodeableConcept = Field(
         description="Classification of the status",
-        default=None,
     )
     actual: Optional[fhir.boolean] = Field(
         description="Either occurred or expected",
         default=None,
     )
-    period: Optional[Period] = Field(
+    period: Period = Field(
         description="When the status started and/or ended",
-        default=None,
     )
 
 
@@ -82,9 +79,8 @@ class CitationCitedArtifactVersion(BackboneElement):
     The defined version of the cited artifact.
     """
 
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The version number or other version identifier",
-        default=None,
     )
     baseCitation: Optional[Reference] = Field(
         description="Citation for the main version of the cited artifact",
@@ -97,17 +93,15 @@ class CitationCitedArtifactStatusDate(BackboneElement):
     An effective date or period, historical or future, actual or expected, for a status of the cited artifact.
     """
 
-    activity: Optional[CodeableConcept] = Field(
+    activity: CodeableConcept = Field(
         description="Classification of the status",
-        default=None,
     )
     actual: Optional[fhir.boolean] = Field(
         description="Either occurred or expected",
         default=None,
     )
-    period: Optional[Period] = Field(
+    period: Period = Field(
         description="When the status started and/or ended",
-        default=None,
     )
 
 
@@ -124,9 +118,8 @@ class CitationCitedArtifactTitle(BackboneElement):
         description="Used to express the specific language",
         default=None,
     )
-    text: Optional[fhir.markdown] = Field(
+    text: fhir.markdown = Field(
         description="The title of the article or artifact",
-        default=None,
     )
 
 
@@ -143,9 +136,8 @@ class CitationCitedArtifactAbstract(BackboneElement):
         description="Used to express the specific language",
         default=None,
     )
-    text: Optional[fhir.markdown] = Field(
+    text: fhir.markdown = Field(
         description="Abstract content",
-        default=None,
     )
     copyright: Optional[fhir.markdown] = Field(
         description="Copyright notice for the abstract",
@@ -177,9 +169,8 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
     The artifact related to the cited artifact.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as | reprint | reprint-of",
-        default=None,
     )
     classifier: Optional[ListType[CodeableConcept]] = Field(
         description="Additional classifiers",
@@ -344,9 +335,8 @@ class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElem
     Contributions with accounting for time or number.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="The specific contribution",
-        default=None,
     )
     time: Optional[fhir.dateTime] = Field(
         description="The time that the contribution was made",
@@ -359,9 +349,8 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
     An individual entity named as a contributor, for example in the author list or contributor list.
     """
 
-    contributor: Optional[Reference] = Field(
+    contributor: Reference = Field(
         description="The identity of the individual contributor",
-        default=None,
     )
     forenameInitials: Optional[fhir.string] = Field(
         description="For citation styles that use initials",
@@ -412,9 +401,8 @@ class CitationCitedArtifactContributorshipSummary(BackboneElement):
         description="Used to code the producer or rule for creating the display string",
         default=None,
     )
-    value: Optional[fhir.markdown] = Field(
+    value: fhir.markdown = Field(
         description="The display string for the author list, contributor list, or contributorship statement",
-        default=None,
     )
 
 
@@ -541,9 +529,8 @@ class Citation(DomainResource):
         description="Name for this citation record (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

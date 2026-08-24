@@ -29,13 +29,11 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     Associated or related knowledge about a medication.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category of medicationKnowledge",
-        default=None,
     )
-    reference: Optional[ListType[Reference]] = Field(
+    reference: ListType[Reference] = Field(
         description="Associated documentation about the associated medication knowledge",
-        default=None,
     )
 
 
@@ -98,17 +96,15 @@ class MedicationKnowledgeCost(BackboneElement):
     The price of the medication.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="The category of the cost information",
-        default=None,
     )
     source: Optional[fhir.string] = Field(
         description="The source or owner for the price information",
         default=None,
     )
-    cost: Optional[Money] = Field(
+    cost: Money = Field(
         description="The price of the medication",
-        default=None,
     )
 
 
@@ -132,13 +128,11 @@ class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
     Dosage for the medication for the specific guidelines.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Type of dosage",
-        default=None,
     )
-    dosage: Optional[ListType[Dosage]] = Field(
+    dosage: ListType[Dosage] = Field(
         description="Dosage for the medication for the specific guidelines",
-        default=None,
     )
 
 
@@ -227,9 +221,8 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
     Categorization of the medication within a formulary or classification system.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="The type of category for the medication (for example, therapeutic classification, therapeutic sub-classification)",
-        default=None,
     )
     classification: Optional[ListType[CodeableConcept]] = Field(
         description="Specific category assigned to the medication",
@@ -300,13 +293,11 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     Specifies if changes are allowed when dispensing a medication from a regulatory perspective.
     """
 
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Specifies the type of substitution allowed",
-        default=None,
     )
-    allowed: Optional[fhir.boolean] = Field(
+    allowed: fhir.boolean = Field(
         description="Specifies if regulation allows for changes in the medication when dispensing",
-        default=None,
     )
 
 
@@ -315,9 +306,8 @@ class MedicationKnowledgeRegulatorySchedule(BackboneElement):
     Specifies the schedule of a medication in jurisdiction.
     """
 
-    schedule: Optional[CodeableConcept] = Field(
+    schedule: CodeableConcept = Field(
         description="Specifies the specific drug schedule",
-        default=None,
     )
 
 
@@ -326,9 +316,8 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     The maximum number of units of the medication that can be dispensed in a period.
     """
 
-    quantity: Optional[Quantity] = Field(
+    quantity: Quantity = Field(
         description="The maximum number of units of the medication that can be dispensed",
-        default=None,
     )
     period: Optional[Duration] = Field(
         description="The period that applies to the maximum number of units",
@@ -341,9 +330,8 @@ class MedicationKnowledgeRegulatory(BackboneElement):
     Regulatory information about a medication.
     """
 
-    regulatoryAuthority: Optional[Reference] = Field(
+    regulatoryAuthority: Reference = Field(
         description="Specifies the authority of the regulation",
-        default=None,
     )
     substitution: Optional[ListType[MedicationKnowledgeRegulatorySubstitution]] = Field(
         description="Specifies if changes are allowed when dispensing a medication from a regulatory perspective",

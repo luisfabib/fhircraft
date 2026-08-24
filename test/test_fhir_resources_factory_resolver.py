@@ -27,7 +27,6 @@ from fhircraft.exceptions import (
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 
-
 # ------------------------------------------------------------------
 # Utilities
 # ------------------------------------------------------------------
@@ -38,13 +37,15 @@ def make_element(id: str, path: str | None = None, **kwargs) -> ElementDefinitio
     return ElementDefinition.model_construct(
         id=id,
         path=String(value=path) if path is not None else String(value=id),
+        min=kwargs.pop("min", 0),
+        max=kwargs.pop("max", "1"),
         **kwargs,
     )
 
 
-def make_node(id: str, path: str | None = None, **kwargs) -> ElementNode:
+def make_node(id: str, path: str, min: int, max: str, **kwargs) -> ElementNode:
     """Convenience wrapper — builds an ElementNode directly from kwargs."""
-    return ElementNode(definition=make_element(id, path, **kwargs))
+    return ElementNode(definition=make_element(id, path, min=min, max=max, **kwargs))
 
 
 def make_base_index(*elements: ElementDefinition) -> DefinitionIndex:
@@ -116,7 +117,7 @@ def base_index():
       - BaseResource.component.code  (min=1, max="1", short="Component code")
     """
     return make_base_index(
-        make_element("BaseResource", "BaseResource"),
+        make_element("BaseResource", path="BaseResource", min=0, max="*"),
         make_element(
             "BaseResource.status",
             "BaseResource.status",
@@ -508,7 +509,13 @@ def test_build_intermediate_node__type_choice_id_is_not_polymorphic(resolver):
 
 def test_build_intermediate_node__path_lookup_ignores_slices(resolver, base_index):
     base_index.add(
-        make_node(id="BaseResource.component:sliceA", path="BaseResource.component")
+        make_node(
+            id="BaseResource.component:sliceA",
+            path="BaseResource.component",
+            min=0,
+            max="*",
+            type_codes=["BackboneElement"],
+        )
     )
     base_node = base_index.get("BaseResource.component")
     node = resolver._build_intermediate_node("MyProfile.component:sliceB", base_index)
@@ -558,22 +565,32 @@ def test_build_intermediate_node__preserves_slicing_from_base(resolver):
 
 
 def test_merge_node_with_base__returns_element_node(resolver):
-    diff = make_node(id="MyProfile.status", min=1, max="1")
-    base = make_node(id="BaseResource.status", min=0, max="1", short="The status")
+    diff = make_node(id="MyProfile.status", path="MyProfile.status", min=1, max="1")
+    base = make_node(
+        id="BaseResource.status",
+        path="BaseResource.status",
+        min=0,
+        max="1",
+        short="The status",
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert isinstance(result, ElementNode)
 
 
 def test_merge_node_with_base__result_carries_diff_id(resolver):
-    diff = make_node(id="MyProfile.status", min=1)
-    base = make_node(id="BaseResource.status", min=0, max="1")
+    diff = make_node(id="MyProfile.status", path="MyProfile.status", min=1, max="1")
+    base = make_node(
+        id="BaseResource.status", path="BaseResource.status", min=0, max="1"
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert result.id == "MyProfile.status"
 
 
 def test_merge_node_with_base__result_carries_diff_path(resolver):
-    diff = make_node(id="MyProfile.status", path="MyProfile.status")
-    base = make_node(id="BaseResource.status", path="BaseResource.status")
+    diff = make_node(id="MyProfile.status", path="MyProfile.status", min=0, max="*")
+    base = make_node(
+        id="BaseResource.status", path="BaseResource.status", min=0, max="*"
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert result.path == "MyProfile.status"
 
@@ -590,8 +607,14 @@ def test_merge_node_with_base__falls_back_to_base_path_when_diff_path_absent(res
 
 
 def test_merge_node_with_base__base_fields_inherited_when_not_in_diff(resolver):
-    diff = make_node(id="MyProfile.status")
-    base = make_node(id="BaseResource.status", min=0, max="1", short="The status")
+    diff = make_node(id="MyProfile.status", path="MyProfile.status", min=0, max="1")
+    base = make_node(
+        id="BaseResource.status",
+        path="BaseResource.status",
+        min=0,
+        max="1",
+        short="The status",
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert result.min_cardinality == 0
     assert result.max_cardinality == 1
@@ -599,8 +622,20 @@ def test_merge_node_with_base__base_fields_inherited_when_not_in_diff(resolver):
 
 
 def test_merge_node_with_base__diff_cardinality_overrides_base(resolver):
-    diff = make_node(id="MyProfile.status", min=1, max="4", short="Overridden status")
-    base = make_node(id="BaseResource.status", min=0, max="*", short="The status")
+    diff = make_node(
+        id="MyProfile.status",
+        path="MyProfile.status",
+        min=1,
+        max="4",
+        short="Overridden status",
+    )
+    base = make_node(
+        id="BaseResource.status",
+        path="BaseResource.status",
+        min=0,
+        max="*",
+        short="The status",
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert result.min_cardinality == 1
     assert result.max_cardinality == 4
@@ -608,16 +643,26 @@ def test_merge_node_with_base__diff_cardinality_overrides_base(resolver):
 
 
 def test_merge_node_with_base__definition_class_matches_base(resolver):
-    diff = make_node(id="MyProfile.status", min=1)
-    base = make_node(id="BaseResource.status", min=0, max="1")
+    diff = make_node(id="MyProfile.status", path="MyProfile.status", min=1, max="1")
+    base = make_node(
+        id="BaseResource.status", path="BaseResource.status", min=0, max="1"
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert type(result.definition) is type(base.definition)
 
 
 def test_merge_node_with_base__base_type_kept_when_diff_has_none(resolver):
     base_type = [ElementDefinitionType.model_construct(code="code")]
-    diff = make_node(id="MyProfile.status")  # no type
-    base = make_node(id="BaseResource.status", min=0, max="1", type=base_type)
+    diff = make_node(
+        id="MyProfile.status", path="MyProfile.status", min=0, max="1"
+    )  # no type
+    base = make_node(
+        id="BaseResource.status",
+        path="BaseResource.status",
+        min=0,
+        max="1",
+        type=base_type,
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert result.type_codes == ["code"]
 
@@ -632,8 +677,10 @@ def test_merge_node_with_base__base_type_kept_when_diff_has_none(resolver):
 def test_merge_node_with_base__base_is_constructued(
     resolver, min, max, base_min, base_max, expected_min, expected_max
 ):
-    diff = make_node(id="MyProfile.status", min=min, max=max)
-    base = make_node(id="BaseResource.status", min=base_min, max=base_max)
+    diff = make_node(id="MyProfile.status", path="MyProfile.status", min=min, max=max)
+    base = make_node(
+        id="BaseResource.status", path="BaseResource.status", min=base_min, max=base_max
+    )
     result = resolver._merge_node_with_base(diff, base)
     assert result.definition.base.min == expected_min
     assert result.definition.base.max == expected_max
@@ -652,8 +699,8 @@ def test_resolve_differential__returns_definition_index(resolver, base_index):
 
 def test_resolve_differential__diff_element_present_in_base(resolver, base_index):
     diff = [
-        make_element("MyProfile", "MyProfile"),
-        make_element("MyProfile.status", "MyProfile.status", min=1, max="1"),
+        make_element("MyProfile", path="MyProfile", min=0, max="*"),
+        make_element("MyProfile.status", path="MyProfile.status", min=1, max="1"),
     ]
     index = resolver._resolve_differential(diff, base_index)
     assert "MyProfile.status" in index
@@ -661,8 +708,8 @@ def test_resolve_differential__diff_element_present_in_base(resolver, base_index
 
 def test_resolve_differential__diff_overrides_base_min(resolver, base_index):
     diff = [
-        make_element("MyProfile", "MyProfile"),
-        make_element("MyProfile.status", "MyProfile.status", min=1),
+        make_element("MyProfile", path="MyProfile", min=0, max="*"),
+        make_element("MyProfile.status", path="MyProfile.status", min=1),
     ]
     index = resolver._resolve_differential(diff, base_index)
     assert (node := index.get("MyProfile.status"))
@@ -672,8 +719,8 @@ def test_resolve_differential__diff_overrides_base_min(resolver, base_index):
 
 def test_resolve_differential__diff_overrides_base_max(resolver, base_index):
     diff = [
-        make_element("MyProfile", "MyProfile"),
-        make_element("MyProfile.status", "MyProfile.status", max="0"),
+        make_element("MyProfile", path="MyProfile", min=0, max="*"),
+        make_element("MyProfile.status", path="MyProfile.status", max="0"),
     ]
     index = resolver._resolve_differential(diff, base_index)
     assert (node := index.get("MyProfile.status"))
@@ -685,10 +732,12 @@ def test_resolve_differential__intermediate_nodes_filled_from_base(
     resolver, base_index
 ):
     diff = [
-        make_element("MyProfile", "MyProfile"),
+        make_element("MyProfile", path="MyProfile", min=0, max="*"),
         make_element(
             "MyProfile.component.code",
-            "MyProfile.component.code",
+            path="MyProfile.component.code",
+            min=1,
+            max="1",
         ),
     ]
     index = resolver._resolve_differential(diff, base_index)
@@ -710,14 +759,21 @@ def test_resolve_differential__multiple_diff_elements_all_in_result(
         make_element(
             "MyProfile.component:sliceA", "MyProfile.component", min=2, max="3"
         ),
-        make_element("MyProfile.component:sliceB", "MyProfile.component", min=3),
         make_element(
-            "MyProfile.component:sliceB.code", "MyProfile.component.code", max="1"
+            "MyProfile.component:sliceB", "MyProfile.component", min=3, max="*"
+        ),
+        make_element(
+            "MyProfile.component:sliceB.code",
+            "MyProfile.component.code",
+            min=1,
+            max="1",
         ),
         make_element(
             "MyProfile.component:sliceB.code.coding.system",
             "MyProfile.component.code.coding.system",
             fixedString="http://example.org/system",
+            min=0,
+            max="1",
         ),
     ]
     index = resolver._resolve_differential(diff, base_index)
@@ -800,7 +856,7 @@ def test_resolve_differential__calls_merge_when_base_node_found(resolver, base_i
         make_element("MyProfile", "MyProfile"),
         make_element("MyProfile.status", "MyProfile.status", min=1),
     ]
-    sentinel = make_node(id="MyProfile.status", min=1, max="1")
+    sentinel = make_node(id="MyProfile.status", path="MyProfile.status", min=1, max="1")
 
     with patch.object(
         resolver, "_merge_node_with_base", return_value=sentinel
@@ -821,7 +877,9 @@ def test_resolve_differential__calls_merge_when_base_node_found(resolver, base_i
 def test_resolve_differential__merge_result_is_stored_not_diff_node(
     resolver, base_index
 ):
-    merged_sentinel = make_node(id="MyProfile.status", min=99, max="99")
+    merged_sentinel = make_node(
+        id="MyProfile.status", path="MyProfile.status", min=99, max="99"
+    )
 
     diff = [
         make_element("MyProfile", "MyProfile"),
@@ -837,7 +895,7 @@ def test_resolve_differential__merge_result_is_stored_not_diff_node(
 def test_resolve_differential__extension_slice_on_complex_field_is_present(resolver):
     # Build a minimal Observation snapshot — only the top-level 'code' field.
     obs_snapshot = [
-        make_element("Observation", "Observation"),
+        make_element("Observation", "Observation", min=0, max="1"),
         make_element(
             "Observation.code",
             "Observation.code",
@@ -850,9 +908,11 @@ def test_resolve_differential__extension_slice_on_complex_field_is_present(resol
 
     # The differential introduces a slice on Observation.code.extension.
     diff = [
-        make_element("Observation", "Observation"),
-        make_element("Observation.code", "Observation.code"),
-        make_element("Observation.code.extension", "Observation.code.extension"),
+        make_element("Observation", "Observation", min=0, max="1"),
+        make_element("Observation.code", "Observation.code", min=0, max="1"),
+        make_element(
+            "Observation.code.extension", "Observation.code.extension", min=0, max="*"
+        ),
         make_element(
             "Observation.code.extension:mySlice",
             "Observation.code.extension",
@@ -895,8 +955,8 @@ def test_resolve_differential__slicing_preserved_on_intermediate_complex_type_no
     base_index = make_base_index(*obs_snapshot)
 
     diff = [
-        make_element("Observation", "Observation"),
-        make_element("Observation.code", "Observation.code"),
+        make_element("Observation", "Observation", min=0, max="1"),
+        make_element("Observation.code", "Observation.code", min=0, max="1"),
         make_element("Observation.code.extension", "Observation.code.extension"),
         make_element(
             "Observation.code.extension:mySlice",

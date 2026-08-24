@@ -28,13 +28,11 @@ class OperationDefinitionParameterBinding(BackboneElement):
     Binds to a value set if this parameter is coded (code, Coding, CodeableConcept).
     """
 
-    strength: Optional[fhir.code] = Field(
+    strength: fhir.code = Field(
         description="required | extensible | preferred | example",
-        default=None,
     )
-    valueSet: Optional[fhir.canonical] = Field(
+    valueSet: fhir.canonical = Field(
         description="Source of value set",
-        default=None,
     )
 
 
@@ -43,9 +41,8 @@ class OperationDefinitionParameterReferencedFrom(BackboneElement):
     Identifies other resource parameters within the operation invocation that are expected to resolve to this resource.
     """
 
-    source: Optional[fhir.string] = Field(
+    source: fhir.string = Field(
         description="Referencing parameter",
-        default=None,
     )
     sourceId: Optional[fhir.string] = Field(
         description="Element id of reference",
@@ -58,25 +55,21 @@ class OperationDefinitionParameter(BackboneElement):
     The parameters for the operation/query.
     """
 
-    name: Optional[fhir.code] = Field(
+    name: fhir.code = Field(
         description="Name in Parameters.parameter.name or in URL",
-        default=None,
     )
-    use: Optional[fhir.code] = Field(
+    use: fhir.code = Field(
         description="in | out",
-        default=None,
     )
     scope: Optional[ListType[fhir.code]] = Field(
         description="instance | type | system",
         default=None,
     )
-    min: Optional[fhir.integer] = Field(
+    min: fhir.integer = Field(
         description="Minimum Cardinality",
-        default=None,
     )
-    max: Optional[fhir.string] = Field(
+    max: fhir.string = Field(
         description="Maximum Cardinality (a number or *)",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="Description of meaning/use",
@@ -158,21 +151,18 @@ class OperationDefinition(DomainResource):
         description="How to compare versions",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this operation definition (computer friendly)",
-        default=None,
     )
     title: Optional[fhir.string] = Field(
         description="Name for this operation definition (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="operation | query",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -218,9 +208,8 @@ class OperationDefinition(DomainResource):
         description="Whether content is changed by the operation",
         default=None,
     )
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="Recommended name for operation in search url",
-        default=None,
     )
     comment: Optional[fhir.markdown] = Field(
         description="Additional information about use",
@@ -234,17 +223,14 @@ class OperationDefinition(DomainResource):
         description="Types this operation applies to",
         default=None,
     )
-    system: Optional[fhir.boolean] = Field(
+    system: fhir.boolean = Field(
         description="Invoke at the system level?",
-        default=None,
     )
-    type: Optional[fhir.boolean] = Field(
+    type: fhir.boolean = Field(
         description="Invoke at the type level?",
-        default=None,
     )
-    instance: Optional[fhir.boolean] = Field(
+    instance: fhir.boolean = Field(
         description="Invoke on an instance?",
-        default=None,
     )
     inputProfile: Optional[fhir.canonical] = Field(
         description="Validation information for in parameters",

@@ -26,13 +26,11 @@ class NamingSystemUniqueId(BackboneElement):
     Indicates how the system may be identified when referenced in electronic exchange.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="oid | uuid | uri | other",
-        default=None,
     )
-    value: Optional[fhir.string] = Field(
+    value: fhir.string = Field(
         description="The unique identifier",
-        default=None,
     )
     preferred: Optional[fhir.boolean] = Field(
         description="Is this the id that should be used for this type",
@@ -69,21 +67,17 @@ class NamingSystem(DomainResource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for this naming system (computer friendly)",
-        default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="codesystem | identifier | root",
-        default=None,
     )
-    date: Optional[fhir.dateTime] = Field(
+    date: fhir.dateTime = Field(
         description="Date last changed",
-        default=None,
     )
     publisher: Optional[fhir.string] = Field(
         description="Name of the publisher (organization or individual)",
@@ -117,9 +111,8 @@ class NamingSystem(DomainResource):
         description="How/where is it used",
         default=None,
     )
-    uniqueId: Optional[ListType[NamingSystemUniqueId]] = Field(
+    uniqueId: ListType[NamingSystemUniqueId] = Field(
         description="Unique identifiers used for system",
-        default=None,
     )
 
     @model_validator(mode="after")

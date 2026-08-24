@@ -29,9 +29,8 @@ class MedicationIngredient(BackboneElement):
     Identifies a particular constituent of interest in the product.
     """
 
-    item: Optional[CodeableReference] = Field(
+    item: CodeableReference = Field(
         description="The ingredient (substance or medication) that the ingredient.strength relates to",
-        default=None,
     )
     isActive: Optional[fhir.boolean] = Field(
         description="Active ingredient indicator",

@@ -18,7 +18,7 @@ from fhircraft.exceptions import (
     MapperScopeError,
 )
 from fhircraft.fhir.path.engine import Exists
-from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroup,
     StructureMapGroupInput,
     StructureMapGroupRule,
@@ -71,7 +71,7 @@ def group_definition_with_multiple_inputs():
 def group_definition_with_rules():
     """Group definition with rule configurations."""
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
-    rule = StructureMapGroupRule(
+    rule = StructureMapGroupRule.model_construct(
         name="test-rule", source=None, target=None, rule=None, dependent=None
     )
     return StructureMapGroup(name="group-with-rules", input=[input_def], rule=[rule])
@@ -80,13 +80,17 @@ def group_definition_with_rules():
 @pytest.fixture
 def group_definition_without_inputs():
     """Group definition missing inputs (for error testing)."""
-    return StructureMapGroup(name="no-inputs-group", input=None, rule=None)
+    return StructureMapGroup.model_construct(
+        name="no-inputs-group", input=None, rule=None
+    )
 
 
 @pytest.fixture
 def group_definition_input_without_name():
     """Group definition with input missing name."""
-    input_def = StructureMapGroupInput(name=None, type="Person", mode="source")
+    input_def = StructureMapGroupInput.model_construct(
+        name=None, type="Person", mode="source"
+    )
     return StructureMapGroup(name="invalid-input-group", input=[input_def], rule=None)
 
 
@@ -168,7 +172,9 @@ def test_init__minimal_group_definition(minimal_group_definition, mock_parent_gr
 
 def test_init__without_name(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
-    definition = StructureMapGroup(name=None, input=[input_def], rule=None)
+    definition = StructureMapGroup.model_construct(
+        name=None, input=[input_def], rule=None
+    )
     group = Group(definition, mock_parent_group)
 
     assert group.name.startswith("group-")

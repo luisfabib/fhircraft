@@ -33,18 +33,15 @@ class InventoryItemName(BackboneElement):
     The item name(s) - the brand name, or common name, functional name, generic name.
     """
 
-    nameType: Optional[Coding] = Field(
+    nameType: Coding = Field(
         description="The type of name e.g. \u0027brand-name\u0027, \u0027functional-name\u0027, \u0027common-name\u0027",
-        default=None,
     )
-    language: Optional[fhir.code] = Field(
+    language: fhir.code = Field(
         description="The language used to express the item name",
-        default=None,
     )
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="The name or designation of the item",
-        default=None,
     )
 
 
@@ -53,13 +50,11 @@ class InventoryItemResponsibleOrganization(BackboneElement):
     Organization(s) responsible for the product.
     """
 
-    role: Optional[CodeableConcept] = Field(
+    role: CodeableConcept = Field(
         description="The role of the organization e.g. manufacturer, distributor, or other",
-        default=None,
     )
-    organization: Optional[Reference] = Field(
+    organization: Reference = Field(
         description="An organization that is associated with the item",
-        default=None,
     )
 
 
@@ -84,17 +79,14 @@ class InventoryItemAssociation(BackboneElement):
     Association with other items or products.
     """
 
-    associationType: Optional[CodeableConcept] = Field(
+    associationType: CodeableConcept = Field(
         description="The type of association between the device and the other item",
-        default=None,
     )
-    relatedItem: Optional[Reference] = Field(
+    relatedItem: Reference = Field(
         description="The related item or product",
-        default=None,
     )
-    quantity: Optional[Ratio] = Field(
+    quantity: Ratio = Field(
         description="The quantity of the product in this product",
-        default=None,
     )
 
 
@@ -103,9 +95,8 @@ class InventoryItemCharacteristic(BackboneElement):
     The descriptive or identifying characteristics of the item.
     """
 
-    characteristicType: Optional[CodeableConcept] = Field(
+    characteristicType: CodeableConcept = Field(
         description="The characteristic that is being defined",
-        default=None,
     )
     valueString: Optional[fhir.string] = Field(
         description="The value of the attribute",
@@ -231,9 +222,8 @@ class InventoryItem(DomainResource):
         description="Business identifier for the inventory item",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | inactive | entered-in-error | unknown",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Category or class of the item",

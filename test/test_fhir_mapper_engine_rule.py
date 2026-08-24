@@ -41,7 +41,7 @@ class PersonModel(BaseModel):
 def minimal_rule_definition():
     """Minimal rule definition with just a name."""
     return StructureMapGroupRule(
-        name="test-rule", source=None, target=None, rule=None, dependent=None
+        name="test-rule", source=[], target=None, rule=None, dependent=None
     )
 
 
@@ -74,7 +74,7 @@ def rule_definition_with_targets():
     )
     return StructureMapGroupRule(
         name="rule-with-targets",
-        source=None,
+        source=[],
         target=[target1, target2],
         rule=None,
         dependent=None,
@@ -85,10 +85,10 @@ def rule_definition_with_targets():
 def rule_definition_with_nested_rules():
     """Rule definition with nested rule configurations."""
     nested_rule = StructureMapGroupRule(
-        name="nested-rule", source=None, target=None, rule=None, dependent=None
+        name="nested-rule", source=[], target=None, rule=None, dependent=None
     )
     return StructureMapGroupRule(
-        name="parent-rule", source=None, target=None, rule=[nested_rule], dependent=None
+        name="parent-rule", source=[], target=None, rule=[nested_rule], dependent=None
     )
 
 
@@ -100,7 +100,7 @@ def rule_definition_with_dependents():
     )
     return StructureMapGroupRule(
         name="rule-with-dependents",
-        source=None,
+        source=[],
         target=None,
         rule=None,
         dependent=[dependent],
@@ -219,8 +219,10 @@ def test_init__creates_dependents(rule_definition_with_dependents, mock_parent_g
 
 
 def test_init__raises_error_for_dependent_without_name(mock_parent_group):
-    dependent = StructureMapGroupRuleDependent(name=None, variable=["var1"])
-    rule_def = StructureMapGroupRule(
+    dependent = StructureMapGroupRuleDependent.model_construct(
+        name=None, variable=["var1"]
+    )
+    rule_def = StructureMapGroupRule.model_construct(
         name="rule-invalid-dependent",
         source=None,
         target=None,

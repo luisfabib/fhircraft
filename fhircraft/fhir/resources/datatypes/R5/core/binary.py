@@ -23,9 +23,8 @@ class Binary(Resource):
     _type = "Binary"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Binary"
 
-    contentType: Optional[fhir.code] = Field(
+    contentType: fhir.code = Field(
         description="MimeType of the binary content",
-        default=None,
     )
     securityContext: Optional[Reference] = Field(
         description="Identifies another resource to use as proxy when enforcing access control",

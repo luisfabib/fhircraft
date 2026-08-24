@@ -84,9 +84,8 @@ class PlanDefinitionGoal(BackboneElement):
         description="E.g. Treatment, dietary, behavioral",
         default=None,
     )
-    description: Optional[CodeableConcept] = Field(
+    description: CodeableConcept = Field(
         description="code or text describing the goal",
-        default=None,
     )
     priority: Optional[CodeableConcept] = Field(
         description="high-priority | medium-priority | low-priority",
@@ -115,9 +114,8 @@ class PlanDefinitionActionCondition(BackboneElement):
     An expression that describes applicability criteria or start/stop conditions for the action.
     """
 
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="applicability | start | stop",
-        default=None,
     )
     expression: Optional[Expression] = Field(
         description="boolean-valued expression",
@@ -130,13 +128,11 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
     A relationship to another action such as "before" or "30-60 minutes after start of".
     """
 
-    actionId: Optional[fhir.id_] = Field(
+    actionId: fhir.id_ = Field(
         description="What action is this related to",
-        default=None,
     )
-    relationship: Optional[fhir.code] = Field(
+    relationship: fhir.code = Field(
         description="before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end",
-        default=None,
     )
     offsetDuration: Optional[Duration] = Field(
         description="time offset for the relationship",
@@ -169,9 +165,8 @@ class PlanDefinitionActionParticipant(BackboneElement):
     Indicates who should participate in performing the action described.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="patient | practitioner | related-person | device",
-        default=None,
     )
     role: Optional[CodeableConcept] = Field(
         description="E.g. Nurse, Surgeon, Parent",
@@ -438,9 +433,8 @@ class PlanDefinition(DomainResource):
         description="order-set | clinical-protocol | eca-rule | workflow-definition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",

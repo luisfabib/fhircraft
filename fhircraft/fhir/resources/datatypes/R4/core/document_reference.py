@@ -28,13 +28,11 @@ class DocumentReferenceRelatesTo(BackboneElement):
     Relationships that this document has with other document references that already exist.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="replaces | transforms | signs | appends",
-        default=None,
     )
-    target: Optional[Reference] = Field(
+    target: Reference = Field(
         description="Target of the relationship",
-        default=None,
     )
 
 
@@ -43,9 +41,8 @@ class DocumentReferenceContent(BackboneElement):
     The document and format referenced. There may be multiple content element repetitions, each with a different format.
     """
 
-    attachment: Optional[Attachment] = Field(
+    attachment: Attachment = Field(
         description="Where to access the document",
-        default=None,
     )
     format: Optional[Coding] = Field(
         description="Format/content rules for the document",
@@ -117,9 +114,8 @@ class DocumentReference(DomainResource):
         description="Other identifiers for the document",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="current | superseded | entered-in-error",
-        default=None,
     )
     docStatus: Optional[fhir.code] = Field(
         description="preliminary | final | amended | entered-in-error",
@@ -165,9 +161,8 @@ class DocumentReference(DomainResource):
         description="Document security-tags",
         default=None,
     )
-    content: Optional[ListType[DocumentReferenceContent]] = Field(
+    content: ListType[DocumentReferenceContent] = Field(
         description="Document referenced",
-        default=None,
     )
     context: Optional[DocumentReferenceContext] = Field(
         description="Clinical context of document",

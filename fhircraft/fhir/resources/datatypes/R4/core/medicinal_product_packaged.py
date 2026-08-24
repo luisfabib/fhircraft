@@ -28,9 +28,8 @@ class MedicinalProductPackagedBatchIdentifier(BackboneElement):
     Batch numbering.
     """
 
-    outerPackaging: Optional[Identifier] = Field(
+    outerPackaging: Identifier = Field(
         description="A number appearing on the outer packaging of a specific batch",
-        default=None,
     )
     immediatePackaging: Optional[Identifier] = Field(
         description="A number appearing on the immediate packaging (and not the outer packaging)",
@@ -46,13 +45,11 @@ class MedicinalProductPackagedPackageItem(BackboneElement):
         description="Including possibly Data Carrier Identifier",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="The physical type of the container of the medicine",
-        default=None,
     )
-    quantity: Optional[Quantity] = Field(
+    quantity: Quantity = Field(
         description="The quantity of this package in the medicinal product, at the current level of packaging. The outermost is always 1",
-        default=None,
     )
     material: Optional[ListType[CodeableConcept]] = Field(
         description="Material type of the package item",
@@ -146,7 +143,6 @@ class MedicinalProductPackaged(DomainResource):
             default=None,
         )
     )
-    packageItem: Optional[ListType[MedicinalProductPackagedPackageItem]] = Field(
+    packageItem: ListType[MedicinalProductPackagedPackageItem] = Field(
         description="A packaging item, as a contained for medicine, possibly with other packaging items within",
-        default=None,
     )

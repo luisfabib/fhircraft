@@ -70,13 +70,11 @@ class ServiceRequest(DomainResource):
         description="Composite Request ID",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | on-hold | revoked | completed | entered-in-error | unknown",
-        default=None,
     )
-    intent: Optional[fhir.code] = Field(
+    intent: fhir.code = Field(
         description="proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option",
-        default=None,
     )
     category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of service",
@@ -110,9 +108,8 @@ class ServiceRequest(DomainResource):
         description="Service amount",
         default=None,
     )
-    subject: Optional[Reference] = Field(
+    subject: Reference = Field(
         description="Individual or Entity the service is ordered for",
-        default=None,
     )
     encounter: Optional[Reference] = Field(
         description="Encounter in which the request was created",

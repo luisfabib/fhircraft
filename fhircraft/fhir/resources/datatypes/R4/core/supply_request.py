@@ -112,9 +112,8 @@ class SupplyRequest(DomainResource):
         description="Medication, Substance, or Device requested to be supplied",
         default=None,
     )
-    quantity: Optional[Quantity] = Field(
+    quantity: Quantity = Field(
         description="The requested amount of the item indicated",
-        default=None,
     )
     parameter: Optional[ListType[SupplyRequestParameter]] = Field(
         description="Ordered item details",

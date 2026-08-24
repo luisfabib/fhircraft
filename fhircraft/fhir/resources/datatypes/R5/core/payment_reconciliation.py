@@ -134,13 +134,11 @@ class PaymentReconciliation(DomainResource):
         description="Business Identifier for a payment reconciliation",
         default=None,
     )
-    type: Optional[CodeableConcept] = Field(
+    type: CodeableConcept = Field(
         description="Category of payment",
-        default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="active | cancelled | draft | entered-in-error",
-        default=None,
     )
     kind: Optional[CodeableConcept] = Field(
         description="Workflow originating payment",
@@ -150,9 +148,8 @@ class PaymentReconciliation(DomainResource):
         description="Period covered",
         default=None,
     )
-    created: Optional[fhir.dateTime] = Field(
+    created: fhir.dateTime = Field(
         description="Creation date",
-        default=None,
     )
     enterer: Optional[Reference] = Field(
         description="Who entered the payment",
@@ -182,9 +179,8 @@ class PaymentReconciliation(DomainResource):
         description="Disposition message",
         default=None,
     )
-    date: Optional[fhir.date_] = Field(
+    date: fhir.date_ = Field(
         description="When payment issued",
-        default=None,
     )
     location: Optional[Reference] = Field(
         description="Where payment collected",
@@ -226,9 +222,8 @@ class PaymentReconciliation(DomainResource):
         description="Amount returned by the receiver",
         default=None,
     )
-    amount: Optional[Money] = Field(
+    amount: Money = Field(
         description="Total amount of Payment",
-        default=None,
     )
     paymentIdentifier: Optional[Identifier] = Field(
         description="Business identifier for the payment",

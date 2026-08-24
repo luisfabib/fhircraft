@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.factory.builders.base import (
     Builder,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers & Fixtures
 # ---------------------------------------------------------------------------
@@ -49,6 +48,7 @@ def make_node(
     default_value: Any = None,
     base_is_array: Optional[bool] = None,
     is_prohibited: bool = False,
+    is_required: bool = False,
 ):
     """Return a minimal mock of ElementNode."""
     node = MagicMock()
@@ -60,6 +60,7 @@ def make_node(
     node.default_value = default_value
     node.base_is_array = base_is_array
     node.is_prohibited = is_prohibited
+    node.is_required = is_required
     node.fixed = None
     node.pattern = None
     node.max_length = None

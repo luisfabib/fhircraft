@@ -109,9 +109,8 @@ class Substance(DomainResource):
         description="What class/type of substance this is",
         default=None,
     )
-    code: Optional[CodeableConcept] = Field(
+    code: CodeableConcept = Field(
         description="What substance this is",
-        default=None,
     )
     description: Optional[fhir.string] = Field(
         description="Textual description of the substance, comments",

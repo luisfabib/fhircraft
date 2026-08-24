@@ -29,9 +29,8 @@ class CapabilityStatementSoftware(BackboneElement):
     Software that is covered by this capability statement.  It is used when the capability statement describes the capabilities of a particular software version, independent of an installation.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="A name the software is known by",
-        default=None,
     )
     version: Optional[fhir.string] = Field(
         description="Version covered by this statement",
@@ -48,9 +47,8 @@ class CapabilityStatementImplementation(BackboneElement):
     Identifies a specific implementation instance that is described by the capability statement - i.e. a particular installation, rather than the capabilities of a software program.
     """
 
-    description: Optional[fhir.markdown] = Field(
+    description: fhir.markdown = Field(
         description="Describes this specific instance",
-        default=None,
     )
     url: Optional[fhir.url] = Field(
         description="Base URL for the installation",
@@ -86,9 +84,8 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
     Identifies a restful operation supported by the solution.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="read | vread | update | patch | delete | history-instance | history-type | create | search-type",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="Anything special about operation behavior",
@@ -101,17 +98,15 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
     Search parameters for implementations to support and/or make use of - either references to ones defined in the specification, or additional ones defined for/by the implementation.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name for parameter in search url",
-        default=None,
     )
     definition: Optional[fhir.canonical] = Field(
         description="Source of definition for parameter",
         default=None,
     )
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="Server-specific usage",
@@ -124,13 +119,11 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
     Definition of an operation or a named query together with its parameters and their meaning and type. Consult the definition of the operation for details about how to invoke the operation, and the parameters.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="Name by which the operation/query is invoked",
-        default=None,
     )
-    definition: Optional[fhir.canonical] = Field(
+    definition: fhir.canonical = Field(
         description="The defined operation/query",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="Specific details about operation behavior",
@@ -143,9 +136,8 @@ class CapabilityStatementRestResource(BackboneElement):
     A specification of the restful capabilities of the solution for a specific resource type.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="A resource type that is supported",
-        default=None,
     )
     profile: Optional[fhir.canonical] = Field(
         description="System-wide profile",
@@ -222,9 +214,8 @@ class CapabilityStatementRestInteraction(BackboneElement):
     A specification of restful operations supported by the system.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="transaction | batch | search-system | history-system",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="Anything special about operation behavior",
@@ -279,9 +270,8 @@ class CapabilityStatementRest(BackboneElement):
     A definition of the restful capabilities of the solution, if any.
     """
 
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="client | server",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="General description of implementation",
@@ -318,13 +308,11 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
     An endpoint (network accessible address) to which messages and/or replies are to be sent.
     """
 
-    protocol: Optional[Coding] = Field(
+    protocol: Coding = Field(
         description="http | ftp | mllp +",
-        default=None,
     )
-    address: Optional[fhir.url] = Field(
+    address: fhir.url = Field(
         description="Network address or identifier of the end-point",
-        default=None,
     )
 
 
@@ -333,13 +321,11 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
     References to message definitions for messages this system can send or receive.
     """
 
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="sender | receiver",
-        default=None,
     )
-    definition: Optional[fhir.canonical] = Field(
+    definition: fhir.canonical = Field(
         description="Message supported by this system",
-        default=None,
     )
 
 
@@ -373,17 +359,15 @@ class CapabilityStatementDocument(BackboneElement):
     A document definition.
     """
 
-    mode: Optional[fhir.code] = Field(
+    mode: fhir.code = Field(
         description="producer | consumer",
-        default=None,
     )
     documentation: Optional[fhir.markdown] = Field(
         description="Description of document support",
         default=None,
     )
-    profile: Optional[fhir.canonical] = Field(
+    profile: fhir.canonical = Field(
         description="Constraint on the resources used in the document",
-        default=None,
     )
 
 
@@ -424,17 +408,15 @@ class CapabilityStatement(DomainResource):
         description="Name for this capability statement (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[fhir.dateTime] = Field(
+    date: fhir.dateTime = Field(
         description="Date last changed",
-        default=None,
     )
     publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
@@ -468,9 +450,8 @@ class CapabilityStatement(DomainResource):
         description="Copyright holder and year(s)",
         default=None,
     )
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="instance | capability | requirements",
-        default=None,
     )
     instantiates: Optional[ListType[fhir.canonical]] = Field(
         description="canonical URL of another capability statement this implements",
@@ -488,13 +469,11 @@ class CapabilityStatement(DomainResource):
         description="If this describes a specific instance",
         default=None,
     )
-    fhirVersion: Optional[fhir.code] = Field(
+    fhirVersion: fhir.code = Field(
         description="FHIR Version the system supports",
-        default=None,
     )
-    format: Optional[ListType[fhir.code]] = Field(
+    format: ListType[fhir.code] = Field(
         description="formats supported (xml | json | ttl | mime type)",
-        default=None,
     )
     patchFormat: Optional[ListType[fhir.code]] = Field(
         description="Patch formats supported",

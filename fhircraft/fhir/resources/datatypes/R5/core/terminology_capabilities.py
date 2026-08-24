@@ -28,9 +28,8 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
     Software that is covered by this terminology capability statement.  It is used when the statement describes the capabilities of a particular software version, independent of an installation.
     """
 
-    name: Optional[fhir.string] = Field(
+    name: fhir.string = Field(
         description="A name the software is known by",
-        default=None,
     )
     version: Optional[fhir.string] = Field(
         description="Version covered by this statement",
@@ -43,9 +42,8 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
     Identifies a specific implementation instance that is described by the terminology capability statement - i.e. a particular installation, rather than the capabilities of a software program.
     """
 
-    description: Optional[fhir.string] = Field(
+    description: fhir.string = Field(
         description="Describes this specific instance",
-        default=None,
     )
     url: Optional[fhir.url] = Field(
         description="Base URL for the implementation",
@@ -58,13 +56,11 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     Filter Properties supported.
     """
 
-    code: Optional[fhir.code] = Field(
+    code: fhir.code = Field(
         description="code of the property supported",
-        default=None,
     )
-    op: Optional[ListType[fhir.code]] = Field(
+    op: ListType[fhir.code] = Field(
         description="Operations supported for the property",
-        default=None,
     )
 
 
@@ -113,9 +109,8 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         description="Version of code System supported",
         default=None,
     )
-    content: Optional[fhir.code] = Field(
+    content: fhir.code = Field(
         description="not-present | example | fragment | complete | supplement",
-        default=None,
     )
     subsumption: Optional[fhir.boolean] = Field(
         description="Whether subsumption is supported",
@@ -128,9 +123,8 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
     Supported expansion parameter.
     """
 
-    name: Optional[fhir.code] = Field(
+    name: fhir.code = Field(
         description="Name of the supported expansion parameter",
-        default=None,
     )
     documentation: Optional[fhir.string] = Field(
         description="Description of support for parameter",
@@ -170,9 +164,8 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
     Information about the [ValueSet/$validate-code](https://hl7.org/fhir/R5/valueset-operation-validate-code.html) operation.
     """
 
-    translations: Optional[fhir.boolean] = Field(
+    translations: fhir.boolean = Field(
         description="Whether translations are validated",
-        default=None,
     )
 
 
@@ -181,9 +174,8 @@ class TerminologyCapabilitiesTranslation(BackboneElement):
     Information about the [ConceptMap/$translate](https://hl7.org/fhir/R5/conceptmap-operation-translate.html) operation.
     """
 
-    needsMap: Optional[fhir.boolean] = Field(
+    needsMap: fhir.boolean = Field(
         description="Whether the client must identify the map",
-        default=None,
     )
 
 
@@ -235,17 +227,15 @@ class TerminologyCapabilities(DomainResource):
         description="Name for this terminology capabilities (human friendly)",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
         default=None,
     )
-    date: Optional[fhir.dateTime] = Field(
+    date: fhir.dateTime = Field(
         description="Date last changed",
-        default=None,
     )
     publisher: Optional[fhir.string] = Field(
         description="Name of the publisher/steward (organization or individual)",
@@ -279,9 +269,8 @@ class TerminologyCapabilities(DomainResource):
         description="Copyright holder and year(s)",
         default=None,
     )
-    kind: Optional[fhir.code] = Field(
+    kind: fhir.code = Field(
         description="instance | capability | requirements",
-        default=None,
     )
     software: Optional[TerminologyCapabilitiesSoftware] = Field(
         description="Software that is covered by this terminology capability statement",

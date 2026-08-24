@@ -72,9 +72,8 @@ class ResearchDefinition(DomainResource):
         description="Subordinate title of the ResearchDefinition",
         default=None,
     )
-    status: Optional[fhir.code] = Field(
+    status: fhir.code = Field(
         description="draft | active | retired | unknown",
-        default=None,
     )
     experimental: Optional[fhir.boolean] = Field(
         description="For testing purposes, not real usage",
@@ -168,9 +167,8 @@ class ResearchDefinition(DomainResource):
         description="Logic used by the ResearchDefinition",
         default=None,
     )
-    population: Optional[Reference] = Field(
+    population: Reference = Field(
         description="What population?",
-        default=None,
     )
     exposure: Optional[Reference] = Field(
         description="What exposure?",

@@ -135,9 +135,8 @@ class MolecularSequenceQuality(BackboneElement):
     An experimental feature attribute that defines the quality of the feature in a quantitative way, such as a phred quality score ([SO:0001686](http://www.sequenceontology.org/browser/current_svn/term/SO:0001686)).
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="indel | snp | unknown",
-        default=None,
     )
     standardSequence: Optional[CodeableConcept] = Field(
         description="Standard sequence for comparison",
@@ -202,9 +201,8 @@ class MolecularSequenceRepository(BackboneElement):
     Configurations of the external repository. The repository shall store target's observedSeq or records related with target's observedSeq.
     """
 
-    type: Optional[fhir.code] = Field(
+    type: fhir.code = Field(
         description="directlink | openapi | login | oauth | other",
-        default=None,
     )
     url: Optional[fhir.uri] = Field(
         description="URI of the repository",
@@ -314,9 +312,8 @@ class MolecularSequence(DomainResource):
         description="aa | dna | rna",
         default=None,
     )
-    coordinateSystem: Optional[fhir.integer] = Field(
+    coordinateSystem: fhir.integer = Field(
         description="Base number of coordinate system (0 for 0-based numbering or coordinates, inclusive start, exclusive end, 1 for 1-based numbering, inclusive start, inclusive end)",
-        default=None,
     )
     patient: Optional[Reference] = Field(
         description="Who and/or what this is about",
