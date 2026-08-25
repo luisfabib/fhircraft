@@ -1,0 +1,74 @@
+from collections import defaultdict
+from typing import Any, Dict, ForwardRef, List
+
+from fhircraft.utils import get_module_name
+
+from ._constants import FACTORY_MODULE
+
+
+class ImportTracker:
+    """Tracks all import statements needed for a code generation run."""
+
+    def __init__(self) -> None:
+        self.reset()
+
+    def reset(self) -> None:
+        self._imports: Dict[str, List[str]] = defaultdict(list)
+        self._alias_imports: Dict[str, str] = {}
+
+    @property
+    def imports(self) -> Dict[str, List[str]]:
+        return self._imports
+
+    @property
+    def alias_imports(self) -> Dict[str, str]:
+        return self._alias_imports
+
+    def track(self, module: str, name: str) -> None:
+        if module not in (FACTORY_MODULE, "builtins") and name not in self._imports[module]:
+            self._imports[module].append(name)
+
+    def track_obj(self, obj: Any) -> None:
+        """Add an object's module and name to imports; silently skips ForwardRefs."""
+        if isinstance(obj, ForwardRef):
+            return
+        module_name = get_module_name(obj)
+        if (object_name := getattr(obj, "__name__", None)) is None:
+            if (object_name := getattr(obj, "_name", None)) is None:
+                raise ValueError(f"Could not determine object name for import: {obj}")
+        self.track(module_name, object_name)
+
+    def track_alias(self, module: str, alias: str) -> bool:
+        """Register `import module as alias`; returns False if alias is already claimed by another module."""
+        existing = next((m for m, a in self._alias_imports.items() if a == alias), None)
+        if existing and existing != module:
+            return False
+        self._alias_imports[module] = alias
+        return True
+
+    def track_pydantic(self, name: str) -> None:
+        self.track("pydantic", name)
+
+    def track_typing(self, name: str) -> None:
+        self.track("typing", name)
+
+    def group_by_parent(self) -> Dict[str, List[str]]:
+        """Collapse per-class module paths into their shared parent package."""
+        if not self._imports:
+            return {}
+        grouped: Dict[str, List[str]] = {}
+        for full_module, objects in self._imports.items():
+            parts = full_module.split(".")
+            # If the module name is a snake_case version of the single imported symbol,
+            # import from the parent package instead.
+            if (
+                len(objects) == 1
+                and parts[-1].lower().replace("_", "") == objects[0].lower().replace("_", "")
+            ):
+                parent = ".".join(parts[:-1])
+                grouped.setdefault(parent, []).extend(objects)
+            else:
+                grouped.setdefault(full_module, []).extend(objects)
+        for module in grouped:
+            grouped[module] = sorted(set(grouped[module]))
+        return grouped

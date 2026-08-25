@@ -93,7 +93,7 @@ def _assert_construct_core_resource(fhir_release, resource_label, filename):
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
 
-        source_code = CodeGenerator().generate_resource_model_code(resource)
+        source_code = CodeGenerator().generate(resource)
         # Store source code in a file
         temp_file_name = os.path.join(d, "temp_test.py")
         with open(temp_file_name, "w") as test_file:
@@ -372,12 +372,12 @@ def test_construct_profiled_resource(mode, release, example_filename, definition
                 canonical_url=fhir_resource["meta"]["profile"][0],
                 mode=mode,
             )
-        source_code = CodeGenerator().generate_resource_model_code(resource)
+        source_code = CodeGenerator().generate(resource)
         assert (
             json.loads(resource.model_validate(fhir_resource).model_dump_json())
             == fhir_resource
         )
-        source_code = CodeGenerator().generate_resource_model_code(resource)
+        source_code = CodeGenerator().generate(resource)
         # Store source code in a file
         temp_file_name = os.path.join(d, f"temp_test_{resource.__name__}.py")
         with open(temp_file_name, "w") as test_file:

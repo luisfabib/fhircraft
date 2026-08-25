@@ -1,0 +1,124 @@
+{#- Jinja2 macros for rendering individual parts of a generated model class. -#}
+{#- Import into resource_template.py.j2 via: {% from "_macros.py.j2" import ... %} -#}
+
+{% macro render_field(field, info) -%}
+    {{ field }}: {{ info.annotation }} = Field(
+        {% if info.title %}
+        title="{{ info.title }}",
+        {% endif %}
+        {% if info.description %}
+        description={{ info.description|tojson }},
+        {% endif %}
+        {% if info.default != '...' %}
+        default={{ info.default }},
+        {% endif %}
+        {% if info.default_factory != '...' %}
+        default_factory={{ info.default_factory }},
+        {% endif %}
+        {% if info.alias %}
+        alias="{{ info.alias }}",
+        {% endif %}
+    )
+{%- endmacro %}
+
+
+{% macro render_property(name, prop) -%}
+    @property
+    def {{ name }}(self):
+        return {{ prop.func.__name__ }}(self,
+            {% for arg in prop.args %}
+            {{ arg }},
+            {% endfor %}
+            {% for k, v in prop.keywords.items() %}
+            {{ k }}={{ v }},
+            {% endfor %}
+        )
+{%- endmacro %}
+
+
+{% macro render_field_validator(name, v) -%}
+    @field_validator(*{{ v.info.fields }}, mode="{{ v.info.mode }}", check_fields={{ v.info.check_fields }})
+    @classmethod
+    def {{ name }}(cls, value):
+        return {{ v.func.__name__ }}(cls, value,
+            {% for arg in v.args %}
+            {{ arg }},
+            {% endfor %}
+            {% for k, val in v.keywords.items() %}
+            {{ k }}={{ val }},
+            {% endfor %}
+        )
+{%- endmacro %}
+
+
+{% macro render_model_validator(name, v) -%}
+    @model_validator(mode="{{ v.info.mode }}")
+    def {{ name }}(self):
+        return {{ v.func.__name__ }}(
+            self,
+            {% for arg in v.args %}
+            {{ arg }},
+            {% endfor %}
+            {% for k, val in v.keywords.items() %}
+            {{ k }}={{ val }},
+            {% endfor %}
+        )
+{%- endmacro %}
+
+
+{% macro render_class(model, model_data, include_validators) -%}
+class {{ model.__name__ }}({% for base in model.__bases__ %}{{ base.__name__ }}{% if not loop.last %}, {% endif %}{% endfor %}):
+    {% if model.__doc__ %}
+    """
+    {{ model.__doc__ }}
+    """
+    {% endif %}
+    {% if model.__bases__ | selectattr("__name__", "equalto", "FHIRSliceModel") | list | length > 0 %}
+    min_cardinality: ClassVar[int] = {{ model.min_cardinality }}
+    max_cardinality: ClassVar[int | None] = {{ model.max_cardinality }}
+    {% endif %}
+
+    {% if model._fhir_release and (model.__bases__ | selectattr("_fhir_release", "eq", model._fhir_release) | list | length == 0) %}
+    _fhir_release = "{{ model._fhir_release }}"
+    {% endif %}
+    {% if model._type and (model.__bases__ | selectattr("_type", "eq", model._type) | list | length == 0) %}
+    _type = "{{ model._type }}"
+    {% endif %}
+    {% if model._kind and (model.__bases__ | selectattr("_kind", "eq", model._kind) | list | length == 0) %}
+    {% if model._kind.__class__.__name__ == "FHIRModelKind" %}
+    _kind = FHIRModelKind.{{ model._kind.name }}
+    {% else %}
+    _kind = "{{ model._kind }}"
+    {% endif %}
+    {% endif %}
+    {% if model._abstract and (model.__bases__ | selectattr("_abstract", "eq", model._abstract) | list | length == 0) %}
+    _abstract = {{ model._abstract }}
+    {% endif %}
+    {% if model._canonical_url and (model.__bases__ | selectattr("_canonical_url", "eq", model._canonical_url) | list | length == 0) %}
+    _canonical_url = "{{ model._canonical_url }}"
+    {% endif %}
+
+    {% if not model_data.fields %}
+    pass
+    {% endif %}
+    {% for field, info in model_data.fields.items() %}
+    {{ render_field(field, info) }}
+    {% endfor %}
+
+    {% for name, prop in model_data.properties.items() %}
+    {{ render_property(name, prop) }}
+
+    {% endfor %}
+    {% if include_validators %}
+    {% for name, v in model_data.validators.items() %}
+    {% if v.mode == "field" %}
+    {{ render_field_validator(name, v) }}
+
+    {% endif %}
+    {% if v.mode == "model" %}
+    {{ render_model_validator(name, v) }}
+
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+{%- endmacro %}

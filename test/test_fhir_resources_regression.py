@@ -25,13 +25,6 @@ def assertBlockInCode(code, expected_block):
 
 
 @pytest.fixture
-def generator():
-
-    generator = CodeGenerator()
-    yield generator
-
-
-@pytest.fixture
 def factory():
 
     factory = FHIRModelFactory(fhir_release="R5")
