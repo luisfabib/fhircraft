@@ -207,7 +207,7 @@ model_differential = FHIRModelFactory(fhir_release="R4").build(
 
 ### Constructing from Structure Definitions
 
-You can build models from structure definitions already loaded into memory. The structure definition is a JSON or XML document that describes the profile, loaded into memory in the form of a `StructureDefinition` or dictionary object. The [`build`](../reference/fhir-resources-factory.md#fhircraft.fhir.resources.factory.core.FHIRModelFactory.build) method of the factory takes that definition and returns the constructed model.
+You can build models from structure definitions already loaded into memory. The structure definition is a JSON or XML document that describes the profile, loaded into memory in the form of a `StructureDefinition` or dictionary object. The [`build`](../reference/fhir-resources-factory#fhircraft.fhir.resources.factory.core.FHIRModelFactory.build) method of the factory takes that definition and returns the constructed model.
 
 ```python
 from fhircraft import FHIRModelFactory

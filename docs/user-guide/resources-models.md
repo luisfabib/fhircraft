@@ -10,7 +10,7 @@ This guide shows you how to create, validate, and manipulate FHIR resources usin
 
 FHIR defines over 140 different [:lucide-flame: Resource Types](https://www.hl7.org/fhir/resourcelist.html) like [:lucide-flame: Patient](https://www.hl7.org/fhir/patient.html), [:lucide-flame: Observation](https://www.hl7.org/fhir/observation.html), and [:lucide-flame: Condition](https://www.hl7.org/fhir/condition.html). Each resource type has a specific structure with required fields, optional fields, data types, and validation rules. Manually creating and validating these resources would require extensive code to check every constraint and relationship.
 
-Fhircraft provides pre-built [:simple-pydantic: Pydantic models](https://docs.pydantic.dev/latest/concepts/models/) for all standard FHIR resources across all supported releases that subclass the [`FHIRBaseModel`](../reference/fhir-resources-base.md#fhircraft.fhir.resources.base.models.FHIRBaseModel) base class. These models automatically validate data when you create resources, ensuring compliance with FHIR specifications without writing validation code yourself or requiring an external validation service.
+Fhircraft provides pre-built [:simple-pydantic: Pydantic models](https://docs.pydantic.dev/latest/concepts/models/) for all standard FHIR resources across all supported releases that subclass the [`FHIRBaseModel`](../reference/fhir-resources-base#fhircraft.fhir.resources.base.models.FHIRBaseModel) base class. These models automatically validate data when you create resources, ensuring compliance with FHIR specifications without writing validation code yourself or requiring an external validation service.
 
 Using these models means you can focus on your healthcare application logic rather than FHIR implementation details. The models provide type safety, catching errors during development rather than at runtime. They also integrate seamlessly with Python applications, IDEs, and type checkers, giving you autocomplete suggestions and early error detection. All validation follows the same FHIR constraints covered in earlier sections on validation configuration and resource construction.
 
@@ -18,7 +18,7 @@ Using these models means you can focus on your healthcare application logic rath
 
 Before you can create FHIR resources, you need to obtain the appropriate model class. Fhircraft provides all standard FHIR resource models ready to use without any setup or configuration. The models are organized by FHIR version, allowing you to work with the specific version your application requires.
 
-The [`get_fhir_type`](../reference/fhir-resources-type-registries.md#fhircraft.fhir.resources.datatypes.registry.get_fhir_type) function is your entry point to these models. It takes a resource type name and optionally a FHIR version, returning the corresponding [:simple-pydantic: Pydantic BaseModel](https://docs.pydantic.dev/latest/concepts/models/#basic-model-usage) subclass. Alternatively, if familiar with the Fhircraft modules, the models can be directly imported from their corresponding module.
+The [`get_fhir_type`](../reference/fhir-resources-type-registries#fhircraft.fhir.resources.datatypes.registry.get_fhir_type) function is your entry point to these models. It takes a resource type name and optionally a FHIR version, returning the corresponding [:simple-pydantic: Pydantic BaseModel](https://docs.pydantic.dev/latest/concepts/models/#basic-model-usage) subclass. Alternatively, if familiar with the Fhircraft modules, the models can be directly imported from their corresponding module.
 
 
 === "Resolver Function"
@@ -207,6 +207,7 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
 
 Healthcare applications frequently need to convert data from external systems, APIs, databases, or files into FHIR resources. When your application receives data from a REST API, database query, or external system, you typically will end up with Python dictionaries or dataclass objects. Pydantic's [:simple-pydantic: `model_validate`](https://docs.pydantic.dev/latest/concepts/models/#model-methods-and-properties) method converts data objects such as dictionaries into validated model instances.
 
+
 !!! example "Validating an API Response Data"
 
     ```python
@@ -247,7 +248,7 @@ Healthcare applications frequently need to convert data from external systems, A
 
 ### Parsing FHIR JSON Files
 
-When reading FHIR data from files, HTTP responses, or string variables, you often have JSON text rather than Python dictionaries. Fhircraft's [`FHIRBaseModel`](../reference/fhir-resources-base.md#fhircraft.fhir.resources.base.models.FHIRBaseModel) subclasses implement and extension of Pydantic's [:simple-pydantic: `model_validate_json`](https://docs.pydantic.dev/latest/concepts/models/#creating-models-without-validation) method that parses and validates FHIR JSON strings in one operation:
+When reading FHIR data from files, HTTP responses, or string variables, you often have JSON text rather than Python dictionaries. Fhircraft's [`FHIRBaseModel`](../reference/fhir-resources-base#fhircraft.fhir.resources.base.FHIRBaseModel) subclasses implement and extension of Pydantic's [:simple-pydantic: `model_validate_json`](https://docs.pydantic.dev/latest/concepts/models/#creating-models-without-validation) method that parses and validates FHIR JSON strings in one operation:
 
 ```python
 # Example: JSON string from a file or HTTP response
@@ -281,7 +282,8 @@ Using [:simple-pydantic: `model_validate_json`](https://docs.pydantic.dev/latest
 
 ### Parsing FHIR XML Files
 
-Some healthcare systems still use XML format for FHIR data exchange. Fhircraft supports [FHIR XML](https://www.hl7.org/fhir/xml.html) parsing for all subclasses of [`FHIRBaseModel`](../reference/fhir-resources-base.md#fhircraft.fhir.resources.base.models.FHIRBaseModel) using [`model_validate_xml`](../reference/fhir-resources-base.md#fhircraft.fhir.resources.base.mixins.xml.FHIRXMLMixin.model_validate_xml) method that parses and validates FHIR XML strings in one operation:
+Some healthcare systems still use XML format for FHIR data exchange. Fhircraft supports [FHIR XML](https://www.hl7.org/fhir/xml.html) parsing for all subclasses of [`FHIRBaseModel`](../reference/fhir-resources-base#fhircraft.fhir.resources.base.FHIRBaseModel) using [`model_validate_xml`](../reference/fhir-resources-base#fhircraft.fhir.resources.base.mixins.xml.FHIRXMLMixin.model_validate_xml) method that parses and validates FHIR XML strings in one operation:
+
 
 ```python
 # Example: XML string from legacy system or file
@@ -446,7 +448,7 @@ The [:simple-pydantic: `model_dump_json`](https://pydantic.dev/docs/validation/l
 
 ### Exporting to XML Recipe
 
-Some healthcare systems require [FHIR XML format](https://www.hl7.org/fhir/xml.html). Fhircraft provides XML serialization with proper FHIR namespace handling through the [`model_dump_xml`](../reference/fhir-resources-base.md#fhircraft.fhir.resources.base.mixins.xml.FHIRXMLMixin.model_dump_xml) method.
+Some healthcare systems require [FHIR XML format](https://www.hl7.org/fhir/xml.html). Fhircraft provides XML serialization with proper FHIR namespace handling through the [`model_dump_xml`](../reference/fhir-resources-base#fhircraft.fhir.resources.base.mixins.xml.FHIRXMLMixin.model_dump_xml) method.
 
 ```python
 # Export to FHIR XML format
