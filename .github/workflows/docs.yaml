@@ -35,7 +35,7 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          client-id: ${{ secrets.APP_CLIENT_ID }}
+          client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           permission-contents: write
@@ -50,7 +50,7 @@ jobs:
           gh auth setup-git
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          
+
       # ==========================================================
       # Push the dev documentation version to the gh-pages branch
       # ==========================================================
