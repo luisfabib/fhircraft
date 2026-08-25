@@ -31,5 +31,5 @@ jobs:
       - name: Deploy dev documentation version
         working-directory: ./docs-repo
         run: |
-          git fetch origin gh-pages --depth=1
+          git pull origin gh-pages
           mike deploy --push dev
