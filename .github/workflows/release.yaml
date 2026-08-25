@@ -57,7 +57,6 @@ jobs:
         with:
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
           permission-contents: write
       - name: Get GitHub App User ID
         id: get-user-id
