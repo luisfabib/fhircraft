@@ -74,6 +74,8 @@ jobs:
       # Push the new documentation version to the gh-pages branch
       # ==========================================================
       - name: Deploy new documentation version
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git pull --rebase origin gh-pages
           mike deploy --push --update-aliases $(echo "${{ github.event.release.tag_name }}" | grep -oP '^\d+\.\d+') latest
