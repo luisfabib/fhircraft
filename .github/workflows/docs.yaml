@@ -23,8 +23,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install .[docs]
-      - name: Build documentation
-        run: zensical build --clean
       - name: Setup Git CLI user
         working-directory: ./docs-repo
         run: |

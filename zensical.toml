@@ -274,7 +274,7 @@ link = "https://github.com/luisfabib/fhircraft"
 icon = "fontawesome/brands/python"
 link = "https://pypi.org/project/fhircraft/"
 
-[[project.extra.version]]
+[project.extra.version]
 provider = "mike"
 alias = true
 
