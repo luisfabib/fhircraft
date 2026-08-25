@@ -35,18 +35,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # ==========================================================
-      # Setup
-      # ==========================================================
-      - uses: actions/configure-pages@v6
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .[docs]
 
       # ==========================================================
       # Generate a GitHub App token and user to push to gh-pages
@@ -70,6 +58,18 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           
+      # ==========================================================
+      # Setup
+      # ==========================================================
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[docs]
+
       # ==========================================================
       # Push the new documentation version to the gh-pages branch
       # ==========================================================
