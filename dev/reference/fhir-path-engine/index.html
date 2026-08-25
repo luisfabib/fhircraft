@@ -10740,7 +10740,7 @@
   &lt;/span&gt;" href="./#fhircraft.fhir.path.engine.Quantity">Quantity</a></code></td>
             <td>
               <div class="doc-md-description">
-                <p>Quantity(value: Union[int, float], unit: Optional[str])</p>
+                <p>Quantity(value: int | float, unit: str | None)</p>
               </div>
             </td>
           </tr>
@@ -22551,15 +22551,7 @@ setter (Optional[callable]): The setter function for the collection item, by def
                 <code>parent</code>
             </td>
             <td>
-                  <code><span title="ForwardRef">ForwardRef</span>(<a class="autorefs autorefs-internal" title="&lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;FHIRPathCollectionItem&lt;/span&gt;
-            &lt;p class=&quot;module-import-path&quot;&gt;
-                Path: &lt;code&gt;fhircraft.fhir.path.engine.FHIRPathCollectionItem&lt;/code&gt;
-            &lt;/p&gt;
-
-
-  &lt;span class=&quot;doc doc-labels&quot;&gt;
-      &lt;small class=&quot;doc doc-label doc-label-dataclass&quot;&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
-  &lt;/span&gt;" href="./#fhircraft.fhir.path.engine.FHIRPathCollectionItem">FHIRPathCollectionItem</a>) | None</code>
+                  <code><span title="ForwardRef">ForwardRef</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -28806,7 +28798,7 @@ or a subclass thereof. If the input collection is empty (<code>[]</code>), the r
 
 
 
-        <p>Quantity(value: Union[int, float], unit: Optional[str])</p>
+        <p>Quantity(value: int | float, unit: str | None)</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
