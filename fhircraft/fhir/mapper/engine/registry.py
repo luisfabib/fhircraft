@@ -43,8 +43,7 @@ class StructureMapRegistry:
     Attributes:
         fhir_release (FHIRRelease): FHIR release used when validating raw dicts
             (e.g. ``"R4"``, ``"R4B"``, ``"R5"``).
-        structure_maps_by_url (Dict[str, StructureMapUnion]): In-memory manifest, keyed 
-        by the *base* canonical URL (version stripped).
+        structure_maps_by_url (Dict[str, StructureMapUnion]): In-memory manifest, keyed by the *base* canonical URL (version stripped).
     """
 
     fhir_release: FHIRRelease
