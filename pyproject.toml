@@ -73,7 +73,7 @@ dev = [
     "coverage>=7.5.1",
 ]
 docs = [
-    "zensical>=0.0.47",   
+    "zensical>=0.0.57",   
     "mkdocstrings-python>=1.13.0",
     "markdown-exec[ansi]>=1.12.3",
     "griffe-fieldz==0.4.0",
