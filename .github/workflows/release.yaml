@@ -46,6 +46,6 @@ jobs:
           pip install .[docs]
       - name: Deploy dev documentation version
         run: |
-          git pull origin gh-pages
+          git pull --rebase origin gh-pages
           mike deploy --push --update-aliases $(echo "${{ github.event.release.tag_name }}" | grep -oP '^\d+\.\d+') latest
           mike set-default --push latest
