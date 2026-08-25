@@ -52,6 +52,8 @@ jobs:
       # Push the dev documentation version to the gh-pages branch
       # ==========================================================
       - name: Deploy dev documentation version
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git pull --rebase origin gh-pages
           mike deploy --push dev
