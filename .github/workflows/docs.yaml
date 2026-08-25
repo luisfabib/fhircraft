@@ -14,6 +14,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+
+      # ==========================================================
+      # Setup
+      # ==========================================================
       - uses: actions/configure-pages@v6
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -23,10 +27,31 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install .[docs]
+
+      # ==========================================================
+      # Generate a GitHub App token and user to push to gh-pages
+      # ==========================================================
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DEPLOY_BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.DEPLOY_BOT_APP_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-contents: write
+      - name: Get GitHub App User ID
+        id: get-user-id
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Setup Git CLI user
         run: |
-          git config --global user.name  'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+          git config user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
+
+      # ==========================================================
+      # Push the dev documentation version to the gh-pages branch
+      # ==========================================================
       - name: Deploy dev documentation version
         run: |
           git pull --rebase origin gh-pages
