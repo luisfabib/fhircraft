@@ -45,7 +45,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[docs]
       - name: Deploy dev documentation version
-        working-directory: ./docs-repo
         run: |
           git pull origin gh-pages
           mike deploy --push --update-aliases $(echo "${{ github.event.release.tag_name }}" | grep -oP '^\d+\.\d+') latest
