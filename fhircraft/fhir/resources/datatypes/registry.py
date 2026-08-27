@@ -187,6 +187,7 @@ class TypeRegistry:
         match entry.kind:
             case "primitive-type":
                 tier = "primitive"
+                snake = f"_{snake}"
             case "complex-type":
                 tier = "complex"
             case "resource":

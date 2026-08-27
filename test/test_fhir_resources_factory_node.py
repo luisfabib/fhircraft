@@ -4,8 +4,7 @@ from fhircraft.config import configure, reset_config
 from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinition,
 )
-from fhircraft.fhir.resources.datatypes.R4.primitive.string import String
-from fhircraft.fhir.resources.datatypes.R4.primitive.integer import Integer
+from fhircraft.fhir.resources.datatypes.R4.primitive import String, Integer
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 
 

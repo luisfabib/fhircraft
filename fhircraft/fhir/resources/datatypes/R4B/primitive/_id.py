@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field
 
 from fhircraft.fhir.resources.base import IdBase
-from .string import String
+from ._string import String
 
 
 class Id(String, IdBase):

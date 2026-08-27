@@ -4,7 +4,7 @@ from pydantic import BeforeValidator, Field, field_validator
 
 from fhircraft.fhir.resources.base import PositiveIntBase
 from fhircraft.fhir.resources.datatypes import MAX_SIGNED_32BIT_INT
-from .integer import Integer
+from ._integer import Integer
 
 _POSITIVE_INT_PATTERN = r"^\+?[1-9][0-9]*$"
 
