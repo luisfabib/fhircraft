@@ -117,10 +117,9 @@ from fhircraft.exceptions import (
     FHIRPathLexingError,
     FHIRPathRuntimeError,
 )
-from fhircraft import get_fhir_type
+from fhircraft import R5 as fhir
 
-Patient = get_fhir_type("Patient", "R5")
-patient = Patient(
+patient = fhir.Patient(
     name=[
         {"given": ["Alice"], "family": "Johnson"},
         {"given": ["Aly"],   "family": "Johnson", "use": "nickname"},
@@ -183,12 +182,9 @@ There are two kinds of failures inside a `ValidationError`:
 
 ```python
 from pydantic import ValidationError
-from fhircraft import get_fhir_type
-
-Observation = get_fhir_type("Observation", "R4")
 
 try:
-    obs = Observation.model_validate({"valueReference": {"type": "only-type"}})  # (1)!
+    obs = fhir.Observation.model_validate({"valueReference": {"type": "only-type"}})  # (1)!
 except ValidationError as e:
     for error in e.errors():
         if error["type"].startswith("fhir_"):   # (2)!
@@ -209,7 +205,7 @@ from fhircraft.exceptions import FhirValidationWarning
 
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always", FhirValidationWarning)
-    patient = Patient(name=[{"given": ["Alice"]}])  # may emit dom-6 warning
+    patient = fhir.Patient(name=[{"given": ["Alice"]}])  # may emit dom-6 warning
 
 for w in caught:
     print(f"Validation warning: {w.message}")

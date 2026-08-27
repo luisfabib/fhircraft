@@ -21,15 +21,13 @@ Fhircraft uses Pydantic v2 to create strongly-typed Python representations of FH
 ```python
 from pydantic import Field, model_validator
 from typing import Optional, List
-from fhircraft import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.R5.primitive import boolean, code  # (1)!
-from fhircraft.fhir.resources.datatypes.R5.complex import HumanName, Identifier
+from fhircraft import FHIRBaseModel, R5 as fhir
 
 class Patient(FHIRBaseModel):
 
-    active: Optional[boolean] = Field(...)  # (2)!
-    name: Optional[List[HumanName]] = Field(...)
-    gender: Optional[code] = Field(...)
+    active: Optional[fhir.boolean] = Field(...)  # (2)!
+    name: Optional[List[fhir.HumanName]] = Field(...)
+    gender: Optional[fhir.code] = Field(...)
     ...
 
     # FHIR invariant validation
@@ -95,9 +93,9 @@ Fields annotated with a type alias store their values as the corresponding model
 !!! example "Primitive Types"
 
     ```python
-    from fhircraft.fhir.resources.datatypes.R5.core import Patient
+    from fhircraft import R5 as fhir
 
-    patient = Patient(birthDate="1990-05-15")  # (1)!
+    patient = fhir.Patient(birthDate="1990-05-15")  # (1)!
 
     # The field stores a model instance...
     print(type(patient.birthDate))
@@ -132,18 +130,15 @@ FHIR complex types represent structured data with multiple fields—such as addr
 Each complex type is a reusable component that can appear in multiple resources. For example, `HumanName` can be used in `Patient`, `Practitioner`, and `RelatedPerson` resources, while `Address` appears across numerous resource types. These types maintain consistent structure and validation rules regardless of where they're used, making it easy to work with healthcare data in a standardized way.
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.complex import (
-    HumanName, Address, CodeableConcept, Quantity
-)
 
 # Create complex structured data
-name = HumanName(
+name = fhir.HumanName(
     family="Johnson",
     given=["Alice", "Marie"],
     use="official"
 ) 
 
-address = Address(
+address = fhir.Address(
     line=["123 Main Street", "Apt 4B"],
     city="Springfield", 
     state="IL",
@@ -152,7 +147,7 @@ address = Address(
 ) 
 
 # Complex types can contain other complex types
-concept = CodeableConcept(
+concept = fhir.CodeableConcept(
     coding=[{
         "system": "http://loinc.org",
         "code": "29463-7", 
@@ -191,23 +186,23 @@ When the maximum cardinality is greater than 1, the list length is additionally 
 class MyResource(FHIRBaseModel):
 
     # Cardinality 0..1  →  Optional, defaults to None
-    active: Optional[boolean] = Field(default=None)
+    active: Optional[fhir.boolean] = Field(default=None)
 
     # Cardinality 1..1  →  Required, no default
-    status: code = Field(description="active | inactive")
+    status: fhir.code = Field(description="active | inactive")
 
     # Cardinality 0..*  →  Optional list, defaults to None
-    note: Optional[List[str]] = Field(default=None)
+    note: Optional[List[fhir.string]] = Field(default=None)
 
     # Cardinality 1..*  →  Required list, no default
-    name: List[HumanName] = Field(description="A name associated with the patient")
+    name: List[fhir.HumanName] = Field(description="A name associated with the patient")
 
     # Cardinality 1..3  →  Required list with upper bound
-    identifier: List[Identifier] = Field(description="An identifier for this patient", max_length=3)
+    identifier: List[fhir.Identifier] = Field(description="An identifier for this patient", max_length=3)
 
     # Type-choice element (always Optional even when min=1)
-    value: Optional[Quantity] = Field(default=None)
-    valueString: Optional[string] = Field(default=None)
+    value: Optional[fhir.Quantity] = Field(default=None)
+    valueString: Optional[fhir.string] = Field(default=None)
 
 assert not MyResource.model_fields["active"].is_required()
 assert MyResource.model_fields["status"].is_required()
@@ -225,10 +220,8 @@ Fhircraft validates that exactly one type variant is set at a time—attempting 
 !!! example "Working with type choice elements"
 
     ```python
-    from fhircraft.fhir.resources.datatypes.R5.core import Observation
-
     # The effective[x] element can be Date, DateTime, Period, etc.
-    observation = Observation(
+    observation = fhir.Observation(
         status="final",
         code={"text": "Time of Birth"},
         valueDateTime="2023-12-25T10:30:00Z"  # (1)!
@@ -243,10 +236,10 @@ Fhircraft validates that exactly one type variant is set at a time—attempting 
     ```
 
     1. Set the `valueDateTime` variant of the choice element.
-    3. The generic `value` property returns whichever variant is set.
-    4. Setting a different variant does not automatically clear the previous one; both will be set simultaneously, which violates the single-variant constraint.
-    5. The previous variant (`valueDateTime`) must be explicitly cleared to avoid a validation error.
-    6. The generic property now returns the remaining active variant.
+    2. The generic `value` property returns whichever variant is set.
+    3. Setting a different variant does not automatically clear the previous one; both will be set simultaneously, which violates the single-variant constraint.
+    4. The previous variant (`valueDateTime`) must be explicitly cleared to avoid a validation error.
+    5. The generic property now returns the remaining active variant.
 
 ### Backbone Elements
 
@@ -274,7 +267,7 @@ Fhircraft generates dedicated Pydantic models for each backbone element. They in
         }
     }
 
-    observation = Observation(
+    observation = fhir.Observation(
         status="final",
         code={"text": "Blood pressure"},
         component=[component_data]  # (1)!
@@ -304,18 +297,16 @@ Additionally, Fhircraft replaces standard Python lists with context-aware `FHIRL
 !!! example "Working with context-aware structures"
 
     ```python
-    from fhircraft.fhir.resources.datatypes.R5.core import Patient
-    from fhircraft.fhir.resources.datatypes.R5.complex import HumanName
 
-    patient = Patient(name=[])
+    patient = fhir.Patient(name=[])
 
     # List fields use FHIRList instead of standard Python lists
     print(type(patient.name))  # (1)!
     #> <class 'fhircraft.fhir.resources.base.models.FHIRList'>
 
     # Add items and context is automatically maintained
-    patient.name.append(HumanName(family="Smith", given=["John"]))  # (2)!
-    patient.name.append(HumanName(family="Smith", given=["Johnny"], use="nickname"))
+    patient.name.append(fhir.HumanName(family="Smith", given=["John"]))  # (2)!
+    patient.name.append(fhir.HumanName(family="Smith", given=["Johnny"], use="nickname"))
 
     # Access nested elements with maintained context
     name = patient.name[0]  # (3)!
@@ -352,19 +343,13 @@ During serialization, each resource automatically includes a `resourceType` fiel
     During deserialization, Fhircraft reads the `resourceType` discriminator and dynamically instantiates the correct Python class for each resource. This means that accessing `bundle.entry[0].resource` returns an actual `Patient` instance with all its specific methods and fields, not a generic `Resource` object. This polymorphic deserialization works recursively through the entire resource tree, ensuring that every nested resource maintains its precise type identity.
 
     ```python
-    from fhircraft import get_fhir_type
-
-    # Different resource types
-    Patient = get_fhir_type("Patient", "R5") 
-    Practitioner = get_fhir_type("Practitioner", "R5")
-    Bundle = get_fhir_type("Bundle", "R5")
 
     # Create a bundle containing different resource types
-    bundle = Bundle(
+    bundle = fhir.Bundle(
         type="collection",
         entry=[
-            {"resource": Patient(name=[{"family": "Johnson"}]), "fullUrl": 'http:example.org/patient1'},
-            {"resource": Practitioner(name=[{"family": "Smith"}]), "fullUrl": 'http:example.org/patient2'}
+            {"resource": fhir.Patient(name=[{"family": "Johnson"}]), "fullUrl": 'http:example.org/patient1'},
+            {"resource": fhir.Practitioner(name=[{"family": "Smith"}]), "fullUrl": 'http:example.org/patient2'}
         ]
     ) # (1)!
 
@@ -377,7 +362,7 @@ During serialization, each resource automatically includes a `resourceType` fiel
     #> Practitioner
 
     # Deserialization reconstructs exact types
-    bundle_copy = Bundle.model_validate(bundle_dict)
+    bundle_copy = fhir.Bundle.model_validate(bundle_dict)
     print(type(bundle_copy.entry[0].resource))  # (4)!
     #> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
     ```
@@ -407,16 +392,13 @@ For complex types and resources, add extensions via the `extension` field, which
 For **primitive fields**, because field values are now stored as model class instances (e.g. `Boolean`, `Date`) that already inherit from `Element`, you can attach extensions directly to the primitive value by constructing the model class explicitly:
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.core import Patient
-from fhircraft.fhir.resources.datatypes.R5.primitive import Date, Boolean
-from fhircraft.fhir.resources.datatypes.R5.complex import Extension
 
 # Extensions directly on a primitive value
-patient = Patient(
-    birthDate=Date(
+patient = fhir.Patient(
+    birthDate=fhir.Date(
         value="1990-05-15",
         extension=[
-            Extension(
+            fhir.Extension(
                 url="http://example.org/data-quality",
                 valueCode="estimated"
             )
@@ -436,7 +418,7 @@ print(patient.birthDate.extension[0].url)  # (2)!
 
 # Extensions on complex elements
 patient.extension = [
-    Extension(
+    fhir.Extension(
         url="http://example.org/patient-category",
         valueCodeableConcept={
             "coding": [{
@@ -463,11 +445,10 @@ Fhircraft automatically validates these invariants by embedding them directly in
 
 ```python
 from pydantic import ValidationError
-from fhircraft.fhir.resources.datatypes.R5.complex import Quantity
 
 # This violates FHIR invariant qty-3: "If a code for the unit is present, the system SHALL also be present"
 try:
-    invalid_quantity = Quantity(
+    invalid_quantity = fhir.Quantity(
         value=10,
         unit="mg", 
         code="mg"  # (1)!
@@ -495,30 +476,29 @@ This approach ensures type safety while maintaining the flexibility that slicing
     ```python
     from fhircraft import FHIRBaseModel
     from fhircraft.fhir.resources import FHIRSliceModel
-    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, BackboneElement
     from pydantic import Field
     from typing import Optional, List, Union, Annotated
 
     # Base backbone element with all possible fields
-    class ObservationComponent(BackboneElement):
-        code: Optional[CodeableConcept] = Field(...)
-        valueString: Optional[str] = Field(...)
-        valueInteger: Optional[int] = Field(...)
+    class ObservationComponent(fhir.BackboneElement):
+        code: Optional[fhir.CodeableConcept] = Field(...)
+        valueString: Optional[fhir.string] = Field(...)
+        valueInteger: Optional[fhir.integer] = Field(...)
 
     # Slice for string-based components (e.g., text observations)
     class StringComponent(FHIRSliceModel):  # (1)!
-        code: CodeableConcept = Field(...)
-        valueString: str = Field(...)
+        code: fhir.CodeableConcept = Field(...)
+        valueString: fhir.string = Field(...)
         
     # Slice for integer-based components (e.g., numeric measurements)
     class IntegerComponent(FHIRSliceModel):  # (2)!
-        code: CodeableConcept = Field(...)
-        valueInteger: int = Field(...)
+        code: fhir.CodeableConcept = Field(...)
+        valueInteger: fhir.integer = Field(...)
 
     # Profiled observation using sliced components
     class VitalSignsObservation(FHIRBaseModel):  # (3)!
-        status: str = Field(default="final")
-        code: CodeableConcept = Field(...)
+        status: fhir.string = Field(default="final")
+        code: fhir.CodeableConcept = Field(...)
         component: Optional[List[
             Annotated[
                 Union[StringComponent, IntegerComponent, ObservationComponent],  # (4)!

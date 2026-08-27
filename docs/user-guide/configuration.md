@@ -32,11 +32,9 @@ from fhircraft import configure
 configure(disable_validation_warnings=True)
 
 # Create FHIR resources without validation warnings appearing
-from fhircraft import get_fhir_type
-Patient = get_fhir_type("Patient", "R5")
-
+from fhircraft import R5 as fhir
 # This patient creation will not show warnings about missing narrative
-patient = Patient(name=[{"given": ["Alice"]}])
+patient = fhir.Patient(name=[{"given": ["Alice"]}])
 ```
 
 This approach works well for production deployments where you want clean logs and have already validated your data creation logic during development and testing.
@@ -49,17 +47,13 @@ The context manager `override_config` creates an isolated configuration scope. A
 
 ```python
 from fhircraft import override_config
-from fhircraft import get_fhir_type
-
-Patient = get_fhir_type("Patient", "R5")
-
 # Temporarily disable warnings for importing external data
 with override_config(disable_validation_warnings=True):
     # Warnings are disabled only within this block
-    external_patient = Patient(name=[{"given": ["Alice"]}])
+    external_patient = fhir.Patient(name=[{"given": ["Alice"]}])
     
 # Warnings automatically re-enabled after the block ends
-local_patient = Patient(name=[{"given": ["Bob"]}])
+local_patient = fhir.Patient(name=[{"given": ["Bob"]}])
 ```
 
 This pattern is particularly valuable in data processing pipelines where some operations work with untrusted external data while others work with your own validated data structures.
@@ -72,15 +66,12 @@ Disabling constraints by key provides surgical precision. You turn off only the 
 
 ```python
 from fhircraft import disable_constraint, enable_constraint
-from fhircraft import get_fhir_type
 
 # Disable the dom-6 constraint that requires narrative text
 disable_constraint('dom-6')
 
-Patient = get_fhir_type("Patient", "R5")
-
 # Now creating patients without narrative will not trigger dom-6 warnings
-patient = Patient(name=[{"given": ["Alice"]}])
+patient = fhir.Patient(name=[{"given": ["Alice"]}])
 
 # Disable multiple constraints at once
 disable_constraint('dom-6', 'sdf-0', 'ele-1')
@@ -101,16 +92,13 @@ Strict mode enforces the complete set of FHIR constraints. FHIR constraint viola
 
 ```python hl_lines="5"
 from fhircraft import configure
-from fhircraft import get_fhir_type
 
 # Explicitly set strict mode (this is the default)
 configure(validation_mode='strict')
 
-Patient = get_fhir_type("Patient", "R5")
-
 # Validation errors will raise ValidationError
 # Validation warnings will emit Python warnings
-patient = Patient(name=[{"given": ["Alice"]}])
+patient = fhir.Patient(name=[{"given": ["Alice"]}])
 ```
 
 ### Lenient Mode
@@ -124,7 +112,7 @@ from fhircraft import configure
 configure(validation_mode='lenient')
 
 # Operations that would normally raise validation errors now emit warnings
-patient = Patient(name=[{"given": ["Alice"]}]) #(1)!
+patient = fhir.Patient(name=[{"given": ["Alice"]}]) #(1)!
 ```
 1. This allows processing to continue even with non-compliant data
 
@@ -141,7 +129,7 @@ from fhircraft import configure
 configure(validation_mode='skip')
 
 # No validations will be performed at all 
-patient = Patient(name=[{"given": ["Alice"]}]) #(1)!
+patient = fhir.Patient(name=[{"given": ["Alice"]}]) #(1)!
 ```
 
 1. Use only when you have validated data through other means
@@ -276,11 +264,9 @@ Use `override_config` when you need a different terminology service for a specif
 ```python
 from fhircraft import override_config
 
-Observation = get_fhir_type("Observation", "R5")
-
 with override_config(terminology_service=MyTerminologyService()):
     # All FHIRPath evaluations in this block use the staging service
-    result = Observation(status="final", code={"coding":[{"code":"LP-12292"}]}).fhirpath_single(
+    result = fhir.Observation(status="final", code={"coding":[{"code":"LP-12292"}]}).fhirpath_single(
         "Observation.code.memberOf('http://example.org/ValueSet/LabCodes')"
     )
 
