@@ -2,9 +2,9 @@ import re
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field, field_validator
 
-from fhircraft.fhir.resources.datatypes import MAX_SIGNED_32BIT_INT
 from fhircraft.fhir.resources.base import PositiveIntBase
-from .integer import Integer
+from fhircraft.fhir.resources.datatypes import MAX_SIGNED_32BIT_INT
+from ._integer import Integer
 
 _POSITIVE_INT_PATTERN = r"^\+?[1-9][0-9]*$"
 

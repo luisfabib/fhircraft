@@ -7,7 +7,7 @@ from fhircraft.fhir.resources.datatypes import (
     MAX_SIGNED_64BIT_INT,
 )
 from fhircraft.fhir.resources.base import Integer64Base
-from .integer import Integer
+from ._integer import Integer
 
 _INTEGER_PATTERN = r"^[0]|[-+]?[1-9][0-9]*$"
 

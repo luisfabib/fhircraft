@@ -2,12 +2,12 @@ import re
 from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field, field_validator
 
-from fhircraft.fhir.resources.base import UnsignedIntBase
 from fhircraft.fhir.resources.datatypes import (
     MIN_UNSIGNED_32BIT_INT,
     MAX_UNSIGNED_32BIT_INT,
 )
-from .integer import Integer
+from fhircraft.fhir.resources.base import UnsignedIntBase
+from ._integer import Integer
 
 _UNSIGNED_INT_PATTERN = r"^[0]|([1-9][0-9]*)$"
 
