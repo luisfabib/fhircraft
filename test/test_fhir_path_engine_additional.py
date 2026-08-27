@@ -1,7 +1,7 @@
 from collections import namedtuple
 from unittest import result
 import pytest
-import sys 
+import sys
 
 from fhircraft.exceptions import FHIRPathWarning, FHIRPathException
 from fhircraft.fhir.path.engine.additional import *
@@ -18,17 +18,17 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Age as R4_Age,
     Extension as R4_Extension,
 )
-from fhircraft.fhir.resources.datatypes.R4.primitive.boolean import Boolean
+from fhircraft.fhir.resources.datatypes.R4.primitive import Boolean
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity as R4B_Quantity,
     Reference as R4B_Reference,
 )
-from fhircraft.fhir.resources.datatypes.R4B.primitive.string import String
+from fhircraft.fhir.resources.datatypes.R4B.primitive import String
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity as R5_Quantity,
     Reference as R5_Reference,
 )
-from fhircraft.fhir.resources.datatypes.R5.primitive.integer import Integer
+from fhircraft.fhir.resources.datatypes.R5.primitive import Integer
 
 env = dict()
 
@@ -609,6 +609,7 @@ def test_resolve_with_unresolvable_internal_reference():
     result = Resolve().evaluate(collection, {"%resource": resource})
     assert result == []
 
+
 def test_resolve_ignores_non_reference_items():
     contained_resource = {"id": "123", "resourceType": "Patient"}
     resource = {"contained": [contained_resource]}
@@ -618,6 +619,7 @@ def test_resolve_ignores_non_reference_items():
     ]
     result = Resolve().evaluate(collection, {"%resource": resource})
     assert result[0].value == contained_resource
+
 
 # -------------
 # ConformsTo

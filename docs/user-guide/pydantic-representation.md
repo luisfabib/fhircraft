@@ -101,7 +101,7 @@ Fields annotated with a type alias store their values as the corresponding model
 
     # The field stores a model instance...
     print(type(patient.birthDate))
-    #> <class 'fhircraft.fhir.resources.datatypes.R5.primitive.date.Date'>
+    #> <class 'fhircraft.fhir.resources.datatypes.R5.primitive._date.Date'>
 
     # ...but it compares and prints like the underlying value:
     print(patient.birthDate)

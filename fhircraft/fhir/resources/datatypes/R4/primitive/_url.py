@@ -2,7 +2,7 @@ from typing import Annotated
 from pydantic import BeforeValidator
 
 from fhircraft.fhir.resources.base import UrlBase
-from .uri import Uri
+from ._uri import Uri
 
 
 class Url(Uri, UrlBase):

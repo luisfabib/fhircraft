@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 from pydantic import BeforeValidator, Field
 
 from fhircraft.fhir.resources.base import OidBase
-from .uri import Uri
+from ._uri import Uri
 
 
 class Oid(Uri, OidBase):

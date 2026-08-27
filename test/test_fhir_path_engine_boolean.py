@@ -5,7 +5,7 @@ import pytest
 from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.boolean import *
 from fhircraft.fhir.path.engine.core import *
-from fhircraft.fhir.resources.datatypes.R4.primitive.boolean import Boolean
+from fhircraft.fhir.resources.datatypes.R4.primitive import Boolean
 
 env = dict()
 
