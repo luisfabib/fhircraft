@@ -20,15 +20,13 @@ __version__ = "0.8.3"
 
 from typing import Final, Literal
 
-# ---  Supported FHIR releases  --- 
+# ---  Supported FHIR releases  ---
 SUPPORTED_FHIR_RELEASES: Final = ("R4", "R4B", "R5")
-
-# --- Resource access ---
-from fhircraft.fhir.resources.datatypes import get_fhir_type
 
 # --- Model building ---
 from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.datatypes import R4, R4B, R5
 
 # --- Data transformation ---
 from fhircraft.fhir.mapper import FHIRStructureMapper
@@ -49,7 +47,9 @@ from fhircraft.utils import get_FHIR_release_from_version
 
 __all__ = [
     # Resource access
-    "get_fhir_type",
+    "R4",
+    "R4B",
+    "R5",
     # Model building
     "FHIRModelFactory",
     "FHIRBaseModel",

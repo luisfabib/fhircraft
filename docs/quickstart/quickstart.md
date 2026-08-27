@@ -13,13 +13,10 @@ FHIR resources represent different types of healthcare data - patients, observat
 Fhircraft includes Pydantic models for all core FHIR resources. Here's how to create a [Patient resource from FHIR R5](https://hl7.org/fhir/patient.html):
 
 ```python
-from fhircraft import get_fhir_type
-
-# Get the Patient model for FHIR R5
-Patient = get_fhir_type("Patient", "R5")
+from fhircraft import R5 as fhir
 
 # Create a patient with automatic validation
-patient = Patient(
+patient = fhir.Patient(
     name=[{"given": ["Alice"], "family": "Johnson"}],
     gender="female",
     birthDate="1985-03-15"
@@ -54,7 +51,7 @@ from fhircraft.utils import load_file
 data = load_file('patient.json')
 
 # Validate against FHIR specification
-patient = Patient.model_validate(data)
+patient = fhir.Patient.model_validate(data)
 
 # Export back to JSON
 json_str = patient.model_dump_json(indent=2) # (1)!
@@ -76,7 +73,7 @@ FHIR resources can contain complex nested data structures. Instead of writing lo
 Use [FHIRPath expressions](https://hl7.org/fhirpath/) to extract data from FHIR resources:
 
 ```python
-patient = Patient(
+patient = fhir.Patient(
     name=[{"given": ["Alice", "Samantha", "Erika"], "family": "Johnson"}],
     gender="female",
     birthDate="1985-03-15"

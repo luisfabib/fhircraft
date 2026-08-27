@@ -199,12 +199,10 @@ test/
 ```python
 # test/test_my_feature.py
 import pytest
-from fhircraft import get_fhir_type
+from fhircraft.fhir.resources.datatypes.R5 import Patient
 
 def test_patient_creation_validates_gender():
-    """Test that invalid gender codes raise validation errors."""
-    Patient = get_fhir_type("Patient", "R5")
-    
+    """Test that invalid gender codes raise validation errors."""    
     # Valid gender should work
     patient = Patient(gender="female")
     assert patient.gender == "female"
