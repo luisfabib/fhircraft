@@ -73,10 +73,7 @@ pip install git+https://github.com/luisfabib/fhircraft.git
 To verify your installation:
 
 ```python
-from fhircraft import get_fhir_type
-
-# This should work without errors
-Patient = get_fhir_type("Patient","R4B")
+import fhircraft
 print("✓ Fhircraft installed successfully!")
 ```
 
@@ -88,13 +85,10 @@ print("✓ Fhircraft installed successfully!")
 Work with pre-generated Pydantic models for all standard FHIR resources. Each model includes full validation rules from the FHIR specification:
 
 ```python
-from fhircraft import get_fhir_type
-
-# Get built-in Patient model for FHIR R5
-Patient = get_fhir_type("Patient", "R5")
+from fhircraft import R5 as fhir
 
 # Create and validate a patient
-patient = Patient(
+patient = fhir.Patient(
     name=[{"given": ["Alice"], "family": "Johnson"}],
     gender="female",
     birthDate="1985-03-15"

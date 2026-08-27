@@ -16,75 +16,32 @@ Using these models means you can focus on your healthcare application logic rath
 
 ## Getting Resource Models
 
-Before you can create FHIR resources, you need to obtain the appropriate model class. Fhircraft provides all standard FHIR resource models ready to use without any setup or configuration. The models are organized by FHIR version, allowing you to work with the specific version your application requires.
+Before you can create FHIR resources, you need to obtain the appropriate model class. Fhircraft provides all standard FHIR resource models ready to use without any setup or configuration. The models are organized by FHIR release, allowing you to work with the specific release your application requires. 
 
-The [`get_fhir_type`](../reference/fhir-resources-type-registries#fhircraft.fhir.resources.datatypes.registry.get_fhir_type) function is your entry point to these models. It takes a resource type name and optionally a FHIR version, returning the corresponding [:simple-pydantic: Pydantic BaseModel](https://docs.pydantic.dev/latest/concepts/models/#basic-model-usage) subclass. Alternatively, if familiar with the Fhircraft modules, the models can be directly imported from their corresponding module.
+Each FHIR release can be imported as a module, providing direct access to all resource models, including primitive, complex, and other types. We recommend using the alias fhir for these imports to maintain a clear and consistent namespace for all FHIR-related classes.
 
+```python
+from fhircraft import R4B as fhir
 
-=== "Resolver Function"
+print(fhir.Patient)
+#> <class 'fhircraft.fhir.resources.datatypes.R4B.core.patient.Patient'>
 
-    ```python
-    # Import the resource type resolver
-    from fhircraft import get_fhir_type
+print(fhir.Condition)
+#> <class 'fhircraft.fhir.resources.datatypes.R4B.core.condition.Condition'>
+```
 
-    # Get built-in models
-    Patient = get_fhir_type("Patient", "R4B")
-    Condition = get_fhir_type("Condition", "R4B")
+Working with multiple FHIR releases simultaneously is as easy as importing multiple releases:
 
-    print(Patient)
-    #> <class 'fhircraft.fhir.resources.datatypes.R4B.core.patient.Patient'>
+```python
+# Import the resource models directly
+from fhircraft import R4 as fhir_r4, R5 as fhir_r5
 
-    print(Condition)
-    #> <class 'fhircraft.fhir.resources.datatypes.R4B.core.condition.Condition'>
-    ```
+print(fhir_r4.Patient._fhir_release)
+#> R4
 
-
-=== "Direct Import"
-
-    ```python
-    # Import the resource models directly
-    from fhircraft.fhir.resources.datatypes.R4B.core import Patient, Condition
-
-    print(Patient)
-    #> <class 'fhircraft.fhir.resources.datatypes.R4B.core.patient.Patient'>
-
-    print(Condition)
-    #> <class 'fhircraft.fhir.resources.datatypes.R4B.core.condition.Condition'>
-    ```
-
-Accessing the right model for a chosen FHIR version can be similarly achieved with both approaches:
-
-
-=== "Resolver Function"
-
-    ```python
-    # Import the resource type resolver
-    from fhircraft import get_fhir_type
-
-    # Get models for specific FHIR versions
-    PatientR4B = get_fhir_type("Patient", "R4B") 
-    PatientR5 = get_fhir_type("Patient", "R5") 
-
-    print(PatientR4B._fhir_release)
-    #> R4B
-
-    print(PatientR5._fhir_release)
-    #> R5
-    ```
-
-=== "Direct Import"
-
-    ```python
-    # Import the resource models directly
-    from fhircraft.fhir.resources.datatypes.R4B.core import Patient as PatientR4B
-    from fhircraft.fhir.resources.datatypes.R5.core import Patient as PatientR5
-
-    print(PatientR4B._fhir_release)
-    #> R4B
-
-    print(PatientR5._fhir_release)
-    #> R5
-    ```
+print(fhir_r5.Patient._fhir_release)
+#> R5
+```
 
 
 The returned model is a standard Python class that you instantiate like any other class. These models use [:simple-pydantic: Pydantic's validation](https://docs.pydantic.dev/latest/concepts/validators/) to ensure data correctness.
@@ -98,13 +55,10 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
     One of the most common healthcare resource is [:lucide-flame: Patient](https://www.hl7.org/fhir/patient.html), which represents a person receiving care. Creating a basic patient requires only minimal information, though you can add as much detail as your application needs:
 
     ```python
-    from fhircraft import get_fhir_type
-
-    # Get the Patient model for FHIR R5
-    Patient = get_fhir_type("Patient", "R5")
+    from fhircraft import R5 as fhir
 
     # Create a patient with basic demographics
-    patient = Patient(
+    patient = fhir.Patient(
         name=[{                      # Name is an array of HumanName objects
             "given": ["John"],       # Given names (first, middle)
             "family": "Doe",         # Family name (last name)
@@ -129,28 +83,17 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
     Real patient records contain multiple names, contact methods, addresses, and identifiers. FHIR uses [:lucide-flame: Complex Types](https://www.hl7.org/fhir/datatypes.html) to represent these rich structures. This recipe shows how to create a comprehensive patient record with all common elements:
 
     ```python
-    from fhircraft import get_fhir_type
-    # Import FHIR complex data types
-    from fhircraft.fhir.resources.datatypes.R5.complex import (
-        HumanName,      # Person names
-        ContactPoint,   # Phone, email, etc.
-        Address,        # Physical addresses
-        Identifier      # System identifiers like MRN
-    )
-
-    Patient = get_fhir_type("Patient", "R5")
-
     # Create a comprehensive patient record
-    patient = Patient(
+    patient = fhir.Patient(
         # Multiple names for different contexts
         name=[
-            HumanName(
+            fhir.HumanName(
                 given=["John", "Michael"],  # First and middle names
                 family="Doe",                # Last name
                 use="official",              # Legal/official name
                 prefix=["Mr."]               # Title
             ),
-            HumanName(
+            fhir.HumanName(
                 given=["Johnny"],
                 family="Doe", 
                 use="nickname"               # Informal name
@@ -159,12 +102,12 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
         
         # Contact methods (phone, email, etc.)
         telecom=[
-            ContactPoint(
+            fhir.ContactPoint(
                 system="phone",              # Type of contact
                 value="+1-555-123-4567",    # Actual contact value
                 use="home"                   # Context of use
             ),
-            ContactPoint(
+            fhir.ContactPoint(
                 system="email", 
                 value="john.doe@example.com",
                 use="work"
@@ -173,7 +116,7 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
         
         # Physical addresses
         address=[
-            Address(
+            fhir.Address(
                 line=["123 Main Street", "Apt 4B"],  # Street address lines
                 city="Springfield",
                 state="IL",
@@ -185,7 +128,7 @@ Creating FHIR resources with Fhircraft follows standard Python patterns. You ins
         
         # System identifiers
         identifier=[
-            Identifier(
+            fhir.Identifier(
                 system="http://example.org/mrn",  # Identifier system URL
                 value="MRN123456",                 # Actual identifier value
                 use="usual"                        # Primary identifier
@@ -211,8 +154,6 @@ Healthcare applications frequently need to convert data from external systems, A
 !!! example "Validating an API Response Data"
 
     ```python
-    from fhircraft import get_fhir_type
-
     # Example: Data received from a REST API or database
     patient_data = {
         "resourceType": "Patient",
@@ -226,11 +167,9 @@ Healthcare applications frequently need to convert data from external systems, A
         "active": True
     }
 
-    Patient = get_fhir_type("Patient", "R5")
-
     # Validate and convert dictionary to Patient model
     # This performs all FHIR validation automatically
-    patient = Patient.model_validate(patient_data)
+    patient = fhir.Patient.model_validate(patient_data)
 
     # Now you have a fully validated Patient object
     print(f"Validated patient: {patient.name[0].given[0]} {patient.name[0].family}")
@@ -265,10 +204,8 @@ fhir_json = '''
 }
 '''
 
-Patient = get_fhir_type("Patient", "R4")
-
 # Parse JSON string and validate in one step
-patient = Patient.model_validate_json(fhir_json)
+patient = fhir.Patient.model_validate_json(fhir_json)
 
 # Access the parsed data as Python objects
 print(f"Parsed patient ID: {patient.id}")
@@ -299,10 +236,8 @@ fhir_xml = '''<?xml version="1.0"?>
   <gender value="male"/>
 </Patient>'''
 
-Patient = get_fhir_type("Patient", "R4")
-
 # Parse XML and validate against FHIR specification
-patient = Patient.model_validate_xml(fhir_xml)
+patient = fhir.Patient.model_validate_xml(fhir_xml)
 
 # Access the parsed data as Python objects
 print(f"Parsed patient ID: {patient.id}")
@@ -321,10 +256,7 @@ Once you have created or parsed a FHIR resource, you need to read its data, modi
 FHIR resource models are standard Python objects with properties you access using dot notation. This recipe shows safe patterns for reading data, including handling optional fields that might not exist:
 
 ```python
-from fhircraft import get_fhir_type
-
-Patient = get_fhir_type("Patient", "R4")
-patient = Patient(
+patient = fhir.Patient(
     name=[{"given": ["Alice"], "family": "Johnson"}],
     gender="female",
     birthDate="1992-08-15"
@@ -364,12 +296,11 @@ Pydantic models use [Python descriptors](https://docs.pydantic.dev/latest/concep
 Pydantic models are mutable by default, allowing you to modify resource properties after creation. Changes trigger validation automatically, ensuring the resource remains FHIR-compliant. This recipe shows safe patterns for updating resources:
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.complex import ContactPoint
 from pydantic import ValidationError
 
 # Add new data to existing resource
 patient.telecom = [
-    ContactPoint(
+    fhir.ContactPoint(
         system="email",
         value="alice.johnson@example.com",
         use="work"
@@ -383,11 +314,10 @@ patient.active = True   # Mark record as active
 patient.gender = "female"
 
 # Append to arrays
-from fhircraft.fhir.resources.datatypes.R5.complex import ContactPoint
 if not patient.telecom:
     patient.telecom = []
 patient.telecom.append(
-    ContactPoint(system="phone", value="555-0123", use="mobile")
+    fhir.ContactPoint(system="phone", value="555-0123", use="mobile")
 )
 
 print(f"Updated patient gender to {patient.gender} and active to {patient.active}")
@@ -418,10 +348,7 @@ Healthcare systems exchange data using standardized formats. These recipes show 
 FHIR JSON is the most common format for FHIR data exchange. Pydantic provides multiple [:simple-pydantic: serialization methods](https://docs.pydantic.dev/latest/concepts/serialization/) that convert models to JSON while respecting FHIR formatting rules:
 
 ```python
-from fhircraft import get_fhir_type
-
-Patient = get_fhir_type("Patient", "R4")
-patient = Patient(
+patient = fhir.Patient(
     name=[{"given": ["John"], "family": "Doe"}],
     gender="male",
     birthDate="1990-01-15"

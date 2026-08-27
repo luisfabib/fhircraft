@@ -30,7 +30,7 @@ See the [:lucide-flame: FHIR structure definition documentation](https://hl7.org
 Snapshot mode works with structure definitions that contain complete element definitions. This mode is useful for base resource definitions and profiles that include full snapshots.
 
 ```python
-from fhircraft import FHIRModelFactory, get_fhir_type, FHIRBaseModel
+from fhircraft import FHIRModelFactory, FHIRBaseModel, R4 as fhir
 
 # Create a new factory set to the R4 FHIR release
 factory = FHIRModelFactory(fhir_release="R4")
@@ -76,8 +76,7 @@ LegacyPatient = factory.build(
 
 assert issubclass(LegacyPatient, FHIRBaseModel)
 
-Patient = get_fhir_type("Patient", "R4")
-assert not issubclass(LegacyPatient, Patient) # (2)!
+assert not issubclass(LegacyPatient, fhir.Patient) # (2)!
 
 instance = LegacyPatient(fullName="Maria Johnson")
 
@@ -103,7 +102,7 @@ print(f"Legacy patient name: {instance.fullName}")
 Differential mode works with structure definitions that only specify changes from a base definition. The factory automatically resolves the base definition and merges the differential constraints with it. This is the standard approach for FHIR profiles and implementation guides.
 
 ```python
-from fhircraft import FHIRModelFactory, get_fhir_type
+from fhircraft import FHIRModelFactory
 from pydantic import ValidationError 
 
 # Structure definition with only differential elements
@@ -135,7 +134,7 @@ MyPatient = FHIRModelFactory(fhir_release="R4").build(
 )
 
 assert issubclass(MyPatient, FHIRBaseModel)
-assert issubclass(MyPatient, Patient) # (2)!
+assert issubclass(MyPatient, fhir.Patient) # (2)!
 
 # Valid patient
 patient = MyPatient(
@@ -522,22 +521,21 @@ Here is what the generated code looks like:
 
 from typing import List, Optional
 from pydantic import BaseModel, Field
-from fhircraft.fhir.resources.datatypes.R4.complex import Identifier, HumanName
 
 class Patient(BaseModel):
     """US Core Patient Profile"""
     
-    identifier: List[Identifier] = Field(
+    identifier: List[fhir.Identifier] = Field(
         ...,
         description="An identifier for this patient"
     )
     
-    name: List[HumanName] = Field(
+    name: List[fhir.HumanName] = Field(
         ...,
         description="A name associated with the patient"
     )
     
-    gender: Optional[str] = Field(
+    gender: Optional[fhir.code] = Field(
         None,
         description="male | female | other | unknown"
     )
