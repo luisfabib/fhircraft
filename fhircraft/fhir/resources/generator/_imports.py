@@ -28,10 +28,10 @@ class ImportTracker:
         return self._alias_imports
 
     def track(self, module: str, name: str) -> None:
-        if module not in (FACTORY_MODULE, "builtins") and name not in self._imports[module]:
-            print(f"Tracking import: {name}")
-            print("Existing imports:", self._imports[module])
-
+        if (
+            module not in (FACTORY_MODULE, "builtins")
+            and name not in self._imports[module]
+        ):
             self._imports[module].append(name)
 
     def track_obj(self, obj: Any) -> None:
@@ -67,10 +67,9 @@ class ImportTracker:
             parts = full_module.split(".")
             # If the module name is a snake_case version of the single imported symbol,
             # import from the parent package instead.
-            if (
-                len(objects) == 1
-                and parts[-1].lower().replace("_", "") == objects[0].lower().replace("_", "")
-            ):
+            if len(objects) == 1 and parts[-1].lower().replace("_", "") == objects[
+                0
+            ].lower().replace("_", ""):
                 parent = ".".join(parts[:-1])
                 grouped.setdefault(parent, []).extend(objects)
             else:
@@ -79,14 +78,14 @@ class ImportTracker:
             grouped[module] = sorted(set(grouped[module]))
         return grouped
 
-    def get_shortest_public_path(self, obj: object) -> str:
+    def get_shortest_public_path(self, obj: object) -> str | None:
         """Finds the shortest imported module path where this object is accessible."""
         target = obj if inspect.isclass(obj) or inspect.isfunction(obj) else type(obj)
-        full_module = getattr(target, "__module__", "")
-        name = getattr(target, "__name__", "")
-        
+        full_module = getattr(target, "__module__", None)
+        name = getattr(target, "__name__", None)
+
         if not full_module or not name:
-            return str(target)
+            return None
 
         top_pkg = full_module.split(".")[0]
         candidate_modules = []
@@ -100,6 +99,6 @@ class ImportTracker:
         # Sort by number of dots (depth) and string length
         if candidate_modules:
             shortest_mod = min(candidate_modules, key=lambda m: (m.count("."), len(m)))
-            return f"{shortest_mod}"
+            return shortest_mod
 
-        return f"{full_module}"
+        return full_module

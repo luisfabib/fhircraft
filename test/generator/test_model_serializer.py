@@ -3,7 +3,7 @@ from typing import List, Optional
 import pytest
 from pydantic import BaseModel, Field, create_model
 
-from fhircraft.fhir.resources.generator._annotations import AnnotationAssembler
+from fhircraft.fhir.resources.generator._annotations import AnnotationSerializer
 from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
 from fhircraft.fhir.resources.generator._imports import ImportTracker
 from fhircraft.fhir.resources.generator._serializer import ModelSerializer
@@ -16,7 +16,7 @@ def tracker():
 
 @pytest.fixture
 def resolver(tracker):
-    return AnnotationAssembler(tracker)
+    return AnnotationSerializer(tracker)
 
 
 @pytest.fixture
@@ -36,15 +36,20 @@ class TestModelClassification:
     def test_identifies_pydantic_subclass(self, serializer):
         class MyModel(BaseModel):
             pass
+
         # MyModel defined here is NOT from pydantic, so should be False
         assert serializer._is_builtin_pydantic_model(MyModel) is False
 
     def test_identifies_fhir_framework_model(self, serializer):
-        from fhircraft.fhir.resources.datatypes.R4.core.domain_resource import DomainResource
+        from fhircraft.fhir.resources.datatypes.R4.core.domain_resource import (
+            DomainResource,
+        )
+
         assert serializer._is_fhir_framework_model(DomainResource) is True
 
     def test_factory_model_is_not_framework(self, serializer):
         from fhircraft.fhir.resources.factory import FHIRModelFactory
+
         factory = FHIRModelFactory(fhir_release="R4B")
         sd = {
             "resourceType": "StructureDefinition",
@@ -85,6 +90,7 @@ class TestCleanArgument:
 
     def test_list_of_types(self, serializer, tracker):
         from pydantic import BaseModel
+
         result = serializer.clean_argument([BaseModel])
         assert result == ["BaseModel"]
         assert "BaseModel" in tracker.imports["pydantic"]
@@ -133,6 +139,7 @@ class TestSerialize:
 
     def test_field_annotation_string_captured(self, serializer):
         from fhircraft.fhir.resources.datatypes.R4B import primitive as p
+
         Model = create_model("PrimModel", code=(p.string, Field(description="code")))
         serializer.serialize(Model)
         ann = serializer.data[Model]["fields"]["code"]["annotation"]

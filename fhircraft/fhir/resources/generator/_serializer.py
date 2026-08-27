@@ -10,7 +10,7 @@ from typing_extensions import TypeAliasType
 
 from fhircraft.utils import get_module_name
 
-from ._annotations import AnnotationAssembler
+from ._annotations import AnnotationSerializer
 from ._constants import FACTORY_MODULE
 from ._defaults import DefaultExtractor
 from ._imports import ImportTracker
@@ -22,7 +22,7 @@ class ModelSerializer:
     def __init__(
         self,
         tracker: ImportTracker,
-        resolver: AnnotationAssembler,
+        resolver: AnnotationSerializer,
         extractor: DefaultExtractor,
     ) -> None:
         self._tracker = tracker
@@ -76,7 +76,9 @@ class ModelSerializer:
                 self._tracker.track_alias(primitive_module, "fhir")
             return
 
-        resolved_primitive_class = self._resolver.resolve_primitive_class_alias(annotation)
+        resolved_primitive_class = self._resolver.resolve_primitive_class_alias(
+            annotation
+        )
         if resolved_primitive_class is not None:
             primitive_module, _ = resolved_primitive_class
             self._tracker.track_alias(primitive_module, "fhir")
@@ -97,10 +99,9 @@ class ModelSerializer:
             is_factory_model = False
             if isinstance(type_obj, type):
                 try:
-                    is_factory_model = (
-                        get_module_name(type_obj) == FACTORY_MODULE
-                        and issubclass(type_obj, BaseModel)
-                    )
+                    is_factory_model = get_module_name(
+                        type_obj
+                    ) == FACTORY_MODULE and issubclass(type_obj, BaseModel)
                 except (TypeError, AttributeError):
                     pass
 
@@ -120,7 +121,9 @@ class ModelSerializer:
 
     def _add_constant_value_imports(self, instance: BaseModel) -> None:
         self.resolve_imports(instance.__class__)
-        for fieldname in sorted(instance.model_fields_set or instance.__class__.model_fields):
+        for fieldname in sorted(
+            instance.model_fields_set or instance.__class__.model_fields
+        ):
             value = getattr(instance, fieldname)
             if isinstance(value, BaseModel):
                 self._add_constant_value_imports(value)
@@ -137,7 +140,7 @@ class ModelSerializer:
         """Normalize a partial-function argument for source-code output."""
         if isinstance(arg, str):
             if "\n" in arg:
-                escaped = arg.replace("\\", "\\\\").replace('"""', r'\"\"\"')
+                escaped = arg.replace("\\", "\\\\").replace('"""', r"\"\"\"")
                 return f'"""{escaped}"""'
             escaped = arg.replace("\\", "\\\\").replace('"', '\\"')
             return f'"{escaped}"'
@@ -176,7 +179,9 @@ class ModelSerializer:
         for base in model.__bases__:
             if not base:
                 continue
-            if self._is_builtin_pydantic_model(base) or self._is_fhir_framework_model(base):
+            if self._is_builtin_pydantic_model(base) or self._is_fhir_framework_model(
+                base
+            ):
                 self._tracker.track_obj(base)
             elif base is not BaseModel:
                 self.serialize(base)
@@ -191,11 +196,20 @@ class ModelSerializer:
         if hasattr(model, "min_cardinality") or hasattr(model, "max_cardinality"):
             self._tracker.track_typing("ClassVar")
 
-        if (kind := getattr(model, "_kind", None)) and getattr(kind, "__class__", None) and kind.__class__.__name__ == "FHIRModelKind":
+        if (
+            (kind := getattr(model, "_kind", None))
+            and getattr(kind, "__class__", None)
+            and kind.__class__.__name__ == "FHIRModelKind"
+        ):
             from fhircraft.fhir.resources.base import FHIRModelKind as _FBMKind
+
             self._tracker.track_obj(_FBMKind)
 
-        self._data[model] = {"fields": fields, "properties": properties, "validators": validators}
+        self._data[model] = {
+            "fields": fields,
+            "properties": properties,
+            "validators": validators,
+        }
 
     def _extract_fields(self, model: type[BaseModel]) -> Dict:
         fields = {}
@@ -205,7 +219,8 @@ class ModelSerializer:
                 model.__base__
                 and field in model.__base__.model_fields
                 and all(
-                    getattr(info, slot) == getattr(model.__base__.model_fields[field], slot)
+                    getattr(info, slot)
+                    == getattr(model.__base__.model_fields[field], slot)
                     for slot in info.__slots__
                     if not slot.startswith("_")
                 )
@@ -217,7 +232,9 @@ class ModelSerializer:
             annotation_string = self._resolver.to_string(original_annotation)
 
             if "ForwardRef" in annotation_string:
-                annotation_string = re.sub(r"ForwardRef\('(\w+)'\)", r"'\1'", annotation_string)
+                annotation_string = re.sub(
+                    r"ForwardRef\('(\w+)'\)", r"'\1'", annotation_string
+                )
             elif "Literal" not in annotation_string:
                 annotation_string = re.sub(
                     rf"(?<!\.)(\b{model.__name__}\b)",
@@ -239,12 +256,16 @@ class ModelSerializer:
             elif info.default is not PydanticUndefined:
                 default = repr(info.default)
             elif info.default_factory is not None:
-                default_factory = self._extractor.extract_default_factory(info.default_factory)
+                default_factory = self._extractor.extract_default_factory(
+                    info.default_factory
+                )
 
             fields[field] = {
                 "annotation": annotation_string,
                 "title": str(info.title) if info.title is not None else None,
-                "description": str(info.description) if info.description is not None else None,
+                "description": (
+                    str(info.description) if info.description is not None else None
+                ),
                 "alias": info.alias,
                 "default": default,
                 "default_factory": default_factory,
@@ -265,7 +286,9 @@ class ModelSerializer:
 
         def _equivalent(a, b):
             if isinstance(a, functools.partial) and isinstance(b, functools.partial):
-                return a.func == b.func and a.args == b.args and a.keywords == b.keywords
+                return (
+                    a.func == b.func and a.args == b.args and a.keywords == b.keywords
+                )
             try:
                 return inspect.getsource(a) == inspect.getsource(b)
             except (OSError, TypeError):
@@ -285,7 +308,9 @@ class ModelSerializer:
                 properties[key] = {
                     "func": val.fget.func,
                     "args": [self.clean_argument(a) for a in val.fget.args],
-                    "keywords": {k: self.clean_argument(v) for k, v in val.fget.keywords.items()},
+                    "keywords": {
+                        k: self.clean_argument(v) for k, v in val.fget.keywords.items()
+                    },
                 }
         return properties
 
@@ -324,7 +349,11 @@ class ModelSerializer:
                     "info": validator.info,
                     "func": fn.func,
                     "args": [self.clean_argument(a) for a in fn.args],
-                    "keywords": {k: self.clean_argument(v) for k, v in fn.keywords.items()},
+                    "keywords": {
+                        k: self.clean_argument(v) for k, v in fn.keywords.items()
+                    },
                 }
-                self._tracker.track_pydantic("field_validator" if mode == "field" else "model_validator")
+                self._tracker.track_pydantic(
+                    "field_validator" if mode == "field" else "model_validator"
+                )
         return validators

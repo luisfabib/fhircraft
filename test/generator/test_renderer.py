@@ -33,14 +33,19 @@ class TestStripModulePrefixes:
 class TestCleanClassReprs:
     def test_replaces_class_repr(self, renderer):
         from pydantic import BaseModel
+
         code = "x: <class 'BaseModel'> = ..."
-        result = renderer._clean_class_reprs(code, imports={"pydantic": ["BaseModel"]}, data={})
+        result = renderer._clean_class_reprs(
+            code, imports={"pydantic": ["BaseModel"]}, data={}
+        )
         assert "<class 'BaseModel'>" not in result
         assert "BaseModel" in result
 
     def test_replaces_qualified_class_repr(self, renderer):
         code = "x: <class 'pydantic.main.BaseModel'> = ..."
-        result = renderer._clean_class_reprs(code, imports={"pydantic": ["BaseModel"]}, data={})
+        result = renderer._clean_class_reprs(
+            code, imports={"pydantic": ["BaseModel"]}, data={}
+        )
         assert "<class" not in result
 
     def test_replaces_builtin_repr(self, renderer):
@@ -52,6 +57,7 @@ class TestCleanClassReprs:
     def test_uses_data_model_names(self, renderer):
         class FakeModel:
             __name__ = "FakeModel"
+
         code = "<class 'FakeModel'>"
         result = renderer._clean_class_reprs(code, imports={}, data={FakeModel: {}})
         assert "FakeModel" in result
@@ -75,15 +81,18 @@ class TestCleanFactoryRefs:
 class TestRenderIntegration:
     def test_render_produces_valid_python(self, renderer):
         from pydantic import BaseModel, Field, create_model
-        Model = create_model("RenderTest", x=(int, Field(default=1, description="A value.")))
+
+        Model = create_model(
+            "RenderTest", x=(int, Field(default=1, description="A value."))
+        )
 
         from fhircraft.fhir.resources.generator._imports import ImportTracker
-        from fhircraft.fhir.resources.generator._annotations import AnnotationAssembler
+        from fhircraft.fhir.resources.generator._annotations import AnnotationSerializer
         from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
         from fhircraft.fhir.resources.generator._serializer import ModelSerializer
 
         tracker = ImportTracker()
-        resolver = AnnotationAssembler(tracker)
+        resolver = AnnotationSerializer(tracker)
         extractor = DefaultExtractor()
         serializer = ModelSerializer(tracker, resolver, extractor)
         serializer.serialize(Model)
@@ -108,18 +117,22 @@ class TestRenderIntegration:
             x=(int, Field(default=1)),
             __validators__={
                 "validate_x": field_validator("x")(
-                    classmethod(functools.partial(fhir_validators.validate_type, expected_types=[int]))
+                    classmethod(
+                        functools.partial(
+                            fhir_validators.validate_type, expected_types=[int]
+                        )
+                    )
                 )
             },
         )
 
         from fhircraft.fhir.resources.generator._imports import ImportTracker
-        from fhircraft.fhir.resources.generator._annotations import AnnotationAssembler
+        from fhircraft.fhir.resources.generator._annotations import AnnotationSerializer
         from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
         from fhircraft.fhir.resources.generator._serializer import ModelSerializer
 
         tracker = ImportTracker()
-        resolver = AnnotationAssembler(tracker)
+        resolver = AnnotationSerializer(tracker)
         extractor = DefaultExtractor()
         serializer = ModelSerializer(tracker, resolver, extractor)
         serializer.serialize(Model)
