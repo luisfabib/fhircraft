@@ -3,7 +3,7 @@ from typing import List, Optional
 import pytest
 from pydantic import BaseModel, Field, create_model
 
-from fhircraft.fhir.resources.generator._annotations import AnnotationResolver
+from fhircraft.fhir.resources.generator._annotations import AnnotationAssembler
 from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
 from fhircraft.fhir.resources.generator._imports import ImportTracker
 from fhircraft.fhir.resources.generator._serializer import ModelSerializer
@@ -16,7 +16,7 @@ def tracker():
 
 @pytest.fixture
 def resolver(tracker):
-    return AnnotationResolver(tracker)
+    return AnnotationAssembler(tracker)
 
 
 @pytest.fixture

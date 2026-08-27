@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from fhircraft.utils import ensure_list
 
-from ._annotations import AnnotationResolver
+from ._annotations import AnnotationAssembler
 from ._defaults import DefaultExtractor
 from ._imports import ImportTracker
 from ._renderer import CodeRenderer
@@ -24,7 +24,7 @@ class CodeGenerator:
 
     def __init__(self) -> None:
         self._tracker = ImportTracker()
-        self._resolver = AnnotationResolver(self._tracker)
+        self._resolver = AnnotationAssembler(self._tracker)
         self._extractor = DefaultExtractor()
         self._serializer = ModelSerializer(self._tracker, self._resolver, self._extractor)
         self._renderer = CodeRenderer()

@@ -4,7 +4,7 @@ from typing import Annotated, Any, Optional, Tuple, get_args, get_origin
 from ._imports import ImportTracker
 
 
-class AnnotationResolver:
+class AnnotationAssembler:
     """Converts type annotations to source-code strings for code generation."""
 
     def __init__(self, tracker: ImportTracker) -> None:
@@ -24,6 +24,7 @@ class AnnotationResolver:
         if idx < 1:
             return None
         return ".".join(parts[: idx + 1])
+
 
     def resolve_annotated_primitive(self, annotation: Any) -> Optional[Tuple[str, str]]:
         """Return (module, alias_name) if the annotation is a module-level Annotated primitive alias."""
@@ -97,10 +98,17 @@ class AnnotationResolver:
 
         # Non-primitive Annotated: unwrap and use the inner type
         if origin is Annotated:
-            return self.to_string(args[0]) if args else repr(annotation)
+            if args:
+                return self.to_string(args[0])
+            else:
+                module_path: str | None = self._tracker.get_shortest_public_path(annotation)
+                self._tracker.track(module_path, annotation.__name__)
+                return annotation.__name__
 
         if not args:
-            return repr(annotation)
+            module_path: str | None = self._tracker.get_shortest_public_path(annotation)
+            self._tracker.track(module_path, annotation.__name__)
+            return annotation.__name__
 
         def _has_annotated_or_primitive(ann: Any) -> bool:
             if get_origin(ann) is Annotated:
@@ -110,7 +118,9 @@ class AnnotationResolver:
             return any(_has_annotated_or_primitive(a) for a in get_args(ann))
 
         if not any(_has_annotated_or_primitive(a) for a in args):
-            return repr(annotation)
+            module_path: str | None = self._tracker.get_shortest_public_path(annotation)
+            self._tracker.track(module_path, annotation.__name__)
+            return annotation.__name__
 
         is_union = origin is Union or (
             hasattr(_types, "UnionType") and isinstance(annotation, _types.UnionType)
@@ -137,5 +147,7 @@ class AnnotationResolver:
                 self._tracker.track_typing(origin_name)
             parts = [self.to_string(a) for a in args]
             return f"{origin_name}[{', '.join(parts)}]"
-
-        return repr(annotation)
+        
+        module_path: str | None = self._tracker.get_shortest_public_path(annotation)
+        self._tracker.track(module_path, annotation.__name__)
+        return annotation.__name__

@@ -10,7 +10,7 @@ from typing_extensions import TypeAliasType
 
 from fhircraft.utils import get_module_name
 
-from ._annotations import AnnotationResolver
+from ._annotations import AnnotationAssembler
 from ._constants import FACTORY_MODULE
 from ._defaults import DefaultExtractor
 from ._imports import ImportTracker
@@ -22,7 +22,7 @@ class ModelSerializer:
     def __init__(
         self,
         tracker: ImportTracker,
-        resolver: AnnotationResolver,
+        resolver: AnnotationAssembler,
         extractor: DefaultExtractor,
     ) -> None:
         self._tracker = tracker

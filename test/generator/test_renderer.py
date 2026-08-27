@@ -78,12 +78,12 @@ class TestRenderIntegration:
         Model = create_model("RenderTest", x=(int, Field(default=1, description="A value.")))
 
         from fhircraft.fhir.resources.generator._imports import ImportTracker
-        from fhircraft.fhir.resources.generator._annotations import AnnotationResolver
+        from fhircraft.fhir.resources.generator._annotations import AnnotationAssembler
         from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
         from fhircraft.fhir.resources.generator._serializer import ModelSerializer
 
         tracker = ImportTracker()
-        resolver = AnnotationResolver(tracker)
+        resolver = AnnotationAssembler(tracker)
         extractor = DefaultExtractor()
         serializer = ModelSerializer(tracker, resolver, extractor)
         serializer.serialize(Model)
@@ -114,12 +114,12 @@ class TestRenderIntegration:
         )
 
         from fhircraft.fhir.resources.generator._imports import ImportTracker
-        from fhircraft.fhir.resources.generator._annotations import AnnotationResolver
+        from fhircraft.fhir.resources.generator._annotations import AnnotationAssembler
         from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
         from fhircraft.fhir.resources.generator._serializer import ModelSerializer
 
         tracker = ImportTracker()
-        resolver = AnnotationResolver(tracker)
+        resolver = AnnotationAssembler(tracker)
         extractor = DefaultExtractor()
         serializer = ModelSerializer(tracker, resolver, extractor)
         serializer.serialize(Model)

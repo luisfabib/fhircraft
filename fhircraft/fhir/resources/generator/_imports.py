@@ -1,6 +1,9 @@
 from collections import defaultdict
 from typing import Any, Dict, ForwardRef, List
 
+import sys
+import inspect
+
 from fhircraft.utils import get_module_name
 
 from ._constants import FACTORY_MODULE
@@ -26,6 +29,9 @@ class ImportTracker:
 
     def track(self, module: str, name: str) -> None:
         if module not in (FACTORY_MODULE, "builtins") and name not in self._imports[module]:
+            print(f"Tracking import: {name}")
+            print("Existing imports:", self._imports[module])
+
             self._imports[module].append(name)
 
     def track_obj(self, obj: Any) -> None:
@@ -72,3 +78,28 @@ class ImportTracker:
         for module in grouped:
             grouped[module] = sorted(set(grouped[module]))
         return grouped
+
+    def get_shortest_public_path(self, obj: object) -> str:
+        """Finds the shortest imported module path where this object is accessible."""
+        target = obj if inspect.isclass(obj) or inspect.isfunction(obj) else type(obj)
+        full_module = getattr(target, "__module__", "")
+        name = getattr(target, "__name__", "")
+        
+        if not full_module or not name:
+            return str(target)
+
+        top_pkg = full_module.split(".")[0]
+        candidate_modules = []
+
+        # Check loaded modules under the same top-level package
+        for mod_name, mod in sys.modules.items():
+            if (mod_name == top_pkg or mod_name.startswith(top_pkg + ".")) and mod:
+                if getattr(mod, name, None) is target:
+                    candidate_modules.append(mod_name)
+
+        # Sort by number of dots (depth) and string length
+        if candidate_modules:
+            shortest_mod = min(candidate_modules, key=lambda m: (m.count("."), len(m)))
+            return f"{shortest_mod}"
+
+        return f"{full_module}"
