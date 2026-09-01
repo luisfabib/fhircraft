@@ -2,6 +2,7 @@
 Base Builder class and utility functions for building Pydantic models from FHIR definitions.
 """
 
+import importlib
 import inspect
 from typing import (
     TYPE_CHECKING,
@@ -10,8 +11,8 @@ from typing import (
     List,
     Literal,
     Optional,
-    Annotated,
 )
+from typing_extensions import TypeAliasType
 
 from abc import ABC, abstractmethod
 from functools import partial
@@ -24,6 +25,7 @@ from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
 from pydantic_core import PydanticUndefined
 
+from fhircraft.fhir.resources.base.primitives import FHIRPrimitiveModel
 from fhircraft.fhir.resources.datatypes.registry import (
     get_fhir_type,
 )
@@ -81,6 +83,7 @@ FHIRPATH_TYPE_MAPPING: dict[str, type] = {
 }
 
 _Unset: Any = PydanticUndefined
+Type = type
 
 
 @dataclass
@@ -94,6 +97,9 @@ class TypeInformation:
 
     kind: str
     """The kind of FHIR type (e.g., "primitive", "complex", "resource"). """
+
+    alias: TypeAliasType | None = None
+    """The alias for the resolved Python type. """
 
 
 @dataclass
@@ -401,6 +407,7 @@ class Builder(ABC):
                 impossible to resolve the type for the given FHIR release.
         """
 
+        fhir_type: Type[Any]
         fhir_release = type._fhir_release
         # Normalise the identifier: strip well-known URL prefixes
         if not type.code:
@@ -432,9 +439,19 @@ class Builder(ABC):
             if inspect.isclass(fhir_type) and issubclass(fhir_type, FHIRBaseModel)
             else "primitive-type"
         )
+
+        fhir_type_alias = None
+        if issubclass(fhir_type, FHIRPrimitiveModel):
+            type_code = type_code[0].lower() + type_code[1:]
+            mod = importlib.import_module(fhir_type.__module__)
+            fhir_type_alias = getattr(mod, f"{type_code}_", None) or getattr(
+                mod, type_code
+            )
+
         return TypeInformation(
             type=fhir_type,
             kind=kind,
+            alias=fhir_type_alias,
         )
 
     def build_field_validators(

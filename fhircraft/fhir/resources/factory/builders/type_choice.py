@@ -41,12 +41,11 @@ class TypeChoiceFieldBuilder(Builder):
         children = index.get_children(node.id)
         if isinstance(children, list) and children:
             subtree = index.get_subtree(node.id)
-            for field_type_info in field_type_infos:
-                original_type = field_type_info.type
+            for type_info in field_type_infos:
                 type_name = (
-                    original_type
-                    if isinstance(original_type, str)
-                    else original_type.__name__
+                    type_info.type
+                    if isinstance(type_info.type, str)
+                    else type_info.type.__name__
                 )
                 sub_model_name = (
                     f"{self.context.resource_name}{capitalize(base_name)}{type_name}"
@@ -57,20 +56,21 @@ class TypeChoiceFieldBuilder(Builder):
                     resource_name=sub_model_name,
                 )
                 sub_models[type_name] = assembler.assemble(
-                    sub_model_name, base=(original_type,)
+                    sub_model_name, base=(type_info.type,)
                 )
 
         for field_type_info in field_type_infos:
-            original_type = field_type_info.type
             type_name = (
-                original_type
-                if isinstance(original_type, str)
-                else original_type.__name__
+                field_type_info.type
+                if isinstance(field_type_info.type, str)
+                else field_type_info.type.__name__
             )
             # Use the sub-model as the actual field type when children are present;
             # the field name always uses the original (base) type name so that the
             # type-choice validator keeps working.
-            field_type = sub_models.get(type_name, original_type)
+            field_type = sub_models.get(
+                type_name, field_type_info.alias or field_type_info.type
+            )
 
             typed_name = f"{base_name}{type_name}"
             safe_name, validation_alias = self.handle_python_keyword(typed_name)

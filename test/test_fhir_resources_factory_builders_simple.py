@@ -225,14 +225,11 @@ def test_build__array_required_annotation_is_list(builder: Builder, index):
 
 
 def test_build__two_types_annotation_contains_both_types(builder: Builder, index):
-    node = make_node("name", type_codes=["Quantity", "string"])
+    node = make_node("name", type_codes=["Quantity", "string"], min_cardinality=1)
     build = builder.build(node, index)
-    inner = get_args(build.fields[0].annotation)  # unwrap Optional
-    union_args = set()
-    for arg in inner:
-        union_args.update(get_args(arg) or [arg])
-    assert r4_complex.Quantity in union_args
-    assert r4_primitives.String in union_args
+    union_args = get_args(build.fields[0].annotation)
+    assert r4_complex.Quantity == union_args[0]
+    assert r4_primitives.string == union_args[1]
 
 
 def test_build__validators_list_populated_from_build_field_validators(
@@ -247,6 +244,14 @@ def test_build__no_validators_when_nothing_set(builder: Builder, index):
     node = make_node("status", type_codes=["code"])
     build = builder.build(node, index)
     assert build.validators == []
+
+
+def test_build__primitives_use_aliased_annotation(builder: Builder, index):
+    node = make_node("status", type_codes=["code"])
+    build = builder.build(node, index)
+    field = build.fields[0]
+    assert field.name == "status"
+    assert field.annotation == Optional[r4_primitives.code]
 
 
 def test_build__fixed_value_produces_validator(builder: Builder, index):

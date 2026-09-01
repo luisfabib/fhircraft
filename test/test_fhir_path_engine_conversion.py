@@ -599,7 +599,6 @@ todatetime_cases = (
 def test_todatetime_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDateTime().evaluate(collection, env)
-    print(result[0].value, expected)
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 

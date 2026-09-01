@@ -13,7 +13,6 @@ from fhircraft.fhir.resources.factory.builders.base import (
 from fhircraft.fhir.resources.factory.builders.type_choice import TypeChoiceFieldBuilder
 from fhircraft.exceptions import FactoryTypeResolutionError
 
-
 # ---------------------------------------------------------------------------
 # Helpers & fixtures
 # ---------------------------------------------------------------------------
@@ -137,6 +136,8 @@ def test_build__single_type_produces_one_field(builder, index):
     node = make_node("value", type_codes=["Quantity"])
     result = builder.build(node, index)
     assert len(result.fields) == 1
+    assert result.fields[0].name == "valueQuantity"
+    assert result.fields[0].annotation == Optional[r4_complex.Quantity]
 
 
 def test_build__two_types_produce_two_fields(builder, index):
@@ -144,12 +145,22 @@ def test_build__two_types_produce_two_fields(builder, index):
     result = builder.build(node, index)
     # Two typed fields (no primitives, no placeholders)
     assert len(result.fields) == 2
+    assert result.fields[0].name == "valueCoding"
+    assert result.fields[0].annotation == Optional[r4_complex.Coding]
+    assert result.fields[1].name == "valueQuantity"
+    assert result.fields[1].annotation == Optional[r4_complex.Quantity]
 
 
 def test_build__three_types_produce_three_fields(builder, index):
     node = make_node("value", type_codes=["string", "Quantity", "CodeableConcept"])
     result = builder.build(node, index)
     assert len(result.fields) == 3
+    assert result.fields[0].name == "valueString"
+    assert result.fields[0].annotation == Optional[primitives.string]
+    assert result.fields[1].name == "valueQuantity"
+    assert result.fields[1].annotation == Optional[r4_complex.Quantity]
+    assert result.fields[2].name == "valueCodeableConcept"
+    assert result.fields[2].annotation == Optional[r4_complex.CodeableConcept]
 
 
 def test_build__field_name_is_base_plus_type_name(builder, index):
