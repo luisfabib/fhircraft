@@ -237,40 +237,45 @@ def test_resolve_type__raises_when_code_is_empty_string(builder: Builder):
 
 
 FHIR_PRIMITIVE_CODES = [
-    ("string", primitive.String),
-    ("integer", primitive.Integer),
-    ("positiveInt", primitive.PositiveInt),
-    ("boolean", primitive.Boolean),
-    ("decimal", primitive.Decimal),
-    ("date", primitive.Date),
-    ("dateTime", primitive.DateTime),
-    ("time", primitive.Time),
-    ("code", primitive.Code),
-    ("id", primitive.Id),
-    ("uri", primitive.Uri),
-    ("canonical", primitive.Canonical),
+    ("string", primitive.String, primitive.string),
+    ("integer", primitive.Integer, primitive.integer),
+    ("positiveInt", primitive.PositiveInt, primitive.positiveInt),
+    ("boolean", primitive.Boolean, primitive.boolean),
+    ("decimal", primitive.Decimal, primitive.decimal),
+    ("date", primitive.Date, primitive.date_),
+    ("dateTime", primitive.DateTime, primitive.dateTime),
+    ("time", primitive.Time, primitive.time_),
+    ("code", primitive.Code, primitive.code),
+    ("id", primitive.Id, primitive.id_),
+    ("uri", primitive.Uri, primitive.uri),
+    ("url", primitive.Url, primitive.url),
+    ("canonical", primitive.Canonical, primitive.canonical),
 ]
 
 
 @pytest.mark.parametrize(
-    "code, expected",
+    "code, expected_type, expected_alias",
     FHIR_PRIMITIVE_CODES,
 )
-def test_resolve_type__primitive(builder: Builder, code, expected):
+def test_resolve_type__primitive(builder: Builder, code, expected_type, expected_alias):
     # Simulate a primitive: not a subclass of FHIRBaseModel
     info = builder.resolve_type(make_type(code=code))
     assert info.kind == "primitive-type"
-    assert info.type is expected
+    assert info.type is expected_type
+    assert info.alias is expected_alias
 
 
 @pytest.mark.parametrize(
-    "code, expected",
+    "code, expected_type, expected_alias",
     FHIR_PRIMITIVE_CODES,
 )
-def test_resolve_type__primitive_absolute_url(builder: Builder, code, expected):
+def test_resolve_type__primitive_absolute_url(
+    builder: Builder, code, expected_type, expected_alias
+):
     info = builder.resolve_type(make_type(code=f"{FHIR_SD_PREFIX}{code}"))
     assert info.kind == "primitive-type"
-    assert info.type is expected
+    assert info.type is expected_type
+    assert info.alias is expected_alias
 
 
 FHIRPATH_CODES = [

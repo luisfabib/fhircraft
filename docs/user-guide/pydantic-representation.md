@@ -189,7 +189,7 @@ class MyResource(FHIRBaseModel):
     active: Optional[fhir.boolean] = Field(default=None)
 
     # Cardinality 1..1  →  Required, no default
-    status: code = Field(description="active | inactive")
+    status: fhir.code = Field(description="active | inactive")
 
     # Cardinality 0..*  →  Optional list, defaults to None
     note: Optional[List[fhir.string]] = Field(default=None)

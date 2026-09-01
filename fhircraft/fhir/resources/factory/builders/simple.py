@@ -39,11 +39,10 @@ class SimpleFieldBuilder(Builder):
                 f"Element '{node.path}' has no types that could be resolved"
             )
 
-        # Union when multiple types
         field_type: Any = (
-            Union[tuple([subtype.type for subtype in field_types])]
+            Union[tuple([subtype.alias or subtype.type for subtype in field_types])]
             if len(field_types) > 1
-            else field_types[0].type
+            else (field_types[0].alias or field_types[0].type)
         )
 
         # Build the field information
