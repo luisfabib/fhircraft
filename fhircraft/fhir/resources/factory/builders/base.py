@@ -11,9 +11,8 @@ from typing import (
     List,
     Literal,
     Optional,
-    Annotated,
-    TypeAliasType,
 )
+from typing_extensions import TypeAliasType
 
 from abc import ABC, abstractmethod
 from functools import partial
