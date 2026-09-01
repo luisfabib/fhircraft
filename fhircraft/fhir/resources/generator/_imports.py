@@ -4,9 +4,8 @@ from typing import Any, Dict, ForwardRef, List
 import sys
 import inspect
 
+from fhircraft.fhir.resources.factory.core import FHIRModelFactory
 from fhircraft.utils import get_module_name
-
-from ._constants import FACTORY_MODULE
 
 
 class ImportTracker:
@@ -29,20 +28,10 @@ class ImportTracker:
 
     def track(self, module: str, name: str) -> None:
         if (
-            module not in (FACTORY_MODULE, "builtins")
+            module not in (get_module_name(FHIRModelFactory), "builtins")
             and name not in self._imports[module]
         ):
             self._imports[module].append(name)
-
-    def track_obj(self, obj: Any) -> None:
-        """Add an object's module and name to imports; silently skips ForwardRefs."""
-        if isinstance(obj, ForwardRef):
-            return
-        module_name = get_module_name(obj)
-        if (object_name := getattr(obj, "__name__", None)) is None:
-            if (object_name := getattr(obj, "_name", None)) is None:
-                raise ValueError(f"Could not determine object name for import: {obj}")
-        self.track(module_name, object_name)
 
     def track_alias(self, module: str, alias: str) -> bool:
         """Register `import module as alias`; returns False if alias is already claimed by another module."""

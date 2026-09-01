@@ -1,4 +1,4 @@
-from ._generator import CodeGenerator
+from .core import CodeGenerator
 
 __all__ = ["CodeGenerator", "generate_code"]
 

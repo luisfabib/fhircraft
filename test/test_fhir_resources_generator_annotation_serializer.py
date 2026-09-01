@@ -1,10 +1,11 @@
 # Test module AnnotationSerializer
 
-from typing import Annotated, List, Optional, Union
+from typing import Annotated, Dict, List, Literal, Optional, Sequence, Union, ForwardRef
 from datetime import datetime
 
 import pytest
 
+from pydantic import BaseModel, Field
 from fhircraft.fhir.resources.datatypes import R5 as fhir
 
 from fhircraft.fhir.resources.generator._annotations import AnnotationSerializer
@@ -34,6 +35,22 @@ def test_serialize__none_type(serializer, tracker):
 def test_serialize__builtin_type(serializer, tracker):
     assert serializer.serialize(str) == "str"
     assert len(tracker.imports) == 0, "No imports should be tracked for builtin type"
+
+
+def test_serialize__dependency_type(serializer, tracker):
+    assert serializer.serialize(BaseModel) == "BaseModel"
+    assert len(tracker.imports) == 1
+    assert "pydantic" in tracker.imports
+    assert "BaseModel" in tracker.imports["pydantic"]
+
+
+def test_serialize__optional_dependency_type(serializer, tracker):
+    assert serializer.serialize(BaseModel | None) == "Optional[BaseModel]"
+    assert len(tracker.imports) == 2
+    assert "pydantic" in tracker.imports
+    assert "BaseModel" in tracker.imports["pydantic"]
+    assert "typing" in tracker.imports
+    assert "Optional" in tracker.imports["typing"]
 
 
 def test_serialize__builtin_type_optional(serializer, tracker):
@@ -257,11 +274,130 @@ def test_serialize__union_with_none_alt(serializer, tracker):
     assert "Union" in tracker.imports["typing"]
 
 
-def test_serialize__deeply_nested_annotation(serializer, tracker):
+def test_serialize__annotated_metadata_simple(serializer, tracker):
+    result = serializer.serialize(Annotated[str, "some metadata"])
+    assert result == "Annotated[str, 'some metadata']"
+    assert "typing" in tracker.imports
+    assert "Annotated" in tracker.imports["typing"]
+
+
+def test_serialize__annotated_metadata_multiple(serializer, tracker):
+    result = serializer.serialize(Annotated[str, "some metadata", 123])
+    assert result == "Annotated[str, 'some metadata', 123]"
+    assert "typing" in tracker.imports
+    assert "Annotated" in tracker.imports["typing"]
+
+
+def test_serialize__annotated_metadata_field(serializer, tracker):
+    result = serializer.serialize(Annotated[str, Field(description="A string field")])
+    assert result == "Annotated[str, Field(description='A string field')]"
+    assert "typing" in tracker.imports
+    assert "Annotated" in tracker.imports["typing"]
+    assert "pydantic" in tracker.imports
+    assert "Field" in tracker.imports["pydantic"]
+
+
+def test_serialize__forward_ref_as_delimited_string(serializer, tracker):
+    result = serializer.serialize(ForwardRef("fhir.Coding"))
+    assert result == '"fhir.Coding"'
+    assert len(tracker.imports) == 0, "No imports should be tracked for ForwardRef"
+
+
+def test_serialize__optional_forward_ref_as_delimited_string(serializer, tracker):
+    result = serializer.serialize(ForwardRef("fhir.Coding") | None)
+    assert result == 'Optional["fhir.Coding"]'
+    assert "typing" in tracker.imports
+    assert "Optional" in tracker.imports["typing"]
+
+
+def test_serialize__builtins_list_annotation(serializer, tracker):
+    result = serializer.serialize(list[fhir.Coding])
+    assert result == "List[fhir.Coding]"
+    assert "typing" in tracker.imports
+    assert "List" in tracker.imports["typing"]
+    assert "fhir" in tracker.alias_imports.values()
+    assert "fhircraft.fhir.resources.datatypes.R5" in tracker.alias_imports.keys()
+
+
+def test_serialize__builtins_dict_annotation(serializer, tracker):
+    result = serializer.serialize(dict[str, fhir.Coding])
+    assert result == "Dict[str, fhir.Coding]"
+    assert "typing" in tracker.imports
+    assert "Dict" in tracker.imports["typing"]
+    assert "fhir" in tracker.alias_imports.values()
+    assert "fhircraft.fhir.resources.datatypes.R5" in tracker.alias_imports.keys()
+
+
+def test_serialize__builtins_set_annotation(serializer, tracker):
+    result = serializer.serialize(set[fhir.Coding])
+    assert result == "Set[fhir.Coding]"
+    assert "typing" in tracker.imports
+    assert "Set" in tracker.imports["typing"]
+    assert "fhir" in tracker.alias_imports.values()
+    assert "fhircraft.fhir.resources.datatypes.R5" in tracker.alias_imports.keys()
+
+
+def test_serialize__builtins_tuple_annotation(serializer, tracker):
+    result = serializer.serialize(tuple[fhir.Coding])
+    assert result == "Tuple[fhir.Coding]"
+    assert "typing" in tracker.imports
+    assert "Tuple" in tracker.imports["typing"]
+    assert "fhir" in tracker.alias_imports.values()
+    assert "fhircraft.fhir.resources.datatypes.R5" in tracker.alias_imports.keys()
+
+
+def test_serialize__dict_annotation(serializer, tracker):
+    result = serializer.serialize(Dict[str, fhir.Coding])
+    assert result == "Dict[str, fhir.Coding]"
+    assert "typing" in tracker.imports
+    assert "Dict" in tracker.imports["typing"]
+    assert "fhir" in tracker.alias_imports.values()
+    assert "fhircraft.fhir.resources.datatypes.R5" in tracker.alias_imports.keys()
+
+
+def test_serialize__literal_annotation(serializer, tracker):
+    result = serializer.serialize(Literal["test1", "test2", "test3"])
+    assert result == 'Literal["test1", "test2", "test3"]'
+    assert "typing" in tracker.imports
+    assert "Literal" in tracker.imports["typing"]
+
+
+def test_serialize__annotated_union_metadata_union_mode(serializer, tracker):
     result = serializer.serialize(
-        Optional[List[Union[fhir.string, List[fhir.integer], None]]]
+        Annotated[
+            Union[fhir.Coding, fhir.CodeableConcept], Field(union_mode="left_to_right")
+        ]
     )
-    assert result == "Optional[List[Optional[Union[fhir.string, List[fhir.integer]]]]]"
+    assert (
+        result
+        == "Annotated[Union[fhir.Coding, fhir.CodeableConcept], Field(union_mode='left_to_right')]"
+    )
+    assert "typing" in tracker.imports
+    assert "Annotated" in tracker.imports["typing"]
+    assert "pydantic" in tracker.imports
+    assert "Field" in tracker.imports["pydantic"]
+
+
+def test_serialize__deeply_nested(serializer, tracker):
+    result = serializer.serialize(
+        Optional[
+            List[
+                Union[
+                    fhir.string,
+                    List[fhir.integer],
+                    None,
+                    Annotated[
+                        Union[fhir.Coding, fhir.CodeableConcept],
+                        Field(union_mode="left_to_right"),
+                    ],
+                ]
+            ]
+        ]
+    )
+    assert (
+        result
+        == "Optional[List[Optional[Union[fhir.string, List[fhir.integer], Annotated[Union[fhir.Coding, fhir.CodeableConcept], Field(union_mode='left_to_right')]]]]]"
+    )
 
     assert "fhir" in tracker.alias_imports.values()
     assert "fhircraft.fhir.resources.datatypes.R5" in tracker.alias_imports.keys()
@@ -270,19 +406,7 @@ def test_serialize__deeply_nested_annotation(serializer, tracker):
     assert "Optional" in tracker.imports["typing"]
     assert "List" in tracker.imports["typing"]
     assert "Union" in tracker.imports["typing"]
-
-
-def test_serialize__annotated_non_primitive_unwraps(serializer):
-    from pydantic import BaseModel
-
-    inner = BaseModel
-    ann = Annotated[inner, "some metadata"]
-    result = serializer.serialize(ann)
-    assert "BaseModel" in result
-
-
-def test_serialize__registers_fhir_alias_import(serializer, tracker):
-    from fhircraft.fhir.resources.datatypes.R4B import primitive as p
-
-    serializer.serialize(p.boolean)
-    assert any("fhir" in v for v in tracker.alias_imports.values())
+    assert "Union" in tracker.imports["typing"]
+    assert "Annotated" in tracker.imports["typing"]
+    assert "pydantic" in tracker.imports
+    assert "Field" in tracker.imports["pydantic"]

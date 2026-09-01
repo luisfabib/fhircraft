@@ -1,0 +1,112 @@
+{#- Jinja2 macros for rendering individual parts of a generated model class. -#}
+{#- Import into resource_template.py.j2 via: {% from "_macros.py.j2" import ... %} -#}
+
+{% macro render_field(field) -%}
+{{ field.name }}: {{ field.annotation }} = Field(
+    {% for k, v in field.arguments.items() %}
+    {{ k }}={{ v }},
+    {% endfor %}
+)
+{%- endmacro %}
+
+
+{% macro render_partial_function(fixed_args, func) -%}
+{{ func.name }}({{ fixed_args }},
+        {% for arg in func.arguments %}
+        {{ arg }},
+        {% endfor %}
+        {% for k, v in func.keywords.items() %}
+        {{ k }}={{ v }},
+        {% endfor %}
+    )
+{%- endmacro %}
+
+
+{% macro render_property(prop) -%}
+{% if prop.source %}
+{{ prop.source }}
+{% elif prop.partial %}
+@property
+def {{ prop.name }}(self):
+    return {{ render_partial_function("self", prop.partial) }}
+{% endif %}
+{%- endmacro %}
+
+
+{% macro render_field_validator(validator) -%}
+{% if validator.source %}
+{{ validator.source }}
+{% elif validator.partial %}
+@field_validator(*{{ validator.fields }}, mode="{{ validator.mode }}", check_fields={{ validator.check_fields }})
+@classmethod
+def {{ validator.name }}(cls, value):
+    return {{ render_partial_function("cls, value", validator.partial) }}
+{% endif %}
+
+{%- endmacro %}
+
+
+{% macro render_model_validator(validator) -%}
+{% if validator.source %}
+{{ validator.source }}
+{% elif validator.partial %}
+@model_validator(mode="{{ validator.mode }}")
+def {{ validator.name }}(self):
+    return {{ render_partial_function("self", validator.partial) }}
+{% endif %}
+
+{%- endmacro %}
+
+
+{% macro render_class(model, include_validators) -%}
+class {{ model.name }}({% for base in model.bases %}{{ base }}{% if not loop.last %}, {% endif %}{% endfor %}):
+    {% if model.docstring %}
+    """
+    {{ model.docstring }}
+    """
+    {% endif %}
+    {% if model.min_cardinality is not none %}
+    min_cardinality: ClassVar[int] = {{ model.min_cardinality }}
+    {% endif %}
+    {% if model.max_cardinality is not none %}
+    max_cardinality: ClassVar[int | None] = {{ model.max_cardinality }}
+    {% endif %}
+
+    {% if model.fhir_release %}
+    _fhir_release = {{ model.fhir_release }}
+    {% endif %}
+    {% if model.type %}
+    _type = {{ model.type }}
+    {% endif %}
+    {% if model.kind %}
+    _kind = {{ model.kind }}
+    {% endif %}
+    {% if model.abstract is not none %}
+    _abstract = {{ model.abstract }}
+    {% endif %}
+    {% if model.canonical_url %}
+    _canonical_url = {{ model.canonical_url }}
+    {% endif %}
+
+    {% for field, info in model.fields.items() %}
+    {{ render_field(field, info) }}
+    {% else %}
+    pass
+    {% endfor %}
+
+    {% for name, prop in model.properties.items() %}
+    {{ render_property(name, prop) }}
+
+    {% endfor %}
+    {% if include_validators %}
+    {% for validator in model.field_validators %}
+    {{ render_field_validator(validator) }}
+
+    {% endfor %}
+    {% for validator in model.model_validators %}
+    {{ render_model_validator(validator) }}
+
+    {% endfor %}
+
+    {% endif %}
+{%- endmacro %}

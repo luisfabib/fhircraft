@@ -4,14 +4,20 @@ from typing import (
     Annotated,
     Any,
     Dict,
+    FrozenSet,
     List,
     Optional,
     Set,
     Tuple,
+    ForwardRef,
     Union,
     get_args,
     get_origin,
 )
+
+from pydantic_core import PydanticUndefined
+
+from fhircraft.fhir.mapper.engine import target
 
 from ._imports import ImportTracker
 
@@ -21,11 +27,11 @@ class AnnotationSerializer:
 
     # Standard typing generics mapping for Python 3.9+ built-in origins (e.g. list -> List)
     _GENERIC_MAP = {
-        list: "List",
-        dict: "Dict",
-        set: "Set",
-        tuple: "Tuple",
-        frozenset: "FrozenSet",
+        list: List,
+        dict: Dict,
+        set: Set,
+        tuple: Tuple,
+        frozenset: FrozenSet,
     }
 
     def __init__(self, tracker: ImportTracker) -> None:
@@ -35,6 +41,9 @@ class AnnotationSerializer:
         """Entry point to convert any type annotation into a source-code string."""
         if annotation is None or annotation is type(None):
             return "None"
+
+        if type(annotation) is ForwardRef:
+            return f'"{annotation.__forward_arg__}"'
 
         # 1. Handle Annotated types (extract inner type or resolve FHIR primitive metadata)
         origin = get_origin(annotation)
@@ -52,12 +61,13 @@ class AnnotationSerializer:
 
         # 4. Handle Generics & Compound Types recursively (Union, Optional, List, Dict, etc.)
         args = get_args(annotation)
+
         if origin and args:
             return self._handle_generic(origin, args, annotation)
 
-        # 5. Handle Typing special forms or forward references / string instances
+        # 5. Handle string instances
         if isinstance(annotation, str):
-            return repr(annotation)
+            return f'"{annotation}"'
 
         name = getattr(annotation, "__name__", str(annotation))
         module_path = self._tracker.get_shortest_public_path(annotation)
@@ -70,18 +80,78 @@ class AnnotationSerializer:
     # ------------------------------------------------------------------
 
     def _handle_annotated(self, annotation: Any) -> str:
-        """Unwrap Annotated[...] metadata or resolve it if it's a FHIR primitive alias."""
-        # First attempt to resolve primitive alias metadata
+        """Process Annotated[T, metadata_1, metadata_2, ...]."""
+        # Check if this Annotated instance is a special FHIR primitive alias
         resolved = self._resolve_annotated_primitive(annotation)
         if resolved:
             return resolved
 
-        # Otherwise unwrap to the primary underlying type
         args = get_args(annotation)
-        if args:
-            return self.serialize(args[0])
+        if not args:
+            return self._handle_concrete_type(annotation)
 
-        return self._handle_concrete_type(annotation)
+        target_type = args[0]
+        metadata_items = args[1:]
+
+        # Process the inner target type recursively
+        type_str = self.serialize(target_type)
+
+        if not metadata_items:
+            return type_str
+
+        # Serialize all metadata arguments (e.g. FieldInfo or raw strings/objects)
+        serialized_metadata = [
+            self._serialize_metadata(item) for item in metadata_items
+        ]
+
+        self._tracker.track_typing("Annotated")
+        return f"Annotated[{type_str}, {', '.join(serialized_metadata)}]"
+
+    def _serialize_metadata(self, item: Any) -> str:
+        """Serializes metadata objects inside Annotated[...] (strings, types, or Pydantic FieldInfo)."""
+        if isinstance(item, str):
+            return repr(item)
+
+        item_type = type(item)
+
+        # Handle Pydantic v2 FieldInfo dynamically
+        if item_type.__name__ == "FieldInfo":
+            self._tracker.track("pydantic", "Field")
+
+            kwargs: list[str] = []
+
+            # Exctract direct Field attributes explicitly set (e.g. description, alias, default)
+            for attr in getattr(item, "_attributes_set", set()):
+                val = getattr(item, attr, PydanticUndefined)
+                if val is not PydanticUndefined:
+                    serialized_val = (
+                        self.serialize(val) if isinstance(val, type) else repr(val)
+                    )
+                    kwargs.append(f"{attr}={serialized_val}")
+
+            # Extract constraints stored inside item.metadata (e.g. union_mode, gt, lt, pattern)
+            for meta in getattr(item, "metadata", []):
+                # Handle internal Pydantic metadata containers like _PydanticGeneralMetadata
+                for attr in dir(meta):
+                    if (
+                        not attr.startswith("_")
+                        and (value := getattr(meta, attr)) is not PydanticUndefined
+                    ):
+                        # Avoid duplicate keys if already extracted from _attributes_set
+                        if not any(kw.startswith(f"{attr}=") for kw in kwargs):
+                            serialized_val = (
+                                self.serialize(value)
+                                if isinstance(value, type)
+                                else repr(value)
+                            )
+                            kwargs.append(f"{attr}={serialized_val}")
+
+            return f"Field({', '.join(kwargs)})"
+
+        if isinstance(item, type):
+            return self._handle_concrete_type(item)
+
+        return repr(item)
 
     def _handle_concrete_type(self, cls: type) -> str:
         """Format concrete types (str, int, custom models, Pydantic models)."""
@@ -108,25 +178,25 @@ class AnnotationSerializer:
             serialized_args = [self.serialize(a) for a in non_none]
 
             if has_none:
-                self._tracker.track_typing("Optional")
+                self._tracker.track("typing", "Optional")
                 if len(serialized_args) == 1:
                     return f"Optional[{serialized_args[0]}]"
 
-                self._tracker.track_typing("Union")
+                self._tracker.track("typing", "Union")
                 return f"Optional[Union[{', '.join(serialized_args)}]]"
 
-            self._tracker.track_typing("Union")
+            self._tracker.track("typing", "Union")
             return f"Union[{', '.join(serialized_args)}]"
 
-        # --- Handle Container Generics (List, Dict, Tuple, Set, etc.) ---
-        origin_name = self._GENERIC_MAP.get(
-            origin, getattr(origin, "__name__", None) or getattr(origin, "_name", None)
+        # Handle Container Generics (List, Dict, Tuple, Set, etc.)
+        origin = self._GENERIC_MAP.get(origin, origin)
+        origin_name = getattr(origin, "__name__", None) or getattr(
+            origin, "_name", None
         )
-
         if origin_name:
-            if origin_name in ("List", "Dict", "Set", "Tuple", "FrozenSet"):
-                self._tracker.track_typing(origin_name)
-
+            module_path: str | None = self._tracker.get_shortest_public_path(origin)
+            if module_path:
+                self._tracker.track(module_path, origin_name)
             serialized_args = [self.serialize(a) for a in args]
             return f"{origin_name}[{', '.join(serialized_args)}]"
 

@@ -1,7 +1,6 @@
 import pytest
 
 from fhircraft.fhir.resources.generator._renderer import CodeRenderer
-from fhircraft.fhir.resources.generator._constants import FACTORY_MODULE
 
 
 @pytest.fixture
@@ -89,7 +88,7 @@ class TestRenderIntegration:
         from fhircraft.fhir.resources.generator._imports import ImportTracker
         from fhircraft.fhir.resources.generator._annotations import AnnotationSerializer
         from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
-        from fhircraft.fhir.resources.generator._serializer import ModelSerializer
+        from fhircraft.fhir.resources.generator._model import ModelSerializer
 
         tracker = ImportTracker()
         resolver = AnnotationSerializer(tracker)
@@ -129,7 +128,7 @@ class TestRenderIntegration:
         from fhircraft.fhir.resources.generator._imports import ImportTracker
         from fhircraft.fhir.resources.generator._annotations import AnnotationSerializer
         from fhircraft.fhir.resources.generator._defaults import DefaultExtractor
-        from fhircraft.fhir.resources.generator._serializer import ModelSerializer
+        from fhircraft.fhir.resources.generator._model import ModelSerializer
 
         tracker = ImportTracker()
         resolver = AnnotationSerializer(tracker)

@@ -74,15 +74,18 @@ class MapperException(FhircraftException):
     def __init__(self, message: str, component: str = "mapper"):
         super().__init__(message, component=component)
 
+
 class MapperWarning(FhircraftWarning):
     """Warning raised for non-critical issues encountered during mapping operations."""
 
     pass
 
+
 class MapperLexingError(MapperException):
     """Raised when FHIR Mapping Language parsing fails."""
 
     pass
+
 
 class MapperParsingError(MapperException):
     """Raised when FHIR Mapping Language syntax or parsing fails."""
@@ -288,6 +291,12 @@ class FactoryWarning(FhircraftWarning):
     pass
 
 
+class GeneratorWarning(FhircraftWarning):
+    """Warning raised for non-critical issues encountered during generator operations."""
+
+    pass
+
+
 # ============================================================================
 # Package Exceptions
 # ============================================================================
@@ -316,6 +325,7 @@ class PackageValidationError(PackageException):
     """Raised when package validation fails."""
 
     pass
+
 
 class PackageValidationWarning(FhircraftWarning):
     """Warning raised for non-critical issues encountered during package validation."""

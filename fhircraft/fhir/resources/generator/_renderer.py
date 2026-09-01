@@ -7,15 +7,16 @@ from typing import Any, Dict, List
 from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel
 
-from ._constants import FACTORY_MODULE, LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE
+TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 
 
 class CodeRenderer:
     """Renders serialized model data to a Python source-code string via Jinja2."""
 
     def __init__(self) -> None:
-        templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
-        env = Environment(loader=FileSystemLoader(templates_dir), trim_blocks=True, lstrip_blocks=True)
+        env = Environment(
+            loader=FileSystemLoader(TEMPLATES_DIR), trim_blocks=True, lstrip_blocks=True
+        )
         env.filters["escapequotes"] = lambda s: s.replace('"', '\\"')
         env.globals["ismodel"] = lambda obj: isinstance(obj, BaseModel)
         self._template = env.get_template("resource_template.py.j2")
@@ -53,14 +54,20 @@ class CodeRenderer:
         """Remove `module.` prefixes for all objects that are imported at the top."""
         for module, objects in imports.items():
             module_escaped = re.escape(module)
-            for match in re.finditer(rf"({module_escaped}\.)({'|'.join(re.escape(o) for o in objects)})", code):
+            for match in re.finditer(
+                rf"({module_escaped}\.)({'|'.join(re.escape(o) for o in objects)})",
+                code,
+            ):
                 code = code.replace(match.group(1), "")
 
         for module, objects in raw_imports.items():
             if not objects:
                 continue
             module_escaped = re.escape(module)
-            for match in re.finditer(rf"({module_escaped}\.)({'|'.join(re.escape(o) for o in objects)})", code):
+            for match in re.finditer(
+                rf"({module_escaped}\.)({'|'.join(re.escape(o) for o in objects)})",
+                code,
+            ):
                 code = code.replace(match.group(1), "")
 
             parts = module.split(".")
