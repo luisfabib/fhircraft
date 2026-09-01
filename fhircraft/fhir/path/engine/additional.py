@@ -904,7 +904,6 @@ class ConformsTo(FHIRPathFunction):
             )
             return []
         except ValidationError as e:
-            print(f"Validation error during conformsTo() evaluation: {e}")
             return [FHIRPathCollectionItem.wrap(False)]
         return [FHIRPathCollectionItem.wrap(True)]
 
