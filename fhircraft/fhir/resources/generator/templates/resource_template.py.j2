@@ -10,7 +10,7 @@ from {{ module }} import {{ objects | join(', ') }}
 import {{ module }} as {{ alias }}
 {% endfor -%}
 {% if imports or alias_imports %}
-{% endif -%}
+{% endif %}
 
 {% for model in models %}
 {{ render_class(model, include_validators) }}
