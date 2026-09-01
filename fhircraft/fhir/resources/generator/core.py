@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import List, Union
 
@@ -6,6 +7,7 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.resources.generator._schemas import GeneratorModule
 from fhircraft.utils import ensure_list
+from fhircraft import __version__ as fhircraft_version
 
 from ._imports import ImportTracker
 from ._renderer import CodeRenderer
@@ -29,11 +31,11 @@ class CodeGenerator:
             self._module,
         )
         self._renderer = CodeRenderer()
+        self._template = JINJA_ENV.get_template("resource_template.py.j2")
 
     def generate(
         self,
         resources: Union[type[BaseModel], List[type[BaseModel]]],
-        include_validators: bool = True,
     ) -> str:
         """
         Generate source code for one or more pydantic model classes.
@@ -49,13 +51,16 @@ class CodeGenerator:
 
         for resource in ensure_list(resources):
             serialized_resource = self._serializer.serialize(resource)
+            self._module.models.append(serialized_resource)
 
         grouped_imports = self._tracker.group_by_parent()
 
-        return self._renderer.render(
-            data=self._module,
-            imports=self._tracker.group_by_parent(),
+        return self._template.render(
+            models=self._module.models,
+            imports=grouped_imports,
             alias_imports=self._tracker.alias_imports,
-            raw_imports=dict(self._tracker.imports),
-            include_validators=include_validators,
+            metadata={
+                "version": fhircraft_version,
+                "timestamp": datetime.datetime.now(),
+            },
         )

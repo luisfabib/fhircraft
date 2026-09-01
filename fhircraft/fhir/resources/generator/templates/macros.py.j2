@@ -62,51 +62,48 @@ def {{ validator.name }}(self):
 class {{ model.name }}({% for base in model.bases %}{{ base }}{% if not loop.last %}, {% endif %}{% endfor %}):
     {% if model.docstring %}
     """
-    {{ model.docstring }}
+    {{ model.docstring | indent(4, false)  }}
     """
     {% endif %}
-    {% if model.min_cardinality is not none %}
-    min_cardinality: ClassVar[int] = {{ model.min_cardinality }}
+    {% if model.meta.min_cardinality is not none %}
+    min_cardinality: ClassVar[int] = {{ model.meta.min_cardinality }}
     {% endif %}
-    {% if model.max_cardinality is not none %}
-    max_cardinality: ClassVar[int | None] = {{ model.max_cardinality }}
+    {% if model.meta.max_cardinality is not none %}
+    max_cardinality: ClassVar[int | None] = {{ model.meta.max_cardinality }}
+    {% endif %}
+    {% if model.meta.fhir_release %}
+    _fhir_release = {{ model.meta.fhir_release }}
+    {% endif %}
+    {% if model.meta.type %}
+    _type = {{ model.meta.type }}
+    {% endif %}
+    {% if model.meta.kind %}
+    _kind = {{ model.meta.kind }}
+    {% endif %}
+    {% if model.meta.abstract is not none %}
+    _abstract = {{ model.meta.abstract }}
+    {% endif %}
+    {% if model.meta.canonical_url %}
+    _canonical_url = {{ model.meta.canonical_url }}
     {% endif %}
 
-    {% if model.fhir_release %}
-    _fhir_release = {{ model.fhir_release }}
-    {% endif %}
-    {% if model.type %}
-    _type = {{ model.type }}
-    {% endif %}
-    {% if model.kind %}
-    _kind = {{ model.kind }}
-    {% endif %}
-    {% if model.abstract is not none %}
-    _abstract = {{ model.abstract }}
-    {% endif %}
-    {% if model.canonical_url %}
-    _canonical_url = {{ model.canonical_url }}
-    {% endif %}
-
-    {% for field, info in model.fields.items() %}
-    {{ render_field(field, info) }}
+    {% for field in model.fields %}
+    {{ render_field(field) | indent(4, false) }}
     {% else %}
     pass
     {% endfor %}
 
-    {% for name, prop in model.properties.items() %}
-    {{ render_property(name, prop) }}
+    {% for prop in model.properties %}
+    {{ render_property(prop) | indent(4, false) }}
 
     {% endfor %}
-    {% if include_validators %}
     {% for validator in model.field_validators %}
-    {{ render_field_validator(validator) }}
+    {{ render_field_validator(validator) | indent(4, false) }}
 
     {% endfor %}
     {% for validator in model.model_validators %}
-    {{ render_model_validator(validator) }}
+    {{ render_model_validator(validator) | indent(4, false) }}
 
     {% endfor %}
 
-    {% endif %}
 {%- endmacro %}

@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 from pydantic.fields import FieldInfo
 import pytest
 from pydantic import (
+    BeforeValidator,
     AliasChoices,
     AliasPath,
     BaseModel,
@@ -101,6 +102,36 @@ def test_serialize__includes_properties_and_validators(serializer):
     assert result.field_validators[0].name == "validate_val"
     assert len(result.model_validators) == 1
     assert result.model_validators[0].name == "validate_model"
+
+
+def test_serialize__skips_inherited_unchanged_field(serializer):
+
+    class ParentModel(BaseModel):
+        val: int
+
+    class ChildModel(ParentModel):
+        new_val: str
+
+    result = serializer.serialize(ChildModel)
+
+    assert len(result.fields) == 1
+    assert result.fields[0].name == "new_val"
+    assert result.fields[0].annotation == "str"
+
+
+def test_serialize__serialized_inherited_changed_field(serializer):
+
+    class ParentModel(BaseModel):
+        val: int | None = None
+
+    class ChildModel(ParentModel):
+        val: int  # type: ignore
+
+    result = serializer.serialize(ChildModel)
+
+    assert len(result.fields) == 1
+    assert result.fields[0].name == "val"
+    assert result.fields[0].annotation == "int"
 
 
 def test_serialize__skips_inherited_properties_and_validators(serializer):
@@ -278,6 +309,8 @@ def test_serialize_metadata__extracts_fhir_slicing_cardinalities(serializer):
 
     assert result.min_cardinality == 1
     assert result.max_cardinality == 5
+    assert "typing" in serializer._tracker.imports
+    assert "ClassVar" in serializer._tracker.imports["typing"]
 
 
 @pytest.mark.parametrize(
@@ -403,6 +436,16 @@ def test_serialize_field__serializes_annotation(serializer):
     assert str(result.arguments["default"]) == "None"
 
 
+def test_serialize_field__ignores_non_field_arguments(serializer):
+    field = FieldInfo(default=None, metadata=[BeforeValidator(func=lambda x: x)])  # type: ignore
+
+    result = serializer._serialize_field("test", field)
+
+    assert result.name == "test"
+    assert "default" in result.arguments
+    assert "func" not in result.arguments
+
+
 # ----------------------------------------
 # ModelSerializer._serialize_value()
 # ----------------------------------------
@@ -458,10 +501,29 @@ def test_serialize_value__lambda_function(serializer):
     assert result == "lambda x: x + 1"
 
 
+def test_serialize_value__primitive_fhir_model(serializer):
+    model = fhir.String(value="Alice")
+    result = serializer._serialize_value(model)
+    assert result == '"Alice"'
+    assert len(serializer._tracker._alias_imports) == 0
+
+
+def test_serialize_value__primitive_fhir_model_with_id(serializer):
+    model = fhir.String(value="Alice", id="30")
+    result = serializer._serialize_value(model)
+    assert result == 'fhir.String(id="30", value="Alice")'
+    assert "fhircraft.fhir.resources.datatypes.R5" in serializer._tracker._alias_imports
+    assert (
+        serializer._tracker._alias_imports["fhircraft.fhir.resources.datatypes.R5"]
+        == "fhir"
+    )
+
+
 def test_serialize_value__pydantic_model(serializer):
     model = SampleModel(name="Alice", age=30)
     result = serializer._serialize_value(model)
-    assert result == 'SampleModel(name="Alice", age=30)'
+    assert result == 'SampleModel(age=30, name="Alice")'
+    assert "SampleModel" == serializer._module.models[0].name
 
 
 @pytest.mark.parametrize(
@@ -557,6 +619,8 @@ def test_serialize_model_validator__serializes_partial_validator(serializer):
     assert result.partial.name == "dummy_helper"
     assert result.partial.arguments == ["20"]
     assert result.partial.keywords == {"offset": "3"}
+    assert "pydantic" in serializer._tracker._imports
+    assert "model_validator" in serializer._tracker._imports["pydantic"]
 
 
 # ----------------------------------------
@@ -583,3 +647,5 @@ def test_serialize_field_validator__serializes_partial_validator(serializer):
     assert result.partial.name == "dummy_helper"
     assert result.partial.arguments == ["10"]
     assert result.partial.keywords == {"offset": "2"}
+    assert "pydantic" in serializer._tracker._imports
+    assert "field_validator" in serializer._tracker._imports["pydantic"]

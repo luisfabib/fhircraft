@@ -6,7 +6,7 @@ from types import FunctionType
 from enum import Enum
 from typing import Any, Callable
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo
 from pydantic._internal._decorators import (
     Decorator,
@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.base.models import (
     FHIRSliceModel,
     FHIRBaseModel,
 )
+from fhircraft.fhir.resources.base.primitives import FHIRPrimitiveModel
 from ._annotations import AnnotationSerializer
 from ._imports import ImportTracker
 
@@ -33,6 +34,8 @@ from ._schemas import (
     GeneratorPartialFunction,
 )
 
+PYDANTIC_FIELD_PARAMETERS = inspect.signature(Field).parameters.keys()
+
 
 class ModelSerializer:
     """Walks pydantic model classes and extracts structured data for code generation."""
@@ -43,8 +46,8 @@ class ModelSerializer:
         module: GeneratorModule,
     ) -> None:
         self._tracker = tracker
-        self._annotations = AnnotationSerializer(tracker=self._tracker)
         self._module = module
+        self._annotations = AnnotationSerializer(tracker=self._tracker, serializer=self)
 
     def serialize(self, model: type[BaseModel]) -> GeneratorModel:
         """Extract all code-generation data from a model class into self.data."""
@@ -66,7 +69,19 @@ class ModelSerializer:
 
         # Serialize model fields
         for field_name, field_info in model.model_fields.items():
-            serialized_data.fields.append(self._serialize_field(field_name, field_info))
+            serialized_field = self._serialize_field(field_name, field_info)
+            # Check if the field is inherited from a base class and has the same implementation
+            for base in model.__mro__[1:]:
+                if issubclass(base, BaseModel):
+                    if field_name in base.model_fields:
+                        inherited_field = self._serialize_field(
+                            field_name, base.model_fields[field_name], track=False
+                        )
+                        if serialized_field == inherited_field:
+                            break
+            else:
+                # Add the property to the serialized data if it is not inherited or has a different implementation
+                serialized_data.fields.append(serialized_field)
 
         # Serialize model properties
         for name, prop in model.__dict__.items():
@@ -149,6 +164,7 @@ class ModelSerializer:
         if issubclass(model, FHIRSliceModel):
             meta.min_cardinality = model.min_cardinality
             meta.max_cardinality = model.max_cardinality
+            self._tracker.track("typing", "ClassVar")
 
         # Extract FHIR metdata if the model is a FHIR model
         elif issubclass(model, FHIRBaseModel):
@@ -165,7 +181,6 @@ class ModelSerializer:
                     (b for b in model.__bases__ if getattr(b, attr, None) == value),
                     None,
                 ):
-                    print(f"Setting {attr} to {value} for model {model.__name__}")
                     setattr(
                         meta,
                         attr.lstrip("_"),
@@ -173,10 +188,13 @@ class ModelSerializer:
                     )
         return meta
 
-    def _serialize_field(self, name: str, field: FieldInfo) -> GeneratorModelField:
+    def _serialize_field(
+        self, name: str, field: FieldInfo, track: bool = True
+    ) -> GeneratorModelField:
         """Extract all code-generation data from a model field."""
 
-        self._tracker.track("pydantic", "Field")
+        if track:
+            self._tracker.track("pydantic", "Field")
 
         arguments = {}
         # Exctract direct Field attributes explicitly set (e.g. description, alias, default)
@@ -184,7 +202,7 @@ class ModelSerializer:
             if attr == "annotation":
                 continue
             value = getattr(field, attr, PydanticUndefined)
-            if value is not PydanticUndefined:
+            if value is not PydanticUndefined and attr in PYDANTIC_FIELD_PARAMETERS:
                 arguments[attr] = self._serialize_value(value)
 
         # Extract constraints stored inside item.metadata (e.g. union_mode, gt, lt, pattern)
@@ -193,6 +211,7 @@ class ModelSerializer:
             for attr in dir(meta):
                 if (
                     not attr.startswith("_")
+                    and attr in PYDANTIC_FIELD_PARAMETERS
                     and (value := getattr(meta, attr)) is not PydanticUndefined
                 ):
                     arguments[attr] = self._serialize_value(value)
@@ -268,7 +287,8 @@ class ModelSerializer:
     ) -> GeneratorFieldValidator:
         decorated_method = validator.func
         validator_func = getattr(decorated_method, "__func__", decorated_method)
-
+        if track:
+            self._tracker.track("pydantic", "field_validator")
         # Case 1: Dynamic partial function (delegates execution to another callable)
         if isinstance(validator_func, functools.partial):
             helper_func = self.__extract_partial_helper_function(
@@ -328,6 +348,8 @@ class ModelSerializer:
     ) -> GeneratorModelValidator:
         decorated_method = validator.func
         validator_func = getattr(decorated_method, "__func__", decorated_method)
+        if track:
+            self._tracker.track("pydantic", "model_validator")
         # Case 1: Dynamic partial function (delegates execution to another callable)
         if isinstance(validator_func, functools.partial):
             helper_func = self.__extract_partial_helper_function(
@@ -396,10 +418,18 @@ class ModelSerializer:
             escaped = value.replace("\\", "\\\\").replace('"', '\\"')
             return f'"{escaped}"'
         elif isinstance(value, FunctionType):
-            print("Lambda function detected:", inspect.getsourcelines(value))
             funcString = str(inspect.getsourcelines(value)[0])
             return funcString.strip("['\\n']").split(" = ")[1]
         elif isinstance(value, BaseModel):
-            return f"{value.__class__.__name__}({', '.join([k + '=' + self._serialize_value(v) for k,v in value.model_dump().items()])})"
+            # Handle FHIR Primitives instanciated with just the value field
+            if (
+                isinstance(value, FHIRPrimitiveModel)
+                and not value.id
+                and not value.extension
+            ):
+                return self._serialize_value(value.value)
+            # Handle all other Pydantic models
+            model_name = self._annotations.serialize(value.__class__)
+            return f"{model_name}({', '.join([k + '=' + self._serialize_value(getattr(value, k)) for k in sorted(value.model_fields_set)])})"
         else:
             return repr(value)

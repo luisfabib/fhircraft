@@ -1,6 +1,7 @@
 import sys
 import types
 from typing import (
+    TYPE_CHECKING,
     Annotated,
     Any,
     Dict,
@@ -15,11 +16,12 @@ from typing import (
     get_origin,
 )
 
+from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
 
-from fhircraft.fhir.mapper.engine import target
-
-from ._imports import ImportTracker
+if TYPE_CHECKING:
+    from ._imports import ImportTracker
+    from ._model import ModelSerializer
 
 
 class AnnotationSerializer:
@@ -34,8 +36,13 @@ class AnnotationSerializer:
         frozenset: FrozenSet,
     }
 
-    def __init__(self, tracker: ImportTracker) -> None:
+    def __init__(
+        self,
+        tracker: "ImportTracker",
+        serializer: "ModelSerializer",
+    ) -> None:
         self._tracker = tracker
+        self._model_serializer = serializer
 
     def serialize(self, annotation: Any) -> str:
         """Entry point to convert any type annotation into a source-code string."""
@@ -213,9 +220,13 @@ class AnnotationSerializer:
             if "fhircraft.fhir.resources.datatypes" in module_path:
                 self._tracker.track_alias(module_path, "fhir")
                 return f"fhir.{name}"
-
+            # Handle Pydantic BaseModel subclasses
+            elif issubclass(target, BaseModel) and target is not BaseModel:
+                model = self._model_serializer.serialize(target)
+                self._model_serializer._module.models.append(model)
             # Fallback to standard tracker resolution
-            self._tracker.track(module_path, name)
+            else:
+                self._tracker.track(module_path, name)
 
         return name
 
