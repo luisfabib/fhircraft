@@ -145,4 +145,5 @@ class MedicinalProductPackaged(DomainResource):
     )
     packageItem: ListType[MedicinalProductPackagedPackageItem] = Field(
         description="A packaging item, as a contained for medicine, possibly with other packaging items within",
-    )
+     	min_length=1,
+	)

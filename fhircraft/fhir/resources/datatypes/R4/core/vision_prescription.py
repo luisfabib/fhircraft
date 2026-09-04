@@ -139,4 +139,5 @@ class VisionPrescription(DomainResource):
     )
     lensSpecification: ListType[VisionPrescriptionLensSpecification] = Field(
         description="Vision lens authorization",
-    )
+     	min_length=1,
+	)

@@ -147,7 +147,8 @@ class Appointment(DomainResource):
     )
     participant: ListType[AppointmentParticipant] = Field(
         description="Participants involved in appointment",
-    )
+     	min_length=1,
+	)
     requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
         default=None,

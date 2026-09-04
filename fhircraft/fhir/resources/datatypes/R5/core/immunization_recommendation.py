@@ -118,7 +118,8 @@ class ImmunizationRecommendation(DomainResource):
     recommendation: ListType[ImmunizationRecommendationRecommendation] = (
         Field(
             description="Vaccine administration recommendations",
-        )
+         	min_length=1,
+	)
     )
 
     @model_validator(mode="after")

@@ -86,7 +86,8 @@ class ContractTermOfferParty(BackboneElement):
 
     reference: ListType[Reference] = Field(
         description="Referenced entity",
-    )
+     	min_length=1,
+	)
     role: CodeableConcept = Field(
         description="Participant engagement type",
     )
@@ -483,7 +484,8 @@ class ContractTermActionSubject(BackboneElement):
 
     reference: ListType[Reference] = Field(
         description="Entity of the action",
-    )
+     	min_length=1,
+	)
     role: Optional[CodeableConcept] = Field(
         description="Role type of the agent",
         default=None,
@@ -689,7 +691,8 @@ class ContractSigner(BackboneElement):
     )
     signature: ListType[Signature] = Field(
         description="Contract Documentation Signature",
-    )
+     	min_length=1,
+	)
 
 
 class ContractFriendly(BackboneElement):

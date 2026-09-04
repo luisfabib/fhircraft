@@ -70,4 +70,5 @@ class OperationOutcome(DomainResource):
     )
     issue: ListType[OperationOutcomeIssue] = Field(
         description="A single issue associated with the action",
-    )
+     	min_length=1,
+	)

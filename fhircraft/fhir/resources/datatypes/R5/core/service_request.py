@@ -101,7 +101,8 @@ class ServiceRequestOrderDetail(BackboneElement):
     )
     parameter: ListType[ServiceRequestOrderDetailParameter] = Field(
         description="The parameter details for the service being requested",
-    )
+     	min_length=1,
+	)
 
 
 class ServiceRequestPatientInstruction(BackboneElement):

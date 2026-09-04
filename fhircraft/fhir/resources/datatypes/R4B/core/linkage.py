@@ -60,7 +60,8 @@ class Linkage(DomainResource):
     )
     item: ListType[LinkageItem] = Field(
         description="Item to be linked",
-    )
+     	min_length=1,
+	)
 
     @model_validator(mode="after")
     def FHIR_lnk_1_constraint_validator(self):

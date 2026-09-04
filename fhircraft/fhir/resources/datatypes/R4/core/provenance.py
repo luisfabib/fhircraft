@@ -102,7 +102,8 @@ class Provenance(DomainResource):
     )
     target: ListType[Reference] = Field(
         description="Target Reference(s) (usually version specific)",
-    )
+     	min_length=1,
+	)
     occurredPeriod: Optional[Period] = Field(
         description="When the activity occurred",
         default=None,
@@ -132,7 +133,8 @@ class Provenance(DomainResource):
     )
     agent: ListType[ProvenanceAgent] = Field(
         description="Actor involved",
-    )
+     	min_length=1,
+	)
     entity: Optional[ListType[ProvenanceEntity]] = Field(
         description="An entity used in this activity",
         default=None,

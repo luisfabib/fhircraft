@@ -185,7 +185,8 @@ class NamingSystem(DomainResource):
     )
     uniqueId: ListType[NamingSystemUniqueId] = Field(
         description="Unique identifiers used for system",
-    )
+     	min_length=1,
+	)
 
     @property
     def versionAlgorithm(self):

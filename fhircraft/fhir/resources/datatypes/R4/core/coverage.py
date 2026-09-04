@@ -150,7 +150,8 @@ class Coverage(DomainResource):
     )
     payor: ListType[Reference] = Field(
         description="Issuer of the policy",
-    )
+     	min_length=1,
+	)
     class_: Optional[ListType[CoverageClass]] = Field(
         description="Additional coverage classifications",
         default=None,

@@ -155,7 +155,8 @@ class NutritionIntake(DomainResource):
     )
     consumedItem: ListType[NutritionIntakeConsumedItem] = Field(
         description="What food or fluid product or item was consumed",
-    )
+     	min_length=1,
+	)
     ingredientLabel: Optional[ListType[NutritionIntakeIngredientLabel]] = Field(
         description="Total nutrient for the whole meal, product, serving",
         default=None,

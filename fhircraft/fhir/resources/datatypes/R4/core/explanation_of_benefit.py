@@ -1128,7 +1128,8 @@ class ExplanationOfBenefit(DomainResource):
     )
     insurance: ListType[ExplanationOfBenefitInsurance] = Field(
         description="Patient insurance information",
-    )
+     	min_length=1,
+	)
     accident: Optional[ExplanationOfBenefitAccident] = Field(
         description="Details of the event",
         default=None,

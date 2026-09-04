@@ -42,7 +42,7 @@ def _sm(url: str, group_names=None) -> StructureMap:
         url=url,
         name=url.split("/")[-1],
         status="active",
-        group=[_group(n) for n in (group_names or [])],
+        group=[_group(n) for n in (group_names or ["default"])],
     )
 
 

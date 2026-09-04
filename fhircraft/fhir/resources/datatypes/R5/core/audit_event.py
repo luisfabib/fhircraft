@@ -352,7 +352,8 @@ class AuditEvent(DomainResource):
     )
     agent: ListType[AuditEventAgent] = Field(
         description="Actor involved in the event",
-    )
+     	min_length=1,
+	)
     source: AuditEventSource = Field(
         description="Audit Event Reporter",
     )

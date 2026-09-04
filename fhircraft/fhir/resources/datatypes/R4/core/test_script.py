@@ -106,7 +106,8 @@ class TestScriptMetadata(BackboneElement):
     )
     capability: ListType[TestScriptMetadataCapability] = Field(
         description="Capabilities  that are assumed to function correctly on the FHIR server being tested",
-    )
+     	min_length=1,
+	)
 
 
 class TestScriptFixture(BackboneElement):
@@ -357,7 +358,8 @@ class TestScriptSetup(BackboneElement):
 
     action: ListType[TestScriptSetupAction] = Field(
         description="A setup operation or assert to perform",
-    )
+     	min_length=1,
+	)
 
 
 class TestScriptSetupActionOperationRequestHeader(BackboneElement):
@@ -576,7 +578,8 @@ class TestScriptTest(BackboneElement):
     )
     action: ListType[TestScriptTestAction] = Field(
         description="A test operation or assert to perform",
-    )
+     	min_length=1,
+	)
 
 
 class TestScriptTeardownAction(BackboneElement):
@@ -596,7 +599,8 @@ class TestScriptTeardown(BackboneElement):
 
     action: ListType[TestScriptTeardownAction] = Field(
         description="One or more teardown operations to perform",
-    )
+     	min_length=1,
+	)
 
 
 class TestScript(DomainResource):

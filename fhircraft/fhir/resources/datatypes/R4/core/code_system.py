@@ -36,7 +36,8 @@ class CodeSystemFilter(BackboneElement):
     )
     operator: ListType[fhir.code] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | exists",
-    )
+     	min_length=1,
+	)
     value: fhir.string = Field(
         description="What to use for the value",
     )

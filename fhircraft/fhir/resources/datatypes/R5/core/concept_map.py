@@ -346,7 +346,8 @@ class ConceptMapGroup(BackboneElement):
     )
     element: ListType[ConceptMapGroupElement] = Field(
         description="Mappings for a concept from the source set",
-    )
+     	min_length=1,
+	)
     unmapped: Optional[ConceptMapGroupUnmapped] = Field(
         description="What to do when there is no mapping target for the source concept and ConceptMap.group.element.noMap is not true",
         default=None,

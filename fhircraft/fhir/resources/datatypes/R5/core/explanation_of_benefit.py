@@ -364,7 +364,8 @@ class ExplanationOfBenefitItemBodySite(BackboneElement):
 
     site: ListType[CodeableReference] = Field(
         description="Location",
-    )
+     	min_length=1,
+	)
     subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
         default=None,
@@ -793,7 +794,8 @@ class ExplanationOfBenefitAddItemBodySite(BackboneElement):
 
     site: ListType[CodeableReference] = Field(
         description="Location",
-    )
+     	min_length=1,
+	)
     subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
         default=None,

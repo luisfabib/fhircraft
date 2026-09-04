@@ -143,7 +143,8 @@ class BodyStructure(DomainResource):
     )
     includedStructure: ListType[BodyStructureIncludedStructure] = Field(
         description="Included anatomic location(s)",
-    )
+     	min_length=1,
+	)
     excludedStructure: Optional[ListType[BodyStructureExcludedStructure]] = Field(
         description="Excluded anatomic locations(s)",
         default=None,

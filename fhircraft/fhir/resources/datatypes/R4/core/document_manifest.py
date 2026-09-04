@@ -95,7 +95,8 @@ class DocumentManifest(DomainResource):
     )
     content: ListType[Reference] = Field(
         description="Items in manifest",
-    )
+     	min_length=1,
+	)
     related: Optional[ListType[DocumentManifestRelated]] = Field(
         description="Related things",
         default=None,

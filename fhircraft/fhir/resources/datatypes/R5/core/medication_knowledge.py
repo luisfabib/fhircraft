@@ -41,7 +41,8 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     )
     reference: ListType[Reference] = Field(
         description="Associated documentation about the associated medication knowledge",
-    )
+     	min_length=1,
+	)
 
 
 class MedicationKnowledgeMonograph(BackboneElement):
@@ -126,7 +127,8 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElemen
     )
     dosage: ListType[Dosage] = Field(
         description="Dosage for the medication for the specific guidelines",
-    )
+     	min_length=1,
+	)
 
 
 class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic(

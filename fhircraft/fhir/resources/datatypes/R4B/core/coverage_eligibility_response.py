@@ -217,7 +217,8 @@ class CoverageEligibilityResponse(DomainResource):
     )
     purpose: ListType[fhir.code] = Field(
         description="auth-requirements | benefits | discovery | validation",
-    )
+     	min_length=1,
+	)
     patient: Reference = Field(
         description="Intended recipient of products and services",
     )

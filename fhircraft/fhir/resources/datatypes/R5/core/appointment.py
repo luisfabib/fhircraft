@@ -286,7 +286,8 @@ class Appointment(DomainResource):
     )
     participant: ListType[AppointmentParticipant] = Field(
         description="Participants involved in appointment",
-    )
+     	min_length=1,
+	)
     recurrenceId: Optional[fhir.positiveInt] = Field(
         description="The sequence number in the recurrence",
         default=None,

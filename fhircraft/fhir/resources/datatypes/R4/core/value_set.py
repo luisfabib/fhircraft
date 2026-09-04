@@ -145,7 +145,8 @@ class ValueSetCompose(BackboneElement):
     )
     include: ListType[ValueSetComposeInclude] = Field(
         description="Include one or more codes from a code system or other value set(s)",
-    )
+     	min_length=1,
+	)
     exclude: Optional[ListType[ValueSetComposeExclude]] = Field(
         description="Explicitly exclude codes from a code system or other value sets",
         default=None,

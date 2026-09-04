@@ -58,7 +58,8 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     )
     op: ListType[fhir.code] = Field(
         description="Operations supported for the property",
-    )
+     	min_length=1,
+	)
 
 
 class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):

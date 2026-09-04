@@ -54,7 +54,8 @@ class Endpoint(DomainResource):
     )
     connectionType: ListType[CodeableConcept] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
-    )
+     	min_length=1,
+	)
     name: Optional[fhir.string] = Field(
         description="A name that this endpoint can be identified by",
         default=None,

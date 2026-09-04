@@ -175,7 +175,8 @@ class PlanDefinitionActor(BackboneElement):
     )
     option: ListType[PlanDefinitionActorOption] = Field(
         description="Who or what can be this actor",
-    )
+     	min_length=1,
+	)
 
 
 class PlanDefinitionActionCondition(BackboneElement):

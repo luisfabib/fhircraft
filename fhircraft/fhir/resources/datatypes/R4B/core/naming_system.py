@@ -113,7 +113,8 @@ class NamingSystem(DomainResource):
     )
     uniqueId: ListType[NamingSystemUniqueId] = Field(
         description="Unique identifiers used for system",
-    )
+     	min_length=1,
+	)
 
     @model_validator(mode="after")
     def FHIR_nsd_0_constraint_validator(self):

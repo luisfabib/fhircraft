@@ -70,7 +70,8 @@ class Endpoint(DomainResource):
     )
     payloadType: ListType[CodeableConcept] = Field(
         description="The type of content that may be used at this endpoint (e.g. XDS Discharge summaries)",
-    )
+     	min_length=1,
+	)
     payloadMimeType: Optional[ListType[fhir.code]] = Field(
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,

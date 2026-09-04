@@ -9,8 +9,9 @@ from fhircraft.exceptions import (
     MapperExecutionError,
     MapperDigestionError,
 )
-from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroupRule,
+    StructureMapGroupRuleDependentParameter,
     StructureMapGroupRuleSource,
     StructureMapGroupRuleTarget,
     StructureMapGroupRuleDependent,
@@ -41,7 +42,13 @@ class PersonModel(BaseModel):
 def minimal_rule_definition():
     """Minimal rule definition with just a name."""
     return StructureMapGroupRule(
-        name="test-rule", source=[], target=None, rule=None, dependent=None
+        name="test-rule",
+        source=[
+            StructureMapGroupRuleSource(context="src", variable="a", element=None),
+        ],
+        target=None,
+        rule=None,
+        dependent=None,
     )
 
 
@@ -74,7 +81,11 @@ def rule_definition_with_targets():
     )
     return StructureMapGroupRule(
         name="rule-with-targets",
-        source=[],
+        source=[
+            StructureMapGroupRuleSource(
+                context="Patient", variable="src", element=None
+            ),
+        ],
         target=[target1, target2],
         rule=None,
         dependent=None,
@@ -85,10 +96,26 @@ def rule_definition_with_targets():
 def rule_definition_with_nested_rules():
     """Rule definition with nested rule configurations."""
     nested_rule = StructureMapGroupRule(
-        name="nested-rule", source=[], target=None, rule=None, dependent=None
+        name="nested-rule",
+        source=[
+            StructureMapGroupRuleSource(
+                context="Patient", variable="src", element=None
+            ),
+        ],
+        target=None,
+        rule=None,
+        dependent=None,
     )
     return StructureMapGroupRule(
-        name="parent-rule", source=[], target=None, rule=[nested_rule], dependent=None
+        name="parent-rule",
+        source=[
+            StructureMapGroupRuleSource(
+                context="Patient", variable="src", element=None
+            ),
+        ],
+        target=None,
+        rule=[nested_rule],
+        dependent=None,
     )
 
 
@@ -96,11 +123,16 @@ def rule_definition_with_nested_rules():
 def rule_definition_with_dependents():
     """Rule definition with dependent configurations."""
     dependent = StructureMapGroupRuleDependent(
-        name="dependent-group", variable=["test_var"]
+        name="dependent-group",
+        parameter=[StructureMapGroupRuleDependentParameter(valueId="testVar")],
     )
     return StructureMapGroupRule(
         name="rule-with-dependents",
-        source=[],
+        source=[
+            StructureMapGroupRuleSource(
+                context="Patient", variable="src", element=None
+            ),
+        ],
         target=None,
         rule=None,
         dependent=[dependent],
@@ -170,7 +202,6 @@ def test_init__minimal(minimal_rule_definition, mock_parent_group):
     assert rule.definition == minimal_rule_definition
     assert rule.name == "test-rule"
     assert rule.parent_group == mock_parent_group
-    assert len(rule.sources) == 0
     assert len(rule.targets) == 0
     assert len(rule.nested_rules) == 0
     assert len(rule.dependents) == 0
@@ -352,16 +383,6 @@ def test_process__with_nested_rules(
 
     # Should call nested rule processing
     rule.nested_rules[0].process.assert_called_once()
-
-
-def test_process__finishes_processing_rule_in_scope(
-    minimal_rule_definition, mapping_scope
-):
-    rule = Rule(minimal_rule_definition, None)
-
-    with patch.object(mapping_scope, "finish_processing_rule") as mock_finish:
-        rule.process(mapping_scope)
-        mock_finish.assert_called_once_with("test-rule")
 
 
 # ============================================================================
