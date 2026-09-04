@@ -224,6 +224,9 @@ class ModelSerializer:
         # Special case: If the field is Optional and has a min_length of 0, remove the min_length constraint (redundant)
         if "Optional" in annotation and arguments.get("min_length") == str(0):
             arguments.pop("min_length")
+        # Special case: Remove trailing period from description if present (for better comparisons)
+        if arguments.get("description", "").endswith('."'):
+            arguments["description"] = arguments["description"][:-2] + '"'
 
         return GeneratorModelField(
             name=name,
