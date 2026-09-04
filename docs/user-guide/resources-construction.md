@@ -446,8 +446,7 @@ You can use code generation to avoid runtime overhead of model construction. Ins
 The generated code is readable Python that you can inspect, modify, and share with others. All imports are included automatically, so the generated file is self-contained.
 
 ```python
-from fhircraft import FHIRModelFactory
-from fhircraft.fhir.resources.generator import generate_resource_model_code
+from fhircraft import FHIRModelFactory, generate_code
 
 factory = FHIRModelFactory(fhir_release="R4")
 
@@ -459,7 +458,7 @@ USCorePatient = factory.build(
 
 # Generate Python source code for the model
 # The code includes all fields, validators, and imports
-source_code = generate_resource_model_code(USCorePatient)
+source_code = generate_code(USCorePatient)
 
 # Save to a file for later import
 with open("us_core_patient.py", "w") as f:
@@ -475,8 +474,7 @@ See the [Pydantic JSON schema documentation](https://docs.pydantic.dev/latest/co
     When working with multiple profiles from an implementation guide, you generate all models together in a single file. This keeps related models organized and ensures they can reference each other correctly.
 
     ```python
-    from fhircraft import FHIRModelFactory
-    from fhircraft.fhir.resources.generator import generate_resource_model_code
+    from fhircraft import FHIRModelFactory, generate_code
 
     factory = FHIRModelFactory(fhir_release="R4")
     
@@ -501,7 +499,7 @@ See the [Pydantic JSON schema documentation](https://docs.pydantic.dev/latest/co
 
     # Generate source code for all models together
     # This ensures proper cross-references between models
-    source_code = generate_resource_model_code(models_to_generate)
+    source_code = generate_code(models_to_generate)
 
     # Save to a single module file
     with open("us_core_models.py", "w") as f:

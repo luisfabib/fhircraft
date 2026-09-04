@@ -25,6 +25,7 @@ SUPPORTED_FHIR_RELEASES: Final = ("R4", "R4B", "R5")
 
 # --- Model building ---
 from fhircraft.fhir.resources.factory import FHIRModelFactory
+from fhircraft.fhir.resources.generator import generate_code
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes import R4, R4B, R5
 
@@ -53,6 +54,7 @@ __all__ = [
     # Model building
     "FHIRModelFactory",
     "FHIRBaseModel",
+    "generate_code",
     # Data transformation
     "FHIRStructureMapper",
     # Configuration

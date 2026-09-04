@@ -1,12 +1,13 @@
 import ast
 import functools
 import inspect
+import re
 import textwrap
 from types import FunctionType
 from enum import Enum
 from typing import Any, Callable
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 from pydantic.fields import FieldInfo
 from pydantic._internal._decorators import (
     Decorator,
@@ -30,7 +31,6 @@ from ._schemas import (
     GeneratorModelMeta,
     GeneratorModelProperty,
     GeneratorModelValidator,
-    GeneratorModule,
     GeneratorPartialFunction,
 )
 
@@ -43,10 +43,8 @@ class ModelSerializer:
     def __init__(
         self,
         tracker: ImportTracker,
-        module: GeneratorModule,
     ) -> None:
         self._tracker = tracker
-        self._module = module
         self._annotations = AnnotationSerializer(tracker=self._tracker, serializer=self)
 
     def serialize(self, model: type[BaseModel]) -> GeneratorModel:
@@ -111,6 +109,7 @@ class ModelSerializer:
                     if serialized_validator == inherited_validator:
                         break
             else:
+                self._tracker.track("pydantic", "field_validator")
                 # Add the validator to the serialized data if it is not inherited or has a different implementation
                 serialized_data.field_validators.append(serialized_validator)
 
@@ -126,6 +125,7 @@ class ModelSerializer:
                     if serialized_validator == inherited_validator:
                         break
             else:
+                self._tracker.track("pydantic", "model_validator")
                 # Add the validator to the serialized data if it is not inherited or has a different implementation
                 serialized_data.model_validators.append(serialized_validator)
 
@@ -147,11 +147,13 @@ class ModelSerializer:
             if module.startswith("fhircraft.fhir.resources.datatypes"):
                 self._tracker.track_alias(module, "fhir")
                 name = f"fhir.{name}"
+            elif module.startswith("fhircraft.fhir.resources.factory"):
+                self._tracker.track_generated_model(self.serialize(base))
             else:
                 self._tracker.track(module, name)
         # For any custom Pydantic models, serialize them and add to the generator's module models list
         elif issubclass(base, BaseModel) and base is not BaseModel:
-            self._module.models.append(self.serialize(base))
+            self._tracker.track_generated_model(self.serialize(base))
         else:
             self._tracker.track(module, base.__name__)
         return name
@@ -287,8 +289,6 @@ class ModelSerializer:
     ) -> GeneratorFieldValidator:
         decorated_method = validator.func
         validator_func = getattr(decorated_method, "__func__", decorated_method)
-        if track:
-            self._tracker.track("pydantic", "field_validator")
         # Case 1: Dynamic partial function (delegates execution to another callable)
         if isinstance(validator_func, functools.partial):
             helper_func = self.__extract_partial_helper_function(
@@ -348,8 +348,6 @@ class ModelSerializer:
     ) -> GeneratorModelValidator:
         decorated_method = validator.func
         validator_func = getattr(decorated_method, "__func__", decorated_method)
-        if track:
-            self._tracker.track("pydantic", "model_validator")
         # Case 1: Dynamic partial function (delegates execution to another callable)
         if isinstance(validator_func, functools.partial):
             helper_func = self.__extract_partial_helper_function(
@@ -413,10 +411,19 @@ class ModelSerializer:
             )
             return "{" + items + "}"
         elif isinstance(value, Enum):
+            self._tracker.track(value.__class__.__module__, value.__class__.__name__)
             return f"{value.__class__.__name__}.{value.name}"
         elif isinstance(value, str):
             escaped = value.replace("\\", "\\\\").replace('"', '\\"')
-            return f'"{escaped}"'
+            every_100_chars = re.compile(r"(.{100} )", flags=re.MULTILINE)
+            escaped = every_100_chars.sub("\\1\n", escaped)
+            if "\n" in escaped:
+                return f'"""{escaped}"""'
+            else:
+                return f'"{escaped}"'
+        elif isinstance(value, AliasChoices):
+            self._tracker.track("pydantic", "AliasChoices")
+            return f"""AliasChoices({", ".join(self._serialize_value(choice) for choice in value.choices)})"""
         elif isinstance(value, FunctionType):
             funcString = str(inspect.getsourcelines(value)[0])
             return funcString.strip("['\\n']").split(" = ")[1]

@@ -223,7 +223,7 @@ class AnnotationSerializer:
             # Handle Pydantic BaseModel subclasses
             elif issubclass(target, BaseModel) and target is not BaseModel:
                 model = self._model_serializer.serialize(target)
-                self._model_serializer._module.models.append(model)
+                self._tracker.track_generated_model(model)
             # Fallback to standard tracker resolution
             else:
                 self._tracker.track(module_path, name)

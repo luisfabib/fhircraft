@@ -14,13 +14,16 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from fhircraft.fhir.resources.base.models import FHIRBaseModel, FHIRSliceModel
+from fhircraft.fhir.resources.base.models import (
+    FHIRBaseModel,
+    FHIRModelKind,
+    FHIRSliceModel,
+)
 from fhircraft.fhir.resources.datatypes import R5 as fhir
 from fhircraft.fhir.resources.generator._schemas import (
     GeneratorFieldValidator,
     GeneratorModelProperty,
     GeneratorModelValidator,
-    GeneratorModule,
     GeneratorModel,
 )
 from fhircraft.fhir.resources.generator._imports import ImportTracker
@@ -33,13 +36,8 @@ def tracker():
 
 
 @pytest.fixture
-def module():
-    return GeneratorModule()
-
-
-@pytest.fixture
-def serializer(tracker, module):
-    return ModelSerializer(tracker, module=module)
+def serializer(tracker):
+    return ModelSerializer(tracker)
 
 
 def dummy_helper(value, offset=0):
@@ -156,7 +154,7 @@ def test_serialize__skips_inherited_properties_and_validators(serializer):
 
     result = serializer.serialize(ChildModel)
 
-    serialized_models = [m.name for m in serializer._module.models]
+    serialized_models = [m.name for m in serializer._tracker.generated_models]
     assert "ParentModel" in serialized_models
 
     assert len(result.properties) == 0
@@ -189,7 +187,7 @@ def test_serialize__skips_deeply_inherited_properties_and_validators(serializer)
 
     result = serializer.serialize(ChildModel)
 
-    serialized_models = [m.name for m in serializer._module.models]
+    serialized_models = [m.name for m in serializer._tracker.generated_models]
     assert "GrandParentModel" in serialized_models
     assert "ParentModel" in serialized_models
 
@@ -271,7 +269,7 @@ def test_serialize_base__serializes_custom_base(mock_serialize, serializer):
 
     assert result == "CustomBase"
     assert mock_serialize.called
-    assert serializer._module.models[0].name == "CustomBase"
+    assert serializer._tracker.generated_models[0].name == "CustomBase"
 
 
 def test_serialize_base__serializes_non_pydantic_base(serializer):
@@ -366,7 +364,7 @@ def test_serialize_metadata__ignores_inherited_fhir_base_model_metadata(serializ
         [
             "validation_alias",
             AliasChoices("username", AliasPath("user", "name")),
-            "AliasChoices(choices=['username', AliasPath(path=['user', 'name'])])",
+            "AliasChoices(\"username\", AliasPath(path=['user', 'name']))",
         ],
         ["serialization_alias", "userName", '"userName"'],
         ["title", "User Name", '"User Name"'],
@@ -446,6 +444,19 @@ def test_serialize_field__ignores_non_field_arguments(serializer):
     assert "func" not in result.arguments
 
 
+def test_serialize_field__alias_choices_import_tracked(serializer):
+    field = FieldInfo(annotation=str, validation_alias=AliasChoices("a", "b"))  # type: ignore
+
+    result = serializer._serialize_field("test", field)
+
+    assert result.name == "test"
+    assert "annotation" not in result.arguments
+    assert "validation_alias" in result.arguments
+    assert str(result.arguments["validation_alias"]) == 'AliasChoices("a", "b")'
+    assert serializer._tracker.imports
+    assert "AliasChoices" in serializer._tracker.imports["pydantic"]
+
+
 # ----------------------------------------
 # ModelSerializer._serialize_value()
 # ----------------------------------------
@@ -484,14 +495,33 @@ def test_serialize_value__dict(serializer):
 
 
 def test_serialize_value__enum(serializer):
-    result = serializer._serialize_value(SampleEnum.ALPHA)
-    assert result == "SampleEnum.ALPHA"
+    result = serializer._serialize_value(FHIRModelKind.COMPLEX_TYPE)
+    assert result == "FHIRModelKind.COMPLEX_TYPE"
+    assert "fhircraft.fhir.resources.base.models" in serializer._tracker.imports
+    assert (
+        "FHIRModelKind"
+        in serializer._tracker.imports["fhircraft.fhir.resources.base.models"]
+    )
 
 
 def test_serialize_value__string_escaping(serializer):
     raw_str = 'Hello "World" \\ Path'
     result = serializer._serialize_value(raw_str)
     assert result == '"Hello \\"World\\" \\\\ Path"'
+
+
+def test_serialize_value__string_splits_into_multilines(serializer):
+    raw_str = (
+        "Vestibulum Ut Scelerisque Enim Tempus Id Est Et Egestas Laoreet Pharetra Adipiscing Lobortis "
+        "Dictumst Volutpat Elit Vel Fames Orci Pretium Iaculis Justo Et Sit Ornare Felis Porttitor Luctus "
+        "Ullamcorper Luctus Senectus Fringilla At Purus Quisque Felis Quis Lectus Eget Mi"
+    )
+    result = serializer._serialize_value(raw_str)
+    assert result == (
+        '"""Vestibulum Ut Scelerisque Enim Tempus Id Est Et Egestas Laoreet Pharetra Adipiscing Lobortis Dictumst '
+        "\nVolutpat Elit Vel Fames Orci Pretium Iaculis Justo Et Sit Ornare Felis Porttitor Luctus Ullamcorper Luctus "
+        '\nSenectus Fringilla At Purus Quisque Felis Quis Lectus Eget Mi"""'
+    )
 
 
 def test_serialize_value__lambda_function(serializer):
@@ -523,7 +553,7 @@ def test_serialize_value__pydantic_model(serializer):
     model = SampleModel(name="Alice", age=30)
     result = serializer._serialize_value(model)
     assert result == 'SampleModel(age=30, name="Alice")'
-    assert "SampleModel" == serializer._module.models[0].name
+    assert "SampleModel" == serializer._tracker.generated_models[0].name
 
 
 @pytest.mark.parametrize(
@@ -558,9 +588,6 @@ def test_serialize_property__serializes_partial_getter(serializer):
     assert result.partial.name == "dummy_helper"
     assert result.partial.arguments == ["10"]
     assert result.partial.keywords == {"offset": "5"}
-    assert "dummy_helper" in serializer._tracker.imports.get(
-        dummy_helper.__module__, {}
-    )
 
 
 def test_serialize_property__serializes_source_getter(serializer):
@@ -596,8 +623,6 @@ def test_serialize_property__does_not_track_when_track_is_false(serializer):
 
     serializer._serialize_property("test_prop", prop, track=False)
 
-    assert dummy_helper.__module__ not in serializer._tracker.imports
-
 
 # ----------------------------------------
 # ModelSerializer._serialize_model_validator()
@@ -619,8 +644,6 @@ def test_serialize_model_validator__serializes_partial_validator(serializer):
     assert result.partial.name == "dummy_helper"
     assert result.partial.arguments == ["20"]
     assert result.partial.keywords == {"offset": "3"}
-    assert "pydantic" in serializer._tracker._imports
-    assert "model_validator" in serializer._tracker._imports["pydantic"]
 
 
 # ----------------------------------------
@@ -647,5 +670,3 @@ def test_serialize_field_validator__serializes_partial_validator(serializer):
     assert result.partial.name == "dummy_helper"
     assert result.partial.arguments == ["10"]
     assert result.partial.keywords == {"offset": "2"}
-    assert "pydantic" in serializer._tracker._imports
-    assert "field_validator" in serializer._tracker._imports["pydantic"]

@@ -4,7 +4,7 @@
 {% macro render_field(field) -%}
 {{ field.name }}: {{ field.annotation }} = Field(
     {% for k, v in field.arguments.items() %}
-    {{ k }}={{ v }},
+    {{ k }}={%if v is string %}{{ v | indent(4, false) }}{% else %}{{ v }}{% endif %},
     {% endfor %}
 )
 {%- endmacro %}
@@ -16,7 +16,7 @@
         {{ arg }},
         {% endfor %}
         {% for k, v in func.keywords.items() %}
-        {{ k }}={{ v }},
+        {{ k }}={%if v is string %}{{ v | indent(8, false) }}{% else %}{{ v }}{% endif %},
         {% endfor %}
     )
 {%- endmacro %}

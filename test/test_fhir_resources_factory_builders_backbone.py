@@ -1,6 +1,7 @@
 from typing import List, Optional, get_args
 from unittest.mock import ANY, MagicMock
 
+from pydantic_core import PydanticUndefined
 import pytest
 from pydantic import BaseModel
 from pydantic.aliases import AliasChoices
@@ -380,7 +381,7 @@ def test_build__non_keyword_field_has_no_validation_alias(
 ):
     node = make_node(name="component")
     result = builder.build(node, index)
-    assert result.fields[0].validation_alias is None
+    assert result.fields[0].validation_alias is PydanticUndefined
     assert mock_assembler.return_value.assemble.called
 
 

@@ -58,6 +58,26 @@ def test_render_field__no_arguments(jinja_env):
     assert rendered.strip() == expected.strip()
 
 
+def test_render_field__multiline_description(jinja_env):
+    field_obj = GeneratorModelField(
+        name="age",
+        annotation="int",
+        arguments={
+            "description": '"""This is a multiline\ndescription for the age field."""'
+        },
+    )
+
+    rendered = jinja_env.render_field(field_obj)
+
+    expected = dedent('''
+        age: int = Field(
+            description="""This is a multiline
+            description for the age field.""",
+        )
+    ''')
+    assert rendered.strip() == expected.strip()
+
+
 def test_render_property(jinja_env):
     prop_obj = GeneratorModelProperty(
         name="is_adult",

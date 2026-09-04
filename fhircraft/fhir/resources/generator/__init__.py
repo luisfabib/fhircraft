@@ -1,9 +1,10 @@
+from pydantic import BaseModel
 from .core import CodeGenerator
 
 __all__ = ["CodeGenerator", "generate_code"]
 
 
-def generate_code(resources, include_validators: bool = True) -> str:
+def generate_code(resources: type[BaseModel] | list[type[BaseModel]]) -> str:
     """
     Convenience function: generate Python source code for one or more FHIR model classes.
 
@@ -18,4 +19,4 @@ def generate_code(resources, include_validators: bool = True) -> str:
     Returns:
         A string containing valid Python source code.
     """
-    return CodeGenerator().generate(resources, include_validators=include_validators)
+    return CodeGenerator().generate(resources)

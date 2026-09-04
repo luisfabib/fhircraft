@@ -1,10 +1,11 @@
 from collections import defaultdict
-from typing import Any, Dict, ForwardRef, List
+from typing import Any, Dict, ForwardRef, List, Set
 
 import sys
 import inspect
 
 from fhircraft.fhir.resources.factory.core import FHIRModelFactory
+from fhircraft.fhir.resources.generator._schemas import GeneratorModel
 from fhircraft.utils import get_module_name
 
 
@@ -15,6 +16,7 @@ class ImportTracker:
         self.reset()
 
     def reset(self) -> None:
+        self._generated_models: Dict[str, GeneratorModel] = {}
         self._imports: Dict[str, List[str]] = defaultdict(list)
         self._alias_imports: Dict[str, str] = {}
 
@@ -23,8 +25,15 @@ class ImportTracker:
         return self._imports
 
     @property
+    def generated_models(self) -> List[GeneratorModel]:
+        return list(self._generated_models.values())
+
+    @property
     def alias_imports(self) -> Dict[str, str]:
         return self._alias_imports
+
+    def track_generated_model(self, model: GeneratorModel) -> None:
+        self._generated_models[model.name] = model
 
     def track(self, module: str, name: str) -> None:
         if (

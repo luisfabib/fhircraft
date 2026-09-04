@@ -1,6 +1,7 @@
 import warnings
 from typing import Annotated, List, Optional, Union, get_args, get_origin
 
+from pydantic_core import PydanticUndefined
 import pytest
 from pydantic.aliases import AliasChoices
 
@@ -245,7 +246,7 @@ def test_build__field_name_matches_node_name(builder: Builder, index, assembler)
 def test_build__non_keyword_field_has_no_alias(builder: Builder, index, assembler):
     node = make_entry_node(name="category")
     build = builder.build(node, index)
-    assert build.fields[0].alias is None
+    assert build.fields[0].alias is PydanticUndefined
 
 
 def test_build__python_keyword_field_gets_alias(index, assembler, monkeypatch):
@@ -541,7 +542,7 @@ def test_build__non_keyword_field_has_no_validation_alias(
 ):
     node = make_entry_node(name="category")
     build = builder.build(node, index)
-    assert build.fields[0].validation_alias is None
+    assert build.fields[0].validation_alias is PydanticUndefined
 
 
 def test_build__raises_assertion_error_when_assembler_returns_non_slice_model(

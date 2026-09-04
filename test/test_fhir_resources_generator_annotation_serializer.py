@@ -7,7 +7,6 @@ import pytest
 
 from pydantic import BaseModel, Field
 from fhircraft.fhir.resources.datatypes import R5 as fhir
-from fhircraft.fhir.resources.generator._schemas import GeneratorModule
 from fhircraft.fhir.resources.generator._annotations import AnnotationSerializer
 from fhircraft.fhir.resources.generator._imports import ImportTracker
 from fhircraft.fhir.resources.generator._model import ModelSerializer
@@ -22,7 +21,7 @@ def tracker():
 def serializer(tracker):
     return AnnotationSerializer(
         tracker=tracker,
-        serializer=ModelSerializer(tracker=tracker, module=GeneratorModule()),
+        serializer=ModelSerializer(tracker=tracker),
     )
 
 
@@ -422,4 +421,6 @@ def test_serialize__custom_model(serializer):
 
     result = serializer.serialize(CustomModel)
     assert result == "CustomModel"
-    assert "CustomModel" in serializer._model_serializer._module.models[0].name
+    assert (
+        "CustomModel" in serializer._model_serializer._tracker.generated_models[0].name
+    )

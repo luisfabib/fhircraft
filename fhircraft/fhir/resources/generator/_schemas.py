@@ -62,8 +62,3 @@ class GeneratorModel:
     properties: List[GeneratorModelProperty] = field(default_factory=list)
     field_validators: List[GeneratorFieldValidator] = field(default_factory=list)
     model_validators: List[GeneratorModelValidator] = field(default_factory=list)
-
-
-@dataclass
-class GeneratorModule:
-    models: List[GeneratorModel] = field(default_factory=list)
