@@ -457,6 +457,16 @@ def test_serialize_field__alias_choices_import_tracked(serializer):
     assert "AliasChoices" in serializer._tracker.imports["pydantic"]
 
 
+def test_serialize_field__special_case_optional_min_length_zero(serializer):
+    field = FieldInfo(annotation=Optional[str], min_length=0)  # type: ignore
+
+    result = serializer._serialize_field("test", field)
+
+    assert result.name == "test"
+    assert "annotation" not in result.arguments
+    assert "min_length" not in result.arguments
+
+
 # ----------------------------------------
 # ModelSerializer._serialize_value()
 # ----------------------------------------

@@ -218,9 +218,16 @@ class ModelSerializer:
                 ):
                     arguments[attr] = self._serialize_value(value)
 
+        # Serialize the field's annotation as a string
+        annotation = self._annotations.serialize(field.annotation)
+
+        # Special case: If the field is Optional and has a min_length of 0, remove the min_length constraint (redundant)
+        if "Optional" in annotation and arguments.get("min_length") == str(0):
+            arguments.pop("min_length")
+
         return GeneratorModelField(
             name=name,
-            annotation=self._annotations.serialize(field.annotation),
+            annotation=annotation,
             arguments=arguments,
         )
 
