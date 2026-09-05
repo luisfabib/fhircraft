@@ -53,85 +53,94 @@ class ModelSerializer:
         if not issubclass(model, BaseModel):
             raise ValueError(f"Model '{model.__name__}' is not a Pydantic model.")
 
-        serialized_data = GeneratorModel(
-            name=model.__name__, docstring=inspect.getdoc(model)
-        )
+        with self._tracker.model_context(model.__name__):
+            serialized_data = GeneratorModel(
+                name=model.__name__, docstring=inspect.getdoc(model)
+            )
 
-        # Serialize base classes and track imports for all bases
-        for base in model.__bases__:
-            serialized_data.bases.append(self._serialize_base(base))
+            # Serialize base classes and track imports for all bases
+            for base in model.__bases__:
+                serialized_data.bases.append(
+                    self._serialize_base(base, serialized_data.name)
+                )
 
-        # Serialize FHIR metadata
-        if issubclass(model, (FHIRBaseModel, FHIRSliceModel)):
-            serialized_data.meta = self._serialize_metadata(model)
+            # Serialize FHIR metadata
+            if issubclass(model, (FHIRBaseModel, FHIRSliceModel)):
+                serialized_data.meta = self._serialize_metadata(model)
 
-        # Serialize model fields
-        for field_name, field_info in model.model_fields.items():
-            serialized_field = self._serialize_field(field_name, field_info)
-            # Check if the field is inherited from a base class and has the same implementation
-            for base in model.__mro__[1:]:
-                if issubclass(base, BaseModel):
-                    if field_name in base.model_fields:
-                        inherited_field = self._serialize_field(
-                            field_name, base.model_fields[field_name], track=False
-                        )
-                        if serialized_field == inherited_field:
-                            break
-            else:
-                # Add the property to the serialized data if it is not inherited or has a different implementation
-                serialized_data.fields.append(serialized_field)
-
-        # Serialize model properties
-        for name, prop in model.__dict__.items():
-            if isinstance(prop, property):
-                serialized_property = self._serialize_property(name, prop)
-                # Check if the property is inherited from a base class and has the same implementation
+            # Serialize model fields
+            for field_name, field_info in model.model_fields.items():
+                serialized_field = self._serialize_field(field_name, field_info)
+                # Check if the field is inherited from a base class and has the same implementation
                 for base in model.__mro__[1:]:
-                    if name in base.__dict__:
-                        inherited_property = self._serialize_property(
-                            name, prop, track=False
-                        )
-                        if serialized_property == inherited_property:
-                            break
+                    if issubclass(base, BaseModel):
+                        if field_name in base.model_fields:
+                            inherited_field = self._serialize_field(
+                                field_name, base.model_fields[field_name], track=False
+                            )
+                            if serialized_field == inherited_field:
+                                break
                 else:
                     # Add the property to the serialized data if it is not inherited or has a different implementation
-                    serialized_data.properties.append(serialized_property)
+                    serialized_data.fields.append(serialized_field)
 
-        # Serialize field validators
-        for name, validator in model.__pydantic_decorators__.field_validators.items():
-            serialized_validator = self._serialize_field_validator(name, validator)
-            # Check if the validator is inherited from a base class and has the same implementation
-            for base in model.__mro__[1:]:
-                if name in base.__dict__:
-                    inherited_validator = self._serialize_field_validator(
-                        name, validator, track=False
-                    )
-                    if serialized_validator == inherited_validator:
-                        break
-            else:
-                self._tracker.track("pydantic", "field_validator")
-                # Add the validator to the serialized data if it is not inherited or has a different implementation
-                serialized_data.field_validators.append(serialized_validator)
+            # Serialize model properties
+            for name, prop in model.__dict__.items():
+                if isinstance(prop, property):
+                    serialized_property = self._serialize_property(name, prop)
+                    # Check if the property is inherited from a base class and has the same implementation
+                    for base in model.__mro__[1:]:
+                        if name in base.__dict__:
+                            inherited_property = self._serialize_property(
+                                name, prop, track=False
+                            )
+                            if serialized_property == inherited_property:
+                                break
+                    else:
+                        # Add the property to the serialized data if it is not inherited or has a different implementation
+                        serialized_data.properties.append(serialized_property)
 
-        # Serialize model validators
-        for name, validator in model.__pydantic_decorators__.model_validators.items():
-            serialized_validator = self._serialize_model_validator(name, validator)
-            # Check if the validator is inherited from a base class and has the same implementation
-            for base in model.__mro__[1:]:
-                if name in base.__dict__:
-                    inherited_validator = self._serialize_model_validator(
-                        name, validator, track=False
-                    )
-                    if serialized_validator == inherited_validator:
-                        break
-            else:
-                self._tracker.track("pydantic", "model_validator")
-                # Add the validator to the serialized data if it is not inherited or has a different implementation
-                serialized_data.model_validators.append(serialized_validator)
+            # Serialize field validators
+            for (
+                name,
+                validator,
+            ) in model.__pydantic_decorators__.field_validators.items():
+                serialized_validator = self._serialize_field_validator(name, validator)
+                # Check if the validator is inherited from a base class and has the same implementation
+                for base in model.__mro__[1:]:
+                    if name in base.__dict__:
+                        inherited_validator = self._serialize_field_validator(
+                            name, validator, track=False
+                        )
+                        if serialized_validator == inherited_validator:
+                            break
+                else:
+                    self._tracker.track("pydantic", "field_validator")
+                    # Add the validator to the serialized data if it is not inherited or has a different implementation
+                    serialized_data.field_validators.append(serialized_validator)
 
-        return serialized_data
+            # Serialize model validators
+            for (
+                name,
+                validator,
+            ) in model.__pydantic_decorators__.model_validators.items():
+                serialized_validator = self._serialize_model_validator(name, validator)
+                # Check if the validator is inherited from a base class and has the same implementation
+                for base in model.__mro__[1:]:
+                    if name in base.__dict__:
+                        inherited_validator = self._serialize_model_validator(
+                            name, validator, track=False
+                        )
+                        if serialized_validator == inherited_validator:
+                            break
+                else:
+                    self._tracker.track("pydantic", "model_validator")
+                    # Add the validator to the serialized data if it is not inherited or has a different implementation
+                    serialized_data.model_validators.append(serialized_validator)
 
-    def _serialize_base(self, base: type) -> str:
+            return serialized_data
+
+    def _serialize_base(self, base: type, model_name: str) -> str:
         # Get the name of the base class
         name = getattr(base, "__name__", None)
         if not name:
@@ -148,14 +157,22 @@ class ModelSerializer:
                 self._tracker.track_alias(module, "fhir")
                 name = f"fhir.{name}"
             elif module.startswith("fhircraft.fhir.resources.factory"):
-                self._tracker.track_generated_model(self.serialize(base))
+                serialized_base = self.serialize(base)
+                if name == model_name:
+                    name = f"{model_name}Base"
+                    serialized_base.name = name
+                self._tracker.track_generated_model(serialized_base)
             else:
                 self._tracker.track(module, name)
         # For any custom Pydantic models, serialize them and add to the generator's module models list
         elif issubclass(base, BaseModel) and base is not BaseModel:
-            self._tracker.track_generated_model(self.serialize(base))
+            serialized_base = self.serialize(base)
+            if name == model_name:
+                name = f"{model_name}Base"
+                serialized_base.name = name
+            self._tracker.track_generated_model(serialized_base)
         else:
-            self._tracker.track(module, base.__name__)
+            self._tracker.track(module, name)
         return name
 
     def _serialize_metadata(

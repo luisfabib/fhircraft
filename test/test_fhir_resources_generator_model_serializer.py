@@ -202,7 +202,7 @@ def test_serialize__skips_deeply_inherited_properties_and_validators(serializer)
 
 
 def test_serialize_base__serializes_fhir_resource(serializer):
-    result = serializer._serialize_base(fhir.Patient)
+    result = serializer._serialize_base(fhir.Patient, "")
 
     assert result == "fhir.Patient"
     assert (
@@ -213,7 +213,7 @@ def test_serialize_base__serializes_fhir_resource(serializer):
 
 
 def test_serialize_base__serializes_fhir_complex_with_alias(serializer):
-    result = serializer._serialize_base(fhir.CodeableConcept)
+    result = serializer._serialize_base(fhir.CodeableConcept, "")
 
     assert result == "fhir.CodeableConcept"
     assert (
@@ -224,7 +224,7 @@ def test_serialize_base__serializes_fhir_complex_with_alias(serializer):
 
 
 def test_serialize_base__serializes_fhir_primitive_with_alias(serializer):
-    result = serializer._serialize_base(fhir.String)
+    result = serializer._serialize_base(fhir.String, "")
 
     assert result == "fhir.String"
     assert (
@@ -235,7 +235,7 @@ def test_serialize_base__serializes_fhir_primitive_with_alias(serializer):
 
 
 def test_serialize_base__serializes_fhir_slice_model(serializer):
-    result = serializer._serialize_base(FHIRSliceModel)
+    result = serializer._serialize_base(FHIRSliceModel, "")
 
     assert result == "FHIRSliceModel"
     assert "fhircraft.fhir.resources" in serializer._tracker.imports
@@ -243,7 +243,7 @@ def test_serialize_base__serializes_fhir_slice_model(serializer):
 
 
 def test_serialize_base__serializes_fhir_base_model(serializer):
-    result = serializer._serialize_base(FHIRBaseModel)
+    result = serializer._serialize_base(FHIRBaseModel, "")
 
     assert result == "FHIRBaseModel"
     assert "fhircraft" in serializer._tracker.imports
@@ -251,7 +251,7 @@ def test_serialize_base__serializes_fhir_base_model(serializer):
 
 
 def test_serialize_base__serializes_pydantic_base_model(serializer):
-    result = serializer._serialize_base(BaseModel)
+    result = serializer._serialize_base(BaseModel, "")
 
     assert result == "BaseModel"
     assert "pydantic" in serializer._tracker.imports
@@ -265,15 +265,29 @@ def test_serialize_base__serializes_custom_base(mock_serialize, serializer):
     class CustomBase(BaseModel):
         pass
 
-    result = serializer._serialize_base(CustomBase)
+    result = serializer._serialize_base(CustomBase, "")
 
     assert result == "CustomBase"
     assert mock_serialize.called
     assert serializer._tracker.generated_models[0].name == "CustomBase"
 
 
+@patch("fhircraft.fhir.resources.generator._model.ModelSerializer.serialize")
+def test_serialize_base__handles_conflicting_base_name(mock_serialize, serializer):
+    mock_serialize.return_value = GeneratorModel(name="SameModelName")
+
+    class SameModelName(BaseModel):
+        pass
+
+    result = serializer._serialize_base(SameModelName, "SameModelName")
+
+    assert result == "SameModelNameBase"
+    assert mock_serialize.called
+    assert serializer._tracker.generated_models[0].name == "SameModelNameBase"
+
+
 def test_serialize_base__serializes_non_pydantic_base(serializer):
-    result = serializer._serialize_base(ABC)
+    result = serializer._serialize_base(ABC, "")
 
     assert result == "ABC"
     assert "abc" in serializer._tracker.imports
@@ -281,7 +295,7 @@ def test_serialize_base__serializes_non_pydantic_base(serializer):
 
 
 def test_serialize_base__serializes_non_pydantic_base_without_import(serializer):
-    result = serializer._serialize_base(str)
+    result = serializer._serialize_base(str, "")
 
     assert result == "str"
 
@@ -289,7 +303,7 @@ def test_serialize_base__serializes_non_pydantic_base_without_import(serializer)
 def test_serialize_base__raises_when_no_name(serializer):
     invalid_base = object()  # plain object or non-type instance lacking __name__
     with pytest.raises(ValueError, match="has no __name__ attribute"):
-        serializer._serialize_base(invalid_base)
+        serializer._serialize_base(invalid_base, "")
 
 
 # ----------------------------------------
