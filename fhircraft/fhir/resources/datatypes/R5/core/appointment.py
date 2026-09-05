@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AppointmentParticipant(BackboneElement):
     """
     List of participants involved in the appointment.
@@ -49,6 +50,7 @@ class AppointmentParticipant(BackboneElement):
     status: fhir.code = Field(
         description="accepted | declined | tentative | needs-action",
     )
+
 
 class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
     """
@@ -88,6 +90,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
         default=None,
     )
 
+
 class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
     """
     Information about monthly recurring appointments.
@@ -109,6 +112,7 @@ class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
         description="Recurs every nth month",
     )
 
+
 class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
     """
     Information about yearly recurring appointments.
@@ -117,6 +121,7 @@ class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
     yearInterval: fhir.positiveInt = Field(
         description="Recurs every nth year",
     )
+
 
 class AppointmentRecurrenceTemplate(BackboneElement):
     """
@@ -162,6 +167,7 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Any recurrence IDs that should be excluded from the recurrence",
         default=None,
     )
+
 
 class Appointment(DomainResource):
     """
@@ -286,8 +292,8 @@ class Appointment(DomainResource):
     )
     participant: ListType[AppointmentParticipant] = Field(
         description="Participants involved in appointment",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     recurrenceId: Optional[fhir.positiveInt] = Field(
         description="The sequence number in the recurrence",
         default=None,

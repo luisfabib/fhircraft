@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CoverageEligibilityRequestSupportingInfo(BackboneElement):
     """
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
@@ -37,6 +38,7 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
         description="Applies to all items",
         default=None,
     )
+
 
 class CoverageEligibilityRequestInsurance(BackboneElement):
     """
@@ -54,6 +56,7 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         description="Additional provider contract number",
         default=None,
     )
+
 
 class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
     """
@@ -84,6 +87,7 @@ class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
             field_name_base="diagnosis",
             required=False,
         )
+
 
 class CoverageEligibilityRequestItem(BackboneElement):
     """
@@ -131,6 +135,7 @@ class CoverageEligibilityRequestItem(BackboneElement):
         default=None,
     )
 
+
 class CoverageEligibilityRequest(DomainResource):
     """
     The CoverageEligibilityRequest provides patient and insurance coverage information to an insurer for them to respond, in the form of an CoverageEligibilityResponse, with information regarding whether the stated coverage is valid and in-force and optionally to provide the insurance details of the policy.
@@ -167,8 +172,8 @@ class CoverageEligibilityRequest(DomainResource):
     )
     purpose: ListType[fhir.code] = Field(
         description="auth-requirements | benefits | discovery | validation",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     patient: Reference = Field(
         description="Intended recipient of products and services",
     )

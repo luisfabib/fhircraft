@@ -35,8 +35,8 @@ class DeviceUsageAdherence(BackboneElement):
     )
     reason: ListType[CodeableConcept] = Field(
         description="lost | stolen | prescribed | broken | burned | forgot",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
 
 class DeviceUsage(DomainResource):

@@ -320,8 +320,8 @@ class ResearchElementDefinition(DomainResource):
     )
     characteristic: ListType[ResearchElementDefinitionCharacteristic] = Field(
         description="What defines the members of the research element",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
     @property
     def subject(self):

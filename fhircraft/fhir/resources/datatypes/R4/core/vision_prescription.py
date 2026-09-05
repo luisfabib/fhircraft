@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class VisionPrescriptionLensSpecificationPrism(BackboneElement):
     """
     Allows for adjustment on two axis.
@@ -32,6 +33,7 @@ class VisionPrescriptionLensSpecificationPrism(BackboneElement):
     base: fhir.code = Field(
         description="up | down | in | out",
     )
+
 
 class VisionPrescriptionLensSpecification(BackboneElement):
     """
@@ -93,6 +95,7 @@ class VisionPrescriptionLensSpecification(BackboneElement):
         default=None,
     )
 
+
 class VisionPrescription(DomainResource):
     """
     An authorization for the provision of glasses and/or contact lenses to a patient.
@@ -139,5 +142,5 @@ class VisionPrescription(DomainResource):
     )
     lensSpecification: ListType[VisionPrescriptionLensSpecification] = Field(
         description="Vision lens authorization",
-     	min_length=1,
-	)
+        min_length=1,
+    )

@@ -34,8 +34,8 @@ class AllergyIntoleranceReaction(BackboneElement):
     )
     manifestation: ListType[CodeableConcept] = Field(
         description="Clinical symptoms/signs associated with the Event",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     description: Optional[fhir.string] = Field(
         description="Description of the event as a whole",
         default=None,

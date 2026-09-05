@@ -203,8 +203,8 @@ class DocumentReference(DomainResource):
     )
     content: ListType[DocumentReferenceContent] = Field(
         description="Document referenced",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
     @model_validator(mode="after")
     def FHIR_docRef_1_constraint_validator(self):

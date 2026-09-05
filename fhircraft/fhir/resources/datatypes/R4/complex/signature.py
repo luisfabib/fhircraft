@@ -9,6 +9,7 @@ from .coding import Coding
 from .element import Element
 from .reference import Reference
 
+
 class Signature(Element):
     """
     A Signature - XML DigSig, JWS, Graphical image of signature, etc.
@@ -18,8 +19,8 @@ class Signature(Element):
 
     type: List[Coding] = Field(
         description="Indication of the reason the entity signed the object(s)",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     when: fhir.instant = Field(
         description="When the signature was created",
     )

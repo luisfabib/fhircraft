@@ -474,8 +474,8 @@ class CapabilityStatement(DomainResource):
     )
     format: ListType[fhir.code] = Field(
         description="formats supported (xml | json | ttl | mime type)",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     patchFormat: Optional[ListType[fhir.code]] = Field(
         description="Patch formats supported",
         default=None,

@@ -72,8 +72,8 @@ class InsurancePlanCoverage(BackboneElement):
     )
     benefit: ListType[InsurancePlanCoverageBenefit] = Field(
         description="List of benefits",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
 
 class InsurancePlanPlanGeneralCost(BackboneElement):

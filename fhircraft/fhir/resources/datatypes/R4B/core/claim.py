@@ -669,8 +669,8 @@ class Claim(DomainResource):
     )
     insurance: ListType[ClaimInsurance] = Field(
         description="Patient insurance information",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     accident: Optional[ClaimAccident] = Field(
         description="Details of the event",
         default=None,

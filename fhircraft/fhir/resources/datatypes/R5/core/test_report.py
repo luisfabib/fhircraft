@@ -99,8 +99,8 @@ class TestReportSetup(BackboneElement):
 
     action: ListType[TestReportSetupAction] = Field(
         description="A setup operation or assert that was executed",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
 
 class TestReportTestActionOperation(BackboneElement):
@@ -207,8 +207,8 @@ class TestReportTest(BackboneElement):
     )
     action: ListType[TestReportTestAction] = Field(
         description="A test operation or assert that was performed",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
 
 class TestReportTeardownAction(BackboneElement):
@@ -228,8 +228,8 @@ class TestReportTeardown(BackboneElement):
 
     action: ListType[TestReportTeardownAction] = Field(
         description="One or more teardown operations performed",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
 
 class TestReport(DomainResource):

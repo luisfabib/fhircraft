@@ -163,8 +163,8 @@ class DocumentReference(DomainResource):
     )
     content: ListType[DocumentReferenceContent] = Field(
         description="Document referenced",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     context: Optional[DocumentReferenceContext] = Field(
         description="Clinical context of document",
         default=None,

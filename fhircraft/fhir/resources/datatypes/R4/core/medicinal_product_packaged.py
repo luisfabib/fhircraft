@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicinalProductPackagedBatchIdentifier(BackboneElement):
     """
     Batch numbering.
@@ -35,6 +36,7 @@ class MedicinalProductPackagedBatchIdentifier(BackboneElement):
         description="A number appearing on the immediate packaging (and not the outer packaging)",
         default=None,
     )
+
 
 class MedicinalProductPackagedPackageItem(BackboneElement):
     """
@@ -87,6 +89,7 @@ class MedicinalProductPackagedPackageItem(BackboneElement):
         description="Manufacturer of this Package Item",
         default=None,
     )
+
 
 class MedicinalProductPackaged(DomainResource):
     """
@@ -145,5 +148,5 @@ class MedicinalProductPackaged(DomainResource):
     )
     packageItem: ListType[MedicinalProductPackagedPackageItem] = Field(
         description="A packaging item, as a contained for medicine, possibly with other packaging items within",
-     	min_length=1,
-	)
+        min_length=1,
+    )

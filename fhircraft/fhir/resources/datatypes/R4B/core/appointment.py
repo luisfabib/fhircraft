@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AppointmentParticipant(BackboneElement):
     """
     List of participants involved in the appointment.
@@ -44,6 +45,7 @@ class AppointmentParticipant(BackboneElement):
         description="Participation period of the actor",
         default=None,
     )
+
 
 class Appointment(DomainResource):
     """
@@ -147,8 +149,8 @@ class Appointment(DomainResource):
     )
     participant: ListType[AppointmentParticipant] = Field(
         description="Participants involved in appointment",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
         default=None,

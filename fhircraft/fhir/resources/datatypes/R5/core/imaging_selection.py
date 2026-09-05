@@ -49,8 +49,8 @@ class ImagingSelectionInstanceImageRegion2D(BackboneElement):
     )
     coordinate: ListType[fhir.decimal] = Field(
         description="Specifies the coordinates that define the image region",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
 
 class ImagingSelectionInstanceImageRegion3D(BackboneElement):
@@ -63,8 +63,8 @@ class ImagingSelectionInstanceImageRegion3D(BackboneElement):
     )
     coordinate: ListType[fhir.decimal] = Field(
         description="Specifies the coordinates that define the image region",
-     	min_length=1,
-	)
+        min_length=1,
+    )
 
 
 class ImagingSelectionInstance(BackboneElement):

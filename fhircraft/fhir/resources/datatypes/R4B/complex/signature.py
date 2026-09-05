@@ -6,6 +6,7 @@ import fhircraft.fhir.resources.validators as fhir_validators
 import fhircraft.fhir.resources.datatypes.R4B.primitive as fhir
 from fhircraft.fhir.resources.datatypes.R4B.complex import Coding, Element, Reference
 
+
 class Signature(Element):
     """
     A Signature - XML DigSig, JWS, Graphical image of signature, etc.
@@ -15,8 +16,8 @@ class Signature(Element):
 
     type: List[Coding] = Field(
         description="Indication of the reason the entity signed the object(s)",
-     	min_length=1,
-	)
+        min_length=1,
+    )
     when: fhir.instant = Field(
         description="When the signature was created",
     )
