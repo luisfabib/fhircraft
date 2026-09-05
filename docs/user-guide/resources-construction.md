@@ -441,12 +441,14 @@ print(factory.list_built())  # []
 
 The code generator converts constructed Pydantic models into Python source code. This is useful when you want to save generated models to files instead of constructing them at runtime. The generated code includes all field definitions, validators, and properties from the original model.
 
-You can use code generation to avoid runtime overhead of model construction. Instead of loading structure definitions and constructing models each time your application starts, you generate the code once and import the models directly. This is especially valuable in production environments where startup time matters or to generate a re-usable a codebase for Python-based FHIR service or application.
+You can use code generation to avoid runtime overhead of model construction. Instead of loading structure definitions and constructing models each time your application starts, you generate the code once and import the models directly. This is especially valuable in production environments where startup time matters or to generate a re-usable codebase for a Python-based FHIR service or application.
 
-The generated code is readable Python that you can inspect, modify, and share with others. All imports are included automatically, so the generated file is self-contained.
+`FHIRModelFactory` is the primary entry point for code generation, since it already keeps track of every model it has built. Its `generate_source`, `generate_files`, and `generate` methods each delegate to a `CodeGenerator` internally, and if you omit the `resources` argument they operate on every model currently in the factory's construction cache, so a typical workflow is simply to build the profiles you need and then generate:
+
+`generate_source` is the simplest of the three. It returns a single string of Python source for one or more models, which is useful when you just want to inspect the generated code or embed it somewhere yourself:
 
 ```python
-from fhircraft import FHIRModelFactory, generate_code
+from fhircraft import FHIRModelFactory
 
 factory = FHIRModelFactory(fhir_release="R4")
 
@@ -458,7 +460,7 @@ USCorePatient = factory.build(
 
 # Generate Python source code for the model
 # The code includes all fields, validators, and imports
-source_code = generate_code(USCorePatient)
+source_code = factory.generate_source(USCorePatient)
 
 # Save to a file for later import
 with open("us_core_patient.py", "w") as f:
@@ -467,52 +469,53 @@ with open("us_core_patient.py", "w") as f:
 print("Generated model saved to us_core_patient.py")
 ```
 
+Once you start generating more than a handful of profiles, dumping everything into one file becomes unwieldy, and generating each profile separately duplicates any base classes and value types they share. `generate` addresses both problems by writing a proper, importable package to a directory of your choosing:
+
+```python
+from fhircraft import FHIRModelFactory
+
+factory = FHIRModelFactory(fhir_release="R4")
+factory.register_package("hl7.fhir.us.core", "5.0.1")
+
+us_core_profiles = [
+    "us-core-patient",
+    "us-core-condition",
+    "us-core-procedure",
+]
+models = [
+    factory.build(f"http://hl7.org/fhir/us/core/StructureDefinition/{profile_name}")
+    for profile_name in us_core_profiles
+]
+
+written_paths = factory.generate("generated/us_core", resources=models)
+print(f"Wrote {len(written_paths)} files")
+```
+
+By default `generate` splits the output, giving every generated model its own module, including base classes and referenced types that were not part of your original list but were pulled in because a profile depends on them. Modules import from each other with ordinary relative imports, and a generated `__init__.py` re-exports every model so the package can be used as a single unit:
+
+```
+from generated.us_core import Patient, Condition, Procedure
+```
+
+Because each model is written once regardless of how many profiles reference it, shared base classes and datatypes are never duplicated across files, which is what makes this approach scale to entire implementation guides rather than a handful of profiles. If you would rather keep everything in one file, as `generate_source` does, pass `split=False`; `generate` then writes a single `models.py` alongside the `__init__.py`. The target directory is created automatically if it does not already exist, and passing `exist_ok=False` makes the call fail instead of writing into a directory that is already there.
+
+When you need the generated files without touching disk, for example to inspect them, pipe them through a formatter, or package them up yourself, call `generate_files` instead. It accepts the same `resources` and `split` arguments as `generate` but returns a dictionary mapping filenames to their source, leaving writing to you:
+
+```python
+files = factory.generate_files(resources=models, split=True)
+for filename, source in files.items():
+    print(filename, len(source), "bytes")
+```
+
+If you are generating code for models that were not built through a factory, for instance plain Pydantic models assembled by hand, use the `CodeGenerator` class directly from `fhircraft.fhir.resources.generator`. It exposes the same three methods and is what the factory methods call under the hood.
+
 See the [Pydantic JSON schema documentation](https://docs.pydantic.dev/latest/concepts/json_schema/) for information about model introspection.
-
-!!! example "Multiple Models Generation"
-
-    When working with multiple profiles from an implementation guide, you generate all models together in a single file. This keeps related models organized and ensures they can reference each other correctly.
-
-    ```python
-    from fhircraft import FHIRModelFactory, generate_code
-
-    factory = FHIRModelFactory(fhir_release="R4")
-    
-    # Load the implementation guide
-    factory.register_package("hl7.fhir.us.core", "5.0.1")
-
-    # Construct multiple related models
-    models_to_generate = []
-
-    us_core_profiles = [
-        "us-core-patient",
-        "us-core-condition",
-        "us-core-procedure",
-    ]
-
-    # Construct each model and add to the list
-    for profile_name in us_core_profiles:
-        model = factory.build(
-            f"http://hl7.org/fhir/us/core/StructureDefinition/{profile_name}"
-        )
-        models_to_generate.append(model)
-
-    # Generate source code for all models together
-    # This ensures proper cross-references between models
-    source_code = generate_code(models_to_generate)
-
-    # Save to a single module file
-    with open("us_core_models.py", "w") as f:
-        f.write(source_code)
-
-    print(f"Generated {len(models_to_generate)} models in us_core_models.py")
-    ```
 
 ### Generated Code Structure
 
 The generated code follows a consistent structure. It starts with imports, then defines models in dependency order so that base classes appear before derived classes. Each model includes field definitions with type annotations, default values, and metadata.
 
-Here is what the generated code looks like:
+Here is what a single generated model looks like:
 
 ```python
 # Generated automatically - includes timestamp and version
@@ -539,7 +542,8 @@ class Patient(BaseModel):
     )
 ```
 
-The generator handles inheritance, forward references, and circular dependencies automatically.
+When the output is split across a package, each file follows this same shape, but only carries the imports its own model needs; anything it depends on from another generated model is pulled in with a relative import instead of being redefined. The generator handles inheritance, forward references, and circular dependencies automatically, whether the result ends up in one file or spread across many.
+
 
 ## Common Problems
 
