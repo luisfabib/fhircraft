@@ -1,7 +1,6 @@
 import json
 import os
 import pprint
-from unittest.mock import MagicMock
 
 import pytest
 from pydantic import BaseModel
