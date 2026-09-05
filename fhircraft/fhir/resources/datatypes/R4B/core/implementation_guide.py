@@ -198,6 +198,7 @@ class ImplementationGuideDefinition(BackboneElement):
     )
     resource: ListType[ImplementationGuideDefinitionResource] = Field(
         description="Resource in the implementation guide",
+        min_length=1,
     )
     page: Optional[ImplementationGuideDefinitionPage] = Field(
         description="Page/Section in the Guide",
@@ -280,6 +281,7 @@ class ImplementationGuideManifest(BackboneElement):
     )
     resource: ListType[ImplementationGuideManifestResource] = Field(
         description="Resource in the implementation guide",
+        min_length=1,
     )
     page: Optional[ListType[ImplementationGuideManifestPage]] = Field(
         description="HTML page within the parent IG",
@@ -374,6 +376,7 @@ class ImplementationGuide(DomainResource):
     )
     fhirVersion: ListType[fhir.code] = Field(
         description="FHIR Version(s) this Implementation Guide targets",
+        min_length=1,
     )
     dependsOn: Optional[ListType[ImplementationGuideDependsOn]] = Field(
         description="Another Implementation guide this depends on",

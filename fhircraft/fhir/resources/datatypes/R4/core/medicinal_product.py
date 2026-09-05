@@ -243,6 +243,7 @@ class MedicinalProduct(DomainResource):
     )
     name: ListType[MedicinalProductName] = Field(
         description="The product\u0027s name, including full name and possibly coded parts",
+        min_length=1,
     )
     crossReference: Optional[ListType[Identifier]] = Field(
         description="Reference to another product, e.g. for linking authorised to investigational product",

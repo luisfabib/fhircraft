@@ -66,6 +66,7 @@ class StructureDefinitionSnapshot(BackboneElement):
 
     element: ListType[ElementDefinition] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
+        min_length=1,
     )
 
 
@@ -76,6 +77,7 @@ class StructureDefinitionDifferential(BackboneElement):
 
     element: ListType[ElementDefinition] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
+        min_length=1,
     )
 
 

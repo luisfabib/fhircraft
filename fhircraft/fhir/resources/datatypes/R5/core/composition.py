@@ -150,6 +150,7 @@ class Composition(DomainResource):
     )
     author: ListType[Reference] = Field(
         description="Who and/or what authored the composition",
+        min_length=1,
     )
     name: Optional[fhir.string] = Field(
         description="Name for this Composition (computer friendly)",

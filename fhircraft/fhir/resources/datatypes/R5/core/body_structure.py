@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class BodyStructureIncludedStructure(BackboneElement):
     """
     The anatomical location(s) or region(s) of the specimen, lesion, or body structure.
@@ -50,6 +51,7 @@ class BodyStructureIncludedStructure(BackboneElement):
         default=None,
     )
 
+
 class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
     BackboneElement
 ):
@@ -65,6 +67,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
         description="Measured distance from body landmark",
         default=None,
     )
+
 
 class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
     """
@@ -91,6 +94,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
         description="Relative landmark surface orientation",
         default=None,
     )
+
 
 class BodyStructureExcludedStructure(BackboneElement):
     """
@@ -120,6 +124,7 @@ class BodyStructureExcludedStructure(BackboneElement):
         default=None,
     )
 
+
 class BodyStructure(DomainResource):
     """
     Record details about an anatomical structure.  This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
@@ -143,6 +148,7 @@ class BodyStructure(DomainResource):
     )
     includedStructure: ListType[BodyStructureIncludedStructure] = Field(
         description="Included anatomic location(s)",
+        min_length=1,
     )
     excludedStructure: Optional[ListType[BodyStructureExcludedStructure]] = Field(
         description="Excluded anatomic locations(s)",

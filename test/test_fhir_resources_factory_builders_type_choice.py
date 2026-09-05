@@ -1,6 +1,7 @@
 from typing import List, Optional
 from unittest.mock import MagicMock, patch
 
+from pydantic_core import PydanticUndefined
 import pytest
 
 from fhircraft.fhir.resources.datatypes.R4 import primitive as primitives
@@ -203,7 +204,7 @@ def test_build__non_keyword_typed_name_has_no_validation_alias(builder, index):
     ti = make_type_info(r4_complex.Quantity, "complex-type")
     with patch.object(builder, "resolve_type", return_value=ti):
         result = builder.build(node, index)
-    assert result.fields[0].validation_alias is None
+    assert result.fields[0].validation_alias is PydanticUndefined
 
 
 def test_build__non_array_typed_field_annotation_is_optional(builder, index):

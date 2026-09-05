@@ -407,6 +407,7 @@ class Evidence(DomainResource):
     )
     variableDefinition: ListType[EvidenceVariableDefinition] = Field(
         description="Evidence variable such as population, exposure, or outcome",
+        min_length=1,
     )
     synthesisType: Optional[CodeableConcept] = Field(
         description="The method to combine studies",

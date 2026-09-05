@@ -1,0 +1,109 @@
+{#- Jinja2 macros for rendering individual parts of a generated model class. -#}
+{#- Import into resource_template.py.j2 via: {% from "_macros.py.j2" import ... %} -#}
+
+{% macro render_field(field) -%}
+{{ field.name }}: {{ field.annotation }} = Field(
+    {% for k, v in field.arguments.items() %}
+    {{ k }}={%if v is string %}{{ v | indent(4, false) }}{% else %}{{ v }}{% endif %},
+    {% endfor %}
+)
+{%- endmacro %}
+
+
+{% macro render_partial_function(fixed_args, func) -%}
+{{ func.name }}({{ fixed_args }},
+        {% for arg in func.arguments %}
+        {{ arg }},
+        {% endfor %}
+        {% for k, v in func.keywords.items() %}
+        {{ k }}={%if v is string %}{{ v | indent(8, false) }}{% else %}{{ v }}{% endif %},
+        {% endfor %}
+    )
+{%- endmacro %}
+
+
+{% macro render_property(prop) -%}
+{% if prop.source %}
+{{ prop.source }}
+{% elif prop.partial %}
+@property
+def {{ prop.name }}(self):
+    return {{ render_partial_function("self", prop.partial) }}
+{% endif %}
+{%- endmacro %}
+
+
+{% macro render_field_validator(validator) -%}
+{% if validator.source %}
+{{ validator.source }}
+{% elif validator.partial %}
+@field_validator(*{{ validator.fields }}, mode="{{ validator.mode }}", check_fields={{ validator.check_fields }})
+@classmethod
+def {{ validator.name }}(cls, value):
+    return {{ render_partial_function("cls, value", validator.partial) }}
+{% endif %}
+
+{%- endmacro %}
+
+
+{% macro render_model_validator(validator) -%}
+{% if validator.source %}
+{{ validator.source }}
+{% elif validator.partial %}
+@model_validator(mode="{{ validator.mode }}")
+def {{ validator.name }}(self):
+    return {{ render_partial_function("self", validator.partial) }}
+{% endif %}
+
+{%- endmacro %}
+
+
+{% macro render_class(model, include_validators) -%}
+class {{ model.name }}({% for base in model.bases %}{{ base }}{% if not loop.last %}, {% endif %}{% endfor %}):
+    {% if model.docstring %}
+    """
+    {{ model.docstring | indent(4, false)  }}
+    """
+    {% endif %}
+    {% if model.meta.min_cardinality is not none %}
+    min_cardinality: ClassVar[int] = {{ model.meta.min_cardinality }}
+    {% endif %}
+    {% if model.meta.max_cardinality is not none %}
+    max_cardinality: ClassVar[int | None] = {{ model.meta.max_cardinality }}
+    {% endif %}
+    {% if model.meta.fhir_release %}
+    _fhir_release = {{ model.meta.fhir_release }}
+    {% endif %}
+    {% if model.meta.type %}
+    _type = {{ model.meta.type }}
+    {% endif %}
+    {% if model.meta.kind %}
+    _kind = {{ model.meta.kind }}
+    {% endif %}
+    {% if model.meta.abstract is not none %}
+    _abstract = {{ model.meta.abstract }}
+    {% endif %}
+    {% if model.meta.canonical_url %}
+    _canonical_url = {{ model.meta.canonical_url }}
+    {% endif %}
+
+    {% for field in model.fields %}
+    {{ render_field(field) | indent(4, false) }}
+    {% else %}
+    pass
+    {% endfor %}
+
+    {% for prop in model.properties %}
+    {{ render_property(prop) | indent(4, false) }}
+
+    {% endfor %}
+    {% for validator in model.field_validators %}
+    {{ render_field_validator(validator) | indent(4, false) }}
+
+    {% endfor %}
+    {% for validator in model.model_validators %}
+    {{ render_model_validator(validator) | indent(4, false) }}
+
+    {% endfor %}
+
+{%- endmacro %}

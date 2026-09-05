@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ProvenanceAgent(BackboneElement):
     """
     An actor taking a role in an activity  for which it can be assigned some degree of responsibility for the activity taking place.
@@ -40,6 +41,7 @@ class ProvenanceAgent(BackboneElement):
         description="Who the agent is representing",
         default=None,
     )
+
 
 class ProvenanceEntityAgent(BackboneElement):
     """
@@ -63,6 +65,7 @@ class ProvenanceEntityAgent(BackboneElement):
         default=None,
     )
 
+
 class ProvenanceEntity(BackboneElement):
     """
     An entity used in this activity.
@@ -78,6 +81,7 @@ class ProvenanceEntity(BackboneElement):
         description="Entity is attributed to this agent",
         default=None,
     )
+
 
 class Provenance(DomainResource):
     """
@@ -102,6 +106,7 @@ class Provenance(DomainResource):
     )
     target: ListType[Reference] = Field(
         description="Target Reference(s) (usually version specific)",
+        min_length=1,
     )
     occurredPeriod: Optional[Period] = Field(
         description="When the activity occurred",
@@ -132,6 +137,7 @@ class Provenance(DomainResource):
     )
     agent: ListType[ProvenanceAgent] = Field(
         description="Actor involved",
+        min_length=1,
     )
     entity: Optional[ListType[ProvenanceEntity]] = Field(
         description="An entity used in this activity",

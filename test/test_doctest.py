@@ -160,6 +160,11 @@ def mock_open_func(file, mode="r", *args, **kwargs):
     return _original_open(file, mode, *args, **kwargs)
 
 
+def mock_makedirs(name, *args, **kwargs):
+    """Mock os.makedirs to prevent creating directories on disk."""
+    pass
+
+
 @pytest.mark.parametrize("fpath", pathlib.Path("docs").glob("**/*.md"), ids=str)
 @patch(
     "fhircraft.fhir.resources.factory.FHIRModelFactory.register_package",
@@ -175,9 +180,10 @@ def mock_open_func(file, mode="r", *args, **kwargs):
 )
 @patch("fhircraft.utils.load_file", mock_load_file)
 @patch("builtins.open", side_effect=mock_open_func)
+@patch("os.makedirs", side_effect=mock_makedirs)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.integration
-def test_documentation_examples(mock_file, fpath):
+def test_documentation_examples(mock_dirs, mock_file, fpath):
     check_md_file(fpath=fpath, memory=True)
 
 
@@ -191,7 +197,8 @@ def test_documentation_examples(mock_file, fpath):
     mock_factory_build,
 )
 @patch("builtins.open", side_effect=mock_open_func)
+@patch("os.makedirs", side_effect=mock_makedirs)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.integration
-def test_readme_examples(mock_file):
+def test_readme_examples(mock_dirs, mock_file):
     check_md_file(fpath=pathlib.Path("README.md"), memory=True)

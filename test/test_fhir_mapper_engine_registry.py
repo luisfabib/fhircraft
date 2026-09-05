@@ -11,6 +11,7 @@ from fhircraft.fhir.mapper.engine.registry import (
     MapperRegistryNotFoundError,
     StructureMapRegistry,
 )
+from fhircraft.utils import FHIRRelease
 
 # ---------------------------------------------------------------------------
 # Patch targets
@@ -39,11 +40,11 @@ def make_sm(
 ) -> MagicMock:
     sm = MagicMock(name="mock-structure-map")
     sm.url = url
-    sm.group = groups or []
+    sm.group = groups or [make_group("default")]
     return sm
 
 
-def make_registry(fhir_release: str = FHIR_RELEASE) -> StructureMapRegistry:
+def make_registry(fhir_release: FHIRRelease = FHIR_RELEASE) -> StructureMapRegistry:
     return StructureMapRegistry(fhir_release=fhir_release)
 
 
@@ -237,7 +238,12 @@ def test_get__downloads_and_manifests_when_internet_enabled():
         "url": SM_URL,
         "name": "MyMap",
         "status": "active",
-        "group": [],
+        "group": [
+            {
+                "name": "test-group",
+                "input": [{"name": "test-input", "mode": "source"}],
+            }
+        ],
     }
 
     mock_response = MagicMock()
@@ -272,7 +278,12 @@ def test_from_dict__validates_and_registers_valid_sm():
         "url": SM_URL,
         "name": "MyMap",
         "status": "active",
-        "group": [],
+        "group": [
+            {
+                "name": "test-group",
+                "input": [{"name": "test-input", "mode": "source"}],
+            }
+        ],
     }
     result = reg.from_dict(raw)
     assert result.url == SM_URL
@@ -292,7 +303,12 @@ def test_from_dict__respects_fail_if_exists():
         "url": SM_URL,
         "name": "MyMap",
         "status": "active",
-        "group": [],
+        "group": [
+            {
+                "name": "test-group",
+                "input": [{"name": "test-input", "mode": "source"}],
+            }
+        ],
     }
     reg.from_dict(raw)
     with pytest.raises(ValueError, match="already exists"):

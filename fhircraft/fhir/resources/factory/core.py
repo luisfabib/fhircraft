@@ -259,6 +259,94 @@ class FHIRModelFactory:
         """Allow the definition registry to resolve unknown URLs from the internet."""
         self.definition_registry.enable_internet_access()
 
+    # ------------------------------------------------------------------
+    # Code generation
+    # ------------------------------------------------------------------
+
+    def _resolve_generation_resources(
+        self, resources: type[BaseModel] | Sequence[type[BaseModel]] | None
+    ) -> type[BaseModel] | list[type[BaseModel]]:
+        if resources is not None:
+            return resources
+        if not self.construction_cache:
+            raise ValueError(
+                "No models have been built yet. Pass 'resources' explicitly or "
+                "call 'build()' first."
+            )
+        return list(self.construction_cache.values())
+
+    def generate_source(
+        self, resources: type[BaseModel] | Sequence[type[BaseModel]] | None = None
+    ) -> str:
+        """
+        Generate Python source code for one or more built models.
+
+        Args:
+            resources: Model class(es) to generate. Defaults to every model
+                currently in the construction cache.
+
+        Returns:
+            A string containing valid Python source code.
+        """
+        from fhircraft.fhir.resources.generator import CodeGenerator
+
+        return CodeGenerator().generate_source(
+            self._resolve_generation_resources(resources)
+        )
+
+    def generate_files(
+        self,
+        resources: type[BaseModel] | Sequence[type[BaseModel]] | None = None,
+        split: bool = True,
+    ) -> dict[str, str]:
+        """
+        Generate an importable package (as an in-memory mapping) for one or more built models.
+
+        Args:
+            resources: Model class(es) to generate. Defaults to every model
+                currently in the construction cache.
+            split: If True, each generated model gets its own module. If False,
+                all models are placed in a single `models.py` module.
+
+        Returns:
+            A mapping of relative filename (including `__init__.py`) to file content.
+        """
+        from fhircraft.fhir.resources.generator import CodeGenerator
+
+        return CodeGenerator().generate_files(
+            self._resolve_generation_resources(resources), split=split
+        )
+
+    def generate(
+        self,
+        output_dir: str,
+        resources: type[BaseModel] | Sequence[type[BaseModel]] | None = None,
+        split: bool = True,
+        exist_ok: bool = True,
+    ) -> list[str]:
+        """
+        Generate a fully importable Python package on disk for one or more built models.
+
+        Args:
+            output_dir: Directory the package is written to (created if missing).
+            resources: Model class(es) to generate. Defaults to every model
+                currently in the construction cache.
+            split: If True, each generated model gets its own module. If False,
+                all models are written to a single `models.py` module.
+            exist_ok: If False, raise if `output_dir` already exists.
+
+        Returns:
+            The absolute paths of all files written.
+        """
+        from fhircraft.fhir.resources.generator import CodeGenerator
+
+        return CodeGenerator().generate(
+            self._resolve_generation_resources(resources),
+            output_dir,
+            split=split,
+            exist_ok=exist_ok,
+        )
+
     def disable_internet_access(self) -> None:
         """Prevent the definition registry from making any outgoing HTTP requests."""
         self.definition_registry.disable_internet_access()

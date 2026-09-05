@@ -122,6 +122,7 @@ class SearchParameter(DomainResource):
     )
     base: ListType[fhir.code] = Field(
         description="The resource type(s) this search parameter applies to",
+        min_length=1,
     )
     type: fhir.code = Field(
         description="number | date | string | token | reference | composite | quantity | uri | special",

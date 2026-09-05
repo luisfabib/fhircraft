@@ -167,6 +167,7 @@ class Consent(DomainResource):
     )
     category: ListType[CodeableConcept] = Field(
         description="Classification of the consent statement - for indexing/retrieval",
+        min_length=1,
     )
     patient: Optional[Reference] = Field(
         description="Who the consent applies to",

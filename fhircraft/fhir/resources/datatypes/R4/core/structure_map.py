@@ -500,6 +500,7 @@ class StructureMapGroupRuleDependent(BackboneElement):
     )
     variable: ListType[fhir.string] = Field(
         description="Variable to pass to the rule or group",
+        min_length=1,
     )
 
 
@@ -513,6 +514,7 @@ class StructureMapGroupRule(BackboneElement):
     )
     source: ListType[StructureMapGroupRuleSource] = Field(
         description="Source inputs to the mapping",
+        min_length=1,
     )
     target: Optional[ListType[StructureMapGroupRuleTarget]] = Field(
         description="Content to create because of this mapping rule",
@@ -553,9 +555,11 @@ class StructureMapGroup(BackboneElement):
     )
     input: ListType[StructureMapGroupInput] = Field(
         description="Named instance provided when invoking the map",
+        min_length=1,
     )
     rule: ListType[StructureMapGroupRule] = Field(
         description="Transform Rule from source to target",
+        min_length=1,
     )
 
 
@@ -648,6 +652,7 @@ class StructureMap(DomainResource):
     )
     group: ListType[StructureMapGroup] = Field(
         description="Named sections for reader convenience",
+        min_length=1,
     )
 
     @model_validator(mode="after")

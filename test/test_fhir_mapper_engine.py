@@ -685,7 +685,12 @@ def test_resolve_aliased_source_structure_definitions():
                 alias="SimpleSourceAlias",
             )
         ],
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",
@@ -714,7 +719,12 @@ def test_resolve_unaliased_source_structure_definitions():
                 mode="source",
             )
         ],
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",
@@ -744,7 +754,12 @@ def test_resolve_aliased_target_structure_definitions():
                 alias="SimpleTargetAlias",
             )
         ],
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",
@@ -774,7 +789,12 @@ def test_resolve_unaliased_target_structure_definitions():
                 mode="target",
             )
         ],
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",
@@ -799,7 +819,12 @@ def test_resolve_structure_definitions_empty_structure_map():
     """Test resolving structure definitions when StructureMap has no structures defined."""
     structure_map = StructureMap(
         structure=None,
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",
@@ -824,7 +849,12 @@ def test_resolve_structure_definitions_missing_url():
                 mode="source", alias="TestAlias", url="http://test.org"
             )
         ],
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",
@@ -857,7 +887,12 @@ def test_resolve_structure_definitions_different_mode():
                 alias="TargetAsSource",
             ),
         ],
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",
@@ -901,7 +936,12 @@ def test_resolve_structure_definitions_mixed_scenarios():
                 alias="DifferentMode",
             ),
         ],
-        group=[],
+        group=[
+            StructureMapGroup(
+                name="test-group",
+                input=[StructureMapGroupInput(name="test-input", mode="source")],
+            )
+        ],
         name="test",
         status="final",
         url="http://test.org",

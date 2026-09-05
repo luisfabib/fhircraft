@@ -113,6 +113,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
     )
     characteristic: ListType["EvidenceVariableCharacteristic"] = Field(
         description="A defining factor of the characteristic",
+        min_length=1,
     )
 
 

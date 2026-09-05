@@ -160,6 +160,7 @@ class EventDefinition(DomainResource):
     )
     trigger: ListType[TriggerDefinition] = Field(
         description='"when" the event occurs (multiple = \u0027or\u0027)',
+        min_length=1,
     )
 
     @property

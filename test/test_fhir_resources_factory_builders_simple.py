@@ -175,7 +175,7 @@ def test_build__python_keyword_field_has_validation_alias(
 def test_build__normal_name_has_no_validation_alias(builder: Builder, index):
     node = make_node("status", type_codes=["string"])
     build = builder.build(node, index)
-    assert build.fields[0].validation_alias is None
+    assert build.fields[0].validation_alias is PydanticUndefined
 
 
 def test_build__non_array_optional_annotation_is_optional_type(builder: Builder, index):

@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class Schedule(DomainResource):
     """
     A container for slots of time that may be available for booking appointments.
@@ -62,6 +63,7 @@ class Schedule(DomainResource):
     )
     actor: ListType[Reference] = Field(
         description="Resource(s) that availability information is being provided for",
+        min_length=1,
     )
     planningHorizon: Optional[Period] = Field(
         description="Period of time covered by schedule",

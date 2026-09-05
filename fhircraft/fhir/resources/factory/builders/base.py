@@ -311,8 +311,8 @@ class Builder(ABC):
             name=name,
             annotation=annotation,
             default=default,
-            alias=alias,
-            validation_alias=validation_alias,
+            alias=alias or _Unset,
+            validation_alias=validation_alias or _Unset,
             description=description or node.documentation,
             min_length=node.min_cardinality if effective_is_array else None,
             max_length=node.max_length

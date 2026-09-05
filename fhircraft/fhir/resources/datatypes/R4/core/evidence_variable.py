@@ -262,6 +262,7 @@ class EvidenceVariable(DomainResource):
     )
     characteristic: ListType[EvidenceVariableCharacteristic] = Field(
         description="What defines the members of the evidence element",
+        min_length=1,
     )
 
     @model_validator(mode="after")

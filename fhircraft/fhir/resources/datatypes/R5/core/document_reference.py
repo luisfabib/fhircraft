@@ -203,6 +203,7 @@ class DocumentReference(DomainResource):
     )
     content: ListType[DocumentReferenceContent] = Field(
         description="Document referenced",
+        min_length=1,
     )
 
     @model_validator(mode="after")

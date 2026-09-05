@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EndpointPayload(BackboneElement):
     """
     The set of payloads that are provided/available at this endpoint.
@@ -35,6 +36,7 @@ class EndpointPayload(BackboneElement):
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
+
 
 class Endpoint(DomainResource):
     """
@@ -54,6 +56,7 @@ class Endpoint(DomainResource):
     )
     connectionType: ListType[CodeableConcept] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
+        min_length=1,
     )
     name: Optional[fhir.string] = Field(
         description="A name that this endpoint can be identified by",

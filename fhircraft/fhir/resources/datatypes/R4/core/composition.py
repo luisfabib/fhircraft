@@ -187,6 +187,7 @@ class Composition(DomainResource):
     )
     author: ListType[Reference] = Field(
         description="Who and/or what authored the composition",
+        min_length=1,
     )
     title: fhir.string = Field(
         description="Human Readable name/title",

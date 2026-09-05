@@ -18,6 +18,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class LinkageItem(BackboneElement):
     """
     Identifies which record considered as the reference to the same real-world occurrence as well as how the items should be evaluated within the collection of linked items.
@@ -29,6 +30,7 @@ class LinkageItem(BackboneElement):
     resource: Reference = Field(
         description="Resource being linked",
     )
+
 
 class Linkage(DomainResource):
     """
@@ -49,6 +51,7 @@ class Linkage(DomainResource):
     )
     item: ListType[LinkageItem] = Field(
         description="Item to be linked",
+        min_length=1,
     )
 
     @model_validator(mode="after")

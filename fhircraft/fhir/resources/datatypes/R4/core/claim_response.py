@@ -102,6 +102,7 @@ class ClaimResponseItemDetail(BackboneElement):
     )
     adjudication: ListType[ClaimResponseItemDetailAdjudication] = Field(
         description="Detail level adjudication details",
+        min_length=1,
     )
     subDetail: Optional[ListType[ClaimResponseItemDetailSubDetail]] = Field(
         description="Adjudication for claim sub-details",
@@ -123,6 +124,7 @@ class ClaimResponseItem(BackboneElement):
     )
     adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Adjudication details",
+        min_length=1,
     )
     detail: Optional[ListType[ClaimResponseItemDetail]] = Field(
         description="Adjudication for claim details",
@@ -164,6 +166,7 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
     )
     adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Added items detail adjudication",
+        min_length=1,
     )
 
 
@@ -201,6 +204,7 @@ class ClaimResponseAddItemDetail(BackboneElement):
     )
     adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Added items detail adjudication",
+        min_length=1,
     )
     subDetail: Optional[ListType[ClaimResponseAddItemDetailSubDetail]] = Field(
         description="Insurer added line items",
@@ -290,6 +294,7 @@ class ClaimResponseAddItem(BackboneElement):
     )
     adjudication: ListType[ClaimResponseItemAdjudication] = Field(
         description="Added items adjudication",
+        min_length=1,
     )
     detail: Optional[ListType[ClaimResponseAddItemDetail]] = Field(
         description="Insurer added line details",
