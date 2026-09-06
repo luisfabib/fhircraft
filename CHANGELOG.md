@@ -103,6 +103,18 @@ Version `v0.9.0` represents the (probably) final major release candidate milesto
 
 ----------------- 
 
+## v0.8.3 - 2026-04-15
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.8.3)
+
+
+### Fixed
+
+* Fixed `validate_type_choice_element` to correctly handle FHIR primitive wrapper types by checking for instances of `FHIRPrimitiveModel` and using their `.value` attribute, solving false errors during model validation ([#351](https://github.com/luisfabib/fhircraft/pull/351))
+
+
+----------------- 
+
 ## v0.8.2 - 2026-04-15
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.1...0.8.2)
