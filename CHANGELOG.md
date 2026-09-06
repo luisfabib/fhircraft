@@ -7,14 +7,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## v0.8.3 - 2026-04-15
+## v0.9.0 - 2026-09-06
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.8.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.8.3)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.9.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.8.2...0.9.0)
+
+Version `v0.9.0` represents the (probably) final major release candidate milestone before fhircraft `v1.0.0`. This release focuses on stabilizing the public API footprint, unifying error handling, overhaul of core architecture, and polishing user and developer experience. It introduces several major breaking changes such as the re-introduction of the FHIR minimal cardinality translation into Pydantic field requiredness.
+
+### Added
+* Added a pluggable terminology service configuration and wired it into global config handling ([#396](https://github.com/luisfabib/fhircraft/pull/396), closes [#306](https://github.com/luisfabib/fhircraft/issues/306))
+* Implemented the FHIRPath `memberOf()`, `subsumes()`, and `subsumedBy()` functions delegated to the plugged terminology service ([#396](https://github.com/luisfabib/fhircraft/pull/396), closes [#363](https://github.com/luisfabib/fhircraft/issues/363))
+* Implemented the `conformsTo` FHIRPath function for core resources (profiles currently not supported) ([#396](https://github.com/luisfabib/fhircraft/pull/396), closes [#363](https://github.com/luisfabib/fhircraft/issues/363))
+* Added and ensured `py.typed` is shipped in distributions so type information is preserved for downstream users. ([#391](https://github.com/luisfabib/fhircraft/pull/391), closes [#366](https://github.com/luisfabib/fhircraft/issues/366))
+* Added a new source code generator module with new public interface and enhanced functionality ([#427](https://github.com/luisfabib/fhircraft/pull/427))
+    - Exposed the code generation public interface as additional method of `FHIRModelFactory` for a single entrypoint for dynamic model and code generation. 
+    - Added `generate_files(resources, split=True)`, which returns an in-memory mapping of filenames to source code for a full importable package, splitting every generated model (including inherited base classes and referenced types) into its own module with cross-file imports, or a single `models.py` when `split=False`.
+    - Added `generate(resources, output_dir, split=True)`, which writes that package to disk, including a generated `__init__.py` that re-exports every model.
+    - Added per-model import and dependency tracking to `ImportTracker`, enabling accurate, minimal imports for each file in a split package.
+    - Added `generate_source()` which returns source as a single string (as the code generator did thus far).
+
+* Added a unified entrypoint for all library exceptions and warnings `fhircraft.exceptions` which replaces the previous per-component exception modules ([#393](https://github.com/luisfabib/fhircraft/pull/393), closes [#380](https://github.com/luisfabib/fhircraft/issues/380))
+* Added new package-wide base classes `FhircraftException` and `FhircraftWarning` for all exceptions and warnings raised by Fhircraft ([#393](https://github.com/luisfabib/fhircraft/pull/393))
+* Added a full set of component exception hierarchies under `MapperException`, `FhirPathException`, `FactoryException`, and `PackageException` replacing most of the previously available exception classes ([#393](https://github.com/luisfabib/fhircraft/pull/393))
+* Exposed `FHIRModelKind`, `FHIRPrimitiveModel`, and `StructureDefinitionRegistry` directly from `fhircraft.fhir.resources`, removing the need to reach into internal submodules ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Added `parse_fhirpath()` as an intuitive, thread-safe replacement for the old engine import function, using a singleton parser instance internally for better performance.  ([#398](https://github.com/luisfabib/fhircraft/pull/398), closes [#386](https://github.com/luisfabib/fhircraft/issues/386))
+* Added `raise_on_errors` parameter to `load_resources_from_package`, allowing callers to opt into strict validation or continue loading despite individual file errors ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Declared explicit `__all__` lists in all subpackage modules (`fhircraft.fhir.resources`, `fhircraft.fhir.packages`, `fhircraft.fhir.mapper`, `fhircraft.fhir.path`), making the public/internal boundary unambiguous. ([#398](https://github.com/luisfabib/fhircraft/pull/398), closes [#375](https://github.com/luisfabib/fhircraft/issues/375))
+* Exposed `fhir_release` as a public instance attribute on `FHIRStructureMapper`, making the configured FHIR release inspectable after construction ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+
+* Added a new `SUPPORTED_FHIR_RELEASES` constant to the public package API as a single source of truth for supported releases. ([#399](https://github.com/luisfabib/fhircraft/pull/399), closes [#395](https://github.com/luisfabib/fhircraft/issues/395))
+* Added a shared `FHIRRelease` type alias in utilities for stronger typing across FHIR-release-aware components ([#399](https://github.com/luisfabib/fhircraft/pull/399))
+* Added explicit unsupported-release validation in mapper interface and mapping parser initialization ([#399](https://github.com/luisfabib/fhircraft/pull/399))
+* Migrated the documentation to Zensical. Added `zensical.toml` with full site metadata, navigation, and theme settings; and improved documentation organization and generation with new framework ([#403](https://github.com/luisfabib/fhircraft/pull/403))
+* Introduced versioning of the documentation through the Zensical fork of `mike` (now added as a dev dependency) ([#411](https://github.com/luisfabib/fhircraft/pull/411))
+
+### Changed
+
+- Exposed `R4`, `R4B`, and `R5` as top-level exports from `fhircraft` as the new public API to access built-in models ([#424](https://github.com/luisfabib/fhircraft/pull/424))
+* Required FHIR elements (those with `min ≥ 1`) now raise a `ValidationError` when absent from a resource instance . The `Optional[T]` annotation and `default=None` are no longer applied to non-polymorphic required fields in dynamically-built models. Type-choice (`[x]`) elements remain optional. All built-in models have been adapted. ([#409](https://github.com/luisfabib/fhircraft/pull/391), closes [#407](https://github.com/luisfabib/fhircraft/issues/407))
+* Rewrote multiple critical components (`FHIRBaseModel`) as modular components to improve readability, maintainability and test coverage ([#357](https://github.com/luisfabib/fhircraft/pull/357))
+* Rewrote the code generator as modular components instead of one monolithic module, and added extensive unit test coverage for each improving stability and performance ([#427](https://github.com/luisfabib/fhircraft/pull/427)) 
+* Renamed `FhirBaseModelKind` to `FHIRModelKind` ([#357](https://github.com/luisfabib/fhircraft/pull/357))
+* Updated the project's logo to feel simpler and modern ([#389](https://github.com/luisfabib/fhircraft/pull/389))
+* Updated and improved the documentation ([#390](https://github.com/luisfabib/fhircraft/pull/390)) 
+* Dropped support for Python 3.10 (EOL) and ensured Python 3.11 through 3.14 are supported and tested  ([#391](https://github.com/luisfabib/fhircraft/pull/391), closes [#369](https://github.com/luisfabib/fhircraft/issues/369))
+* Tightened the  lower bounds for development dependencies and the `requests` dependency ([#392](https://github.com/luisfabib/fhircraft/pull/392), closes [#372](https://github.com/luisfabib/fhircraft/issues/372))
+* Replaced all `assert` statements used for runtime validation with explicit `raise` calls using specific exception types, making them non-bypassable with `-O` optimisation flags ([#393](https://github.com/luisfabib/fhircraft/pull/393), fixes [#359](https://github.com/luisfabib/fhircraft/issues/359))
+* Updated all FHIR validators to now raise `PydanticCustomError` (with a `fhir_<key>` type string) instead of `AssertionError` for better traceability ([#393](https://github.com/luisfabib/fhircraft/pull/393))
+* Replaced all generic warnings during validation with the new `FhirValidationWarning` category ([#393](https://github.com/luisfabib/fhircraft/pull/393), fixes [#370](https://github.com/luisfabib/fhircraft/issues/370))
+* Tightened all shallow `except Exception:` (and equivalent) clauses to `except (Exception,):` to avoid re-raising `SystemExit` and `KeyboardInterrupt` ([#393](https://github.com/luisfabib/fhircraft/pull/393), fixes [#364](https://github.com/luisfabib/fhircraft/issues/364))
+* Updated the FHIRPath `slice()` function to always return an empty collection rather than raising a `NotImplementedError` (as noted in the official specification) ([#396](https://github.com/luisfabib/fhircraft/pull/396), closes [#363](https://github.com/luisfabib/fhircraft/issues/363)) 
+* Fixed multiple FHIRPath FHIR-specific functions that permanently raised `NotImplementedError` ([#396](https://github.com/luisfabib/fhircraft/pull/396)) 
+* Renamed `FhircraftConfig.mode` to `FhircraftConfig.validation_mode` to align the config field with the `validation_mode` keyword already accepted by `configure()` and `override_config()` ([#398](https://github.com/luisfabib/fhircraft/pull/398), closes [#368](https://github.com/luisfabib/fhircraft/issues/368))
+* Standardised all `FHIRPath*` exception and class names to use the full uppercase `FHIR` acronym (e.g. `FhirPathParser` → `FHIRPathParser`, `FhirPathError` → `FHIRPathError`) ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Replaced `import_fhirpath_engine()` with the new `parse_fhirpath()` function ([#386](https://github.com/luisfabib/fhircraft/pull/398), closes [#386](https://github.com/luisfabib/fhircraft/issues/386))
+* Replaced bare `Exception` raises in `FHIRStructureMapper.map()` and `parse()` with typed `MapperExecutionError` and `MapperParsingError` respectively ([#386](https://github.com/luisfabib/fhircraft/pull/398), closes [#381](https://github.com/luisfabib/fhircraft/issues/381))
+* Replaced bare `RuntimeError` raises in `load_resources_from_package` with typed `PackageValidationError`, giving callers a stable exception contract ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Downgraded the empty-result case in package loading from a hard `PackageValidationError` to a `PackageValidationWarning`, allowing terminology-only packages to load without error ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Replaced all `print()` calls in the packages module with `warnings.warn()` using the `PackageValidationWarning` category ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Replaced the `__getattr__` lazy-dispatch in `__init__.py` with straightforward direct imports, and expanded `__all__` to explicitly declare all 12 public symbols ([#398](https://github.com/luisfabib/fhircraft/pull/398), closes [#379](https://github.com/luisfabib/fhircraft/issues/379))
+* Enforced `fhir_release` in the FHIR mapping parser and engine to initialize a release-bound mapping parser and engine ([#399](https://github.com/luisfabib/fhircraft/pull/399))
 
 
-### Fixed
+### Fixed 
 
-* Fixed `validate_type_choice_element` to correctly handle FHIR primitive wrapper types by checking for instances of `FHIRPrimitiveModel` and using their `.value` attribute, solving false errors during model validation ([#351](https://github.com/luisfabib/fhircraft/pull/351))
+* Updated `ToQuantity` and `ConvertsToQuantity` to now accept an optional unit parameter, allowing conversion to a specified unit and handling unit compatibility ([#355](https://github.com/luisfabib/fhircraft/pull/355), fixes [#310](https://github.com/luisfabib/fhircraft/issues/310))
+* Added `clean_unit_string` and `convert_to` methods to the `Quantity` class to standardize and convert units, improving compatibility with the Pint library and UCUM unit conventions ([#355](https://github.com/luisfabib/fhircraft/pull/355))
+* Fixed XML serialization structure in `FHIRBaseModel` to produce well-formed and standards-compliant output ([#356](https://github.com/luisfabib/fhircraft/pull/356), fixes [#319](https://github.com/luisfabib/fhircraft/issues/319))
+* Updated the root node resource list in the FHIRPath lexer to be generated dynamically by querying the registry for all resource names across FHIR releases R4, R4B, and R5, instead of using a static hardcoded list ([#353](https://github.com/luisfabib/fhircraft/pull/353), fixes [#314](https://github.com/luisfabib/fhircraft/issues/314))
+* Updated the FHIR mapping engine to catch `StructureDefinitionNotFoundError` in addition to `KeyError`, `ValueError`, and `AttributeError`, ensuring that failures to resolve structure definitions fall back gracefully to `ArbitraryModel` and log a warning, and to continue processing other structures even if one fails to resolve, instead of returning early ([#354](https://github.com/luisfabib/fhircraft/pull/354), fixes [#315](https://github.com/luisfabib/fhircraft/pull/315))
+* Updated the PyPI classifiers to ensure all OSs are listed as supported and  to mark the project as a beta ([#391](https://github.com/luisfabib/fhircraft/pull/391), fixes [#371](https://github.com/luisfabib/fhircraft/issues/371), towards [#377](https://github.com/luisfabib/fhircraft/pull/377))
+* Updated the package module to properly expose the `__version__` attribute and the build metadata to use a dynamic version sourced from the package itself ([#391](https://github.com/luisfabib/fhircraft/pull/391), fixes [#365](https://github.com/luisfabib/fhircraft/issues/365))
+* Removed the vestigial CLI extra dependency from the project metadata ([#391](https://github.com/luisfabib/fhircraft/pull/391), fixes [#378](https://github.com/luisfabib/fhircraft/issues/378))
+* Fixed an error rising only in Python 3.13 related to a type-hint causing errors at import-time ([#391](https://github.com/luisfabib/fhircraft/pull/391))
+* Added explicit dependency pins for `pydantic_core` `typing_extensions` ([#392](https://github.com/luisfabib/fhircraft/pull/392), fixes [#362](https://github.com/luisfabib/fhircraft/issues/362))
+* Fixed the FHIRPath `resolve()` function so that non-reference items in the collection are ignored (skipped) instead of causing an exception to be raised ([#394](https://github.com/luisfabib/fhircraft/pull/394), fixes [#307](https://github.com/luisfabib/fhircraft/issues/307))
+* Fixed dead-code exception re-raise in package loading where `PackageNotFoundError` and `PackageResolutionError` were caught after a catch-all `Exception` handler and never propagated correctly ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Fixed a `re` module deprecation warning in the code generator ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Fixed `_resolve_mapping()` in `FHIRStructureMapper` to use `get_fhir_type()` for release-aware `StructureMap` resolution instead of hardcoded R5 types, enabling consistent R4, R4B, and R5 support. ([#398](https://github.com/luisfabib/fhircraft/pull/398), fixes [#373](https://github.com/luisfabib/fhircraft/issues/373))
+* Updated the root node resource list in the FHIRPath lexer to be generated dynamically by querying the registry for all resource names across FHIR releases R4, R4B, and R5, instead of using a static hardcoded list ([#353](https://github.com/luisfabib/fhircraft/pull/353), fixes [#314](https://github.com/luisfabib/fhircraft/issues/314))
+* Added `cache_limit` parameter to `FHIRPathParser.__init__()` (default: `1000`) to configure the maximum number of cached expressions per instance ([#400](https://github.com/luisfabib/fhircraft/pull/400), fixes [#397](https://github.com/luisfabib/fhircraft/issues/397))
+* Updated the `FHIRBaseModel` methods`model_validate` and `model_validate_json` to raise a `TypeError` if `by_alias`, `extra`, or `by_name` are provided, instead of issuing warnings ([#402](https://github.com/luisfabib/fhircraft/pull/402), fixes [#385](https://github.com/luisfabib/fhircraft/issues/385))
+* Fixed version range overlap in `get_FHIR_release_from_version` between R4B and R5 for release 4.2.0 ([#405](https://github.com/luisfabib/fhircraft/pull/405), fixes [#361](https://github.com/luisfabib/fhircraft/issues/361))
+* Fixed pattern validation incorrectly applying dict-subset matching to non-dict scalar patterns in `validate_FHIR_element_pattern`, causing false validation failures when a pattern was a plain value rather than a structured object ([#409](https://github.com/luisfabib/fhircraft/pull/409))
+* Renamed with a prepended underscore all internal primitive type submodules to ensure type checkers recognize primitive type aliase objects as such and not as modules ([#423](https://github.com/luisfabib/fhircraft/pull/423), fixes [#422](https://github.com/luisfabib/fhircraft/issues/422))
+* Ensured all resource types accessible directly on the corresponding release module namespace by including a wildcard import of all core submodule resources ([#424](https://github.com/luisfabib/fhircraft/pull/424))
+* Ensured that primitive type aliases (`fhir.string`, `fhir.date_`, etc) are used in generated factory models instead of the bare primitive type models (`fhir.String`, `fhir.Date`, etc.) to maintain flexibility in generated models ([#426](https://github.com/luisfabib/fhircraft/pull/426), fixes [#425](https://github.com/luisfabib/fhircraft/issues/425))
+ 
+### Removed
+* Removed unused methods and intermediate classes related to FHIRBaseModel ([#357](https://github.com/luisfabib/fhircraft/pull/357))
+* Deleted vestigial documentation assets no longer used ([#389](https://github.com/luisfabib/fhircraft/pull/389))
+* Removed all per-component exception modules (`fhir/path/exceptions.py`, `fhir/mapper/engine/exceptions.py`, etc.) ([#393](https://github.com/luisfabib/fhircraft/pull/393))
+* Removed multiple objects (e.g. `FHIRMapper`, `FHIRPath`, `FHIRPathCollection`, `FhirPathParser`,etc.) from the public Fhircraft namespace ([#398](https://github.com/luisfabib/fhircraft/pull/398))
+* Removed `mkdocs.yml` and all MkDocs Material configuration ([#403](https://github.com/luisfabib/fhircraft/pull/403))
+
 
 ----------------- 
 
