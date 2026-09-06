@@ -38,7 +38,7 @@ Version `v0.9.0` represents the (probably) final major release candidate milesto
 * Added a shared `FHIRRelease` type alias in utilities for stronger typing across FHIR-release-aware components ([#399](https://github.com/luisfabib/fhircraft/pull/399))
 * Added explicit unsupported-release validation in mapper interface and mapping parser initialization ([#399](https://github.com/luisfabib/fhircraft/pull/399))
 * Migrated the documentation to Zensical. Added `zensical.toml` with full site metadata, navigation, and theme settings; and improved documentation organization and generation with new framework ([#403](https://github.com/luisfabib/fhircraft/pull/403))
-* Introduced versioning of the documentation through the Zensical fork of `mike` (now added as a dev dependency) ([#411](https://github.com/luisfabib/fhircraft/pull/411))
+* Introduced versioning of the documentation through the Zensical fork of `mike` ([#411](https://github.com/luisfabib/fhircraft/pull/411))
 
 ### Changed
 
