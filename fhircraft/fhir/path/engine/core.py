@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 FHIRPathCollection = List["FHIRPathCollectionItem"]
 
 __all__ = [
-    "FHIRPath",
+    "FHIRPathNode",
     "FHIRPathCollection",
     "FHIRPathCollectionItem",
     "FHIRPathFunction",
@@ -39,7 +39,7 @@ __all__ = [
 ]
 
 
-class FHIRPath(ABC):
+class FHIRPathNode(ABC):
     """Abstract base class for FHIRPath expressions."""
 
     def values(self, data: Any, environment: dict | None = None) -> List[Any]:
@@ -394,7 +394,7 @@ class FHIRPath(ABC):
         Raises:
             TypeError: If a non-abstract subclass does not override the `evaluate` method.
         """
-        if not inspect.isabstract(cls) and cls.evaluate == FHIRPath.evaluate:
+        if not inspect.isabstract(cls) and cls.evaluate == FHIRPathNode.evaluate:
             raise TypeError(
                 "Subclasses of `FHIRPath` must override the `evaluate` method"
             )
@@ -433,15 +433,15 @@ class FHIRPath(ABC):
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
         return self.evaluate(collection, environment or dict(), create)
 
-    def _invoke(self, invocation: "FHIRPath") -> "FHIRPath":
+    def _invoke(self, invocation: "FHIRPathNode") -> "FHIRPathNode":
         """
         Invoke the FHIRPath expression on the given collection.
 
         Args:
-            invocation (FHIRPath): The FHIRPath expression to invoke.
+            invocation (FHIRPathNode): The FHIRPath expression to invoke.
 
         Returns:
-            Invocation[Self, FHIRPath]: The resulting invocation after processing.
+            Invocation[Self, FHIRPathNode]: The resulting invocation after processing.
         """
         return Invocation(self, invocation)
 
@@ -450,10 +450,10 @@ class FHIRPath(ABC):
         Determines and returns the appropriate child node in a path expression tree.
 
         Args:
-            child (FHIRPath): The child node to be evaluated, which can be an instance of This, Root, or another node type.
+            child (FHIRPathNode): The child node to be evaluated, which can be an instance of This, Root, or another node type.
 
         Returns:
-            (FHIRPath) The resulting node
+            (FHIRPathNode) The resulting node
 
         Note:
             This method is used internally to manage navigation and invocation logic within the path engine.
@@ -474,7 +474,7 @@ class FHIRPathCollectionItem(object):
     Attributes
     ----------
     value (Any): The value of the collection item.
-    path (Optional[FHIRPath]): The path associated with the collection item, by default This().
+    path (Optional[FHIRPathNode]): The path associated with the collection item, by default This().
     element (Optional[str]): The element name of the collection item, by default None.
     index (Optional[int]): The index of the collection item, by default None.
     parent (Optional[FHIRPathCollectionItem]): The item of the parent collection from which this item was derived, by default None.
@@ -605,7 +605,7 @@ class FHIRPathCollectionItem(object):
         return hash((self.path, self.parent, self.value.__repr__()))
 
 
-class FHIRPathFunction(FHIRPath, ABC):
+class FHIRPathFunction(FHIRPathNode, ABC):
     """
     Abstract base class representing a FHIRPath function, used for functional evaluation of collections.
     """
@@ -630,7 +630,7 @@ class FHIRPathFunction(FHIRPath, ABC):
         return f"{self.__class__.__name__}({','.join([repr(arg) for arg in self.__arguments__()])})"
 
 
-class Literal(FHIRPath):
+class Literal(FHIRPathNode):
     """
     A class representation of a constant literal value in the FHIRPath.
 
@@ -688,7 +688,7 @@ class Literal(FHIRPath):
         return hash(("literal", self.value))
 
 
-class Element(FHIRPath):
+class Element(FHIRPathNode):
     """
     A class representing an element in a FHIRPath, used for navigating and manipulating FHIR resources.
 
@@ -857,17 +857,17 @@ class Element(FHIRPath):
         return hash(self.label)
 
 
-class Invocation(FHIRPath):
+class Invocation(FHIRPathNode):
     """
     A class representing an invocation in the context of FHIRPath evaluation
     indicated by two dot-separated identifiers `<left>.<right>`.
 
     Attributes:
-        left (FHIRPath): The left-hand side FHIRPath segment of the invocation.
-        right (FHIRPath): The right-hand side  FHIRPath segment of the invocation.
+        left (FHIRPathNode): The left-hand side FHIRPath segment of the invocation.
+        right (FHIRPathNode): The right-hand side  FHIRPath segment of the invocation.
     """
 
-    def __init__(self, left: FHIRPath, right: FHIRPath):
+    def __init__(self, left: FHIRPathNode, right: FHIRPathNode):
         self.left = left
         self.right = right
 
@@ -910,7 +910,7 @@ class Invocation(FHIRPath):
         return hash((self.left, self.right))
 
 
-class This(FHIRPath):
+class This(FHIRPathNode):
     """
     A representation of a current element. Used for internal purposes and has no FHIRPath shorthand notation.
     """
@@ -944,7 +944,7 @@ class This(FHIRPath):
         return hash("")
 
 
-class RootElement(FHIRPath):
+class RootElement(FHIRPathNode):
     """
     A class representing the root of a FHIRPath, i.e. the top-most segment of the FHIRPath
     whose collection has no parent associated.
@@ -1001,7 +1001,7 @@ class RootElement(FHIRPath):
         return hash(self.type)
 
 
-class TypeSpecifier(FHIRPath):
+class TypeSpecifier(FHIRPathNode):
     """
     A type specifier is an identifier that must resolve to the name of a type in a model.
     Type specifiers can have qualifiers, e.g. FHIR.Patient, where the qualifier is the name of the model.

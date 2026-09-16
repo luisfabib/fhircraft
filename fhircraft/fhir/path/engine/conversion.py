@@ -16,7 +16,7 @@ from fhircraft.fhir.resources.datatypes import (
 )
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -45,21 +45,22 @@ __all__ = [
     "ConvertsToTime",
 ]
 
+
 class Iif(FHIRPathFunction):
     """
     A representation of the FHIRPath [`iif()`](http://hl7.org/fhirpath/N1/#iifcriterion-expression-true-result-collection-otherwise-result-collection-collection) function.
 
     Args:
-        criterion (FHIRPath): The criterion expression,  is expected to evaluate to a `Boolean`.
+        criterion (FHIRPathNode): The criterion expression,  is expected to evaluate to a `Boolean`.
         true_result (Union[FHIRPath, Any]): Value to be returned if `criterion` evaluates to `True`
         otherwise_result (Optional[Union[FHIRPath, Any]]): Value to be returned if `criterion` evaluates to `False`. Defaults to an empty collection.
     """
 
     def __init__(
         self,
-        criterion: FHIRPath,
-        true_result: FHIRPath | FHIRPathCollection,
-        otherwise_result: FHIRPath | FHIRPathCollection = list(),
+        criterion: FHIRPathNode,
+        true_result: FHIRPathNode | FHIRPathCollection,
+        otherwise_result: FHIRPathNode | FHIRPathCollection = list(),
     ):
         self.criterion = criterion
         self.true_result = true_result
@@ -112,7 +113,7 @@ class Iif(FHIRPathFunction):
             )
 
         if criterion:
-            if isinstance(self.true_result, FHIRPath):
+            if isinstance(self.true_result, FHIRPathNode):
                 return self.true_result.evaluate(
                     collection, eval_context(collection), create
                 )
@@ -120,7 +121,7 @@ class Iif(FHIRPathFunction):
                 return self.true_result
         else:
             if self.otherwise_result:
-                if isinstance(self.otherwise_result, FHIRPath):
+                if isinstance(self.otherwise_result, FHIRPathNode):
                     return self.otherwise_result.evaluate(
                         collection, eval_context(collection), create
                     )

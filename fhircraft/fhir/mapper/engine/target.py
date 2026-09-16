@@ -10,7 +10,7 @@ from fhircraft.fhir.mapper.engine import transforms as tf
 from fhircraft.fhir.path import engine as fhirpath
 import logging
 
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path.engine.core import FHIRPathNode
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class RuleTarget(FHIRMappingEngineComponent):
         self.variable = (
             str(source.variable) if source.variable else f"target-{id(source)}"
         )
-        self.resolved_path: Optional[FHIRPath] = None
+        self.resolved_path: Optional[FHIRPathNode] = None
         self.transform = self._resolve_transform(
             str(self.definition.transform) if self.definition.transform else None,
             self.definition.parameter,

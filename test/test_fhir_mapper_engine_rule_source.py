@@ -14,7 +14,7 @@ from fhircraft.exceptions import (
     MapperSourceProcessingError,
 )
 from fhircraft.fhir.path import engine as fp
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path.engine.core import FHIRPathNode
 
 # ============================================================================
 # Helpers & Fixtures

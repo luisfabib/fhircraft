@@ -12,7 +12,7 @@ import logging
 from typing import Optional
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -33,10 +33,12 @@ class Trace(FHIRPathFunction):
     A representation of the FHIRPath [`trace()`](http://hl7.org/fhirpath/N1/#tracename-string-projection-expression-collection) function.
 
     Attributes:
-        name  (str | FHIRPath): Subtring query or FHIRPath to evaluate for the trace name.
+        name  (str | FHIRPathNode): Subtring query or FHIRPath to evaluate for the trace name.
     """
 
-    def __init__(self, name: FHIRPath | str, projection: Optional[FHIRPath] = None):
+    def __init__(
+        self, name: FHIRPathNode | str, projection: Optional[FHIRPathNode] = None
+    ):
         self.name = Literal(name) if isinstance(name, str) else name
         self.projection = projection
 

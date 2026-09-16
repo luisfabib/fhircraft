@@ -23,7 +23,7 @@ from math import ceil, exp, floor, log, sqrt
 from typing import Callable
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -37,13 +37,15 @@ from fhircraft.fhir.path.utils import (
 )
 
 
-class FHIRMathOperator(FHIRPath):
+class FHIRMathOperator(FHIRPathNode):
     """
     Abstract class definition for the category of math FHIRPath operators.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -70,8 +72,8 @@ class Addition(FHIRMathOperator):
     A representation of the FHIRPath [`+`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
@@ -125,8 +127,8 @@ class Subtraction(FHIRMathOperator):
     A representation of the FHIRPath [`-`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
@@ -174,8 +176,8 @@ class Multiplication(FHIRMathOperator):
     A representation of the FHIRPath [`*`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
@@ -224,8 +226,8 @@ class Division(FHIRMathOperator):
     A representation of the FHIRPath [`/`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
@@ -280,8 +282,8 @@ class Div(FHIRMathOperator):
     A representation of the FHIRPath [`div`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
@@ -328,8 +330,8 @@ class Mod(FHIRMathOperator):
     A representation of the FHIRPath [`mod`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
@@ -465,8 +467,8 @@ class Log(FHIRPathMathFunction):
         base (int | Literal): The base of the logarithm. Must be an integer greater than 1.
     """
 
-    def __init__(self, base: int | FHIRPath):
-        self.base = Literal(base) if not isinstance(base, FHIRPath) else base
+    def __init__(self, base: int | FHIRPathNode):
+        self.base = Literal(base) if not isinstance(base, FHIRPathNode) else base
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -513,9 +515,9 @@ class Power(FHIRPathMathFunction):
         exponent (int | float | Literal): The exponent to which the input value is raised.
     """
 
-    def __init__(self, exponent: int | float | FHIRPath):
+    def __init__(self, exponent: int | float | FHIRPathNode):
         self.exponent = (
-            Literal(exponent) if not isinstance(exponent, FHIRPath) else exponent
+            Literal(exponent) if not isinstance(exponent, FHIRPathNode) else exponent
         )
 
     def evaluate(
@@ -560,9 +562,9 @@ class Round(FHIRPathMathFunction):
         precision (int): The number of decimal places to round to.
     """
 
-    def __init__(self, precision: int | FHIRPath):
+    def __init__(self, precision: int | FHIRPathNode):
         self.precision = (
-            Literal(precision) if not isinstance(precision, FHIRPath) else precision
+            Literal(precision) if not isinstance(precision, FHIRPathNode) else precision
         )
 
     def evaluate(

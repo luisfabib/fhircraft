@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -21,8 +21,8 @@ from fhircraft.exceptions import FHIRPathRuntimeError
 
 
 def _evaluate_boolean_expressions(
-    left: FHIRPath | FHIRPathCollection,
-    right: FHIRPath | FHIRPathCollection,
+    left: FHIRPathNode | FHIRPathCollection,
+    right: FHIRPathNode | FHIRPathCollection,
     collection: FHIRPathCollection,
     environment: dict,
     create: bool,
@@ -31,8 +31,8 @@ def _evaluate_boolean_expressions(
     Evaluates the boolean values of two FHIRPath expressions or collections within a given context.
 
     Args:
-        left (FHIRPath | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection.
-        right (FHIRPath | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection.
+        left (FHIRPathNode | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection.
+        right (FHIRPathNode | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection.
         collection (FHIRPathCollection): The context collection used for evaluation.
         environment (dict): The environment context for the evaluation.
         create (bool): Whether to create missing elements during evaluation.
@@ -45,7 +45,7 @@ def _evaluate_boolean_expressions(
 
     left_collection = (
         left.evaluate(collection, environment, create)
-        if isinstance(left, FHIRPath)
+        if isinstance(left, FHIRPathNode)
         else left
     )
     if isinstance(left_collection, bool):
@@ -60,7 +60,7 @@ def _evaluate_boolean_expressions(
             left_boolean = None
     right_collection = (
         right.evaluate(collection, environment, create)
-        if isinstance(right, FHIRPath)
+        if isinstance(right, FHIRPathNode)
         else right
     )
     if isinstance(right_collection, bool):
@@ -76,17 +76,19 @@ def _evaluate_boolean_expressions(
     return left_boolean, right_boolean
 
 
-class And(FHIRPath):
+class And(FHIRPathNode):
     """
     A representation of the FHIRPath [`and`](https://hl7.org/fhirpath/N1/#and) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -141,17 +143,19 @@ class And(FHIRPath):
         return hash((self.left, self.right))
 
 
-class Or(FHIRPath):
+class Or(FHIRPathNode):
     """
     A representation of the FHIRPath [`or`](https://hl7.org/fhirpath/N1/#or) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -206,17 +210,19 @@ class Or(FHIRPath):
         return hash((self.left, self.right))
 
 
-class Xor(FHIRPath):
+class Xor(FHIRPathNode):
     """
     A representation of the FHIRPath [`xor`](https://hl7.org/fhirpath/N1/#xor) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -259,17 +265,19 @@ class Xor(FHIRPath):
         return hash((self.left, self.right))
 
 
-class Implies(FHIRPath):
+class Implies(FHIRPathNode):
     """
     A representation of the FHIRPath [`implies`](https://hl7.org/fhirpath/N1/#implies) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right

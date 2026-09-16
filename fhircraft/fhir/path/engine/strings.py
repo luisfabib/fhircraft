@@ -20,14 +20,13 @@ __all__ = [
     "ToChars",
     "Length",
     "Concatenation",
-
 ]
 
 import re
 from typing import Any, List, Optional
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -88,13 +87,13 @@ class IndexOf(StringManipulationFunction):
     A representation of the FHIRPath [`indexOf()`](https://hl7.org/fhirpath/N1/#indexofsubstring-string-integer) function.
 
     Attributes:
-        substring (str | FHIRPath): Subtring query or FHIRPath that resolves to a string..
+        substring (str | FHIRPathNode): Subtring query or FHIRPath that resolves to a string..
     """
 
-    def __init__(self, substring: str | FHIRPath):
+    def __init__(self, substring: str | FHIRPathNode):
         if isinstance(substring, str):
             substring = Literal(substring)
-        if not isinstance(substring, FHIRPath):
+        if not isinstance(substring, FHIRPathNode):
             raise FHIRPathException(
                 "IndexOf() argument must be a literal string or a valid FHIRPath."
             )
@@ -148,13 +147,15 @@ class Substring(StringManipulationFunction):
     A representation of the FHIRPath [`substring()`](https://hl7.org/fhirpath/N1/#substringstart-integer-length-integer-string) function.
 
     Attributes:
-        start (int | FHIRPath): Start index of the substring  or FHIRPath that resolves to an integer.
-        end (Optional[int | FHIRPath]): Optional, end index of the substring  or FHIRPath that resolves to an integer.
+        start (int | FHIRPathNode): Start index of the substring  or FHIRPath that resolves to an integer.
+        end (Optional[int | FHIRPathNode]): Optional, end index of the substring  or FHIRPath that resolves to an integer.
     """
 
-    def __init__(self, start: int | FHIRPath, end: int | FHIRPath | None = None):
-        self.start: FHIRPath = Literal(start) if isinstance(start, int) else start
-        self.end: FHIRPath | None = Literal(end) if isinstance(end, int) else end
+    def __init__(
+        self, start: int | FHIRPathNode, end: int | FHIRPathNode | None = None
+    ):
+        self.start: FHIRPathNode = Literal(start) if isinstance(start, int) else start
+        self.end: FHIRPathNode | None = Literal(end) if isinstance(end, int) else end
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -211,7 +212,9 @@ class Substring(StringManipulationFunction):
             and not isinstance(end, (int, IntegerBase))
             or (isinstance(end, IntegerBase) and (end := end.value) is None)
         ):
-            raise FHIRPathException("Substring() end argument must resolve to an integer.")
+            raise FHIRPathException(
+                "Substring() end argument must resolve to an integer."
+            )
 
         if start > len(string_item) - 1:
             return []
@@ -227,13 +230,13 @@ class StartsWith(StringManipulationFunction):
     A representation of the FHIRPath [`startsWith()`](https://hl7.org/fhirpath/N1/#startswithprefix-string-boolean) function.
 
     Attributes:
-        prefix (str | FHIRPath): String prefix to query or FHIRPath that resolves to a string..
+        prefix (str | FHIRPathNode): String prefix to query or FHIRPath that resolves to a string..
     """
 
-    def __init__(self, prefix: str | FHIRPath):
+    def __init__(self, prefix: str | FHIRPathNode):
         if isinstance(prefix, str):
             prefix = Literal(prefix)
-        if not isinstance(prefix, FHIRPath):
+        if not isinstance(prefix, FHIRPathNode):
             raise FHIRPathException(
                 "StartsWith() argument must be a string literal or a valid FHIRPath."
             )
@@ -286,13 +289,13 @@ class EndsWith(StringManipulationFunction):
     A representation of the FHIRPath [`endsWith()`](https://hl7.org/fhirpath/N1/#endswithsuffix-string-boolean) function.
 
     Attributes:
-        suffix (str | FHIRPath): String suffix to query  or FHIRPath that resolves to a string.
+        suffix (str | FHIRPathNode): String suffix to query  or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, suffix: str | FHIRPath):
+    def __init__(self, suffix: str | FHIRPathNode):
         if isinstance(suffix, str):
             suffix = Literal(suffix)
-        if not isinstance(suffix, FHIRPath):
+        if not isinstance(suffix, FHIRPathNode):
             raise FHIRPathException(
                 "EndsWith() argument must be a string literal or a valid FHIRPath."
             )
@@ -345,13 +348,13 @@ class Contains(StringManipulationFunction):
     A representation of the FHIRPath [`contains()`](https://hl7.org/fhirpath/N1/#containssubstring-string-boolean) function.
 
     Attributes:
-        substring (str | FHIRPath): Substring to query or FHIRPath that resolves to a string.
+        substring (str | FHIRPathNode): Substring to query or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, substring: str | FHIRPath):
+    def __init__(self, substring: str | FHIRPathNode):
         if isinstance(substring, str):
             substring = Literal(substring)
-        if not isinstance(substring, FHIRPath):
+        if not isinstance(substring, FHIRPathNode):
             raise FHIRPathException(
                 "Contains() argument must be a string literal or a valid FHIRPath."
             )
@@ -473,14 +476,14 @@ class Replace(StringManipulationFunction):
     A representation of the FHIRPath [`replace()`](https://hl7.org/fhirpath/N1/#replacepattern-string-substitution-string-string) function.
 
     Attributes:
-        pattern (str | FHIRPath): Substring to substitute or FHIRPath that resolves to a string.
-        substitution (str | FHIRPath): String to substitute `pattern` with or FHIRPath that resolves to a string.
+        pattern (str | FHIRPathNode): Substring to substitute or FHIRPath that resolves to a string.
+        substitution (str | FHIRPathNode): String to substitute `pattern` with or FHIRPath that resolves to a string.
     """
 
     def __init__(
         self,
-        pattern: str | FHIRPath | FHIRPathCollection,
-        substitution: str | FHIRPath | FHIRPathCollection,
+        pattern: str | FHIRPathNode | FHIRPathCollection,
+        substitution: str | FHIRPathNode | FHIRPathCollection,
     ):
         if isinstance(pattern, str):
             self.pattern = Literal(pattern)
@@ -493,7 +496,7 @@ class Replace(StringManipulationFunction):
                 )
             else:
                 self.pattern = Literal(None)
-        elif isinstance(pattern, FHIRPath):
+        elif isinstance(pattern, FHIRPathNode):
             self.pattern = pattern
         else:
             raise FHIRPathException(
@@ -513,7 +516,7 @@ class Replace(StringManipulationFunction):
                 )
             else:
                 self.substitution = Literal(None)
-        elif isinstance(substitution, FHIRPath):
+        elif isinstance(substitution, FHIRPathNode):
             self.substitution = substitution
         else:
             raise FHIRPathException(
@@ -561,7 +564,9 @@ class Replace(StringManipulationFunction):
             pattern := self.pattern.single(collection, environment=environment),
             (str, StringBase),
         ) or (isinstance(pattern, StringBase) and (pattern := pattern.value) is None):
-            raise FHIRPathException("Replace() pattern argument must resolve to a string.")
+            raise FHIRPathException(
+                "Replace() pattern argument must resolve to a string."
+            )
         if not isinstance(
             substitution := self.substitution.single(
                 collection, environment=environment
@@ -583,13 +588,13 @@ class Matches(StringManipulationFunction):
     A representation of the FHIRPath [`matches()`](https://hl7.org/fhirpath/N1/#matchesregex-string-boolean) function.
 
     Attributes:
-        regex (str | FHIRPath): Regular expression to match or FHIRPath that resolves to a string.
+        regex (str | FHIRPathNode): Regular expression to match or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, regex: str | FHIRPath):
+    def __init__(self, regex: str | FHIRPathNode):
         if isinstance(regex, str):
             regex = Literal(regex)
-        if not isinstance(regex, FHIRPath):
+        if not isinstance(regex, FHIRPathNode):
             raise FHIRPathException(
                 "Matches() argument must be a string literal or valid FHIRPath."
             )
@@ -642,20 +647,20 @@ class ReplaceMatches(StringManipulationFunction):
     A representation of the FHIRPath [`replaceMatches()`](https://hl7.org/fhirpath/N1/#replacematchesregex-string-substitution-string-string) function.
 
     Attributes:
-        regex (str | FHIRPath): Regular expression to substitute or FHIRPath that resolves to a string.
-        substitution (str | FHIRPath): String to substitute `regex` with or FHIRPath that resolves to a string.
+        regex (str | FHIRPathNode): Regular expression to substitute or FHIRPath that resolves to a string.
+        substitution (str | FHIRPathNode): String to substitute `regex` with or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, regex: str | FHIRPath, substitution: str | FHIRPath):
+    def __init__(self, regex: str | FHIRPathNode, substitution: str | FHIRPathNode):
         if isinstance(regex, str):
             regex = Literal(regex)
-        if not isinstance(regex, FHIRPath):
+        if not isinstance(regex, FHIRPathNode):
             raise FHIRPathException(
                 "ReplaceMatches() regex argument must be a string literal or valid FHIRPath."
             )
         if isinstance(substitution, str):
             substitution = Literal(substitution)
-        if not isinstance(substitution, FHIRPath):
+        if not isinstance(substitution, FHIRPathNode):
             raise FHIRPathException(
                 "ReplaceMatches() substitution argument must be a string literal or valid FHIRPath."
             )
@@ -776,17 +781,19 @@ class ToChars(StringManipulationFunction):
         return [FHIRPathCollectionItem.wrap(character) for character in string_item]
 
 
-class Concatenation(FHIRPath):
+class Concatenation(FHIRPathNode):
     """
     A representation of the FHIRPath [`&`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right

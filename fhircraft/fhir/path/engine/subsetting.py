@@ -17,7 +17,7 @@ from typing import List, Optional, Union
 
 from fhircraft.fhir.path.engine.core import (
     Element,
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -27,7 +27,7 @@ from fhircraft.exceptions import FHIRPathException
 from fhircraft.utils import ensure_list
 
 
-class Index(FHIRPath):
+class Index(FHIRPathNode):
     """
     A representation of the FHIRPath index [`[idx]`](https://hl7.org/fhirpath/N1/#index-integer-collection) operator.
 
@@ -247,11 +247,11 @@ class Skip(FHIRPathFunction):
     A representation of the FHIRPath [`skip()`](https://hl7.org/fhirpath/N1/#skipnum-integer-collection) function.
 
     Attributes:
-        num (int | FHIRPath): The number of items to skip or FHIRPath evaluating to an integer.
+        num (int | FHIRPathNode): The number of items to skip or FHIRPath evaluating to an integer.
     """
 
-    def __init__(self, num: int | FHIRPath):
-        self.num = Literal(num) if not isinstance(num, FHIRPath) else num
+    def __init__(self, num: int | FHIRPathNode):
+        self.num = Literal(num) if not isinstance(num, FHIRPathNode) else num
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -273,7 +273,9 @@ class Skip(FHIRPathFunction):
         if not isinstance(
             num := self.num.single(collection, environment=environment), int
         ):
-            raise FHIRPathException("Skip() argument must evaluate to an integer number.")
+            raise FHIRPathException(
+                "Skip() argument must evaluate to an integer number."
+            )
         if num <= 0:
             return []
         return ensure_list(collection[num:])
@@ -287,8 +289,8 @@ class Take(FHIRPathFunction):
         num (int): The number of items to take.
     """
 
-    def __init__(self, num: int | FHIRPath):
-        self.num = Literal(num) if not isinstance(num, FHIRPath) else num
+    def __init__(self, num: int | FHIRPathNode):
+        self.num = Literal(num) if not isinstance(num, FHIRPathNode) else num
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -309,7 +311,9 @@ class Take(FHIRPathFunction):
         if not isinstance(
             num := self.num.single(collection, environment=environment), int
         ):
-            raise FHIRPathException("Skip() argument must evaluate to an integer number.")
+            raise FHIRPathException(
+                "Skip() argument must evaluate to an integer number."
+            )
         if num <= 0:
             return []
         return ensure_list(collection[:num])
@@ -323,7 +327,7 @@ class Intersect(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to compute the intersection with.
     """
 
-    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+    def __init__(self, other_collection: FHIRPathNode | FHIRPathCollection):
         self.other_collection = other_collection
 
     def evaluate(
@@ -341,7 +345,7 @@ class Intersect(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        if isinstance(self.other_collection, FHIRPath):
+        if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment, create
             )
@@ -356,7 +360,7 @@ class Exclude(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to compute the exclusion with.
     """
 
-    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+    def __init__(self, other_collection: FHIRPathNode | FHIRPathCollection):
         self.other_collection = other_collection
 
     def evaluate(
@@ -374,7 +378,7 @@ class Exclude(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        if isinstance(self.other_collection, FHIRPath):
+        if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment, create
             )

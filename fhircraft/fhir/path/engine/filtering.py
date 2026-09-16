@@ -10,7 +10,7 @@ __all__ = [
 from typing import List, Optional, Union
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathFunction,
     This,
@@ -26,10 +26,10 @@ class Where(FHIRPathFunction):
     Representation of the FHIRPath [`where()`](http://hl7.org/fhirpath/N1/#wherecriteria-expression-collection) function.
 
     Attributes:
-        expression (FHIRPath): Expression to evaluate for each collection item.
+        expression (FHIRPathNode): Expression to evaluate for each collection item.
     """
 
-    def __init__(self, expression: FHIRPath):
+    def __init__(self, expression: FHIRPathNode):
         self.expression = expression
 
     def evaluate(
@@ -80,10 +80,10 @@ class Select(FHIRPathFunction):
     Representation of the FHIRPath [`select()`](http://hl7.org/fhirpath/N1/#selectprojection-expression-collection) function.
 
     Attributes:
-        projection (FHIRPath): Expression to evaluate for each collection item.
+        projection (FHIRPathNode): Expression to evaluate for each collection item.
     """
 
-    def __init__(self, projection: FHIRPath):
+    def __init__(self, projection: FHIRPathNode):
         self.projection = projection
 
     def evaluate(
@@ -134,10 +134,10 @@ class Repeat(FHIRPathFunction):
     Representation of the FHIRPath [`repeat()`](http://hl7.org/fhirpath/N1/#repeatprojection-expression-collection) function.
 
     Attributes:
-        projection (FHIRPath): Expression to evaluate for each collection item.
+        projection (FHIRPathNode): Expression to evaluate for each collection item.
     """
 
-    def __init__(self, projection: FHIRPath):
+    def __init__(self, projection: FHIRPathNode):
         self.projection = projection
 
     def evaluate(

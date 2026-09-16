@@ -1,12 +1,18 @@
 """
-FHIRPath utility functions for parsing, evaluating, and handling FHIRPath 
+FHIRPath utility functions for parsing, evaluating, and handling FHIRPath
 expressions and collections.
 """
+
 import re
 import threading
 from typing import Any, Dict, Union, TYPE_CHECKING
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPath, Literal
+from fhircraft.fhir.path.engine.core import (
+    FHIRPathCollectionItem,
+    FHIRPathNode,
+    Literal,
+    FHIRPathCollection,
+)
 from fhircraft.utils import ensure_list
 from fhircraft.exceptions import FHIRPathRuntimeError
 
@@ -14,7 +20,7 @@ if TYPE_CHECKING:
     from fhircraft.fhir.path.parser import FHIRPathParser
 
 FHIRPATH_SEPARATORS = re.compile(r"\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)")
-    
+
 # Singleton parser instance with thread-safe initialization
 _parser_instance: "FHIRPathParser | None" = None
 _parser_lock = threading.Lock()
@@ -23,7 +29,8 @@ __all__ = [
     "parse_fhirpath",
 ]
 
-def parse_fhirpath(expression: str) -> "FHIRPath":
+
+def parse_fhirpath(expression: str) -> "FHIRPathNode":
     """
     Parses a FHIRPath expression string into a FHIRPath object.
 
@@ -34,7 +41,7 @@ def parse_fhirpath(expression: str) -> "FHIRPath":
 
     Returns:
         FHIRPath: The parsed FHIRPath object representing the expression.
-    
+
     Example:
         This shows how to parse a FHIRPath expression string into a FHIRPath object:
         ``` python
@@ -44,6 +51,7 @@ def parse_fhirpath(expression: str) -> "FHIRPath":
         ```
     """
     return _get_parser().parse(expression)
+
 
 def _get_parser():
     """Get or create the singleton FHIRPathParser instance in a thread-safe manner."""
@@ -81,10 +89,8 @@ def _underline_error_in_fhir_path(text, error, error_position, line_number=None)
         return f"{text[:error_position+len(str(error))+15]}...\n{underline}"
 
 
-
-
 def _evaluate_fhirpath_collection(
-    fhir_path: Union["FHIRPath", "FHIRPathCollection"],
+    fhir_path: Union["FHIRPathNode", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
     create: bool = False,
@@ -93,7 +99,7 @@ def _evaluate_fhirpath_collection(
     Evaluates a FHIRPath expression or collection against a given collection and environment, optionally creating new elements.
 
     Args:
-        fhir_path (FHIRPath | FHIRPathCollection): The FHIRPath expression or collection to evaluate.
+        fhir_path (FHIRPathNode | FHIRPathCollection): The FHIRPath expression or collection to evaluate.
         collection (FHIRPathCollection): The collection to evaluate the expression against.
         environment (dict): The evaluation environment containing variable bindings.
         create (bool): Whether to create new elements during evaluation if necessary.
@@ -103,14 +109,14 @@ def _evaluate_fhirpath_collection(
     """
     return (
         [item for item in fhir_path.evaluate(collection, environment, create)]
-        if isinstance(fhir_path, FHIRPath)
+        if isinstance(fhir_path, FHIRPathNode)
         else [FHIRPathCollectionItem.wrap(item) for item in ensure_list(fhir_path)]
     )
 
 
 def _evaluate_left_right_expressions(
-    left: Union["FHIRPath", "FHIRPathCollection"],
-    right: Union["FHIRPath", "FHIRPathCollection"],
+    left: Union["FHIRPathNode", "FHIRPathCollection"],
+    right: Union["FHIRPathNode", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
     create: "bool",
@@ -120,8 +126,8 @@ def _evaluate_left_right_expressions(
     optionally creating new elements, and returns the resulting collections of values.
 
     Args:
-        left (FHIRPath | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection of values.
-        right (FHIRPath | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection of values.
+        left (FHIRPathNode | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection of values.
+        right (FHIRPathNode | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection of values.
         collection (FHIRPathCollection): The collection to evaluate the expressions against.
         create (bool): Whether to create new elements during evaluation if necessary.
 
@@ -138,9 +144,9 @@ def _evaluate_left_right_expressions(
 
 
 def _evaluate_and_prepare_collection_values(
-    operator: "FHIRPath",
-    left: Union["FHIRPath", "FHIRPathCollection"],
-    right: Union["FHIRPath", "FHIRPathCollection"],
+    operator: "FHIRPathNode",
+    left: Union["FHIRPathNode", "FHIRPathCollection"],
+    right: Union["FHIRPathNode", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
     create=False,
@@ -150,9 +156,9 @@ def _evaluate_and_prepare_collection_values(
     Evaluates the left and right FHIRPath expressions or collections, prepares their values for comparison, and returns them.
 
     Args:
-        operator (FHIRPath): The FHIRPath operator being evaluated, used for error messages.
-        left (FHIRPath | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection of values.
-        right (FHIRPath | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection of values.
+        operator (FHIRPathNode): The FHIRPath operator being evaluated, used for error messages.
+        left (FHIRPathNode | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection of values.
+        right (FHIRPathNode | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection of values.
         collection (FHIRPathCollection): The collection to evaluate the expressions against.
         environment (dict): The evaluation environment containing variable bindings.
         create (bool): Whether to create new elements during evaluation if necessary.
@@ -209,7 +215,7 @@ def _get_expression_context(
     item: FHIRPathCollectionItem,
     index: int,
 ) -> dict:
-    """ 
+    """
     Creates a new evaluation context for a FHIRPath expression by copying the existing environment
     and adding the current item and index.
 
@@ -217,7 +223,7 @@ def _get_expression_context(
         environment (Dict[str, FHIRPathCollectionItem]): The existing evaluation environment containing variable bindings.
         item (FHIRPathCollectionItem): The current item being evaluated, to be added to the context as $this.
         index (int): The index of the current item in the collection, to be added to the context as $index.
-    
+
     Returns:
         dict: A new evaluation context dictionary containing the existing environment plus $this and $index.
     """

@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     This,
@@ -14,7 +14,7 @@ from fhircraft.fhir.path.engine.core import (
 from fhircraft.exceptions import FHIRPathException
 
 
-class FHIRPathVariable(FHIRPath):
+class FHIRPathVariable(FHIRPathNode):
     """
     Abstract class for FHIRPath contextual and environmental variables
 
@@ -73,7 +73,7 @@ class EnvironmentVariable(FHIRPathVariable):
         return [FHIRPathCollectionItem.wrap(value)]
 
 
-class ContextualVariable(FHIRPath):
+class ContextualVariable(FHIRPathNode):
     """
     A base class for FHIRPath contextual variables such as `$this`, `$index`, and `$total`.
     """

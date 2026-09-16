@@ -11,7 +11,7 @@ from typing import Any
 
 import fhircraft.fhir.path.engine.literals as fhirpath_literals
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -24,14 +24,14 @@ from fhircraft.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import _evaluate_fhirpath_collection
 
 
-class FHIRTypesOperator(FHIRPath):
+class FHIRTypesOperator(FHIRPathNode):
     """
     Abstract class definition for the category of types FHIRPath operators.
     """
 
     def __init__(
         self,
-        left: FHIRPath | FHIRPathCollection,
+        left: FHIRPathNode | FHIRPathCollection,
         type_specifier: TypeSpecifier,
     ):
         self.type_specifier = type_specifier
@@ -108,7 +108,7 @@ class Is(FHIRTypesOperator):
     A representation of the FHIRPath [`is`](https://hl7.org/fhirpath/N1/#is) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
         type_specifier (str): Type specifier.
     """
 
@@ -153,7 +153,7 @@ class LegacyIs(FHIRPathFunction):
     in a model.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
         type_specifier (str): Type specifier.
     """
 
@@ -174,7 +174,7 @@ class As(FHIRTypesOperator):
     A representation of the FHIRPath [`as`](https://hl7.org/fhirpath/N1/#as) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
         type_specifier (str): Type specifier.
     """
 
@@ -219,7 +219,7 @@ class LegacyAs(FHIRPathFunction):
     in a model.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
         type_specifier (str): Type specifier.
     """
 

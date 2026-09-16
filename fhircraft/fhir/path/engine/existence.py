@@ -18,7 +18,7 @@ __all__ = [
 from typing import Callable
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -55,10 +55,10 @@ class Exists(FHIRPathFunction):
     Representation of the FHIRPath [`exists()`](http://hl7.org/fhirpath/N1/#existscriteria-expression-boolean) function.
 
     Attributes:
-        criteria (FHIRPath): Optional criteria to be applied to the collection prior to the determination of the exists
+        criteria (FHIRPathNode): Optional criteria to be applied to the collection prior to the determination of the exists
     """
 
-    def __init__(self, criteria: FHIRPath | None = None):
+    def __init__(self, criteria: FHIRPathNode | None = None):
         self.criteria = criteria
 
     def evaluate(
@@ -100,10 +100,10 @@ class All(FHIRPathFunction):
     Representation of the FHIRPath [`all()`](https://hl7.org/fhirpath/N1/#allcriteria-expression-boolean) function.
 
     Attributes:
-        criteria (FHIRPath): Criteria to be applied to the collection prior to the evalution.
+        criteria (FHIRPathNode): Criteria to be applied to the collection prior to the evalution.
     """
 
-    def __init__(self, criteria: FHIRPath | FHIRPathCollection):
+    def __init__(self, criteria: FHIRPathNode | FHIRPathCollection):
         self.criteria = criteria
 
     def evaluate(
@@ -134,7 +134,7 @@ class All(FHIRPathFunction):
                                     environment, item, index
                                 ),
                             )
-                            if isinstance(self.criteria, FHIRPath)
+                            if isinstance(self.criteria, FHIRPathNode)
                             else item.value == self.criteria
                         )
                         for index, item in enumerate(collection)
@@ -271,7 +271,7 @@ class SubsetOf(FHIRPathFunction):
         other (Union[FHIRPathCollection, FHIRPath]): other collection to which to determine whether input is a subset of.
     """
 
-    def __init__(self, other: FHIRPathCollection | FHIRPath):
+    def __init__(self, other: FHIRPathCollection | FHIRPathNode):
         self.other = other
 
     def evaluate(
@@ -298,7 +298,7 @@ class SubsetOf(FHIRPathFunction):
             return [FHIRPathCollectionItem.wrap(True)]
         other_collection = (
             self.other.evaluate(collection, environment, create)
-            if isinstance(self.other, FHIRPath)
+            if isinstance(self.other, FHIRPathNode)
             else self.other
         )
         if len(other_collection) == 0:
@@ -321,7 +321,7 @@ class SupersetOf(FHIRPathFunction):
         other (Union[FHIRPathCollection, FHIRPath]): Other collection to which to determine whether input is a superset of.
     """
 
-    def __init__(self, other: FHIRPathCollection | FHIRPath):
+    def __init__(self, other: FHIRPathCollection | FHIRPathNode):
         self.other = other
 
     def evaluate(
@@ -348,7 +348,7 @@ class SupersetOf(FHIRPathFunction):
             return [FHIRPathCollectionItem.wrap(True)]
         other_collection = (
             self.other.evaluate(collection, environment, create)
-            if isinstance(self.other, FHIRPath)
+            if isinstance(self.other, FHIRPathNode)
             else self.other
         )
         if len(other_collection) == 0:

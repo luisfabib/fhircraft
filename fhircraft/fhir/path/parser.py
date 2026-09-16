@@ -27,7 +27,7 @@ import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.utility as utility
 from fhircraft.fhir.path.engine.core import (
     Element,
-    FHIRPath,
+    FHIRPathNode,
     Invocation,
     Literal,
     RootElement,
@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 class FHIRPathParser:
     """
     An LALR-parser for FHIRPath with LRU cache for parsed expressions.
-       
+
     The parser uses an OrderedDict-based LRU (Least Recently Used) cache to store parsed
     expressions. The cache has a configurable size limit (default: 1000 expressions) to
     prevent unbounded memory growth. When the cache reaches its limit, the least recently
@@ -69,7 +69,7 @@ class FHIRPathParser:
     cache_limit: int = 1000
     """Maximum number of expressions to cache. Oldest (least recently used) are evicted when limit is reached."""
 
-    cache: OrderedDict[str, FHIRPath] = OrderedDict()
+    cache: OrderedDict[str, FHIRPathNode] = OrderedDict()
     """A cache of parsed FHIRPath expressions to avoid re-parsing the same expression. Uses LRU eviction policy."""
 
     lr_parser: ply.yacc.LRParser | None = None
@@ -78,13 +78,13 @@ class FHIRPathParser:
     def __init__(self, debug=False, lexer_class=None, cache_limit=1000):
         """
         Initialize the FHIRPath parser.
-        
+
         Args:
             debug (bool): Whether to enable debug output for the parser. Defaults to False.
             lexer_class (type, optional): Custom lexer class to use. Defaults to FHIRPathLexer.
             cache_limit (int): Maximum number of expressions to cache. Defaults to 1000.
                 When the cache exceeds this limit, the least recently used expression is evicted.
-        
+
         Raises:
             FHIRPathParsingError: If docstrings have been removed (required by PLY).
         """
@@ -95,9 +95,7 @@ class FHIRPathParser:
 
         self.debug = debug
         self.cache_limit = cache_limit
-        self.lexer_class = (
-            lexer_class or FHIRPathLexer
-        )
+        self.lexer_class = lexer_class or FHIRPathLexer
         self.lexer = self.lexer_class()
         output_directory = os.path.dirname(__file__)
         try:
@@ -120,25 +118,27 @@ class FHIRPathParser:
         )
 
         # Cache of parsed FHIRPath expressions using OrderedDict for LRU tracking
-        self.cache: OrderedDict[str, FHIRPath] = OrderedDict()
+        self.cache: OrderedDict[str, FHIRPathNode] = OrderedDict()
 
-    def parse(self, input_string: str) -> FHIRPath | Any:
+    def parse(self, input_string: str) -> FHIRPathNode | Any:
         """
         Parse a FHIRPath expression string and return the corresponding FHIRPath object.
-        
+
             Results are cached using an LRU policy. Cached expressions are returned immediately
             without re-parsing. Accessing a cached expression updates its position in the LRU
             queue to mark it as recently used.
-        
+
         Args:
             input_string (str): The FHIRPath expression string to parse.
-        
+
         Returns:
-            FHIRPath: The parsed FHIRPath object representing the expression.
+            FHIRPathNode: The parsed FHIRPath object representing the expression.
 
         Raises:
             FHIRPathParsingError: If there is a parsing error in the input string.
         """
+        if not self.lexer:
+            raise FHIRPathParsingError(f'FHIRPath lexer is not initialized"!')
         self.input_string = str(input_string)
         if self.input_string not in self.cache:
             # Parse the expression
@@ -159,8 +159,12 @@ class FHIRPathParser:
         return {
             "size": len(self.cache),
             "limit": self.cache_limit,
-            "usage_percent": (len(self.cache) / self.cache_limit * 100) if self.cache_limit > 0 else 0,
-            "expressions": list(self.cache)
+            "usage_percent": (
+                (len(self.cache) / self.cache_limit * 100)
+                if self.cache_limit > 0
+                else 0
+            ),
+            "expressions": list(self.cache),
         }
 
     def is_valid(self, input_string: str) -> bool:
@@ -169,7 +173,7 @@ class FHIRPathParser:
 
         Args:
             input_string (str): The FHIRPath expression string to validate.
-        
+
         Returns:
             bool: True if the expression is valid, False otherwise.
         """
@@ -183,16 +187,18 @@ class FHIRPathParser:
         except (FHIRPathParsingError, FHIRPathLexingError):
             return False
 
-    def parse_token_stream(self, token_iterator: Iterator) -> FHIRPath:
+    def parse_token_stream(self, token_iterator: Iterator) -> FHIRPathNode:
         """
         Parse a stream of tokens and return the corresponding FHIRPath object.
 
         Args:
             token_iterator: An iterator that yields tokens from the lexer.
-        
+
         Returns:
-            FHIRPath: The parsed FHIRPath object representing the expression.
+            FHIRPathNode: The parsed FHIRPath object representing the expression.
         """
+        if not self.lr_parser:
+            raise FHIRPathParsingError(f'FHIRPath parser is not initialized"!')
         return self.lr_parser.parse(lexer=IteratorToTokenStream(token_iterator))
 
     # ===================== PLY Parser specification =====================
@@ -217,7 +223,7 @@ class FHIRPathParser:
                 f'FHIRPath parser error near the end of string "{self.input_string}"!'
             )
         raise FHIRPathParsingError(
-            f"FHIRPath parser error at {t.lineno}:{t.col} - Invalid token \"{t.value}\" ({t.type}):"
+            f'FHIRPath parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):'
             f"\n{_underline_error_in_fhir_path(self.input_string, t.value, t.col)}"
         )
 
@@ -374,9 +380,9 @@ class FHIRPathParser:
             p[0] = environment.ContextualTotal()
         else:
             raise FHIRPathParsingError(
-                f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: '
+                f"FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: "
                 f'Invalid contextual operator "{p[1]}".'
-                f'\n{_underline_error_in_fhir_path(self.input_string, p[1], p.lexpos(1))}'
+                f"\n{_underline_error_in_fhir_path(self.input_string, p[1], p.lexpos(1))}"
             )
 
     def p_fhirpath_type_specifier(self, p):
@@ -622,9 +628,9 @@ class FHIRPathParser:
         else:
             pos = self.input_string.find(str(p[1]))
             raise FHIRPathParsingError(
-                f'FHIRPath parser error at {p.lineno(1)}:{pos}: '
+                f"FHIRPath parser error at {p.lineno(1)}:{pos}: "
                 f'Invalid function "{p[1]}".'
-                f'\n{_underline_error_in_fhir_path(self.input_string,p[1], pos)}'
+                f"\n{_underline_error_in_fhir_path(self.input_string,p[1], pos)}"
             )
 
     def p_fhirpath_type_function(self, p):

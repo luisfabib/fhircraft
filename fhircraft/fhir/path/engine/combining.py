@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -22,7 +22,7 @@ class Union(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to combine with.
     """
 
-    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+    def __init__(self, other_collection: FHIRPathNode | FHIRPathCollection):
         self.other_collection = other_collection
 
     def evaluate(
@@ -39,7 +39,7 @@ class Union(FHIRPathFunction):
         Returns:
             FHIRPathCollection: The output collection.
         """
-        if isinstance(self.other_collection, FHIRPath):
+        if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment, create
             )
@@ -57,7 +57,7 @@ class Combine(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to combine with.
     """
 
-    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+    def __init__(self, other_collection: FHIRPathNode | FHIRPathCollection):
         self.other_collection = other_collection
 
     def evaluate(
@@ -76,7 +76,7 @@ class Combine(FHIRPathFunction):
         Returns:
             FHIRPathCollection: The output collection.
         """
-        if isinstance(self.other_collection, FHIRPath):
+        if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment, create
             )

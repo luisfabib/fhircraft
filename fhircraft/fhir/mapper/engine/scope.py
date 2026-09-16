@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Set, TypeVar, Union
 
 from pydantic import BaseModel
 
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path.engine.core import FHIRPathNode
 from fhircraft.fhir.resources.datatypes.R4.core.concept_map import (
     ConceptMap as R4_ConceptMap,
 )
@@ -63,7 +63,7 @@ class MappingScope:
     groups: OrderedDict[str, "Group"] = field(default_factory=OrderedDict)
     """The groups defined on this scope"""
 
-    variables: Dict[str, FHIRPath] = field(default_factory=dict)
+    variables: Dict[str, FHIRPathNode] = field(default_factory=dict)
     """Registry of variables mapped to resolved FHIRPath expressions"""
 
     default_groups: Dict[str, "Group"] = field(default_factory=dict)
@@ -81,18 +81,18 @@ class MappingScope:
     parent: Optional["MappingScope"] = None
     """Parent mapping scope"""
 
-    def define_variable(self, identifier: str, value: FHIRPath) -> None:
+    def define_variable(self, identifier: str, value: FHIRPathNode) -> None:
         """
         Defines a new variable in the current scope.
 
         Args:
             identifier (str): The name of the variable to define.
-            value (FHIRPath): The FHIRPath instance to assign to the variable.
+            value (FHIRPathNode): The FHIRPath instance to assign to the variable.
 
         Raises:
             ValueError: If the provided value is not an instance of FHIRPath.
         """
-        if not isinstance(value, FHIRPath):
+        if not isinstance(value, FHIRPathNode):
             raise ValueError("Variables can only be assigned to a FHIRPath instance")
         self.variables[identifier] = value
 
@@ -208,7 +208,7 @@ class MappingScope:
         )
 
     def resolve_symbol(self, identifier: str) -> Union[
-        FHIRPath,
+        FHIRPathNode,
         type[BaseModel],
         "Group",
     ]:
@@ -394,7 +394,7 @@ class MappingScope:
         )
         return Group(definition=definition)
 
-    def resolve_fhirpath(self, identifier: str) -> FHIRPath:
+    def resolve_fhirpath(self, identifier: str) -> FHIRPathNode:
         """
         Resolve a symbol as a FHIRPath expression.
 
@@ -406,8 +406,10 @@ class MappingScope:
             MapperScopeError: If the symbol is not found or is not a FHIRPath
         """
         symbol = self.resolve_symbol(identifier)
-        if not isinstance(symbol, FHIRPath):
-            raise MapperScopeError(f"Symbol '{identifier}' is not a FHIRPath expression.")
+        if not isinstance(symbol, FHIRPathNode):
+            raise MapperScopeError(
+                f"Symbol '{identifier}' is not a FHIRPath expression."
+            )
         return symbol
 
     def get_all_visible_symbols(
@@ -415,7 +417,7 @@ class MappingScope:
     ) -> Dict[
         str,
         Union[
-            FHIRPath,
+            FHIRPathNode,
             type[BaseModel],
             R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup,
         ],

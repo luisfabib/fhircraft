@@ -8,7 +8,7 @@ __all__ = [
 
 from typing import Any
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -22,13 +22,13 @@ class Aggregate(FHIRPathFunction):
     A representation of the FHIRPath [`aggregate()`](https://hl7.org/fhirpath/N1/#aggregateaggregator-expression-init-value-value) function.
 
     Args:
-        expression (FHIRPath): The aggregator expression to be evaluated for each element of the input collection.
+        expression (FHIRPathNode): The aggregator expression to be evaluated for each element of the input collection.
         init (Optional[Any]): Initial value for the $total variable, defaults to an empty collection if not provided.
     """
 
     def __init__(
         self,
-        expression: FHIRPath,
+        expression: FHIRPathNode,
         init: Any | None = None,
     ):
         self.expression = expression

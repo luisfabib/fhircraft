@@ -10,20 +10,22 @@ __all__ = [
 from abc import ABC
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
 )
 from fhircraft.fhir.path.utils import _evaluate_and_prepare_collection_values
 
 
-class FHIRComparisonOperator(FHIRPath, ABC):
+class FHIRComparisonOperator(FHIRPathNode, ABC):
     """
     Abstract class definition for the category of comparison FHIRPath operators.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -50,8 +52,8 @@ class GreaterThan(FHIRComparisonOperator):
     A representation of the FHIRPath [`>`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
@@ -75,7 +77,9 @@ class GreaterThan(FHIRComparisonOperator):
         left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
+        if (not left_value and left_value != 0) or (
+            not right_value and right_value != 0
+        ):
             return []
         return [FHIRPathCollectionItem.wrap(left_value > right_value)]
 
@@ -88,12 +92,14 @@ class LessThan(FHIRComparisonOperator):
     A representation of the FHIRPath [`<`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -119,7 +125,9 @@ class LessThan(FHIRComparisonOperator):
         left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
+        if (not left_value and left_value != 0) or (
+            not right_value and right_value != 0
+        ):
             return []
         return [FHIRPathCollectionItem.wrap(left_value < right_value)]
 
@@ -132,12 +140,14 @@ class LessEqualThan(FHIRComparisonOperator):
     A representation of the FHIRPath [`<=`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -163,7 +173,9 @@ class LessEqualThan(FHIRComparisonOperator):
         left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
+        if (not left_value and left_value != 0) or (
+            not right_value and right_value != 0
+        ):
             return []
         return [FHIRPathCollectionItem.wrap(left_value <= right_value)]
 
@@ -176,12 +188,14 @@ class GreaterEqualThan(FHIRComparisonOperator):
     A representation of the FHIRPath [`>=`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -207,7 +221,9 @@ class GreaterEqualThan(FHIRComparisonOperator):
         left_value, right_value = _evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
+        if (not left_value and left_value != 0) or (
+            not right_value and right_value != 0
+        ):
             return []
         return [FHIRPathCollectionItem.wrap(left_value >= right_value)]
 

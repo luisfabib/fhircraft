@@ -32,7 +32,7 @@ from typing import Callable
 from fhircraft.config import get_config
 from fhircraft.fhir.path.engine.core import (
     Element,
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathException,
@@ -112,7 +112,7 @@ class Extension(FHIRPathFunction):
         return hash((self.url))
 
 
-class TypeChoice(FHIRPath):
+class TypeChoice(FHIRPathNode):
 
     def __init__(self, type_choice_name: str | Literal):
         if isinstance(type_choice_name, Literal):
@@ -1066,11 +1066,11 @@ class Subsumes(FHIRPathFunction):
     A representation of the FHIRPath [`subsumes()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        code (FHIRPath): The code to check for subsumption.
+        code (FHIRPathNode): The code to check for subsumption.
     """
 
-    def __init__(self, code: FHIRPath):
-        if not isinstance(code, FHIRPath):
+    def __init__(self, code: FHIRPathNode):
+        if not isinstance(code, FHIRPathNode):
             raise FHIRPathException("subsumes() argument must be a FHIRPath instance.")
         self.code = code
 
@@ -1106,11 +1106,11 @@ class SubsumedBy(FHIRPathFunction):
     A representation of the FHIRPath [`subsumedBy()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        code (FHIRPath): The code to check for subsumption.
+        code (FHIRPathNode): The code to check for subsumption.
     """
 
-    def __init__(self, code: FHIRPath):
-        if not isinstance(code, FHIRPath):
+    def __init__(self, code: FHIRPathNode):
+        if not isinstance(code, FHIRPathNode):
             raise FHIRPathException(
                 "subsumedBy() argument must be a FHIRPath instance."
             )
@@ -1150,13 +1150,13 @@ class Comparable(FHIRPathFunction):
     A representation of the FHIRPath [`comparable()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        quantity (Quantity | FHIRPath): The quantity to check for comparability or a FHIRPath that resolves to a Quantity.
+        quantity (Quantity | FHIRPathNode): The quantity to check for comparability or a FHIRPath that resolves to a Quantity.
     """
 
-    def __init__(self, quantity: Quantity | FHIRPath):
+    def __init__(self, quantity: Quantity | FHIRPathNode):
         if isinstance(quantity, Quantity):
             quantity = Literal(quantity)
-        if not isinstance(quantity, FHIRPath):
+        if not isinstance(quantity, FHIRPathNode):
             raise FHIRPathException(
                 "comparable() argument must be a FHIRPath Quantity or valid FHIRPath."
             )

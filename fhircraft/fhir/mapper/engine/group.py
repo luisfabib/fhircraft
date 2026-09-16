@@ -7,7 +7,7 @@ from fhircraft.exceptions import (
 )
 import logging
 
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path.engine.core import FHIRPathNode
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +124,10 @@ class Group(FHIRMappingEngineComponent):
                     )
 
     def bind_parameters(
-        self, scope: "MappingScope", parameters: Sequence[FHIRPath], is_dependent: bool
+        self,
+        scope: "MappingScope",
+        parameters: Sequence[FHIRPathNode],
+        is_dependent: bool,
     ) -> None:
         """Bind input parameters to the group scope."""
         if len(parameters) != len(self.inputs):
@@ -156,7 +159,7 @@ class Group(FHIRMappingEngineComponent):
     def process(
         self,
         scope: "MappingScope",
-        parameters: Sequence[FHIRPath],
+        parameters: Sequence[FHIRPathNode],
         is_dependent: bool = False,
     ):
         """
