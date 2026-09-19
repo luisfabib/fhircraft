@@ -555,9 +555,10 @@ class Replace(StringManipulationFunction):
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Validate pattern and substitution
-        if self.substitution.is_empty(
-            collection, environment=environment
-        ) or self.pattern.is_empty(collection, environment=environment):
+        if (
+            len(self.substitution.evaluate(collection, environment=environment)) == 0
+            or len(self.pattern.evaluate(collection, environment=environment)) == 0
+        ):
             return []
         # Get pattern and substitution values
         if not isinstance(
@@ -631,7 +632,7 @@ class Matches(StringManipulationFunction):
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Get regex value
-        if self.regex.is_empty(collection, environment=environment):
+        if len(self.regex.evaluate(collection, environment=environment)) == 0:
             return []
         if not isinstance(
             regex := self.regex.single(collection, environment=environment),
@@ -697,9 +698,10 @@ class ReplaceMatches(StringManipulationFunction):
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Validate pattern and substitution
-        if self.regex.is_empty(
-            collection, environment=environment
-        ) or self.substitution.is_empty(collection, environment=environment):
+        if (
+            len(self.regex.evaluate(collection, environment=environment)) == 0
+            or len(self.substitution.evaluate(collection, environment=environment)) == 0
+        ):
             return []
         if not isinstance(
             regex := self.regex.single(collection, environment=environment),

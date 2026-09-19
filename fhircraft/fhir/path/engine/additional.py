@@ -126,7 +126,7 @@ class TypeChoice(FHIRPathNode):
     ) -> FHIRPathCollection:
         return [
             FHIRPathCollectionItem(
-                getattr(item.value, field), path=Element(field), parent=item
+                getattr(item.value, field), element=field, parent=item
             )
             for item in collection
             for field in item.value.__class__.model_fields.keys()

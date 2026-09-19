@@ -39,8 +39,8 @@ equals_boolean_logic_cases = (
     (DateTime("@2012-01-01T10:30:12.312"), DateTime("@2012-01-01T10:30"), []),
     ("1 year", "1 year", True),
     ("1 cm", "1 m", False),
-    ("ABC", [], []),
-    ([], "ABC", []),
+    ("ABC", None, []),
+    (None, "ABC", []),
     # FHIR primitive class instances
     (FHIRString(value="ABC"), FHIRString(value="ABC"), True),
     (FHIRString(value="ABC"), FHIRString(value="DEF"), False),
@@ -54,12 +54,10 @@ equals_boolean_logic_cases = (
 
 @pytest.mark.parametrize("left, right, expected", equals_boolean_logic_cases)
 def test_equals_returns_correct_boolean(left, right, expected):
-    resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
-    collection = [FHIRPathCollectionItem(value=resource)]
     result = Equals(
-        Element("left"),
-        Element("right"),
-    ).evaluate(collection, env)
+        [FHIRPathCollectionItem(value=left)] if left is not None else [],
+        [FHIRPathCollectionItem(value=right)] if right is not None else [],
+    ).evaluate([], env)
     if isinstance(expected, bool):
         expected = [FHIRPathCollectionItem(value=expected)]
     assert result == expected
@@ -72,12 +70,10 @@ def test_equals_string_representation():
 
 @pytest.mark.parametrize("left, right, expected", equals_boolean_logic_cases)
 def test_notequals_returns_correct_boolean(left, right, expected):
-    resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
-    collection = [FHIRPathCollectionItem(value=resource)]
     result = NotEquals(
-        Element("left"),
-        Element("right"),
-    ).evaluate(collection, env)
+        [FHIRPathCollectionItem(value=left)] if left is not None else [],
+        [FHIRPathCollectionItem(value=right)] if right is not None else [],
+    ).evaluate([], env)
     if isinstance(expected, bool):
         expected = [FHIRPathCollectionItem(value=not expected)]
 
@@ -120,9 +116,9 @@ equivalent_boolean_logic_cases = (
     (DateTime("@2012-01-01T10:30:31.1"), DateTime("@2012-01-01T10:30:31"), False),
     ("1 year", "1 year", True),
     ("1 cm", "1 m", False),
-    ("ABC", [], False),
-    ([], "ABC", False),
-    ([], [], True),
+    ("ABC", None, False),
+    (None, "ABC", False),
+    (None, None, True),
     (dict(a=1, b=2), dict(b=2, a=1), True),
     (dict(a=1, b=2, id="123"), dict(b=2, a=1, id="456"), True),
     (dict(a=1, b=2, c=3), dict(b=2, a=1, id="456"), False),
@@ -138,12 +134,10 @@ equivalent_boolean_logic_cases = (
 
 @pytest.mark.parametrize("left, right, expected", equivalent_boolean_logic_cases)
 def test_equivalent_returns_correct_boolean(left, right, expected):
-    resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
-    collection = [FHIRPathCollectionItem(value=resource)]
     result = Equivalent(
-        Element("left"),
-        Element("right"),
-    ).evaluate(collection, env)
+        [FHIRPathCollectionItem(value=left)] if left is not None else [],
+        [FHIRPathCollectionItem(value=right)] if right is not None else [],
+    ).evaluate([], env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 
@@ -154,12 +148,10 @@ def test_equivalent_string_representation():
 
 @pytest.mark.parametrize("left, right, expected", equivalent_boolean_logic_cases)
 def test_notequivalent_returns_correct_boolean(left, right, expected):
-    resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
-    collection = [FHIRPathCollectionItem(value=resource)]
     result = NotEquivalent(
-        Element("left"),
-        Element("right"),
-    ).evaluate(collection, env)
+        [FHIRPathCollectionItem(value=left)] if left is not None else [],
+        [FHIRPathCollectionItem(value=right)] if right is not None else [],
+    ).evaluate([], env)
     assert result != [FHIRPathCollectionItem(value=expected)]
 
 

@@ -74,7 +74,7 @@ class Equals(FHIRPathNode):
             return []
         elif len(left_collection) == 1 and len(right_collection) == 1:
             try:
-                equals = left_collection[0] == right_collection[0]
+                equals = left_collection[0].value == right_collection[0].value
             except TypePrecisionError:
                 return []
         elif len(left_collection) != len(right_collection):

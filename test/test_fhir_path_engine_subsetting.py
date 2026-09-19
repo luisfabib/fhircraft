@@ -70,7 +70,7 @@ class TestIndexPrimitive(TestCase):
     def setUp(self):
         TestResource = namedtuple("TestResource", "field")
         self.resource = TestResource(field=[1, 2, 3])
-        parent = FHIRPathCollectionItem(self.resource, path=This())
+        parent = FHIRPathCollectionItem(self.resource)
         self.collection = Element("field").evaluate([parent], env)
 
     def test_index_evaluates_correctly(self):
@@ -91,12 +91,12 @@ class TestIndexPrimitive(TestCase):
         assert len(self.resource.field) == 3
 
     def test_index_updates_value(self):
-        Index(2).update_values(self.collection, value="value")
+        Index(2).evaluate(self.collection, env, create=False)[0].set("value")
         assert len(self.resource.field) == 3
         assert self.resource.field[2] == "value"
 
     def test_index_updates_and_creates_value(self):
-        Index(10).update_values(self.collection, value="value")
+        Index(10).evaluate(self.collection, env, create=True)[0].set("value")
         assert len(self.resource.field) == 11
         assert self.resource.field[10] == "value"
 
@@ -121,7 +121,7 @@ class TestIndexResources(TestCase):
                 Coding(code="code-3", system="system-3"),
             ]
         )
-        parent = FHIRPathCollectionItem(self.resource, path=This())
+        parent = FHIRPathCollectionItem(self.resource)
         self.collection = Element("coding").evaluate([parent], env)
 
     def test_index_evaluates_correctly(self):
@@ -145,16 +145,16 @@ class TestIndexResources(TestCase):
         assert len(self.resource.coding) == 3
 
     def test_index_updates_value(self):
-        Index(2).update_values(
-            self.collection, value=Coding(code="code-5", system="system-5")
+        Index(2).evaluate(self.collection, env, create=False)[0].set(
+            Coding(code="code-5", system="system-5")
         )
         assert self.resource.coding
         assert len(self.resource.coding) == 3
         assert self.resource.coding[2] == Coding(code="code-5", system="system-5")
 
     def test_index_updates_and_creates_value(self):
-        Index(10).update_values(
-            self.collection, value=Coding(code="code-5", system="system-5")
+        Index(10).evaluate(self.collection, env, create=True)[0].set(
+            Coding(code="code-5", system="system-5")
         )
         assert self.resource.coding
         assert len(self.resource.coding) == 11
@@ -163,7 +163,7 @@ class TestIndexResources(TestCase):
     def test_index_creates_with_empty_list(self):
         resource = CodeableConcept.model_construct()
         resource.coding = []
-        parent = FHIRPathCollectionItem(resource, path=This())
+        parent = FHIRPathCollectionItem(resource)
         collection = Element("coding").evaluate([parent], env, create=True)
         Index(0).evaluate(collection, env, create=True)
         assert len(resource.coding) == 1

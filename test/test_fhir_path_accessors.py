@@ -34,6 +34,10 @@ class MockPatient(BaseModel):
     _type: ClassVar[str] = "Patient"
     model_config = ConfigDict(extra="forbid")
 
+    @property
+    def example_property(self) -> str:
+        return "<example_property>"
+
     id: Optional[str] = None
     gender: Optional[str] = None
     birthDate: str = Field(...)
@@ -41,7 +45,6 @@ class MockPatient(BaseModel):
     telecom: list[str] = Field(default_factory=list)
     note: Optional[list[str]] = None
     class_: Optional[str] = None
-    value_ext: Optional[dict] = None
     resource_type: Optional[str] = Field(default=None, alias="resourceType")
 
 
@@ -95,14 +98,6 @@ def test_resolve_field__matches_direct_key_in_mapping():
     assert resolve_field({"gender": "female"}, "gender") == "gender"
 
 
-def test_resolve_field__matches_underscore_suffixed_key_in_mapping():
-    assert resolve_field({"value_": "x"}, "value") == "value_"
-
-
-def test_resolve_field__matches_ext_suffixed_key_in_mapping():
-    assert resolve_field({"value_ext": {"extension": []}}, "value") == "value_ext"
-
-
 def test_resolve_field__falls_back_to_element_name_for_absent_mapping_key():
     # Mappings are open containers: an absent key is still a writable location.
     assert resolve_field({}, "nickname") == "nickname"
@@ -112,16 +107,12 @@ def test_resolve_field__matches_direct_field_on_model(patient):
     assert resolve_field(patient, "gender") == "gender"
 
 
-def test_resolve_field__matches_underscore_suffixed_field_on_model(patient):
-    assert resolve_field(patient, "class") == "class_"
-
-
-def test_resolve_field__matches_ext_suffixed_field_on_model(patient):
-    assert resolve_field(patient, "value") == "value_ext"
-
-
 def test_resolve_field__matches_alias_on_model(patient):
     assert resolve_field(patient, "resourceType") == "resource_type"
+
+
+def test_resolve_field__matches_property_on_model(patient):
+    assert resolve_field(patient, "example_property") == "example_property"
 
 
 def test_resolve_field__returns_none_for_unknown_field_on_closed_model(patient):

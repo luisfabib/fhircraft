@@ -80,7 +80,10 @@ class RuleTarget(FHIRMappingEngineComponent):
             # Execute the transform
             transformed_value = self.transform.process(scope)
             # Update the target structure
-            self.resolved_path.update_single(scope.get_instances(), transformed_value)
+            for collection_item in self.resolved_path._evaluate_wrapped(
+                scope.get_instances()
+            ):
+                collection_item.set(transformed_value)
 
         # Define variable in scope
         scope.define_variable(self.variable, self.resolved_path)

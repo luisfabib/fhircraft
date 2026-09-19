@@ -12,11 +12,9 @@ __all__ = [
     "Exclude",
 ]
 
-from functools import partial
 from typing import List, Optional, Union
 
 from fhircraft.fhir.path.engine.core import (
-    Element,
     FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
@@ -65,65 +63,60 @@ class Index(FHIRPathNode):
             The padded object is initialized based on the collection items' common parent (if exists).
             Therefore, this option is only available for a homogeneous collection of items.
         """
-        # Check whether array is too short and it can be extended
         if len(collection) <= self.index and create:
-            # Calculate how many elements must be padded
-            pad = self.index - len(collection) + 1
-            all_same_parent = collection and all(
-                [
-                    (
-                        item.parent.value
-                        in [
-                            subitem.parent.value
-                            for subitem in collection
-                            if subitem.parent
-                        ]
-                        if item.parent
-                        else True
-                    )
-                    for item in collection
-                ]
-            )
-            if all_same_parent:
-                parent_array = collection[0]
-                if parent_array.parent:
-                    new_values = ensure_list(
-                        parent_array.parent.value.get(parent_array.path.label)
-                        if isinstance(parent_array.parent.value, dict)
-                        else getattr(parent_array.parent.value, parent_array.path.label)
-                    )
-                    if hasattr(new_values[0].__class__, "model_construct"):
-                        new_values.extend(
-                            [parent_array.construct_resource() for __ in range(pad)]
-                        )
-                    else:
-                        new_values.extend([None for __ in range(pad)])
-                else:
-                    new_values = collection
-                    new_values.extend(
-                        [FHIRPathCollectionItem.wrap(None) for __ in range(pad)]
-                    )
-                return [
-                    FHIRPathCollectionItem(
-                        new_values[self.index],
-                        path=Element(parent_array.element or ""),
-                        setter=(
-                            partial(parent_array.setter, index=self.index)
-                            if parent_array.setter
-                            else None
-                        ),
-                        parent=parent_array.parent,
-                    )
-                ]
-            else:
-                raise FHIRPathException(
-                    f"Cannot create new array element due to inhomogeneity in parents"
-                )
+            return self._pad_to_index(collection)
         # If index is within array bounds, get element
         if collection and len(collection) > self.index:
             return [collection[self.index]]
         # Else return empty list
         return []
+
+    def _pad_to_index(self, collection: FHIRPathCollection) -> FHIRPathCollection:
+        """Grow `collection` (and, where possible, its underlying container) up to `self.index`."""
+        if not collection:
+            raise FHIRPathException(
+                "Cannot create new array element due to inhomogeneity in parents"
+            )
+        pad = self.index - len(collection) + 1
+        parent_array = collection[0]
+
+        if parent_array.parent is None:
+            # No underlying container to grow -- pad the in-memory collection itself.
+            padded = list(collection) + [
+                FHIRPathCollectionItem.wrap(None) for __ in range(pad)
+            ]
+            return [padded[self.index]]
+
+        same_parent = parent_array.parent.value
+        if not all(
+            item.parent is None or item.parent.value is same_parent
+            for item in collection
+        ):
+            raise FHIRPathException(
+                "Cannot create new array element due to inhomogeneity in parents"
+            )
+
+        accessor = parent_array.parent.child(None, parent_array.element or "").accessor
+        if accessor is None:
+            raise FHIRPathException(
+                f"Cannot create new array element: '{parent_array.element}' is "
+                "not a writable location"
+            )
+        current = accessor.get()
+        if isinstance(current, list):
+            # Mutate the live list in place: some containers (e.g. namedtuples)
+            # cannot have their field reassigned via `accessor.set()`.
+            values = current
+            values.extend(accessor.construct() for __ in range(pad))
+        else:
+            values = [accessor.construct() for __ in range(pad)]
+            accessor.set(values)
+
+        return [
+            parent_array.parent.child(
+                values[self.index], parent_array.element or "", index=self.index
+            )
+        ]
 
     def __eq__(self, other):
         return isinstance(other, Index) and self.index == other.index

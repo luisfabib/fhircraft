@@ -32,7 +32,7 @@ __all__ = [
 #: model attribute.  Mirrors the fallback chain in ``Element.evaluate``:
 #: ``value`` -> ``value_`` (shadowed builtins / reserved words) -> ``value_ext``
 #: (primitive extensions, the ``_value`` sibling in the JSON representation).
-FIELD_SUFFIXES: tuple[str, ...] = ("", "_", "_ext")
+FIELD_PREFIXES: tuple[str, ...] = ("", "_")
 
 
 def resolve_field(container: Any, element: str) -> str | None:
@@ -45,8 +45,8 @@ def resolve_field(container: Any, element: str) -> str | None:
         return None
 
     if isinstance(container, Mapping):
-        for suffix in FIELD_SUFFIXES:
-            candidate = f"{element}{suffix}"
+        for prefix in FIELD_PREFIXES:
+            candidate = f"{prefix}{element}"
             if candidate in container:
                 return candidate
         # A mapping is open by construction: an absent key is still writable.
@@ -54,11 +54,21 @@ def resolve_field(container: Any, element: str) -> str | None:
 
     model_fields = getattr(type(container), "model_fields", None)
     if model_fields is None:
-        return element if hasattr(container, element) else None
+        for prefix in FIELD_PREFIXES:
+            candidate = f"{prefix}{element}"
+            if hasattr(container, candidate):
+                return candidate
+        return None
 
-    for suffix in FIELD_SUFFIXES:
-        candidate = f"{element}{suffix}"
+    for prefix in FIELD_PREFIXES:
+        candidate = f"{prefix}{element}"
         if candidate in model_fields:
+            return candidate
+
+    # Check for properties defined on the model class itself
+    for prefix in FIELD_PREFIXES:
+        candidate = f"{prefix}{element}"
+        if hasattr(type(container), candidate):
             return candidate
 
     # Aliases (FHIR JSON names that are not valid Python identifiers).
@@ -190,7 +200,13 @@ class ElementAccessor(ABC):
 
         if isinstance(container, Mapping):
             return DictAccessor(container, item.element, field, item.index)
-        if hasattr(type(container), "model_fields") or hasattr(container, "__dict__"):
+        # `resolve_field` already proved `field` is reachable via `hasattr` for
+        # containers without `model_fields`/`__dict__` (e.g. namedtuples).
+        if (
+            hasattr(type(container), "model_fields")
+            or hasattr(container, "__dict__")
+            or hasattr(container, field)
+        ):
             return ModelAccessor(container, item.element, field, item.index)
         return None
 

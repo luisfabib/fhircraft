@@ -1,10 +1,12 @@
 from datetime import date
 from unittest import TestCase
 
+from pydantic import AliasChoices, BaseModel, Field
 import pytest
 
 from fhircraft.fhir.path.engine.core import (
     Element,
+    FHIRPathCollection,
     FHIRPathCollectionItem,
     Invocation,
     Literal,
@@ -13,10 +15,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.strings import Upper
 
-from fhircraft.fhir.resources.datatypes.R4.core.patient import Patient
-
-from dataclasses import dataclass
-from typing import List, Optional
+from typing import Any, List, Optional
 from unittest import TestCase
 
 import pytest
@@ -27,11 +26,38 @@ from fhircraft.fhir.path.engine.core import (
     RootElement,
     TypeSpecifier,
 )
-from fhircraft.exceptions import FHIRPathRuntimeError
 
-from fhircraft.fhir.resources.datatypes.R4 import core, complex, primitive
+from fhircraft.fhir.resources.datatypes.R5 import core, complex, primitive
 
-env = {"%fhirRelease": "R4"}
+env = {"%fhirRelease": "R5"}
+
+
+class MockName(BaseModel):
+    _type = "HumanName"
+    family: Optional[str] = None
+    given: Optional[List[str]] = None
+
+
+class MockPatient(BaseModel):
+    _type = "Patient"
+    name: Optional[List[MockName]] = None
+    gender: Optional[primitive.string] = None
+    birthDate: Optional[primitive.date_] = None
+    age: Optional[primitive.integer] = None
+    active: Optional[primitive.boolean] = None
+
+
+@pytest.fixture
+def collection() -> FHIRPathCollection:
+    return [
+        FHIRPathCollectionItem(value=MockPatient()),
+        FHIRPathCollectionItem(value=MockPatient()),
+    ]
+
+
+# --------------------------------------------------
+# TypeSpecifier
+# --------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -51,231 +77,78 @@ env = {"%fhirRelease": "R4"}
         ("CodeableConcept", complex.CodeableConcept),
     ],
 )
-def test_type_specifier_evaluates_correctly(type_specifier, expected_value):
+def test_type_specifier__evaluate(type_specifier, expected_value):
     type_spec = TypeSpecifier(type_specifier)
     result = type_spec.evaluate([], env)
     assert len(result) == 1
     assert result[0].value == expected_value
 
 
-class TestRoot(TestCase):
-
-    def test_evaluate_returns_collection_unchanged(self):
-        # Root().evaluate should return the collection unchanged
-        items = [
-            FHIRPathCollectionItem(value=MockPatient()),
-            FHIRPathCollectionItem(value=MockPatient()),
-            FHIRPathCollectionItem(value=MockPatient()),
-        ]
-        result = RootElement("Patient").evaluate(items, env)
-        assert result == items
-        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
-
-    def test_evaluate_empty_collection_returns_empty_list(self):
-        # Root().evaluate([]) should return []
-        result = RootElement("Patient").evaluate([], env)
-        assert result == []
-
-    def test_raises_error_for_wrong_type(self):
-        item = FHIRPathCollectionItem(value=MockPatient())
-        with pytest.raises(FHIRPathException):
-            RootElement("Condition").evaluate([item], env)
-
-    def test_root_string_representation(self):
-        expression = RootElement("Patient")
-        assert str(expression) == "Patient"
+# --------------------------------------------------
+# RootElement
+# --------------------------------------------------
 
 
-# class TestParent(TestCase):
-#     class DummyValue:
-#         pass
-
-#     def _make_item_with_parent(self, parent_value=None):
-#         parent_item = FHIRPathCollectionItem(value=parent_value or self.DummyValue())
-#         child_item = FHIRPathCollectionItem(value=self.DummyValue(), parent=parent_item)
-#         return child_item, parent_item
-
-#     def test_evaluate_returns_parents_when_present(self):
-#         child1, parent1 = self._make_item_with_parent()
-#         child2, parent2 = self._make_item_with_parent()
-#         collection = [child1, child2]
-#         result = Parent().evaluate(collection, env)
-#         assert result == [parent1, parent2]
-#         assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
-
-#     def test_evaluate_skips_items_without_parent(self):
-#         item_without_parent = FHIRPathCollectionItem(value=self.DummyValue())
-#         child, parent = self._make_item_with_parent()
-#         collection = [item_without_parent, child]
-#         result = Parent().evaluate(collection, env)
-#         assert result == [parent]
-#         assert parent in result
-#         assert item_without_parent not in result
-
-#     def test_evaluate_empty_collection_returns_empty_list(self):
-#         result = Parent().evaluate([], env)
-#         assert result == []
-
-#     def test_evaluate_all_items_without_parent_returns_empty_list(self):
-#         items = [FHIRPathCollectionItem(value=self.DummyValue()) for _ in range(3)]
-#         result = Parent().evaluate(items, env)
-#         assert result == []
-
-#     def test_parent_string_representation(self):
-#         expression = Parent()
-#         assert str(expression) == "$"
+def test_root_element__evaluate_returns_collection_unchanged(collection):
+    # Root().evaluate should return the collection unchanged
+    result = RootElement("Patient").evaluate(collection, env)
+    assert result == collection
+    assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
 
 
-class TestThis(TestCase):
-    class DummyValue:
-        pass
-
-    def setUp(self):
-        self.value1 = self.DummyValue()
-        self.value2 = self.DummyValue()
-        self.items = [
-            FHIRPathCollectionItem(value=self.value1),
-            FHIRPathCollectionItem(value=self.value2),
-        ]
-
-    def test_evaluate_returns_same_collection(self):
-        # This().evaluate should return the collection unchanged
-        result = This().evaluate(self.items, env)
-        assert result == self.items
-        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
-
-    def test_evaluate_empty_collection_returns_empty_list(self):
-        result = This().evaluate([], env)
-        assert result == []
-
-    def test_evaluate_with_single_item(self):
-        item = FHIRPathCollectionItem(value=self.value1)
-        result = This().evaluate([item], env)
-        assert result == [item]
-
-    def test_evaluate_with_none_value(self):
-        item = FHIRPathCollectionItem(value=None)
-        result = This().evaluate([item], env)
-        assert result == [item]
-        assert result[0].value is None
-
-    def test_this_string_representation(self):
-        expression = This()
-        assert str(expression) == ""
+def test_root_element__evaluate_empty_collection_returns_empty_list():
+    # Root().evaluate([]) should return []
+    result = RootElement("Patient").evaluate([], env)
+    assert result == []
 
 
-class TestElement(TestCase):
-
-    def setUp(self):
-        class DummyResource:
-            def __init__(self):
-                self.status = "active"
-                self.valueString = None
-                self.class_ = "classValue"
-                self.valueString_ext = {
-                    type("Extension", (), {"valueId": "id1"})(),
-                }
-                self.identifier = [
-                    type("Identifier", (), {"value": "id1"})(),
-                    type("Identifier", (), {"value": "id2"})(),
-                ]
-
-        self.resource = DummyResource()
-        self.collection = [FHIRPathCollectionItem(self.resource, path=This())]
-
-    def test_element_string_representation(self):
-        expression = Element("elementName")
-        assert str(expression) == "elementName"
-
-    def test_evaluate_returns_field_value(self):
-        # Should return the value of the field as a FHIRPathCollectionItem
-        result = Element("status").evaluate(self.collection, env, create=False)
-        assert len(result) == 1
-        assert result[0].value == "active"
-
-    def test_evaluate_returns_correct_value_for_reserved_keywords(self):
-        # Should return the value of the field as a FHIRPathCollectionItem
-        result = Element("class").evaluate(self.collection, env, create=False)
-        assert len(result) == 1
-        assert result[0].value == "classValue"
-
-    def test_evaluate_returns_empty_when_field_missing_and_create_false(self):
-        # Should return empty list if field does not exist and create is False
-        result = Element("missingField").evaluate(self.collection, env, create=False)
-        assert result == []
-
-    def test_evaluate_creates_missing_primitive_field(self):
-        # Should create the field if missing and create is True
-        class Dummy:
-            pass
-
-        dummy = Dummy()
-        collection = [FHIRPathCollectionItem(dummy, path=This())]
-        result = Element("newField").evaluate(collection, env, create=True)
-        assert len(result) == 1
-        assert hasattr(dummy, "newField")
-        assert getattr(dummy, "newField") is None
-
-    def test_evaluate_handles_list_fields(self):
-        # Should return all items in a list field as FHIRPathCollectionItems
-        result = Element("identifier").evaluate(self.collection, env, create=False)
-        assert len(result) == 2
-        assert result[0].value.value == "id1"
-        assert result[1].value.value == "id2"
-
-    def test_evaluate_with_empty_collection(self):
-        # Should return empty list if input collection is empty
-        result = Element("status").evaluate([], env, create=False)
-        assert result == []
-
-    def test_evaluate_with_multiple_items(self):
-        # Should evaluate each item in the input collection
-        class Dummy:
-            def __init__(self, val):
-                self.status = val
-
-        items = [FHIRPathCollectionItem(Dummy("a")), FHIRPathCollectionItem(Dummy("b"))]
-        result = Element("status").evaluate(items, env, create=False)
-        assert [item.value for item in result] == ["a", "b"]
-
-    def test_evaluate_returns_parent_link(self):
-        # Should set parent on returned FHIRPathCollectionItem
-        result = Element("status").evaluate(self.collection, env, create=False)
-        assert result[0].parent == self.collection[0]
+def test_root_element__raises_error_for_wrong_type(collection):
+    with pytest.raises(FHIRPathException):
+        RootElement("Condition").evaluate(collection, env)
 
 
-def test_children_returns_correct_primitive_extension():
-    ext = dict(
-        extension=[
-            dict(
-                value="Extension Value",
-                url="http://example.com/ext",
-            )
-        ]
-    )
-    resource = dict(fieldA=1, fieldB="invalid", fieldB_ext=ext)
-    collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("fieldB"), Element("extension")).evaluate(
-        collection, env
-    )
-    assert result[0].value["value"] == ext["extension"][0]["value"]
+def test_root_element__string_representation():
+    expression = RootElement("Patient")
+    assert str(expression) == "Patient"
 
 
-def test_deep_children_returns_correct_primitive_extension():
-    ext = dict(
-        extension=[
-            dict(
-                value="Extension Value",
-                url="http://example.com/ext",
-            )
-        ]
-    )
-    resource = dict(fieldA=1, fieldB=dict(fieldC="invalid", fieldC_ext=ext))
-    collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(
-        Invocation(Element("fieldB"), Element("fieldC")), Element("extension")
-    ).evaluate(collection, env)
-    assert result[0].value["value"] == ext["extension"][0]["value"]
+# --------------------------------------------------
+# This
+# --------------------------------------------------
+
+
+def test_this__evaluate_returns_same_collection(collection):
+    result = This().evaluate(collection, env)
+    assert result == collection
+    assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
+
+
+def test_this__evaluate_with_single_item(collection):
+    item = collection[0]
+    result = This().evaluate([item], env)
+    assert result == [item]
+
+
+def test_this__evaluate_empty_collection_returns_empty_list():
+    result = This().evaluate([], env)
+    assert result == []
+
+
+def test_this__evaluate_with_none_value():
+    item = FHIRPathCollectionItem(value=None)
+    result = This().evaluate([item], env)
+    assert result == [item]
+    assert result[0].value is None
+
+
+def test_this__string_representation():
+    expression = This()
+    assert str(expression) == ""
+
+
+# --------------------------------------------------
+# Invocation
+# --------------------------------------------------
 
 
 class TestInvocation(TestCase):
@@ -286,7 +159,7 @@ class TestInvocation(TestCase):
                 self.status = "active"
 
         self.resource = DummyResource()
-        self.collection = [FHIRPathCollectionItem(self.resource, path=This())]
+        self.collection = [FHIRPathCollectionItem(self.resource)]
 
     def test_evaluate_invokes_method_on_each_item(self):
         result = Invocation(Element("status"), Upper()).evaluate(self.collection, env)
@@ -299,6 +172,11 @@ class TestInvocation(TestCase):
     def test_invocation_string_representation(self):
         expression = Invocation(Element("left"), Element("right"))
         assert str(expression) == "left.right"
+
+
+# --------------------------------------------------
+# Literal
+# --------------------------------------------------
 
 
 class TestLiteral(TestCase):
@@ -340,140 +218,208 @@ class TestLiteral(TestCase):
         assert str(Literal(date(2014, 1, 1))) == "@2014-01-01"
 
 
-@dataclass
-class MockPatient:
-    """Mock FHIR Patient resource for testing."""
-
-    _type = "Patient"
-    name: Optional[List[dict]] = None
-    gender: Optional[str] = None
-    birthDate: Optional[str] = None
-    telecom: Optional[List[dict]] = None
+# --------------------------------------------------
+# Element
+# --------------------------------------------------
 
 
-class TestPublicFHIRPathInterface(TestCase):
+def _collection_with_value(**kwargs) -> FHIRPathCollection:
+    class DummyResource:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
-    def setUp(self):
-        """Set up test data."""
-        self.patient = MockPatient(
-            name=[
-                {"family": "Doe", "given": ["John"]},
-                {"family": "Smith", "given": ["Jane"]},
-            ],
-            gender="male",
-            birthDate="1990-01-01",
-            telecom=[
-                {"system": "phone", "value": "555-1234"},
-                {"system": "email", "value": "john@example.com"},
-            ],
+    return [FHIRPathCollectionItem.wrap(DummyResource(**kwargs))]
+
+
+def test_element__repr_representation():
+    expression = Element("elementName")
+    assert repr(expression) == "Element(elementName)"
+
+
+def test_element__string_representation():
+    expression = Element("elementName")
+    assert str(expression) == "elementName"
+
+
+def test_element__init_accepts_fhir_string_primitive_as_name():
+    # A FHIR `string` primitive is unwrapped to its raw text.
+    expression = Element(primitive.String(value="gender"))
+    assert expression.name == "gender"
+
+
+def test_element__init_accepts_literal_as_name():
+    # `str(Literal(...))` renders as FHIRPath source, quotes included -- this
+    # only ever matches an equally-quoted name, not the bare field name.
+    expression = Element(Literal("gender"))
+    assert expression.name == "'gender'"
+
+
+def test_element__init_raises_for_non_string_name():
+    with pytest.raises(FHIRPathException):
+        Element(123)  # type: ignore
+
+
+def test_element__equality_compares_by_name():
+    assert Element("status") == Element("status")
+    assert Element("status") != Element("gender")
+    assert Element("status") != "status"
+
+
+def test_element__hash_is_consistent_with_equality():
+    assert hash(Element("status")) == hash(Element("status"))
+    assert len({Element("status"), Element("status"), Element("gender")}) == 2
+
+
+def test_element__evaluate_returns_empty_for_empty_collection():
+    assert Element("status").evaluate([], env, create=False) == []
+
+
+def test_element__evaluate_returns_empty_when_field_missing():
+    collection = _collection_with_value(status="active")
+    result = Element("missingField").evaluate(collection, env, create=False)
+    assert result == []
+
+
+@pytest.mark.parametrize(
+    "element_name, element_value",
+    [
+        ("valueString", primitive.String(value="male")),
+        ("valueInteger", primitive.Integer(value=30)),
+        ("valueBoolean", primitive.Boolean(value=True)),
+        ("valueDate", primitive.Date(value="2014-01-01")),
+    ],
+)
+def test_element__evaluate_returns_primitive_value(element_name, element_value):
+    collection = _collection_with_value(**{element_name: element_value})
+    result = Element(element_name).evaluate(collection, env, create=False)
+    assert len(result) == 1
+    assert result[0].value == element_value
+
+
+@pytest.mark.parametrize(
+    "element_name, element_value",
+    [
+        ("valueCoding", complex.Coding(code="code1", system="system1")),
+        ("valueReference", complex.Reference(reference="ref1")),
+    ],
+)
+def test_element__evaluate_returns_complex_value(element_name, element_value):
+    collection = _collection_with_value(**{element_name: element_value})
+    result = Element(element_name).evaluate(collection, env, create=False)
+    assert len(result) == 1
+    assert result[0].value == element_value
+
+
+@pytest.mark.parametrize(
+    "element_name, element_value",
+    [
+        (
+            "valueString",
+            # `model_construct` bypasses the (unrelated, currently broken)
+            # Extension "value[x] xor extension" invariant validator.
+            primitive.String.model_construct(
+                extension=[complex.Extension.model_construct(url="url1", valueId="id1")]
+            ),
+        ),
+        (
+            "valueInteger",
+            primitive.Integer.model_construct(
+                extension=[complex.Extension.model_construct(url="url2", valueId="id2")]
+            ),
+        ),
+    ],
+)
+def test_element__evaluate_returns_primitive_extensions(element_name, element_value):
+    # FHIR primitives carry `extension` as a genuine field on their own model,
+    # so chaining `Element("extension")` needs no special-casing in `Element`.
+    collection = _collection_with_value(**{element_name: element_value})
+    result = Invocation(Element(element_name), Element("extension")).evaluate(
+        collection, env, create=False
+    )
+    assert len(result) == 1
+    assert result[0].value == element_value.extension[0]
+
+
+def test_element__evaluate_identifies_aliased_fields():
+    class DummyResource(BaseModel):
+        class_: str = Field(
+            alias="class", validation_alias=AliasChoices("class", "class_")
         )
 
-        self.empty_patient = MockPatient()
+    collection = [FHIRPathCollectionItem.wrap(DummyResource(class_="classValue"))]  # type: ignore
+    # Should return the value of the field as a FHIRPathCollectionItem
+    result = Element("class").evaluate(collection, env, create=False)
+    assert len(result) == 1
+    assert result[0].value == "classValue"
 
-    def test_get_values_returns_all_matches(self):
-        """Test get_values() returns all matching values as a list."""
-        # Test multiple values
-        path = Element("name")
-        values = path.values(self.patient)
 
-        self.assertIsInstance(values, list)
-        self.assertEqual(len(values), 2)
-        self.assertEqual(values[0]["family"], "Doe")
-        self.assertEqual(values[1]["family"], "Smith")
+def test_element__evaluate_resolves_leading_underscore_extension_sibling():
+    # Raw FHIR JSON keeps a primitive's id/extension under a leading-underscore
+    # sibling key (e.g. `_status`); it is only consulted when `status` itself
+    # is absent.
+    resource = {"_status": {"id": "ext1"}}
+    result = Element("status").evaluate(
+        [FHIRPathCollectionItem(resource)], env, create=False
+    )
+    assert len(result) == 1
+    assert result[0].value == {"id": "ext1"}
+    assert result[0].element == "status"
 
-    def test_get_values_returns_empty_list_for_no_matches(self):
-        """Test get_values() returns empty list when no matches found."""
-        path = Element("nonexistent")
-        values = path.values(self.patient)
 
-        self.assertIsInstance(values, list)
-        self.assertEqual(len(values), 0)
+def test_element__evaluate_handles_list_valued_fields_in_order():
+    patient = MockPatient(name=[MockName(family="Doe"), MockName(family="Smith")])
+    result = Element("name").evaluate([FHIRPathCollectionItem(patient)], env)
+    assert [item.value.family for item in result] == ["Doe", "Smith"]
+    assert [item.index for item in result] == [0, 1]
 
-    def test_get_single_returns_single_match(self):
-        """Test single() returns single value when exactly one match."""
-        path = Element("gender")
-        value = path.single(self.patient)
 
-        self.assertEqual(value, "male")
+def test_element__evaluate_sets_parent_and_element_on_children():
+    collection = _collection_with_value(status="active")
+    result = Element("status").evaluate(collection, env, create=False)
+    assert result[0].parent is collection[0]
+    assert result[0].element == "status"
 
-    def test_get_single_returns_default_for_no_matches(self):
-        """Test single() returns default when no matches."""
-        path = Element("gender")
-        value = path.single(self.empty_patient, default="unknown")
 
-        self.assertEqual(value, "unknown")
+def test_element__evaluate_broadcasts_over_every_item_in_collection():
+    collection = _collection_with_value(status="active") + _collection_with_value(
+        status="cancelled"
+    )
+    result = Element("status").evaluate(collection, env, create=False)
+    assert [item.value for item in result] == ["active", "cancelled"]
 
-    def test_get_single_raises_error_for_multiple_matches(self):
-        """Test single() raises error when multiple matches found."""
-        path = Element("name")
 
-        with self.assertRaises(FHIRPathRuntimeError) as context:
-            path.single(self.patient)
+def test_element__evaluate_skips_items_whose_value_is_none():
+    collection = [FHIRPathCollectionItem(None)] + _collection_with_value(
+        status="active"
+    )
+    result = Element("status").evaluate(collection, env, create=False)
+    assert len(result) == 1
+    assert result[0].value == "active"
 
-        self.assertIn(
-            "Expected single value but found 2 values", str(context.exception)
-        )
 
-    def test_first_returns_first_match(self):
-        """Test first() returns the first matching value."""
-        path = Element("name")
-        value = path.first(self.patient)
+def test_element__evaluate_create_true_materializes_missing_dict_key():
+    # Dicts are open containers, so an absent key becomes writable on create=True.
+    resource = {}
+    result = Element("newField").evaluate(
+        [FHIRPathCollectionItem(resource)], env, create=True
+    )
+    assert len(result) == 1
+    assert result[0].value is None
+    assert resource["newField"] is None
 
-        self.assertEqual(value["family"], "Doe")
 
-    def test_first_returns_default_for_no_matches(self):
-        """Test first() returns default when no matches."""
-        path = Element("name")
-        value = path.first(self.empty_patient, default={"family": "Unknown"})
+def test_element__evaluate_create_true_constructs_missing_model_field():
+    patient = MockPatient()
+    result = Element("name").evaluate(
+        [FHIRPathCollectionItem(patient)], env, create=True
+    )
+    assert len(result) == 1
+    assert isinstance(result[0].value, MockName)
+    assert patient.name == [result[0].value]
 
-        self.assertEqual(value["family"], "Unknown")
 
-    def test_last_returns_last_match(self):
-        """Test last() returns the last matching value."""
-        path = Element("name")
-        value = path.last(self.patient)
-
-        self.assertEqual(value["family"], "Smith")
-
-    def test_last_returns_default_for_no_matches(self):
-        """Test last() returns default when no matches."""
-        path = Element("name")
-        value = path.last(self.empty_patient, default={"family": "Unknown"})
-
-        self.assertEqual(value["family"], "Unknown")
-
-    def test_exists_returns_true_when_matches_found(self):
-        """Test exists() returns True when matches are found."""
-        path = Element("gender")
-
-        self.assertTrue(path.exists(self.patient))
-
-    def test_exists_returns_false_when_no_matches(self):
-        """Test exists() returns False when no matches found."""
-        path = Element("gender")
-
-        self.assertFalse(path.exists(self.empty_patient))
-
-    def test_count_returns_correct_number_of_matches(self):
-        """Test count() returns the correct number of matches."""
-        # Multiple matches
-        path = Element("name")
-        self.assertEqual(path.count(self.patient), 2)
-
-        # Single match
-        path = Element("gender")
-        self.assertEqual(path.count(self.patient), 1)
-
-        # No matches
-        path = Element("nonexistent")
-        self.assertEqual(path.count(self.patient), 0)
-
-    def test_is_empty_returns_correct_boolean(self):
-        """Test is_empty() returns the correct boolean value."""
-        # Has matches
-        path = Element("gender")
-        self.assertFalse(path.is_empty(self.patient))
-
-        # No matches
-        path = Element("gender")
-        self.assertTrue(path.is_empty(self.empty_patient))
+def test_element__evaluate_create_false_does_not_mutate_container():
+    resource = {}
+    Element("newField").evaluate([FHIRPathCollectionItem(resource)], env, create=False)
+    assert resource == {}

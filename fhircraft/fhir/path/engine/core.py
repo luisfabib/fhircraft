@@ -1,21 +1,18 @@
 import datetime
 import inspect
 import logging
-import time
-import typing
 import warnings
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from functools import partial
-from typing import TYPE_CHECKING, Any, Callable, List, Optional
+from typing import TYPE_CHECKING, Any, List
 
 from fhircraft.exceptions import (
     FHIRPathException,
-    FHIRPathRuntimeError,
     FHIRPathWarning,
 )
 from fhircraft import SUPPORTED_FHIR_RELEASES
-from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
+from fhircraft.exceptions import FHIRPathRuntimeError
+from fhircraft.utils import ensure_list
+from fhircraft.fhir.path.collection import FHIRPathCollectionItem
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRPrimitiveModel
@@ -40,170 +37,12 @@ __all__ = [
 
 
 class FHIRPathNode(ABC):
-    """Abstract base class for FHIRPath expressions."""
+    """Abstract base class for one node of a parsed FHIRPath expression tree.
 
-    def values(self, data: Any, environment: dict | None = None) -> List[Any]:
-        """
-        Evaluates the FHIRPath expression and returns all resulting values as a list.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Returns:
-            List[Any]: A list of all values that match the FHIRPath expression. Returns an empty list if no matches are found.
-        """
-        collection = self.__evaluate_wrapped(data, environment=environment)
-        return [item.value for item in collection]
-
-    def single(
-        self, data: Any, default: Any = None, environment: dict | None = None
-    ) -> Any:
-        """
-        Evaluates the FHIRPath expression and returns a single value.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            default: The default value to return if no matches are found.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Returns:
-            Any: The single matching value.
-
-        Raises:
-            FHIRPathException: If more than one value is found.
-        """
-        values = self.values(data, environment=environment)
-        if len(values) == 0:
-            return default
-        elif len(values) == 1:
-            return values[0]
-        else:
-            raise FHIRPathRuntimeError(
-                f"Expected single value but found {len(values)} values. "
-                f"Use values() to retrieve multiple values or first() to get the first one."
-            )
-
-    def first(
-        self, data: Any, default: Any = None, environment: dict | None = None
-    ) -> Any:
-        """
-        Evaluates the FHIRPath expression and returns the first value.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            default: The default value to return if no matches are found.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Returns:
-            Any: The first matching value, or the default if no matches.
-        """
-        values = self.values(data, environment=environment)
-        return values[0] if values else default
-
-    def last(
-        self, data: Any, default: Any = None, environment: dict | None = None
-    ) -> Any:
-        """
-        Evaluates the FHIRPath expression and returns the last value.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            default: The default value to return if no matches are found.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Returns:
-            Any: The last matching value, or the default if no matches.
-        """
-        values = self.values(data, environment=environment)
-        return values[-1] if values else default
-
-    def exists(self, data: Any, environment: dict | None = None) -> bool:
-        """
-        Checks if the FHIRPath expression matches any values in the data.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Returns:
-            bool: True if at least one value matches, False otherwise.
-        """
-        return len(self.values(data, environment=environment)) > 0
-
-    def count(self, data: Any, environment: dict | None = None) -> int:
-        """
-        Returns the number of values that match the FHIRPath expression.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Returns:
-            int: The number of matching values.
-        """
-        return len(self.values(data, environment=environment))
-
-    def is_empty(self, data: Any, environment: dict | None = None) -> bool:
-        """
-        Checks if the FHIRPath expression matches no values in the data.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Returns:
-            bool: True if no values match, False otherwise.
-        """
-        return not self.exists(data, environment=environment)
-
-    def update_values(
-        self, data: Any, value: Any, environment: dict | None = None
-    ) -> None:
-        """
-        Evaluates the FHIRPath expression and sets all matching locations to the given value.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            value: The value to set at all matching locations.
-            environment: Optional map of additional variables to include in the evaluation context.
-
-        Raises:
-            RuntimeError: If no matching locations are found or if locations cannot be set.
-        """
-        collection = self.__evaluate_wrapped(data, environment=environment, create=True)
-        if not collection:
-            raise RuntimeError(
-                "No matching locations found. Cannot set value on empty result."
-            )
-        for item in collection:
-            item.set_value(value)
-
-    def update_single(
-        self, data: Any, value: Any, environment: dict | None = None
-    ) -> None:
-        """
-        Evaluates the FHIRPath expression and sets a single matching location to the given value.
-
-        Args:
-            data: The data to evaluate the FHIRPath expression against.
-            value: The value to set at the matching location.
-
-        Raises:
-            FHIRPathException: If zero or more than one matching locations are found.
-            RuntimeError: If the location cannot be set.
-        """
-        collection = self.__evaluate_wrapped(data, environment=environment, create=True)
-        if len(collection) == 0:
-            raise FHIRPathException(
-                "FHIRPath yielded empty collection. Cannot set value on empty result."
-            )
-        elif len(collection) > 1:
-            raise FHIRPathException(
-                f"Expected single location but found {len(collection)} locations. "
-                f"Use update_values() to set all locations."
-            )
-        collection[0].set_value(value)
+    A node represents a single grammar production -- an element access, an
+    invocation, a literal, a function call -- and `evaluate()` transforms an
+    input collection into an output collection.
+    """
 
     def trace(
         self, data: Any, verbose: bool = False, environment: dict | None = None
@@ -257,10 +96,13 @@ class FHIRPathNode(ABC):
                         f"  Result {i}: {type(item.value).__name__} = {repr(item.value)[:50]}...",
                         1,
                     )
-                    if item.path:
-                        trace_step(f"    Path: {item.path}", 2)
+                    if item.canonical_path:
+                        trace_step(f"    Canonical Path: {item.canonical_path}", 2)
                     if item.parent:
-                        trace_step(f"    Parent: {type(item.parent.value).__name__}", 2)
+                        trace_step(
+                            f"    Parent Canonical Path: {item.parent.canonical_path}",
+                            2,
+                        )
 
             # Extract values for final result
             values = [item.value for item in result_collection]
@@ -329,10 +171,11 @@ class FHIRPathNode(ABC):
                 item_info = {
                     "value_type": type(item.value).__name__,
                     "value_repr": repr(item.value)[:100],
-                    "path": str(item.path) if item.path else None,
-                    "path_type": type(item.path).__name__ if item.path else None,
+                    "canonical_path": (
+                        str(item.canonical_path) if item.canonical_path else None
+                    ),
                     "has_parent": item.parent is not None,
-                    "has_setter": item.setter is not None,
+                    "is_writable": item.is_writable is not None,
                     "element": item.element,
                     "index": item.index,
                 }
@@ -382,6 +225,50 @@ class FHIRPathNode(ABC):
         """
         raise NotImplementedError()
 
+    def single(
+        self, data: Any, default: Any = None, environment: dict | None = None
+    ) -> Any:
+        """
+        Evaluates the FHIRPath expression and returns a single value.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+            default: The default value to return if no matches are found.
+            environment: Optional map of additional variables to include in the evaluation context.
+
+        Returns:
+            Any: The single matching value.
+
+        Raises:
+            FHIRPathException: If more than one value is found.
+        """
+
+        collection = self._evaluate_wrapped(data, environment=environment)
+        values = [item.value for item in collection]
+
+        if len(values) == 0:
+            return default
+        elif len(values) == 1:
+            return values[0]
+        else:
+            raise FHIRPathRuntimeError(
+                f"Expected single value but found {len(values)} values. "
+                f"Use values() to retrieve multiple values or first() to get the first one."
+            )
+
+    def count(self, data: Any, environment: dict | None = None) -> int:
+        """
+        Returns the number of values that match the FHIRPath expression.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+            environment: Optional map of additional variables to include in the evaluation context.
+
+        Returns:
+            int: The number of matching values.
+        """
+        return len(self._evaluate_wrapped(data, environment=environment))
+
     def __init_subclass__(cls, **kwargs):
         """
         Called when a class is subclassed. Ensures that any non-abstract subclass of `FHIRPath`
@@ -400,7 +287,7 @@ class FHIRPathNode(ABC):
             )
         super().__init_subclass__(**kwargs)
 
-    def __evaluate_wrapped(
+    def _evaluate_wrapped(
         self, data: Any, environment: dict | None = None, create=False
     ) -> FHIRPathCollection:
         # Determine %resource and %rootResource from parent tracking if available
@@ -445,164 +332,8 @@ class FHIRPathNode(ABC):
         """
         return Invocation(self, invocation)
 
-    def __get_child(self, child):
-        """
-        Determines and returns the appropriate child node in a path expression tree.
-
-        Args:
-            child (FHIRPathNode): The child node to be evaluated, which can be an instance of This, Root, or another node type.
-
-        Returns:
-            (FHIRPathNode) The resulting node
-
-        Note:
-            This method is used internally to manage navigation and invocation logic within the path engine.
-        """
-        if isinstance(self, This):
-            return child
-        elif isinstance(child, This):
-            return self
-        else:
-            return Invocation(self, child)
-
-
-@dataclass
-class FHIRPathCollectionItem(object):
-    """
-    A context-aware representation of an item in a FHIRPath collection.
-
-    Attributes
-    ----------
-    value (Any): The value of the collection item.
-    path (Optional[FHIRPathNode]): The path associated with the collection item, by default This().
-    element (Optional[str]): The element name of the collection item, by default None.
-    index (Optional[int]): The index of the collection item, by default None.
-    parent (Optional[FHIRPathCollectionItem]): The item of the parent collection from which this item was derived, by default None.
-    setter (Optional[callable]): The setter function for the collection item, by default None.
-    """
-
-    value: typing.Any
-    path: typing.Any = None
-    element: Optional[str] = None
-    index: Optional[int] = None
-    parent: Optional["FHIRPathCollectionItem"] = None
-    setter: Optional[Callable] = None
-
-    def __psot_init__(self):
-        self.path = self.path or This()
-
-    @classmethod
-    def wrap(cls, data: Any) -> "FHIRPathCollectionItem":
-        """
-        Wraps data in a FHIRPathCollectionItem instance.
-
-        Args:
-            data (Any): The data to be wrapped.
-
-        Returns:
-            item (FHIRPathCollectionItem): The wrapped FHIRPathCollectionItem instance.
-        """
-        if isinstance(data, cls):
-            return data
-        else:
-            return cls(data)
-
-    def set_literal(self, value):
-        if not self.parent:
-            raise RuntimeError("There is no parent to set the value on")
-        setattr(self.parent.value, self.path.label, value)
-
-    def set_value(self, value):
-        """
-        Sets the value of the item using the setter function.
-
-        Args:
-            value (Any): The value to set.
-
-        Raises:
-            ValueError: If the value is a list.
-            RuntimeError: If there is no setter function associated with this item.
-        """
-        if self.setter:
-            self.setter(value)
-        else:
-            raise RuntimeError("There is not setter function associated with this item")
-
-    @property
-    def field_info(self):
-        """
-        Retrieves the field information from the parent's value.
-
-        Returns:
-           (Any): The field information, or None if not available.
-        """
-        if not self.parent:
-            raise RuntimeError(
-                "There is no parent to retrieve the field information from"
-            )
-        parent = self.parent.value
-        if isinstance(parent, list):
-            parent = parent[0]
-        if hasattr(parent.__class__, "model_fields") and hasattr(self.path, "label"):
-            return parent.__class__.model_fields.get(self.path.label)
-        return None
-
-    @property
-    def is_list_type(self):
-        """
-        Checks if the field information indicates a list type.
-
-        Returns:
-            (bool): True if the field information indicates a list type, False otherwise.
-        """
-        if not self.field_info:
-            return False
-        return contains_list_type(self.field_info.annotation)
-
-    def construct_resource(self):
-        """
-        Constructs a FHIR resource based on the field information.
-
-        Returns:
-            (Any): The constructed FHIR resource, or None if construction fails.
-        """
-        if self.field_info:
-            model = get_fhir_model_from_field(self.field_info)
-            if not model:
-                raise ValueError(
-                    f"Could not construct resource from field information: {self.field_info}"
-                )
-            return model.model_construct()
-
-    @property
-    def full_path(self):
-        """
-        Retrieves the full path of the item.
-
-        Returns:
-            (str): The full path of the item.
-        """
-        return (
-            self.path
-            if self.parent is None
-            else self.parent.full_path.__get_child(self.path)
-        )
-
-    def __eq__(self, value: Any) -> bool:
-        if isinstance(value, FHIRPathCollectionItem):
-            return (
-                self.value == value.value
-                and self.element == value.element
-                and self.index == value.index
-            )
-        else:
-            return self.value == value
-
-    def __repr__(self):
-        return f"{{{self.value.__repr__()[:10]}}}"
-
-    def __hash__(self):
-        return hash((self.path, self.parent, self.value.__repr__()))
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}()"
 
 
 class FHIRPathFunction(FHIRPathNode, ABC):
@@ -658,7 +389,7 @@ class Literal(FHIRPathNode):
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
-        return [FHIRPathCollectionItem(self.value, parent=None, path=None)]
+        return [FHIRPathCollectionItem(self.value)]
 
     def __str__(self):
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
@@ -693,168 +424,64 @@ class Element(FHIRPathNode):
     A class representing an element in a FHIRPath, used for navigating and manipulating FHIR resources.
 
     Attributes:
-        label (str): The name of the element.
+        name (str): The name of the element.
     """
 
-    def __init__(self, label: "str | Literal | FHIRPrimitiveModel"):
-        if isinstance(label, Literal) or getattr(label, "_type", None) == "string":
-            label = str(label)
-        if not isinstance(label, str):
+    def __init__(self, name: "str | Literal | FHIRPrimitiveModel"):
+        if isinstance(name, Literal) or getattr(name, "_type", None) == "string":
+            name = str(name)
+        if not isinstance(name, str):
             raise FHIRPathException(
-                "Element() argument must be a string, got %r" % (type(label).__name__,)
+                "Element() argument must be a string, got %r" % (type(name).__name__,)
             )
-        self.label = label
+        self.name = name
 
-    def create_element(self, parent: typing.Any) -> typing.Any:
-        """
-        Ensure that the input parent object has the necessary field information to create a new element based on the label provided.
-
-        Args:
-            parent (Any): The parent object from which the element will be created.
-
-        Returns:
-            element (Any): The newly created element based on the field information of the parent object, or None if the parent is invalid or lacks the required field information.
-
-        Raises:
-            KeyError: If there is an issue with retrieving the field information from the parent object.
-            AttributeError: If there is an attribute error while trying to create the new element.
-        """
-        if not parent:
-            return None
-        if not hasattr(parent.__class__, "model_fields"):
-            return None
-        field_info = parent.__class__.model_fields.get(self.label)
-
-        # Check if parent model allows extra fields
-        if field_info is None:
-            model_config = getattr(parent.__class__, "model_config", {})
-            extra_setting = (
-                model_config.get("extra")
-                if isinstance(model_config, dict)
-                else getattr(model_config, "extra", None)
-            )
-            if extra_setting == "allow":
-                # For models with extra='allow', create new instance of same type
-                # This supports dynamic models
-                new_element = parent.__class__()
-                return new_element
-            return None
-
-        model = get_fhir_model_from_field(field_info)
-        if not model:
-            new_element = None
-        else:
-            new_element = model.model_construct()
-        if field_info and contains_list_type(field_info.annotation):
-            new_element = ensure_list(new_element)
-        return new_element
-
-    @staticmethod
-    def setter(
-        value: typing.Any,
-        item: FHIRPathCollectionItem,
-        index: int,
-        label: str,
-        is_list_type: bool,
-    ) -> None:
-        """
-        Sets the value of the specified element in the parent object.
-
-        Args:
-            value (Any): The value to set for the element.
-            item (FHIRPathCollectionItem): The parent collection item.
-            index (int): The index of the element in the parent object.
-            label (str): The label of the element to set.
-        """
-        parent = item.value
-        current_values = getattr(parent, label)
-        if not isinstance(current_values, list):
-            if not is_list_type and isinstance(value, list):
-                if value and len(value) > 1:
-                    raise ValueError(
-                        f"Cannot set multiple values to non-list field '{label}'"
-                    )
-                value = value[0] if value else None
-            setattr(parent, label, value)
-        else:
-            if is_list_type and isinstance(value, list):
-                setattr(parent, label, value)
-            elif len(current_values) <= index:
-                current_values.insert(index, value)
-            else:
-                current_values[index] = value
+    def _children_of(
+        self, item: FHIRPathCollectionItem, label: str, create: bool
+    ) -> FHIRPathCollection:
+        """Resolve `label` under a single parent item into its child items."""
+        if item.value is None:
+            return []
+        accessor = item.child(None, label).accessor
+        if accessor is None:
+            return []
+        value = accessor.get()
+        if not value and not isinstance(value, bool) and create:
+            accessor.set(accessor.construct())
+            value = accessor.get()
+        return [
+            item.child(child_value, label, index=index)
+            for index, child_value in enumerate(ensure_list(value))
+            if create or child_value is not None
+        ]
 
     def _get_collection_by_label(
         self, collection: FHIRPathCollection, label: str, create: bool
     ) -> FHIRPathCollection:
         element_collection = []
         for item in collection:
-            if item.value is None:
-                continue
-            if isinstance(item.value, dict):
-                element_value = item.value.get(label, None)
-            else:
-                element_value = getattr(item.value, label, None)
-            if not element_value and not isinstance(element_value, bool) and create:
-                element_value = self.create_element(item.value)
-                if isinstance(item.value, dict):
-                    item.value[label] = element_value
-                else:
-                    setattr(item.value, label, element_value)
-
-            for index, value in enumerate(ensure_list(element_value)):
-                if create or value is not None:
-                    element = FHIRPathCollectionItem(
-                        value,
-                        path=Element(label),
-                        parent=item,
-                    )
-                    element.setter = partial(
-                        self.setter,
-                        item=item,
-                        index=index,
-                        label=label,
-                        is_list_type=element.is_list_type,
-                    )
-                    element_collection.append(element)
+            element_collection.extend(self._children_of(item, label, create))
         return element_collection
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
-        child_collection = self._get_collection_by_label(collection, self.label, create)
-        if not child_collection:
-            child_collection = self._get_collection_by_label(
-                collection, f"{self.label}_", create
-            )
-        if not child_collection:
-            child_collection = self._get_collection_by_label(
-                collection, f"{self.label}_ext", create
-            )
-        if not child_collection and self.label in ["id", "extension"]:
-            child_collection = []
-            for item in collection:
-                if not item.parent:
-                    continue
-                _collection = self._get_collection_by_label(
-                    [item.parent], f"{item.path}_ext", create
-                )
-                child_collection.extend(
-                    self._get_collection_by_label(_collection, self.label, create)
-                )
-        return child_collection
+        element_collection: FHIRPathCollection = []
+        for item in collection:
+            element_collection.extend(self._children_of(item, self.name, create))
+        return element_collection
 
     def __str__(self):
-        return self.label
+        return self.name
 
     def __repr__(self):
-        return f"Element({self.label})"
+        return f"Element({self.name})"
 
     def __eq__(self, other):
-        return isinstance(other, Element) and self.label == other.label
+        return isinstance(other, Element) and self.name == other.name
 
     def __hash__(self):
-        return hash(self.label)
+        return hash(self.name)
 
 
 class Invocation(FHIRPathNode):
