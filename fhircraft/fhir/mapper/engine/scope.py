@@ -109,6 +109,30 @@ class MappingScope:
             **self.source_instances,
         }
 
+    def get_source_instances(self) -> Dict[str, BaseModel]:
+        """
+        Returns a dictionary containing all source instances from the current scope, including those inherited from the parent scope (if any).
+
+        Returns:
+            Dict[str, BaseModel]: A dictionary mapping source instance names to their corresponding BaseModel objects, aggregated from the parent scope and current scope.
+        """
+        return {
+            **(self.parent.get_source_instances() if self.parent else {}),
+            **self.source_instances,
+        }
+
+    def get_target_instances(self) -> Dict[str, BaseModel]:
+        """
+        Returns a dictionary containing all target instances from the current scope, including those inherited from the parent scope (if any).
+
+        Returns:
+            Dict[str, BaseModel]: A dictionary mapping target instance names to their corresponding BaseModel objects, aggregated from the parent scope and current scope.
+        """
+        return {
+            **(self.parent.get_target_instances() if self.parent else {}),
+            **self.target_instances,
+        }
+
     def get_concept_map(
         self, identifier: str
     ) -> R4_ConceptMap | R4B_ConceptMap | R5_ConceptMap:

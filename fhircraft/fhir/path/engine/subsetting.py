@@ -109,9 +109,10 @@ class Index(FHIRPathNode):
             values = current
             values.extend(accessor.construct() for __ in range(pad))
         else:
-            values = [accessor.construct() for __ in range(pad)]
+            # Preserve the existing single value as the first element instead of discarding it.
+            values = [current if current is not None else accessor.construct()]
+            values.extend(accessor.construct() for __ in range(pad))
             accessor.set(values)
-
         return [
             parent_array.parent.child(
                 values[self.index], parent_array.element or "", index=self.index

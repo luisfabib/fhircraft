@@ -121,45 +121,51 @@ class Rule(FHIRMappingEngineComponent):
                     )
                 source_iterations[source.variable] = source.iteration_count
 
-            for source_var, iterations in source_iterations.items():
-                for source_iteration in range(iterations):
-                    logger.debug(
-                        f"Processing iteration {source_iteration} for rule {self.name}"
-                    )
-                    # Create local iteration scope
-                    iteration_scope = MappingScope(
-                        name=f"{scope.name}_iter_{source_iteration}",
-                        source_instances=scope.source_instances.copy(),
-                        target_instances=scope.target_instances.copy(),
-                        types=scope.types.copy(),
-                        variables=scope.variables.copy(),
-                        parent=scope.parent,
-                    )
+            # All sources bound in the same rule share a single iteration index;
+            # the rule iterates once per element of its largest source collection.
+            num_iterations = max(source_iterations.values(), default=0)
 
-                    # Set the source variable to an indexed FHIRPath
+            for source_iteration in range(num_iterations):
+                logger.debug(
+                    f"Processing iteration {source_iteration} for rule {self.name}"
+                )
+                # Create local iteration scope
+                iteration_scope = MappingScope(
+                    name=f"{scope.name}_iter_{source_iteration}",
+                    source_instances=scope.get_source_instances().copy(),
+                    target_instances=scope.get_target_instances().copy(),
+                    types=scope.types.copy(),
+                    variables=scope.variables.copy(),
+                    parent=scope.parent,
+                )
+
+                # Set each source variable to an indexed FHIRPath for this iteration
+                for source_var, iterations in source_iterations.items():
                     if (rule_source := scope.resolve_fhirpath(source_var)) is None:
                         raise MapperRuleProcessingError(
                             f"Source variable {source_var} not found"
                         )
+                    # Sources with fewer items than the current iteration reuse their last index.
+                    index = min(source_iteration, iterations - 1)
                     iteration_scope.define_variable(
                         source_var,
-                        rule_source._invoke(fhirpath.Index(source_iteration)),
+                        rule_source._invoke(fhirpath.Index(index)),
                     )
 
-                    # Process targets for this iteration
-                    for target in self.targets:
-                        target.process(iteration_scope)
+                # Process targets for this iteration
+                for target in self.targets:
+                    target.process(iteration_scope)
 
-                    # Process dependent rules for this iteration
-                    for dependent in self.dependents:
-                        self._process_dependent_group(dependent, iteration_scope)
+                # Process dependent rules for this iteration
+                for dependent in self.dependents:
+                    self._process_dependent_group(dependent, iteration_scope)
 
-                    # Process nested rules for this iteration
-                    for nested_rule in self.nested_rules:
-                        nested_rule.process(iteration_scope)
+                # Process nested rules for this iteration
+                for nested_rule in self.nested_rules:
+                    nested_rule.process(iteration_scope)
 
-                    # Merge back iteration results to main scope
-                    scope.target_instances.update(iteration_scope.target_instances)
+                # Merge back iteration results to main scope
+                scope.target_instances.update(iteration_scope.target_instances)
 
         finally:
             scope.finish_processing_rule(self.name)
