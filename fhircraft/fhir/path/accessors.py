@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping, MutableMapping
 from typing import Any, ClassVar
 
+from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
 from fhircraft.exceptions import FHIRPathEvaluationError
@@ -362,6 +363,21 @@ class ElementAccessor(ABC):
 
     # -- write ------------------------------------------------------------- #
 
+    def coerce(self, value: Any) -> Any:
+        """Validate raw mappings into the model type the slot expects.
+
+        Values that are not mappings, or slots without a model type (dict
+        containers, primitives), are returned unchanged.
+        """
+        if isinstance(value, list):
+            return [self.coerce(v) for v in value]
+        if not isinstance(value, dict) or self.field_info is None:
+            return value
+        model = get_fhir_model_from_field(self.field_info)
+        if isinstance(model, type) and issubclass(model, BaseModel):
+            return model.model_validate(value)
+        return value
+
     def set(self, value: Any) -> None:
         """Assign *value* to this slot.
 
@@ -370,6 +386,7 @@ class ElementAccessor(ABC):
         List field addressed without an index: replaces the whole list.
         """
         self.ensure_container()
+        value = self.coerce(value)
         current = self._read_field()
 
         if self.index is None:
@@ -440,6 +457,7 @@ class ElementAccessor(ABC):
                 f"Insert index must be non-negative, got {at}"
             )
 
+        value = self.coerce(value)
         current = self._read_field()
         if not isinstance(current, list):
             current = ensure_list(current) if current is not None else []

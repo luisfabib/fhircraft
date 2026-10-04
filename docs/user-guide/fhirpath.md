@@ -40,7 +40,7 @@ for name in patient.name:
         break
 
 # With FHIRPath, express your intent directly:
-official_family_name = patient.fhirpath_single("Patient.name.where(use='official').family") # (1)!
+official_family_name = patient.evaluate("Patient.name.where(use='official').family")[0] # (1)!
 ```
 
 1. This expresses the same logic as the loop above but more clearly and concisely.
@@ -69,18 +69,18 @@ patient = fhir.Patient(
 ) # (1)!
 
 # Query directly on the resource using built-in methods
-family_names = patient.fhirpath_values("Patient.name.family") # (2)!
-gender = patient.fhirpath_single("Patient.gender") # (3)!
-has_phone = patient.fhirpath_exists("Patient.telecom.where(system='phone')") # (4)!
+family_names = patient.evaluate("Patient.name.family") # (2)!
+gender = patient.evaluate("Patient.gender") # (3)!
+has_phone = patient.evaluate("Patient.telecom.where(system='phone').exists()") # (4)!
 
 assert family_names == ["Johnson"]
-assert gender == "female" 
-assert has_phone == True
+assert gender == ["female"]
+assert has_phone == [True]
 ```
 
 1. This creates a patient with name, gender, and contact information.
 2. This extracts all family names directly from the patient object.
-3. This gets the gender value, expecting exactly one result.
+3. This gets the gender value as a one-element list.
 4. This checks if the patient has any phone numbers.
 
 The FHIR model methods automatically handle environment setup and provide the simplest interface for most use cases.
@@ -116,29 +116,15 @@ assert family_names == ["Johnson"]
 3. This evaluates the parsed expression against the dictionary data.
 4. This reuses the same parsed expression for multiple data items, improving performance.
 
-## Query Methods
+## Evaluating Expressions
 
-Healthcare data often contains fields with variable cardinality - some fields may be empty, contain a single value, or hold multiple values. For example, a patient resource might have zero phone numbers, one primary contact number, or multiple phone numbers for home, work, and mobile.
+Healthcare data often contains fields with variable cardinality - some fields may be empty, contain a single value, or hold multiple values. A single method covers every case: `evaluate()` always returns a list of the matching values, which is empty when nothing matches. It never raises for missing data and never modifies the model.
 
-Fhircraft provides safe and predictable query methods to handle these scenarios effectively. These methods ensure that your code handles the variability of FHIR data structures without unexpected errors or null reference exceptions.
+| Method | Purpose | Returns |
+|--------|---------|---------|
+| `model.evaluate(expression, environment=None)` | Get all values matching an expression | `List[Any]` |
 
-Additionally, Fhircraft enables updating values through FHIRPath operations, allowing you to modify healthcare data in a consistent and type-safe manner using the same expressive FHIRPath syntax used for querying.
-
-### Available Methods
-
-| FHIR Model Method | Engine Method | Purpose | Returns | Error Behavior |
-|-------------------|---------------|---------|---------|----------------|
-| `fhirpath_values()` | `values()` | Get all matching values | `List[Any]` | Never raises errors, returns `[]` if empty |
-| `fhirpath_single()` | `single()` | Get exactly one value | `Any` | Raises `FHIRPathRuntimeError` if multiple values found |
-| `fhirpath_first()` | `first()` | Get first value safely | `Any` | Never raises errors, returns default if empty |
-| `fhirpath_last()` | `last()` | Get last value safely | `Any` | Never raises errors, returns default if empty |
-| `fhirpath_exists()` | `exists()` | Check if any values exist | `bool` | Never raises errors |
-| `fhirpath_is_empty()` | `is_empty()` | Check if no values exist | `bool` | Never raises errors |
-| `fhirpath_count()` | `count()` | Count matching values | `int` | Never raises errors |
-| `fhirpath_update_values()` | `update_values()` | Update all matching locations | `None` | Raises `FHIRPathRuntimeError` if no locations found |
-| `fhirpath_update_single()` | `update_single()` | Update exactly one location | `None` | Raises `FHIRPathRuntimeError` if zero or multiple locations |
-| N/A | `trace()` | Get evaluation step trace | `List[str]` | Never raises errors |
-| N/A | `debug_info()` | Get comprehensive debug data | `dict` | Never raises errors |
+Cardinality checks are expressed in FHIRPath itself, so they compose with the rest of the expression:
 
 !!! example "Working with Collections"
 
@@ -155,70 +141,68 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
         ]
     ) # (1)!
 
-    # Get all values - safe for any number of matches
-    all_phones = patient.fhirpath_values("Patient.telecom.where(system='phone').value") # (2)!
+    all_phones = patient.evaluate("Patient.telecom.where(system='phone').value") # (2)!
     assert all_phones == ["555-0123", "555-0456"]
 
-    # Get single value - strict about expecting exactly one
-    gender = patient.fhirpath_single("Patient.gender", default="unknown") # (3)!
-    assert gender == "unknown"
+    assert patient.evaluate("Patient.gender") == [] # (3)!
 
-    # Get first/last safely - handles multiple values gracefully  
-    first_name = patient.fhirpath_first("Patient.name.given") # (4)!
-    last_phone = patient.fhirpath_last("Patient.telecom.where(system='phone').value") # (5)!
+    first_name = patient.evaluate("Patient.name.given.first()") # (4)!
+    last_phone = patient.evaluate("Patient.telecom.where(system='phone').value.last()") # (5)!
+    assert first_name == ["John"]
+    assert last_phone == ["555-0456"]
 
-    assert first_name == "John"
-    assert last_phone == "555-0456"
+    assert patient.evaluate("Patient.birthDate.exists()") == [False] # (6)!
+    assert patient.evaluate("Patient.telecom.where(system='phone').count()") == [2] # (7)!
     ```
 
     1. This creates a patient with multiple names and contact methods.
     2. This gets all phone numbers as a list, regardless of how many exist.
-    3. This gets the gender with a fallback since none was provided.
-    4. This safely gets the first given name from any name entry.
-    5. This gets the last phone number from the filtered list.
+    3. A missing element yields an empty list.
+    4. `first()` restricts the result to a single value.
+    5. `last()` picks the last phone number of the filtered list.
+    6. `exists()` tests for presence.
+    7. `count()` counts the matches.
 
-!!! example "Testing Data Presence"
+## Patching FHIR Models
 
-    ```python
-    # Check existence before processing
-    if patient.fhirpath_exists("Patient.birthDate"): # (1)!
-        birth_year = patient.fhirpath_single("Patient.birthDate.substring(0,4)")
-        print(f"Born in {birth_year}")
+Modifications go through `model.patch`, which offers the [FHIRPatch](https://hl7.org/fhir/fhirpatch.html) operations, with FHIRPath expressions selecting the location. Locations that do not exist yet can be added to: missing parents are created on demand, and plain dictionaries are validated into the expected model type.
 
-    # Count items for validation
-    phone_count = patient.fhirpath_count("Patient.telecom.where(system='phone')") # (2)!
-    if phone_count > 1:
-        print(f"Patient has {phone_count} phone numbers")
+| Operation | Purpose | Error behavior |
+|-----------|---------|----------------|
+| `patch.add(expression, value)` | Append to a repeating element, or assign a single-valued one | Never fails for a missing location |
+| `patch.insert(expression, value, index)` | Insert into a repeating element at a position | Raises `FHIRPathEvaluationError` for single-valued elements or an out-of-range index |
+| `patch.replace(expression, value)` | Replace the value at every match | Raises `FHIRPathEvaluationError` if nothing matches |
+| `patch.delete(expression)` | Delete every match | Raises `FHIRPathEvaluationError` if nothing matches or the element is required |
+| `patch.move(expression, source, destination)` | Reorder entries of a repeating element | Raises `FHIRPathEvaluationError` for out-of-range indices |
 
-    # Verify required data is missing
-    if patient.fhirpath_is_empty("Patient.address"): # (3)!
-        print("No address on file")
-    ```
+Each operation is atomic: if it fails, the model is left unchanged.
 
-    6. This checks if a birth date exists before trying to process it.
-    7. This counts phone numbers to handle multiple values appropriately.
-    8. This verifies that no address information exists.
-
-!!! example "Updating Data"
+!!! example "Patching Data"
 
     ```python
-    # Update all matching values
-    patient.fhirpath_update_values("Patient.name.family", "Johnson") # (1)!
+    patient = fhir.Patient(
+        gender="male",
+        name=[{"family": "Smith"}],
+        telecom=[{"system": "fax", "value": "555-0199"}]
+    )
 
-    # Update single value with error checking
-    try:
-        patient.fhirpath_update_single("Patient.gender", "male") # (2)!
-    except FHIRPathException:
-        print("Expected single gender field but found multiple")
+    patient.patch.add("Patient.name", {"family": "Doe"}) # (1)!
+    patient.patch.add("Patient.address[0].line", "1 Main St") # (2)!
+    patient.patch.replace("Patient.gender", "female") # (3)!
+    patient.patch.move("Patient.name", 0, 1) # (4)!
+    patient.patch.delete("Patient.telecom.where(system='fax')") # (5)!
 
-    # Safe conditional updates
-    if patient.fhirpath_exists("Patient.birthDate"):
-        patient.fhirpath_update_single("Patient.birthDate", "1990-05-15") # (3)!
+    assert patient.evaluate("Patient.name.family") == ["Doe", "Smith"]
+    assert patient.evaluate("Patient.address.line") == ["1 Main St"]
+    assert patient.evaluate("Patient.gender") == ["female"]
+    assert patient.evaluate("Patient.telecom") == []
     ```
 
-    1. This changes all family names to "Johnson" across all name entries.
-    2. This attempts to set gender but fails safely if multiple gender fields exist.
-    3. This only updates birth date if one already exists.
+    1. This appends a new name; the dictionary is converted into a `HumanName`.
+    2. This creates the missing address and adds a line to it.
+    3. This overwrites the existing gender.
+    4. This moves the first name to the second position.
+    5. This removes all fax numbers.
 
 ## Environment Variables
 
@@ -246,19 +230,19 @@ patient = fhir.Patient(
 )
 name = patient.name[0]
 
-print(type(name.fhirpath_single("%context"))) # (1)!
+print(type(name.evaluate("%context")[0])) # (1)!
 #> <class 'fhircraft.fhir.resources.datatypes.R5.complex.human_name.HumanName'>
 
-print(type(patient.fhirpath_single("%resource"))) # (2)!  
+print(type(patient.evaluate("%resource")[0])) # (2)!  
 #> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
-print(type(patient.fhirpath_single("%rootResource"))) # (3)!
+print(type(patient.evaluate("%rootResource")[0])) # (3)!
 #> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
-print(patient.fhirpath_single("%ucum")) # (4)!
+print(patient.evaluate("%ucum")[0]) # (4)!
 #> http://unitsofmeasure.org
 
-print(patient.fhirpath_single("%fhirRelease")) # (5)!
+print(patient.evaluate("%fhirRelease")[0]) # (5)!
 #> R5
 ```
 
@@ -274,7 +258,7 @@ You can define custom environment variables to pass additional context into your
 
 For example, if working with a US-specific profile that requires a `%usZip` variable 
 ```python
-expr = patient.fhirpath_values(
+expr = patient.evaluate(
     expression="Patient.address.where(postalCode.matches(%usZip))", # (1)!
     environment={
         "%usZip": "[0-9]{5}(-[0-9]{4}){0,1}"  # (2)!
@@ -315,10 +299,10 @@ FHIRPath provides contextual variables that give you access to the current evalu
     ) # (1)!
 
     # Filter names using $this to reference the current name object
-    official_names = patient.fhirpath_values("Patient.name.where($this.use = 'official')") # (2)!
+    official_names = patient.evaluate("Patient.name.where($this.use = 'official')") # (2)!
 
     # Use $this for complex conditions
-    short_nicknames = patient.fhirpath_values("Patient.name.where($this.use = 'nickname' and $this.given.length() <= 2)") # (3)!
+    short_nicknames = patient.evaluate("Patient.name.where($this.use = 'nickname' and $this.given.length() <= 2)") # (3)!
     ```
 
     1. This creates a patient with multiple name entries using different use codes.
@@ -339,10 +323,10 @@ FHIRPath provides contextual variables that give you access to the current evalu
     ) # (1)!
 
     # Get the first contact method using index
-    first_contact = patient.fhirpath_values("Patient.telecom.where($index = 0)") # (2)!
+    first_contact = patient.evaluate("Patient.telecom.where($index = 0)") # (2)!
 
     # Get even-positioned items (0, 2, 4, etc.)
-    even_contacts = patient.fhirpath_values("Patient.telecom.where($index mod 2 = 0)") # (3)!
+    even_contacts = patient.evaluate("Patient.telecom.where($index mod 2 = 0)") # (3)!
     ```
 
     1. This creates a patient with multiple contact methods.
@@ -358,15 +342,15 @@ FHIRPath provides contextual variables that give you access to the current evalu
 
     # Sum all values using $total as accumulator
     numbers = [1, 2, 3, 4, 5]
-    total_sum = parse_fhirpath("aggregate($this + $total, 0)").single(numbers) # (1)!
+    total_sum = parse_fhirpath("aggregate($this + $total, 0)").values(numbers)[0] # (1)!
     assert total_sum == 15
 
     # Find minimum value using $total for comparison
-    min_value = parse_fhirpath("aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))").single(numbers) # (2)!
+    min_value = parse_fhirpath("aggregate(iif($total.empty(), $this, iif($this < $total, $this, $total)))").values(numbers)[0] # (2)!
     assert min_value == 1
 
     # Calculate average using $total accumulation
-    avg_calc = parse_fhirpath("aggregate($total + $this, 0)").single(numbers)  # (3)!
+    avg_calc = parse_fhirpath("aggregate($total + $this, 0)").values(numbers)[0]  # (3)!
     average = avg_calc / len(numbers)
     assert average == 3.0
     ```
@@ -426,8 +410,8 @@ When no namespace is specified, FHIRPath defaults to the `FHIR` namespace. The n
 
 ```python
 # These are equivalent - FHIR is the default namespace
-is_patient_explicit = patient.fhirpath_single("Patient is FHIR.Patient") # (1)!
-is_patient_implicit = patient.fhirpath_single("Patient is Patient") # (2)!
+is_patient_explicit = patient.evaluate("Patient is FHIR.Patient")[0] # (1)!
+is_patient_implicit = patient.evaluate("Patient is Patient")[0] # (2)!
 
 print(f"Explicit namespace: {is_patient_explicit}")
 #> Explicit namespace: True
@@ -435,11 +419,11 @@ print(f"Implicit namespace: {is_patient_implicit}")
 #> Implicit namespace: True
 
 # Check for complex types with explicit namespace
-has_name = patient.fhirpath_single("Patient.name.first() is FHIR.HumanName") # (3)!
+has_name = patient.evaluate("Patient.name.first() is FHIR.HumanName") == [True] # (3)!
 print(f"Has HumanName: {has_name}")
 
 # Use namespace for primitive types
-birth_is_date = patient.fhirpath_single("Patient.birthDate is FHIR.date") # (4)!
+birth_is_date = patient.evaluate("Patient.birthDate is FHIR.date") == [True] # (4)!
 print(f"Birth date is FHIR.date: {birth_is_date}")
 ```
 
@@ -460,13 +444,13 @@ FHIRPath provides `is` and `as` operators for type checking and casting. These o
 ```python
 patient = fhir.Patient(id="ID1234") # (1)!
 
-print(patient.fhirpath_single("Patient.id is id"))
+print(patient.evaluate("Patient.id is id")[0])
 #> True
 
-print(patient.fhirpath_single("Patient.id is FHIR.id"))
+print(patient.evaluate("Patient.id is FHIR.id")[0])
 #> True
 
-print(patient.fhirpath_single("Patient.id is FHIR.integer"))
+print(patient.evaluate("Patient.id is FHIR.integer")[0])
 #> False
 ```
 
@@ -506,7 +490,7 @@ configure(terminology_service=MyTerminologyService())
 **Per-evaluation via environment variable** — passes a service only for a specific expression, overriding the global one:
 
 ```python
-result = patient.fhirpath_values(
+result = patient.evaluate(
     "Patient.gender.memberOf('http://hl7.org/fhir/ValueSet/administrative-gender')",
     environment={"%terminologyService": MyTerminologyService()}
 )

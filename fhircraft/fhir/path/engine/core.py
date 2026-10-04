@@ -330,6 +330,13 @@ class FHIRPathNode(ABC):
         result = self.evaluate(collection, environment or dict())
         return result if isinstance(result, FHIRPathCollection) else FHIRPathCollection(result)
 
+    def values(self, data: Any, environment: dict | None = None) -> list[Any]:
+        """Evaluate the expression against raw *data* and return the matching values.
+
+        Intended for data that is not a Fhircraft model (dictionaries, JSON).
+        """
+        return [item.value for item in self._evaluate_wrapped(data, environment)]
+
     def _invoke(self, invocation: "FHIRPathNode") -> "FHIRPathNode":
         """
         Invoke the FHIRPath expression on the given collection.

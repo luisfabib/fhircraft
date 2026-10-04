@@ -128,25 +128,25 @@ patient = fhir.Patient(
 
 # A malformed expression fails at parse time
 try:
-    patient.fhirpath_single("Patient.name.where(use = ")  # (1)!
+    patient.evaluate("Patient.name.where(use = ")  # (1)!
 except FHIRPathParsingError as e:
     print(f"Fix the expression: {e.message}")
 
 # A valid expression that returns multiple values fails at runtime
 try:
-    patient.fhirpath_single("Patient.name")  # (2)!
-except FHIRPathRuntimeError as e:
+    patient.evaluate("Patient.name.single()")  # (2)!
+except FHIRPathException as e:
     print(f"Adjust the query: {e.message}")
 ```
 
 1. The `where(` clause is never closed — this fails during lexing/parsing before any data is touched.
-2. The expression is syntactically valid, but `single()` expects exactly one result and the patient has two names.
+2. The expression is syntactically valid, but `single()` expects exactly one item and the patient has two names.
 
 | Exception | When it is raised |
 |---|---|
 | `FHIRPathParsingError` | Expression cannot be parsed — invalid syntax such as unclosed parentheses or unknown keywords |
 | `FHIRPathLexingError` | Expression contains tokens the lexer does not recognize |
-| `FHIRPathRuntimeError` | Evaluation fails at runtime — wrong cardinality, failed navigation, invalid `single()` or `update_single()` call |
+| `FHIRPathRuntimeError` | Evaluation fails at runtime — failed navigation or invalid operation |
 | `FHIRPathTypeError` | Incompatible types used together (e.g. comparing a string to a date without conversion) |
 | `FHIRPathOperationError` | A function or operator is called with incompatible or unsupported arguments |
 
@@ -161,7 +161,7 @@ except FHIRPathRuntimeError as e:
     # Capture only FHIRPath warnings
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always", FHIRPathWarning)
-        result = patient.fhirpath_values("Patient.name")
+        result = patient.evaluate("Patient.name")
 
     for w in caught:
         print(f"FHIRPath warning: {w.message}")
@@ -408,7 +408,7 @@ except FileNotFoundError as e:
 | `ValidationError` raised but unclear which field failed | Iterate `e.errors()` and print each entry's `loc`, `type`, and `msg` keys. Types prefixed with `fhir_` identify FHIR invariant violations (e.g. `fhir_dom-6`); all others are Pydantic field-type errors. |
 | FHIR constraint violations appear even on valid-looking data | The resource may be missing optional-but-constrained elements such as narrative text (`dom-6`). Use `disable_constraint('dom-6')` or switch to `validation_mode='lenient'` for that operation. See [Configuring Validation Behavior](configuration.md). |
 | `FHIRPathParsingError` on a seemingly correct expression | Check for unclosed parentheses, mismatched quotes, or unsupported syntax. Validate the expression against the [:lucide-flame: FHIRPath specification](https://hl7.org/fhirpath/N1/). |
-| `FHIRPathRuntimeError` from `fhirpath_single()` | The expression matched more than one value. Use `fhirpath_values()` to retrieve all matches, or tighten the expression with a `where()` filter so only one result is returned. |
+| `FHIRPathException` from `single()` | The expression matched more than one value. Drop `single()` to retrieve all matches, or tighten the expression with a `where()` filter so only one result is returned. |
 | Mapper raises `MapperRegistryNotFoundError` | A `uses` declaration in the mapping script references a StructureDefinition that is not loaded. Register the definition or load the relevant package before running the mapper. |
 | `MapperExecutionError` with no clear cause | Enable verbose logging and inspect intermediate scope state. Break the mapping script into smaller groups to isolate the failing rule. |
 | `PackageNotFoundError` for a package that exists on the registry | Verify the package name and version string exactly match the registry entry (names are case-sensitive). Check that the configured registry URL is reachable. |
