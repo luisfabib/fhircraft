@@ -5,20 +5,18 @@ from __future__ import annotations
 import copy
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, MutableMapping
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import Any, ClassVar
 
 from pydantic.fields import FieldInfo
 
 from fhircraft.exceptions import FHIRPathEvaluationError
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
 
-if TYPE_CHECKING:  # pragma: no cover
-    from fhircraft.fhir.path.collection import FHIRPathCollectionItem
-
 __all__ = [
     "ElementAccessor",
     "ModelAccessor",
     "DictAccessor",
+    "RootAccessor",
     "resolve_field",
     "Cardinality",
 ]
@@ -144,27 +142,32 @@ class Cardinality(tuple):
 
 
 class ElementAccessor(ABC):
-    """Read/write handle onto one element slot of one container.
+    """Read/write handle onto one element slot of a (possibly missing) container.
 
-    Subclasses implement only the four raw primitives -- ``_read_field``,
+    An accessor is a *location*: it is chained to its ``parent`` accessor and
+    only resolves the container when asked, so it stays valid -- and writable --
+    even when nothing exists at that location yet ("virtual" accessor).  Writes
+    materialise the missing container chain on demand.
+
+    Subclasses implement only the raw primitives -- ``_read_field``,
     ``_write_field``, ``_remove_field``, ``_field_info`` -- and inherit the
     list/scalar bookkeeping, which is identical for models and mappings.
     """
 
-    __slots__ = ("container", "element", "field", "index", "_is_list")
+    __slots__ = ("parent", "element", "field", "index", "_is_list")
 
     #: Human-readable kind, used in error messages.
     kind: ClassVar[str] = "element"
 
     def __init__(
         self,
-        container: Any,
+        parent: "ElementAccessor | None",
         element: str,
         field: str,
         index: int | None = None,
         is_list: bool | None = None,
     ) -> None:
-        self.container = container
+        self.parent = parent
         self.element = element
         self.field = field
         self.index = index
@@ -173,42 +176,84 @@ class ElementAccessor(ABC):
     # -- construction ------------------------------------------------------ #
 
     @classmethod
-    def for_item(cls, item: "FHIRPathCollectionItem") -> "ElementAccessor | None":
-        """Build the accessor for *item*, or ``None`` if it is not writable.
+    def for_container(
+        cls, container: Any, element: str, index: int | None = None
+    ) -> "ElementAccessor | None":
+        """Accessor for *element* of a concrete *container* (or ``None`` if it has no such element)."""
+        accessor = RootAccessor(container).child(element)
+        if accessor is not None and index is not None:
+            accessor = accessor.at(index)
+        return accessor
 
-        Literals, environment variables and root items have no parent container
-        and therefore no accessor.
+    def at(self, index: int | None) -> "ElementAccessor":
+        """The same element, addressed at list position *index*."""
+        clone = copy.copy(self)
+        clone.index = index
+        return clone
+
+    def child(self, element: str) -> "ElementAccessor | None":
+        """Accessor for the FHIRPath element *element* of the value at this location.
+
+        List-valued fields addressed without an index resolve through their
+        first entry.  Returns ``None`` when the value cannot have such an element.
         """
-        if item.parent is None or item.element is None:
-            return None
-
-        container = item.parent.value
+        slot = self.at(0) if (self.is_list and self.index is None) else self
+        container = slot.get()
+        model = None
+        if container is None:
+            container = slot.construct()
+            model = type(container) if container is not None else None
+            if container is None and slot.field_info is None:
+                return DictAccessor(slot, element, element)
         if container is None:
             return None
         if isinstance(container, list):
-            # A parent collection item should never hold a bare list -- the
-            # engine unwraps lists into sibling items.  Guard rather than
-            # silently writing to element zero.
-            raise FHIRPathEvaluationError(
-                f"Cannot resolve a writable location for '{item.element}': "
-                "its parent is an unwrapped list"
-            )
-
-        field = resolve_field(container, item.element)
-        if field is None:
             return None
 
+        field = resolve_field(container, element)
+        if field is None:
+            return None
         if isinstance(container, Mapping):
-            return DictAccessor(container, item.element, field, item.index)
-        # `resolve_field` already proved `field` is reachable via `hasattr` for
-        # containers without `model_fields`/`__dict__` (e.g. namedtuples).
+            return DictAccessor(slot, element, field)
         if (
             hasattr(type(container), "model_fields")
             or hasattr(container, "__dict__")
             or hasattr(container, field)
         ):
-            return ModelAccessor(container, item.element, field, item.index)
+            accessor = ModelAccessor(slot, element, field)
+            accessor._model = model or type(container)
+            return accessor
         return None
+
+    @property
+    def container(self) -> Any:
+        """The value that owns this element, or ``None`` if it does not exist (yet)."""
+        return self.parent.get() if self.parent is not None else None
+
+    def ensure_container(self) -> Any:
+        """Return the owning container, creating the missing chain of parents if needed."""
+        container = self.container
+        if container is not None:
+            return container
+        parent = self.parent
+        if parent is None:
+            raise FHIRPathEvaluationError(f"'{self.canonical_path}' is not writable")
+        created = parent.construct()
+        if created is None:
+            raise FHIRPathEvaluationError(
+                f"Cannot create the container of '{self.canonical_path}'"
+            )
+        parent.set(created)
+        return parent.get()
+
+    @property
+    def canonical_path(self) -> str:
+        """Canonical, index-qualified FHIRPath to this location, e.g. ``'Patient.name[0].given[1]'``."""
+        segment = self.element if self.index is None else f"{self.element}[{self.index}]"
+        parent_path = self.parent.canonical_path if self.parent is not None else ""
+        if not parent_path:
+            return segment
+        return f"{parent_path}.{segment}" if segment else parent_path
 
     # -- raw primitives (subclass responsibility) -------------------------- #
 
@@ -282,13 +327,13 @@ class ElementAccessor(ABC):
         return isinstance(current, list) and 0 <= self.index < len(current)
 
     def construct(self) -> Any:
-        """Instantiate the empty model this slot expects (the ``create=True`` path).
+        """Instantiate the empty model this slot expects.
 
         Returns ``None`` for primitive slots, which need no container object.
         """
         info = self.field_info
         if info is None:
-            return None
+            return {} if self.kind == "key" else None
         model = get_fhir_model_from_field(info)
         if model is None:
             return None
@@ -324,6 +369,7 @@ class ElementAccessor(ABC):
         element -- silently dropping the rest would hide a cardinality bug.
         List field addressed without an index: replaces the whole list.
         """
+        self.ensure_container()
         current = self._read_field()
 
         if self.index is None:
@@ -436,11 +482,7 @@ class ElementAccessor(ABC):
     # -- dunders ----------------------------------------------------------- #
 
     def __repr__(self) -> str:
-        suffix = "" if self.index is None else f"[{self.index}]"
-        return (
-            f"{type(self).__name__}("
-            f"{type(self.container).__name__}.{self.field}{suffix})"
-        )
+        return f"{type(self).__name__}({self.canonical_path})"
 
 
 def _pad(target: list, index: int, value: Any) -> list:
@@ -450,32 +492,106 @@ def _pad(target: list, index: int, value: Any) -> list:
     return target
 
 
+class RootAccessor(ElementAccessor):
+    """The read-only entry point of a chain: wraps the value an expression runs against."""
+
+    __slots__ = ("value",)
+    kind = "root"
+
+    def __init__(self, value: Any) -> None:
+        super().__init__(None, "", "")
+        self.value = value
+
+    @property
+    def canonical_path(self) -> str:
+        return _root_label(self.value)
+
+    def get(self) -> Any:
+        return self.value
+
+    def exists(self) -> bool:
+        return self.value is not None
+
+    @property
+    def is_list(self) -> bool:
+        return False
+
+    def _read_field(self) -> Any:
+        return self.value
+
+    def _write_field(self, value: Any) -> None:
+        raise FHIRPathEvaluationError("Root resources cannot be modified")
+
+    def _remove_field(self) -> None:
+        raise FHIRPathEvaluationError("Root resources cannot be deleted")
+
+    def _field_info(self) -> FieldInfo | None:
+        return None
+
+    def construct(self) -> Any:
+        return None
+
+    def set(self, value: Any) -> None:
+        self._write_field(value)
+
+    def delete(self) -> None:
+        self._remove_field()
+
+    def insert(self, value: Any, at: int) -> None:
+        self._write_field(value)
+
+    def move(self, source: int, destination: int) -> None:
+        self._write_field(None)
+
+    def at(self, index: int | None) -> "ElementAccessor":
+        return self
+
+
+def _root_label(value: Any) -> str:
+    """The leading segment of a location: the resource or datatype name."""
+    if isinstance(value, Mapping):
+        return str(value.get("resourceType", ""))
+    declared = getattr(type(value), "_type", None) or getattr(value, "_type", None)
+    if isinstance(declared, str):
+        return declared
+    return ""
+
+
 class ModelAccessor(ElementAccessor):
     """Accessor for Pydantic FHIR models."""
 
-    __slots__ = ()
+    __slots__ = ("_model",)
     kind = "field"
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._model: type | None = None
+
     def _read_field(self) -> Any:
-        return getattr(self.container, self.field, None)
+        container = self.container
+        return getattr(container, self.field, None) if container is not None else None
 
     def _write_field(self, value: Any) -> None:
+        container = self.ensure_container()
         try:
-            setattr(self.container, self.field, value)
+            setattr(container, self.field, value)
         except Exception as exc:  # pydantic ValidationError, AttributeError, ...
             raise FHIRPathEvaluationError(
-                f"Cannot assign to '{type(self.container).__name__}."
+                f"Cannot assign to '{type(container).__name__}."
                 f"{self.field}': {exc}"
             ) from exc
 
     def _remove_field(self) -> None:
+        container = self.container
+        if container is None:
+            return
         info = self._field_info()
         if (
             info is None
-            and self.field in getattr(self.container, "__pydantic_extra__", {})
+            and self.field in getattr(container, "__pydantic_extra__", {})
             or {}
         ):
-            del self.container.__pydantic_extra__[self.field]
+            del container.__pydantic_extra__[self.field]
             return
         if info is not None and info.is_required():
             raise FHIRPathEvaluationError(
@@ -485,7 +601,11 @@ class ModelAccessor(ElementAccessor):
         self._write_field(None)
 
     def _field_info(self) -> FieldInfo | None:
-        return getattr(type(self.container), "model_fields", {}).get(self.field)
+        model = self._model
+        if model is None:
+            container = self.container
+            model = type(container) if container is not None else None
+        return getattr(model, "model_fields", {}).get(self.field)
 
 
 class DictAccessor(ElementAccessor):
@@ -499,21 +619,26 @@ class DictAccessor(ElementAccessor):
     kind = "key"
 
     def _read_field(self) -> Any:
-        return self.container.get(self.field)
+        container = self.container
+        return container.get(self.field) if isinstance(container, Mapping) else None
 
     def _write_field(self, value: Any) -> None:
-        if not isinstance(self.container, MutableMapping):
+        container = self.ensure_container()
+        if not isinstance(container, MutableMapping):
             raise FHIRPathEvaluationError(
                 f"Cannot assign to key '{self.field}' of an immutable mapping"
             )
-        self.container[self.field] = value
+        container[self.field] = value
 
     def _remove_field(self) -> None:
-        if not isinstance(self.container, MutableMapping):
+        container = self.container
+        if container is None:
+            return
+        if not isinstance(container, MutableMapping):
             raise FHIRPathEvaluationError(
                 f"Cannot delete key '{self.field}' of an immutable mapping"
             )
-        self.container.pop(self.field, None)
+        container.pop(self.field, None)
 
     def _field_info(self) -> FieldInfo | None:
         return None

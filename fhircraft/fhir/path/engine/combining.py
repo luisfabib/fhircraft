@@ -26,7 +26,7 @@ class Union(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Merge the two collections into a single collection, eliminating any duplicate values.
@@ -34,14 +34,13 @@ class Union(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
         if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
-                collection, environment, create
+                collection, environment
             )
         return [
             FHIRPathCollectionItem.wrap(item)
@@ -61,7 +60,7 @@ class Combine(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Merge the input and other collections into a single collection without eliminating duplicate
@@ -71,13 +70,12 @@ class Combine(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
         if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
-                collection, environment, create
+                collection, environment
             )
         return collection + self.other_collection

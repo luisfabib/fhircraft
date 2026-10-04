@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from collections import namedtuple
 from unittest import TestCase
 
@@ -25,13 +26,13 @@ env = dict()
 
 def test_indexing_returns_empty_for_empty_collection():
     collection = []
-    result = Index(1).evaluate(collection, env, create=False)
+    result = Index(1).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
 def test_indexing_returns_empty_for_out_of_bounds_index():
     collection = [FHIRPathCollectionItem(value="item1")]
-    result = Index(1).evaluate(collection, env, create=False)
+    result = Index(1).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -41,7 +42,7 @@ def test_indexing_returns_correct_item_from_collection():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Index(1).evaluate(collection, env, create=False)
+    result = Index(1).evaluate(FHIRPathCollection(collection), env)
     assert result == [collection[1]]
 
 
@@ -51,7 +52,7 @@ def test_indexing_returns_last_with_negative_index():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Index(-1).evaluate(collection, env, create=False)
+    result = Index(-1).evaluate(FHIRPathCollection(collection), env)
     assert result == [collection[2]]
 
 
@@ -71,37 +72,38 @@ class TestIndexPrimitive(TestCase):
         TestResource = namedtuple("TestResource", "field")
         self.resource = TestResource(field=[1, 2, 3])
         parent = FHIRPathCollectionItem(self.resource)
-        self.collection = Element("field").evaluate([parent], env)
+        self.collection = Element("field").evaluate(FHIRPathCollection([parent]), env)
 
     def test_index_evaluates_correctly(self):
-        result = Index(2).evaluate(self.collection, env, create=False)
+        result = Index(2).evaluate(self.collection, env)
         assert len(result) == 1
         assert result[0].value == 3
         assert len(self.resource.field) == 3
 
-    def test_index_creates_missing_elements(self):
-        result = Index(5).evaluate(self.collection, env, create=True)
-        assert len(result) == 1
-        assert result[0].value is None
-        assert len(self.resource.field) == 6
+    def test_index_out_of_bounds_keeps_writable_target_without_mutating(self):
+        result = Index(5).evaluate(self.collection, env)
+        assert len(result) == 0
+        assert len(result.targets) == 1
+        assert result.targets[0].canonical_path.endswith("field[5]")
+        assert len(self.resource.field) == 3
 
     def test_index_does_not_modify_collection_out_of_bounds(self):
-        result = Index(10).evaluate(self.collection, env, create=False)
+        result = Index(10).evaluate(self.collection, env)
         assert len(result) == 0
         assert len(self.resource.field) == 3
 
     def test_index_updates_value(self):
-        Index(2).evaluate(self.collection, env, create=False)[0].set("value")
+        Index(2).evaluate(self.collection, env).set("value")
         assert len(self.resource.field) == 3
         assert self.resource.field[2] == "value"
 
     def test_index_updates_and_creates_value(self):
-        Index(10).evaluate(self.collection, env, create=True)[0].set("value")
+        Index(10).evaluate(self.collection, env).set("value")
         assert len(self.resource.field) == 11
         assert self.resource.field[10] == "value"
 
     def test_index_handles_negative_indices(self):
-        result = Index(-1).evaluate(self.collection, env, create=False)
+        result = Index(-1).evaluate(self.collection, env)
         assert len(result) == 1
         assert result[0].value == 3
         assert len(self.resource.field) == 3
@@ -122,30 +124,30 @@ class TestIndexResources(TestCase):
             ]
         )
         parent = FHIRPathCollectionItem(self.resource)
-        self.collection = Element("coding").evaluate([parent], env)
+        self.collection = Element("coding").evaluate(FHIRPathCollection([parent]), env)
 
     def test_index_evaluates_correctly(self):
-        result = Index(2).evaluate(self.collection, env, create=False)
+        result = Index(2).evaluate(self.collection, env)
         assert len(result) == 1
         assert result[0].value == Coding(code="code-3", system="system-3")
         assert self.resource.coding
         assert len(self.resource.coding) == 3
 
-    def test_index_creates_missing_elements(self):
-        result = Index(5).evaluate(self.collection, env, create=True)
-        assert len(result) == 1
-        assert result[0].value == Coding.model_construct()
+    def test_index_out_of_bounds_keeps_writable_target_without_mutating(self):
+        result = Index(5).evaluate(self.collection, env)
+        assert len(result) == 0
+        assert len(result.targets) == 1
         assert self.resource.coding
-        assert len(self.resource.coding) == 6
+        assert len(self.resource.coding) == 3
 
     def test_index_does_not_modify_collection_out_of_bounds(self):
-        result = Index(10).evaluate(self.collection, env, create=False)
+        result = Index(10).evaluate(self.collection, env)
         assert len(result) == 0
         assert self.resource.coding
         assert len(self.resource.coding) == 3
 
     def test_index_updates_value(self):
-        Index(2).evaluate(self.collection, env, create=False)[0].set(
+        Index(2).evaluate(self.collection, env).set(
             Coding(code="code-5", system="system-5")
         )
         assert self.resource.coding
@@ -153,21 +155,20 @@ class TestIndexResources(TestCase):
         assert self.resource.coding[2] == Coding(code="code-5", system="system-5")
 
     def test_index_updates_and_creates_value(self):
-        Index(10).evaluate(self.collection, env, create=True)[0].set(
+        Index(10).evaluate(self.collection, env).set(
             Coding(code="code-5", system="system-5")
         )
         assert self.resource.coding
         assert len(self.resource.coding) == 11
         assert self.resource.coding[10] == Coding(code="code-5", system="system-5")
 
-    def test_index_creates_with_empty_list(self):
+    def test_index_set_on_empty_list(self):
         resource = CodeableConcept.model_construct()
         resource.coding = []
         parent = FHIRPathCollectionItem(resource)
-        collection = Element("coding").evaluate([parent], env, create=True)
-        Index(0).evaluate(collection, env, create=True)
-        assert len(resource.coding) == 1
-        assert resource.coding == [Coding.model_construct()]
+        collection = Element("coding").evaluate(FHIRPathCollection([parent]), env)
+        Index(0).evaluate(collection, env).set(Coding(code="c"))
+        assert resource.coding == [Coding(code="c")]
 
 
 # -------------
@@ -177,13 +178,13 @@ class TestIndexResources(TestCase):
 
 def test_single_returns_empty_for_empty_collection():
     collection = []
-    result = Single().evaluate(collection, env, create=False)
+    result = Single().evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
 def test_single_returns_item_for_single_item_collection():
     collection = [FHIRPathCollectionItem(value="item1")]
-    result = Single().evaluate(collection, env, create=False)
+    result = Single().evaluate(FHIRPathCollection(collection), env)
     assert result == collection
 
 
@@ -193,7 +194,7 @@ def test_single_raises_error_for_multiple_item_collection():
         FHIRPathCollectionItem(value="item2"),
     ]
     with pytest.raises(FHIRPathException):
-        Single().evaluate(collection, env, create=False)
+        Single().evaluate(FHIRPathCollection(collection), env)
 
 
 def test_single_string_representation():
@@ -208,7 +209,7 @@ def test_single_string_representation():
 
 def test_first_returns_empty_for_empty_collection():
     collection = []
-    result = First().evaluate(collection, env, create=False)
+    result = First().evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -218,7 +219,7 @@ def test_first_returns_first_item_in_collection():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = First().evaluate(collection, env, create=False)
+    result = First().evaluate(FHIRPathCollection(collection), env)
     assert result == [collection[0]]
 
 
@@ -234,7 +235,7 @@ def test_first_string_representation():
 
 def test_last_returns_empty_for_empty_collection():
     collection = []
-    result = Last().evaluate(collection, env, create=False)
+    result = Last().evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -244,7 +245,7 @@ def test_last_returns_last_item_in_collection():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Last().evaluate(collection, env, create=False)
+    result = Last().evaluate(FHIRPathCollection(collection), env)
     assert result == [collection[-1]]
 
 
@@ -260,7 +261,7 @@ def test_last_string_representation():
 
 def test_tail_returns_empty_for_empty_collection():
     collection = []
-    result = Tail().evaluate(collection, env, create=False)
+    result = Tail().evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -270,7 +271,7 @@ def test_tail_returns_expected_collection():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Tail().evaluate(collection, env, create=False)
+    result = Tail().evaluate(FHIRPathCollection(collection), env)
     assert result == collection[1:]
 
 
@@ -286,7 +287,7 @@ def test_tail_string_representation():
 
 def test_skip_returns_empty_for_empty_collection():
     collection = []
-    result = Skip(2).evaluate(collection, env, create=False)
+    result = Skip(2).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -296,9 +297,9 @@ def test_skip_returns_original_if_num_is_zero_or_less():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Skip(-1).evaluate(collection, env, create=False)
+    result = Skip(-1).evaluate(FHIRPathCollection(collection), env)
     assert result == []
-    result = Skip(0).evaluate(collection, env, create=False)
+    result = Skip(0).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -308,7 +309,7 @@ def test_skip_returns_empty_if_num_larger_than_list():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Skip(5).evaluate(collection, env, create=False)
+    result = Skip(5).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -318,7 +319,7 @@ def test_skip_returns_expected_collection():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Skip(2).evaluate(collection, env, create=False)
+    result = Skip(2).evaluate(FHIRPathCollection(collection), env)
     assert result == [collection[-1]]
 
 
@@ -333,7 +334,7 @@ def test_skip_returns_expected_collection_with_fhirpath():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Skip(EnvironmentVariable("%count")).evaluate(collection, {"%count": 2})
+    result = Skip(EnvironmentVariable("%count")).evaluate(FHIRPathCollection(collection), {"%count": 2})
     assert result == [collection[-1]]
 
 
@@ -344,7 +345,7 @@ def test_skip_returns_expected_collection_with_fhirpath():
 
 def test_take_returns_empty_for_empty_collection():
     collection = []
-    result = Take(2).evaluate(collection, env, create=False)
+    result = Take(2).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -354,9 +355,9 @@ def test_take_returns_original_if_num_is_zero_or_less():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Take(-1).evaluate(collection, env, create=False)
+    result = Take(-1).evaluate(FHIRPathCollection(collection), env)
     assert result == []
-    result = Take(0).evaluate(collection, env, create=False)
+    result = Take(0).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -366,7 +367,7 @@ def test_take_returns_full_collection_if_num_larger():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Take(5).evaluate(collection, env, create=False)
+    result = Take(5).evaluate(FHIRPathCollection(collection), env)
     assert result == collection
 
 
@@ -376,7 +377,7 @@ def test_take_returns_expected_collection():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Take(2).evaluate(collection, env, create=False)
+    result = Take(2).evaluate(FHIRPathCollection(collection), env)
     assert result == collection[:2]
 
 
@@ -391,7 +392,7 @@ def test_take_returns_expected_collection_with_fhirpath():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Take(EnvironmentVariable("%count")).evaluate(collection, {"%count": 2})
+    result = Take(EnvironmentVariable("%count")).evaluate(FHIRPathCollection(collection), {"%count": 2})
     assert result == collection[:2]
 
 
@@ -411,7 +412,7 @@ def test_intersection_returns_common_items_without_duplicates():
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Intersect(other_collection).evaluate(collection, env, create=False)
+    result = Intersect(FHIRPathCollection(other_collection)).evaluate(FHIRPathCollection(collection), env)
     assert result == [
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item3"),
@@ -439,7 +440,7 @@ def test_exclude_returns_common_items_without_duplicates():
         FHIRPathCollectionItem(value="item1"),
         FHIRPathCollectionItem(value="item3"),
     ]
-    result = Exclude(other_collection).evaluate(collection, env, create=False)
+    result = Exclude(FHIRPathCollection(other_collection)).evaluate(FHIRPathCollection(collection), env)
     assert result == [
         FHIRPathCollectionItem(value="item2"),
         FHIRPathCollectionItem(value="item2"),

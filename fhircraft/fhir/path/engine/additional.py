@@ -80,7 +80,7 @@ class Extension(FHIRPathFunction):
         self.url = url
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Filters the input collection for items named `extension` with the given `url`.
@@ -89,7 +89,6 @@ class Extension(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -97,7 +96,7 @@ class Extension(FHIRPathFunction):
         return Invocation(
             Element("extension"),
             Where(Equals(Element("url"), [FHIRPathCollectionItem.wrap(self.url)])),
-        ).evaluate(collection, environment, create)
+        ).evaluate(collection, environment)
 
     def __str__(self):
         return f'Extension("{self.url}")'
@@ -122,7 +121,7 @@ class TypeChoice(FHIRPathNode):
         self.type_choice_name = type_choice_name
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         return [
             FHIRPathCollectionItem(
@@ -155,7 +154,7 @@ class HasValue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true if the input collection contains a single value which is a FHIR primitive, and it has a primitive
@@ -164,7 +163,6 @@ class HasValue(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -189,7 +187,7 @@ class GetValue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Return the underlying system value for the FHIR primitive if the input collection contains a single
@@ -198,7 +196,6 @@ class GetValue(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -228,7 +225,7 @@ class Resolve(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         For each item in the collection, if it is a string that is a `uri` (or `canonical` or `url`), locate the target of the
@@ -241,7 +238,6 @@ class Resolve(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -491,7 +487,7 @@ class HtmlChecks(FHIRPathFunction):
             self.handle_starttag(tag, attrs)
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         When invoked on a single xhtml element returns true if the rules around HTML usage are met, and false if they are not.
@@ -500,7 +496,6 @@ class HtmlChecks(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             bool
@@ -566,7 +561,7 @@ class LowBoundary(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the low boundary of a quantity or range based on precision.
@@ -576,7 +571,6 @@ class LowBoundary(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -659,7 +653,7 @@ class HighBoundary(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the high boundary of a quantity or range based on precision.
@@ -669,7 +663,6 @@ class HighBoundary(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -755,7 +748,7 @@ class ElementDefinition(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the FHIR element definition information for each element in the input collection. If the input collection is empty, the return value will be empty.
@@ -763,7 +756,6 @@ class ElementDefinition(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -795,7 +787,7 @@ class Slice(FHIRPathFunction):
         self.name = name
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the given slice as defined in the given structure definition. The structure
@@ -807,7 +799,6 @@ class Slice(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -835,7 +826,7 @@ class CheckModifiers(FHIRPathFunction):
         self.modifier = modifier
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         For each element in the input collection, verifies that there are no modifying extensions defined other than the ones given by the modifier argument (comma-separated string). If the check passes, the input collection is returned. Otherwise, an error is thrown, including if modifier is empty.
@@ -843,7 +834,6 @@ class CheckModifiers(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -869,7 +859,7 @@ class ConformsTo(FHIRPathFunction):
         self.structure = structure
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `true` if the single input element conforms to the profile specified by the `structure` argument, and false otherwise. If the input is not a single item, the structure is empty, or the structure cannot be resolved to a valid profile, the result is empty.
@@ -878,7 +868,6 @@ class ConformsTo(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -924,7 +913,7 @@ class MemberOf(FHIRPathFunction):
         self.valueset = valueset
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         When invoked on a single code-valued element, returns true if the code is a member of the given valueset.
@@ -938,7 +927,6 @@ class MemberOf(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -989,7 +977,7 @@ class MemberOf(FHIRPathFunction):
         return [FHIRPathCollectionItem.wrap(bool(result))]
 
 
-def _evaluate_subsumtion(code, collection, environment, create, invert=False):
+def _evaluate_subsumtion(code, collection, environment, invert=False):
     """
     Helper function to evaluate subsumption relationships for both subsumes() and subsumedBy() functions.
     """
@@ -1007,7 +995,7 @@ def _evaluate_subsumtion(code, collection, environment, create, invert=False):
         raise FHIRPathException(
             f"The %fhirRelease environment variable is required for evaluating {'subsumes()' if not invert else 'subsumedBy()'}."
         )
-    given = code.evaluate(collection, environment=environment, create=create)
+    given = code.evaluate(collection, environment=environment)
     if len(given) != 1:
         return []
     given = given[0].value
@@ -1075,7 +1063,7 @@ class Subsumes(FHIRPathFunction):
         self.code = code
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         When invoked on a Coding-valued element and the given code is Coding-valued, returns true if the source code is equivalent to the given code, or if the source code subsumes the given code (i.e. the source code is an ancestor of the given code in a subsumption hierarchy), and false otherwise.
@@ -1087,7 +1075,6 @@ class Subsumes(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -1096,7 +1083,6 @@ class Subsumes(FHIRPathFunction):
             code=self.code,
             collection=collection,
             environment=environment,
-            create=create,
             invert=False,
         )
 
@@ -1117,7 +1103,7 @@ class SubsumedBy(FHIRPathFunction):
         self.code = code
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         When invoked on a Coding-valued element and the given code is Coding-valued, returns true if the source code is equivalent to the given code, or if the source code is subsumed by the given code (i.e. the given code is an ancestor of the source code in a subsumption hierarchy), and false otherwise.
@@ -1131,7 +1117,6 @@ class SubsumedBy(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -1140,7 +1125,6 @@ class SubsumedBy(FHIRPathFunction):
             code=self.code,
             collection=collection,
             environment=environment,
-            create=create,
             invert=True,
         )
 
@@ -1163,7 +1147,7 @@ class Comparable(FHIRPathFunction):
         self.quantity = quantity
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         This function returns `true` if the engine executing the FHIRPath statement can compare
@@ -1175,7 +1159,6 @@ class Comparable(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.

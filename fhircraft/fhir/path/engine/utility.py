@@ -43,7 +43,7 @@ class Trace(FHIRPathFunction):
         self.projection = projection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Adds a `String` representation of the input collection to the diagnostic log, using the `name` argument
@@ -56,7 +56,6 @@ class Trace(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The input collection.
@@ -64,7 +63,7 @@ class Trace(FHIRPathFunction):
         log_collection = collection
         if self.projection:
             log_collection = Select(self.projection).evaluate(
-                collection, environment, create
+                collection, environment
             )
         if not isinstance(
             name := self.name.single(collection, environment=environment), str
@@ -82,7 +81,7 @@ class Now(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the current date and time, including timezone offset.
@@ -100,7 +99,7 @@ class TimeOfDay(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the current time.
@@ -117,7 +116,7 @@ class Today(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the current date.

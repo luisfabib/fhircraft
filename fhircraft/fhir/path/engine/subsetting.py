@@ -15,6 +15,7 @@ __all__ = [
 from typing import List, Optional, Union
 
 from fhircraft.fhir.path.engine.core import (
+    _targets_of,
     FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
@@ -41,7 +42,7 @@ class Index(FHIRPathNode):
         self.index = index
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The indexer operation returns a collection with only the index-th item (0-based index). If the input
@@ -50,74 +51,33 @@ class Index(FHIRPathNode):
 
         Args:
             collection (FHIRPathCollection): The input collection.
-            create (bool): Pad the collection array if the index lies out of bounds of the collection.
 
         Returns:
-            FHIRPathCollection): The indexed collection item.
-
-        Raises:
-            FHIRPathError: If `create=True` and collection is composed of items with different parent elements.
+            FHIRPathCollection: The indexed collection item.
 
         Notes:
-            The collection padding with `create=True` allows the function to create and later access new elements.
-            The padded object is initialized based on the collection items' common parent (if exists).
-            Therefore, this option is only available for a homogeneous collection of items.
+            When the collection addresses a single element location (e.g. `Patient.name`), the result
+            carries the accessor of the indexed slot as its `target` even if that position is out of
+            bounds, so that it can be written to later.
         """
-        if len(collection) <= self.index and create:
-            return self._pad_to_index(collection)
-        # If index is within array bounds, get element
-        if collection and len(collection) > self.index:
-            return [collection[self.index]]
-        # Else return empty list
-        return []
-
-    def _pad_to_index(self, collection: FHIRPathCollection) -> FHIRPathCollection:
-        """Grow `collection` (and, where possible, its underlying container) up to `self.index`."""
-        if not collection:
-            raise FHIRPathException(
-                "Cannot create new array element due to inhomogeneity in parents"
-            )
-        pad = self.index - len(collection) + 1
-        parent_array = collection[0]
-
-        if parent_array.parent is None:
-            # No underlying container to grow -- pad the in-memory collection itself.
-            padded = list(collection) + [
-                FHIRPathCollectionItem.wrap(None) for __ in range(pad)
-            ]
-            return [padded[self.index]]
-
-        same_parent = parent_array.parent.value
-        if not all(
-            item.parent is None or item.parent.value is same_parent
-            for item in collection
+        targets = _targets_of(collection)
+        field_targets = [t for t in targets if t.index is None]
+        if (
+            len(field_targets) == 1
+            and len(field_targets) == len(targets)
+            and (field_targets[0].is_list or self.index == 0)
+            and self.index >= 0
         ):
-            raise FHIRPathException(
-                "Cannot create new array element due to inhomogeneity in parents"
-            )
-
-        accessor = parent_array.parent.child(None, parent_array.element or "").accessor
-        if accessor is None:
-            raise FHIRPathException(
-                f"Cannot create new array element: '{parent_array.element}' is "
-                "not a writable location"
-            )
-        current = accessor.get()
-        if isinstance(current, list):
-            # Mutate the live list in place: some containers (e.g. namedtuples)
-            # cannot have their field reassigned via `accessor.set()`.
-            values = current
-            values.extend(accessor.construct() for __ in range(pad))
-        else:
-            # Preserve the existing single value as the first element instead of discarding it.
-            values = [current if current is not None else accessor.construct()]
-            values.extend(accessor.construct() for __ in range(pad))
-            accessor.set(values)
-        return [
-            parent_array.parent.child(
-                values[self.index], parent_array.element or "", index=self.index
-            )
-        ]
+            slot = field_targets[0].at(self.index)
+            value = slot.get()
+            items = [FHIRPathCollectionItem(value, slot)] if value is not None else []
+            return FHIRPathCollection(items, targets=[slot])
+        if len(targets) == 1 and targets[0].index is not None and self.index == 0:
+            # Index zero of a single (possibly absent) slot is that slot.
+            return FHIRPathCollection(list(collection)[:1], targets=targets)
+        if collection and -len(collection) <= self.index < len(collection):
+            return FHIRPathCollection([collection[self.index]])
+        return FHIRPathCollection()
 
     def __eq__(self, other):
         return isinstance(other, Index) and self.index == other.index
@@ -138,7 +98,7 @@ class Single(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Will return the single item in the input if there is just one item. If the input collection is empty (`[]`), the result is empty.
@@ -148,7 +108,6 @@ class Single(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -160,7 +119,7 @@ class Single(FHIRPathFunction):
             raise FHIRPathException(
                 f"Expected single value for single(), instead got {len(collection)} items in the collection"
             )
-        return Index(0).evaluate(collection, environment, create=False)
+        return Index(0).evaluate(collection, environment)
 
 
 class First(FHIRPathFunction):
@@ -169,7 +128,7 @@ class First(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the first item in the input collection.
@@ -177,7 +136,6 @@ class First(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -185,7 +143,7 @@ class First(FHIRPathFunction):
         Info:
             Equivalent to `Index(0)`.
         """
-        return Index(0).evaluate(collection, environment, create=False)
+        return Index(0).evaluate(collection, environment)
 
 
 class Last(FHIRPathFunction):
@@ -194,7 +152,7 @@ class Last(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the last item in the input collection.
@@ -202,7 +160,6 @@ class Last(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -210,7 +167,7 @@ class Last(FHIRPathFunction):
         Info:
             Equivalent to `Index(-1)`.
         """
-        return Index(-1).evaluate(collection, environment, create=False)
+        return Index(-1).evaluate(collection, environment)
 
 
 class Tail(FHIRPathFunction):
@@ -219,7 +176,7 @@ class Tail(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing all but the first item in the input collection. Will return
@@ -228,7 +185,6 @@ class Tail(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -248,7 +204,7 @@ class Skip(FHIRPathFunction):
         self.num = Literal(num) if not isinstance(num, FHIRPathNode) else num
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing all but the first `num` items in the input collection. Will return
@@ -259,7 +215,6 @@ class Skip(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -287,7 +242,7 @@ class Take(FHIRPathFunction):
         self.num = Literal(num) if not isinstance(num, FHIRPathNode) else num
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing the first `num` items in the input collection, or less if there
@@ -297,7 +252,6 @@ class Take(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -325,7 +279,7 @@ class Intersect(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the set of elements that are in both collections. Duplicate items will be eliminated
@@ -334,14 +288,13 @@ class Intersect(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
         if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
-                collection, environment, create
+                collection, environment
             )
         return [item for item in collection if item in self.other_collection]
 
@@ -358,7 +311,7 @@ class Exclude(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the set of elements that are not in the other collection. Duplicate items will not be
@@ -367,13 +320,12 @@ class Exclude(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
         if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
-                collection, environment, create
+                collection, environment
             )
         return [item for item in collection if item not in self.other_collection]

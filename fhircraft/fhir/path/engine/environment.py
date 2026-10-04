@@ -50,7 +50,7 @@ class EnvironmentVariable(FHIRPathVariable):
         self.variable = variable
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment.
@@ -58,7 +58,6 @@ class EnvironmentVariable(FHIRPathVariable):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
@@ -81,7 +80,7 @@ class ContextualVariable(FHIRPathNode):
     variable: str
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment.
@@ -89,7 +88,6 @@ class ContextualVariable(FHIRPathNode):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
@@ -125,7 +123,7 @@ class ContextualThis(ContextualVariable):
     variable = "$this"
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment. For `$this`, if the variable is not defined in the current context
@@ -135,7 +133,6 @@ class ContextualThis(ContextualVariable):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.

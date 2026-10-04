@@ -57,7 +57,7 @@ class GreaterThan(FHIRComparisonOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The greater than operator (>) returns true if the first operand is strictly greater than the second.
@@ -66,7 +66,6 @@ class GreaterThan(FHIRComparisonOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -75,7 +74,7 @@ class GreaterThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if (not left_value and left_value != 0) or (
             not right_value and right_value != 0
@@ -105,7 +104,7 @@ class LessThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The less than operator (<) returns true if the first operand is strictly less than the second.
@@ -114,7 +113,6 @@ class LessThan(FHIRComparisonOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -123,7 +121,7 @@ class LessThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if (not left_value and left_value != 0) or (
             not right_value and right_value != 0
@@ -153,7 +151,7 @@ class LessEqualThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The less or equal operator (<=) returns true if the first operand is less than or equal to the second.
@@ -162,7 +160,6 @@ class LessEqualThan(FHIRComparisonOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -171,7 +168,7 @@ class LessEqualThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if (not left_value and left_value != 0) or (
             not right_value and right_value != 0
@@ -201,7 +198,7 @@ class GreaterEqualThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The greater or equal operator (>=) returns true if the first operand is greater than or equal to the second.
@@ -210,7 +207,6 @@ class GreaterEqualThan(FHIRComparisonOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -219,7 +215,7 @@ class GreaterEqualThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if (not left_value and left_value != 0) or (
             not right_value and right_value != 0

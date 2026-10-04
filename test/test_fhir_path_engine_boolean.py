@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from collections import namedtuple
 
 import pytest
@@ -34,9 +35,9 @@ and_boolean_logic_cases = (
 def test_and_returns_correct_logic_boolean(left, right, expected):
     print(left, right, expected)
     result = And(
-        left=[FHIRPathCollectionItem(left)] if left is not None else [],
-        right=[FHIRPathCollectionItem(right)] if right is not None else [],
-    ).evaluate([], env)
+        left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
+        right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -69,9 +70,9 @@ or_boolean_logic_cases = (
 @pytest.mark.parametrize("left, right, expected", or_boolean_logic_cases)
 def test_or_returns_correct_logic_boolean(left, right, expected):
     result = Or(
-        left=[FHIRPathCollectionItem(left)] if left is not None else [],
-        right=[FHIRPathCollectionItem(right)] if right is not None else [],
-    ).evaluate([], env)
+        left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
+        right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -104,9 +105,9 @@ xor_boolean_logic_cases = (
 @pytest.mark.parametrize("left, right, expected", xor_boolean_logic_cases)
 def test_xor_returns_correct_logic_boolean(left, right, expected):
     result = Xor(
-        left=[FHIRPathCollectionItem(left)] if left is not None else [],
-        right=[FHIRPathCollectionItem(right)] if right is not None else [],
-    ).evaluate([], env)
+        left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
+        right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -139,9 +140,9 @@ implies_boolean_logic_cases = (
 @pytest.mark.parametrize("left, right, expected", implies_boolean_logic_cases)
 def test_implies_returns_correct_logic_boolean(left, right, expected):
     result = Implies(
-        left=[FHIRPathCollectionItem(left)] if left is not None else [],
-        right=[FHIRPathCollectionItem(right)] if right is not None else [],
-    ).evaluate([], env)
+        left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
+        right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -165,7 +166,7 @@ not_boolean_logic_cases = (
 
 @pytest.mark.parametrize("value, expected", not_boolean_logic_cases)
 def test_not_returns_correct_logic_boolean(value, expected):
-    result = Not().evaluate([FHIRPathCollectionItem(value=value)], env)
+    result = Not().evaluate(FHIRPathCollection([FHIRPathCollectionItem(value=value)]), env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 

@@ -49,10 +49,12 @@ class MockPatient(BaseModel):
 
 @pytest.fixture
 def collection() -> FHIRPathCollection:
-    return [
-        FHIRPathCollectionItem(value=MockPatient()),
-        FHIRPathCollectionItem(value=MockPatient()),
-    ]
+    return FHIRPathCollection(
+        [
+            FHIRPathCollectionItem(value=MockPatient()),
+            FHIRPathCollectionItem(value=MockPatient()),
+        ]
+    )
 
 
 # --------------------------------------------------
@@ -79,7 +81,7 @@ def collection() -> FHIRPathCollection:
 )
 def test_type_specifier__evaluate(type_specifier, expected_value):
     type_spec = TypeSpecifier(type_specifier)
-    result = type_spec.evaluate([], env)
+    result = type_spec.evaluate(FHIRPathCollection([]), env)
     assert len(result) == 1
     assert result[0].value == expected_value
 
@@ -98,7 +100,7 @@ def test_root_element__evaluate_returns_collection_unchanged(collection):
 
 def test_root_element__evaluate_empty_collection_returns_empty_list():
     # Root().evaluate([]) should return []
-    result = RootElement("Patient").evaluate([], env)
+    result = RootElement("Patient").evaluate(FHIRPathCollection([]), env)
     assert result == []
 
 
@@ -125,18 +127,18 @@ def test_this__evaluate_returns_same_collection(collection):
 
 def test_this__evaluate_with_single_item(collection):
     item = collection[0]
-    result = This().evaluate([item], env)
+    result = This().evaluate(FHIRPathCollection([item]), env)
     assert result == [item]
 
 
 def test_this__evaluate_empty_collection_returns_empty_list():
-    result = This().evaluate([], env)
+    result = This().evaluate(FHIRPathCollection([]), env)
     assert result == []
 
 
 def test_this__evaluate_with_none_value():
     item = FHIRPathCollectionItem(value=None)
-    result = This().evaluate([item], env)
+    result = This().evaluate(FHIRPathCollection([item]), env)
     assert result == [item]
     assert result[0].value is None
 
@@ -162,11 +164,11 @@ class TestInvocation(TestCase):
         self.collection = [FHIRPathCollectionItem(self.resource)]
 
     def test_evaluate_invokes_method_on_each_item(self):
-        result = Invocation(Element("status"), Upper()).evaluate(self.collection, env)
+        result = Invocation(Element("status"), Upper()).evaluate(FHIRPathCollection(self.collection), env)
         assert result[0].value == "ACTIVE"
 
     def test_evaluate_empty_collection_returns_empty_list(self):
-        result = Invocation(Element("status"), Upper()).evaluate([], env)
+        result = Invocation(Element("status"), Upper()).evaluate(FHIRPathCollection([]), env)
         assert result == []
 
     def test_invocation_string_representation(self):
@@ -187,26 +189,26 @@ class TestLiteral(TestCase):
             FHIRPathCollectionItem(value="b"),
         ]
         literal = Literal(42)
-        result = literal.evaluate(items, env)
+        result = literal.evaluate(FHIRPathCollection(items), env)
         assert len(result) == 1
         assert all(item.value == 42 for item in result)
 
     def test_evaluate_with_empty_collection_returns_nonempty_list(self):
         literal = Literal("test")
-        result = literal.evaluate([], env)
+        result = literal.evaluate(FHIRPathCollection([]), env)
         assert result == [FHIRPathCollectionItem(value="test")]
 
     def test_evaluate_with_single_item(self):
         item = FHIRPathCollectionItem(value="x")
         literal = Literal(True)
-        result = literal.evaluate([item], env)
+        result = literal.evaluate(FHIRPathCollection([item]), env)
         assert len(result) == 1
         assert result[0].value is True
 
     def test_evaluate_with_none_literal(self):
         items = [FHIRPathCollectionItem(value="a")]
         literal = Literal(None)
-        result = literal.evaluate(items, env)
+        result = literal.evaluate(FHIRPathCollection(items), env)
         assert len(result) == 1
         assert result[0].value is None
 
@@ -229,7 +231,7 @@ def _collection_with_value(**kwargs) -> FHIRPathCollection:
             for key, value in kwargs.items():
                 setattr(self, key, value)
 
-    return [FHIRPathCollectionItem.wrap(DummyResource(**kwargs))]
+    return FHIRPathCollection([FHIRPathCollectionItem.wrap(DummyResource(**kwargs))])
 
 
 def test_element__repr_representation():
@@ -272,12 +274,12 @@ def test_element__hash_is_consistent_with_equality():
 
 
 def test_element__evaluate_returns_empty_for_empty_collection():
-    assert Element("status").evaluate([], env, create=False) == []
+    assert Element("status").evaluate(FHIRPathCollection([]), env) == []
 
 
 def test_element__evaluate_returns_empty_when_field_missing():
     collection = _collection_with_value(status="active")
-    result = Element("missingField").evaluate(collection, env, create=False)
+    result = Element("missingField").evaluate(collection, env)
     assert result == []
 
 
@@ -292,7 +294,7 @@ def test_element__evaluate_returns_empty_when_field_missing():
 )
 def test_element__evaluate_returns_primitive_value(element_name, element_value):
     collection = _collection_with_value(**{element_name: element_value})
-    result = Element(element_name).evaluate(collection, env, create=False)
+    result = Element(element_name).evaluate(collection, env)
     assert len(result) == 1
     assert result[0].value == element_value
 
@@ -306,7 +308,7 @@ def test_element__evaluate_returns_primitive_value(element_name, element_value):
 )
 def test_element__evaluate_returns_complex_value(element_name, element_value):
     collection = _collection_with_value(**{element_name: element_value})
-    result = Element(element_name).evaluate(collection, env, create=False)
+    result = Element(element_name).evaluate(collection, env)
     assert len(result) == 1
     assert result[0].value == element_value
 
@@ -335,7 +337,7 @@ def test_element__evaluate_returns_primitive_extensions(element_name, element_va
     # so chaining `Element("extension")` needs no special-casing in `Element`.
     collection = _collection_with_value(**{element_name: element_value})
     result = Invocation(Element(element_name), Element("extension")).evaluate(
-        collection, env, create=False
+        collection, env
     )
     assert len(result) == 1
     assert result[0].value == element_value.extension[0]
@@ -349,7 +351,7 @@ def test_element__evaluate_identifies_aliased_fields():
 
     collection = [FHIRPathCollectionItem.wrap(DummyResource(class_="classValue"))]  # type: ignore
     # Should return the value of the field as a FHIRPathCollectionItem
-    result = Element("class").evaluate(collection, env, create=False)
+    result = Element("class").evaluate(FHIRPathCollection(collection), env)
     assert len(result) == 1
     assert result[0].value == "classValue"
 
@@ -360,32 +362,33 @@ def test_element__evaluate_resolves_leading_underscore_extension_sibling():
     # is absent.
     resource = {"_status": {"id": "ext1"}}
     result = Element("status").evaluate(
-        [FHIRPathCollectionItem(resource)], env, create=False
+        FHIRPathCollection([FHIRPathCollectionItem(resource)]), env
     )
     assert len(result) == 1
     assert result[0].value == {"id": "ext1"}
-    assert result[0].element == "status"
+    assert result[0].accessor.element == "status"
 
 
 def test_element__evaluate_handles_list_valued_fields_in_order():
     patient = MockPatient(name=[MockName(family="Doe"), MockName(family="Smith")])
-    result = Element("name").evaluate([FHIRPathCollectionItem(patient)], env)
+    result = Element("name").evaluate(FHIRPathCollection([FHIRPathCollectionItem(patient)]), env)
     assert [item.value.family for item in result] == ["Doe", "Smith"]
-    assert [item.index for item in result] == [0, 1]
+    assert [item.accessor.index for item in result if item.accessor] == [0, 1]
 
 
 def test_element__evaluate_sets_parent_and_element_on_children():
     collection = _collection_with_value(status="active")
-    result = Element("status").evaluate(collection, env, create=False)
-    assert result[0].parent is collection[0]
-    assert result[0].element == "status"
+    result = Element("status").evaluate(collection, env)
+    assert result[0].accessor.parent.get() is collection[0].value
+    assert result[0].accessor.element == "status"
+    assert result[0].canonical_path.endswith("status")
 
 
 def test_element__evaluate_broadcasts_over_every_item_in_collection():
     collection = _collection_with_value(status="active") + _collection_with_value(
         status="cancelled"
     )
-    result = Element("status").evaluate(collection, env, create=False)
+    result = Element("status").evaluate(FHIRPathCollection(collection), env)
     assert [item.value for item in result] == ["active", "cancelled"]
 
 
@@ -393,33 +396,47 @@ def test_element__evaluate_skips_items_whose_value_is_none():
     collection = [FHIRPathCollectionItem(None)] + _collection_with_value(
         status="active"
     )
-    result = Element("status").evaluate(collection, env, create=False)
+    result = Element("status").evaluate(FHIRPathCollection(collection), env)
     assert len(result) == 1
     assert result[0].value == "active"
 
 
-def test_element__evaluate_create_true_materializes_missing_dict_key():
-    # Dicts are open containers, so an absent key becomes writable on create=True.
+def test_element__evaluate_missing_dict_key_yields_writable_target():
     resource = {}
-    result = Element("newField").evaluate(
-        [FHIRPathCollectionItem(resource)], env, create=True
-    )
-    assert len(result) == 1
-    assert result[0].value is None
-    assert resource["newField"] is None
+    result = Element("newField").evaluate(FHIRPathCollection([FHIRPathCollectionItem(resource)]), env)
+    assert len(result) == 0
+    assert resource == {}
+    result.set("x")
+    assert resource["newField"] == "x"
 
 
-def test_element__evaluate_create_true_constructs_missing_model_field():
+def test_element__evaluate_missing_model_field_yields_writable_target():
     patient = MockPatient()
-    result = Element("name").evaluate(
-        [FHIRPathCollectionItem(patient)], env, create=True
-    )
-    assert len(result) == 1
-    assert isinstance(result[0].value, MockName)
-    assert patient.name == [result[0].value]
+    result = Element("name").evaluate(FHIRPathCollection([FHIRPathCollectionItem(patient)]), env)
+    assert len(result) == 0
+    assert patient.name in (None, [])
+    name = MockName(family="Doe")
+    result.add(name)
+    assert patient.name == [name]
 
 
-def test_element__evaluate_create_false_does_not_mutate_container():
+def test_element__evaluate_chains_through_missing_parents():
+    patient = MockPatient()
+    collection = Element("name").evaluate(FHIRPathCollection([FHIRPathCollectionItem(patient)]), env)
+    result = Element("family").evaluate(collection, env)
+    assert len(result) == 0
+    assert not patient.name
+    result.set("Doe")
+    assert patient.name and patient.name[0].family == "Doe"
+
+
+def test_element__evaluate_literal_has_no_writable_target():
+    result = Element("x").evaluate(FHIRPathCollection([FHIRPathCollectionItem("abc")]), env)
+    assert result == []
+    assert result.targets == ()
+
+
+def test_element__evaluate_does_not_mutate_container():
     resource = {}
-    Element("newField").evaluate([FHIRPathCollectionItem(resource)], env, create=False)
+    Element("newField").evaluate(FHIRPathCollection([FHIRPathCollectionItem(resource)]), env)
     assert resource == {}

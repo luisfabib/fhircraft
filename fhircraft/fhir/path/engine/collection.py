@@ -56,7 +56,7 @@ class Union(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Merge the two collections into a single collection, eliminating any duplicate values to
@@ -65,16 +65,15 @@ class Union(FHIRCollectionOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create=create
+            self.left, self.right, collection, environment
         )
         return UnionFunction(left_collection).evaluate(
-            right_collection, environment, create
+            right_collection, environment
         )
 
     def __str__(self):
@@ -91,7 +90,7 @@ class In(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item, this operator returns true if the item is in the
@@ -101,7 +100,6 @@ class In(FHIRCollectionOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -110,7 +108,7 @@ class In(FHIRCollectionOperator):
             FHIRPathRuntimeError: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(left_collection) == 0:
             return []
@@ -141,7 +139,7 @@ class Contains(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the right operand is a collection with a single item, this operator returns true if the item is in the
@@ -151,7 +149,6 @@ class Contains(FHIRCollectionOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -160,7 +157,7 @@ class Contains(FHIRCollectionOperator):
             FHIRPathException: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(right_collection) == 0:
             return []

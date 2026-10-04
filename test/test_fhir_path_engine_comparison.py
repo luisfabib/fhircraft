@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 import pytest
 from collections import namedtuple
 
@@ -73,7 +74,7 @@ def test_greater_than_returns_correct_boolean(left, right, expected):
     result = GreaterThan(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
+    ).evaluate(FHIRPathCollection(collection), env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 
@@ -139,7 +140,7 @@ def test_less_than_returns_correct_boolean(left, right, expected):
     result = LessThan(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
+    ).evaluate(FHIRPathCollection(collection), env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 
@@ -232,7 +233,7 @@ def test_less_equal_than_returns_correct_boolean(left, right, expected):
     result = LessEqualThan(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
+    ).evaluate(FHIRPathCollection(collection), env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 
@@ -323,7 +324,7 @@ def test_greater_equal_than_returns_correct_boolean(left, right, expected):
     result = GreaterEqualThan(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
+    ).evaluate(FHIRPathCollection(collection), env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 

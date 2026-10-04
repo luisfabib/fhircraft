@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from collections import namedtuple
 
 import pytest
@@ -55,9 +56,9 @@ equals_boolean_logic_cases = (
 @pytest.mark.parametrize("left, right, expected", equals_boolean_logic_cases)
 def test_equals_returns_correct_boolean(left, right, expected):
     result = Equals(
-        [FHIRPathCollectionItem(value=left)] if left is not None else [],
-        [FHIRPathCollectionItem(value=right)] if right is not None else [],
-    ).evaluate([], env)
+        FHIRPathCollection([FHIRPathCollectionItem(value=left)] if left is not None else []),
+        FHIRPathCollection([FHIRPathCollectionItem(value=right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     if isinstance(expected, bool):
         expected = [FHIRPathCollectionItem(value=expected)]
     assert result == expected
@@ -71,9 +72,9 @@ def test_equals_string_representation():
 @pytest.mark.parametrize("left, right, expected", equals_boolean_logic_cases)
 def test_notequals_returns_correct_boolean(left, right, expected):
     result = NotEquals(
-        [FHIRPathCollectionItem(value=left)] if left is not None else [],
-        [FHIRPathCollectionItem(value=right)] if right is not None else [],
-    ).evaluate([], env)
+        FHIRPathCollection([FHIRPathCollectionItem(value=left)] if left is not None else []),
+        FHIRPathCollection([FHIRPathCollectionItem(value=right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     if isinstance(expected, bool):
         expected = [FHIRPathCollectionItem(value=not expected)]
 
@@ -135,9 +136,9 @@ equivalent_boolean_logic_cases = (
 @pytest.mark.parametrize("left, right, expected", equivalent_boolean_logic_cases)
 def test_equivalent_returns_correct_boolean(left, right, expected):
     result = Equivalent(
-        [FHIRPathCollectionItem(value=left)] if left is not None else [],
-        [FHIRPathCollectionItem(value=right)] if right is not None else [],
-    ).evaluate([], env)
+        FHIRPathCollection([FHIRPathCollectionItem(value=left)] if left is not None else []),
+        FHIRPathCollection([FHIRPathCollectionItem(value=right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 
@@ -149,9 +150,9 @@ def test_equivalent_string_representation():
 @pytest.mark.parametrize("left, right, expected", equivalent_boolean_logic_cases)
 def test_notequivalent_returns_correct_boolean(left, right, expected):
     result = NotEquivalent(
-        [FHIRPathCollectionItem(value=left)] if left is not None else [],
-        [FHIRPathCollectionItem(value=right)] if right is not None else [],
-    ).evaluate([], env)
+        FHIRPathCollection([FHIRPathCollectionItem(value=left)] if left is not None else []),
+        FHIRPathCollection([FHIRPathCollectionItem(value=right)] if right is not None else []),
+    ).evaluate(FHIRPathCollection([]), env)
     assert result != [FHIRPathCollectionItem(value=expected)]
 
 

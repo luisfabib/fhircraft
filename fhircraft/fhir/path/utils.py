@@ -93,7 +93,6 @@ def _evaluate_fhirpath_collection(
     fhir_path: Union["FHIRPathNode", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
-    create: bool = False,
 ) -> "FHIRPathCollection":
     """
     Evaluates a FHIRPath expression or collection against a given collection and environment, optionally creating new elements.
@@ -102,13 +101,12 @@ def _evaluate_fhirpath_collection(
         fhir_path (FHIRPathNode | FHIRPathCollection): The FHIRPath expression or collection to evaluate.
         collection (FHIRPathCollection): The collection to evaluate the expression against.
         environment (dict): The evaluation environment containing variable bindings.
-        create (bool): Whether to create new elements during evaluation if necessary.
 
     Returns:
         FHIRPathCollection: The resulting collection after evaluation.
     """
     return (
-        [item for item in fhir_path.evaluate(collection, environment, create)]
+        [item for item in fhir_path.evaluate(collection, environment)]
         if isinstance(fhir_path, FHIRPathNode)
         else [FHIRPathCollectionItem.wrap(item) for item in ensure_list(fhir_path)]
     )
@@ -119,7 +117,6 @@ def _evaluate_left_right_expressions(
     right: Union["FHIRPathNode", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
-    create: "bool",
 ) -> tuple["FHIRPathCollection", "FHIRPathCollection"]:
     """
     Evaluates the given left and right FHIRPath expressions or collections against the provided collection,
@@ -129,16 +126,15 @@ def _evaluate_left_right_expressions(
         left (FHIRPathNode | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection of values.
         right (FHIRPathNode | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection of values.
         collection (FHIRPathCollection): The collection to evaluate the expressions against.
-        create (bool): Whether to create new elements during evaluation if necessary.
 
     Returns:
         tuple[FHIRPathCollection, FHIRPathCollection]: A tuple containing the evaluated left and right collections of values.
     """
     left_collection = _evaluate_fhirpath_collection(
-        left, collection, environment, create
+        left, collection, environment
     )
     right_collection = _evaluate_fhirpath_collection(
-        right, collection, environment, create
+        right, collection, environment
     )
     return left_collection, right_collection
 
@@ -149,7 +145,6 @@ def _evaluate_and_prepare_collection_values(
     right: Union["FHIRPathNode", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
-    create=False,
     prevent_all_empty: bool = True,
 ) -> tuple[Any | None, Any | None]:
     """
@@ -161,7 +156,6 @@ def _evaluate_and_prepare_collection_values(
         right (FHIRPathNode | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection of values.
         collection (FHIRPathCollection): The collection to evaluate the expressions against.
         environment (dict): The evaluation environment containing variable bindings.
-        create (bool): Whether to create new elements during evaluation if necessary.
         prevent_all_empty (bool): If True, returns None for both values if either collection is empty; otherwise treats empty collections as [None].
 
     Returns:
@@ -181,7 +175,7 @@ def _evaluate_and_prepare_collection_values(
         ]
 
     left_collection, right_collection = _evaluate_left_right_expressions(
-        left, right, collection, environment, create
+        left, right, collection, environment
     )
     left_collection = _get_collection_values(left_collection)
     right_collection = _get_collection_values(right_collection)

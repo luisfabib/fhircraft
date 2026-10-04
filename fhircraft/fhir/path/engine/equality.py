@@ -38,7 +38,7 @@ class Equals(FHIRPathNode):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment, create: bool = False
+        self, collection: FHIRPathCollection, environment
     ) -> FHIRPathCollection:
         """
         Returns true if the left collection is equal to the right collection:
@@ -62,13 +62,12 @@ class Equals(FHIRPathNode):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(left_collection) == 0 or len(right_collection) == 0:
             return []
@@ -121,7 +120,7 @@ class Equivalent(FHIRPathNode):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true if the collections are the same. In particular, comparing empty collections for equivalence { } ~ { } will result in true.
@@ -141,14 +140,13 @@ class Equivalent(FHIRPathNode):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
 
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(left_collection) == 0 and len(right_collection) == 0:
             equivalent = True
@@ -285,7 +283,7 @@ class NotEquals(FHIRPathNode):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The converse of the equals operator, returning true if equal returns false; false if equal
@@ -295,13 +293,12 @@ class NotEquals(FHIRPathNode):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         if equals_collection := Equals(self.left, self.right).evaluate(
-            collection, environment, create
+            collection, environment
         ):
             equality = equals_collection[0].value
             return [FHIRPathCollectionItem.wrap(not equality)]
@@ -343,7 +340,7 @@ class NotEquivalent(FHIRPathNode):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The converse of the equivalent operator, returning true if equivalent returns
@@ -359,7 +356,7 @@ class NotEquivalent(FHIRPathNode):
         return [
             FHIRPathCollectionItem.wrap(
                 not Equivalent(self.left, self.right)
-                .evaluate(collection, environment, create)[0]
+                .evaluate(collection, environment)[0]
                 .value
             )
         ]

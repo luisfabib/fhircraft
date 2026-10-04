@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from collections import namedtuple
 
 from fhircraft.fhir.path.engine.additional import GetValue
@@ -17,7 +18,7 @@ def test_union_returns_combined_collection_without_duplicates():
     result = Union(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection, env)
+    ).evaluate(FHIRPathCollection(collection), env)
     assert set(result) == {
         FHIRPathCollectionItem(value="A"),
         FHIRPathCollectionItem(value="B"),
@@ -39,7 +40,7 @@ def test_in_returns_empty_if_left_empty():
         left="A", right=["A", "B", "C"]
     )
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = In([], Element("right")).evaluate(collection, env)
+    result = In(FHIRPathCollection([]), Element("right")).evaluate(FHIRPathCollection(collection), env)
     result = result[0].value if len(result) == 1 else result
     assert result == []
 
@@ -49,7 +50,7 @@ def test_in_returns_false_if_right_empty():
         left="A", right=["A", "B", "C"]
     )
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = In([FHIRPathCollectionItem(value="B")], []).evaluate(collection, env)
+    result = In(FHIRPathCollection([FHIRPathCollectionItem(value="B")]), FHIRPathCollection([])).evaluate(FHIRPathCollection(collection), env)
     result = result[0].value if len(result) == 1 else result
     assert result == False
 
@@ -59,8 +60,8 @@ def test_in_checks_membership_correctly():
         left="A", right=["A", "B", "C"]
     )
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = In([FHIRPathCollectionItem(value="B")], Element("right")).evaluate(
-        collection, env
+    result = In(FHIRPathCollection([FHIRPathCollectionItem(value="B")]), Element("right")).evaluate(
+        FHIRPathCollection(collection), env
     )
     result = result[0].value if len(result) == 1 else result
     assert result == True
@@ -81,7 +82,7 @@ def test_contains_returns_empty_if_right_empty():
         left="A", right=["A", "B", "C"]
     )
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Contains(Element("right"), []).evaluate(collection, env)
+    result = Contains(Element("right"), FHIRPathCollection([])).evaluate(FHIRPathCollection(collection), env)
     result = result[0].value if len(result) == 1 else result
     assert result == []
 
@@ -91,7 +92,7 @@ def test_contains_returns_false_if_left_empty():
         left="A", right=["A", "B", "C"]
     )
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Contains([], [FHIRPathCollectionItem(value="B")]).evaluate(collection, env)
+    result = Contains(FHIRPathCollection([]), FHIRPathCollection([FHIRPathCollectionItem(value="B")])).evaluate(FHIRPathCollection(collection), env)
     result = result[0].value if len(result) == 1 else result
     assert result == False
 
@@ -101,8 +102,8 @@ def test_contains_checks_containership_correctly():
         left="A", right=["A", "B", "C"]
     )
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Contains(Element("right"), [FHIRPathCollectionItem(value="B")]).evaluate(
-        collection, env
+    result = Contains(Element("right"), FHIRPathCollection([FHIRPathCollectionItem(value="B")])).evaluate(
+        FHIRPathCollection(collection), env
     )
     result = result[0].value if len(result) == 1 else result
     assert result == True

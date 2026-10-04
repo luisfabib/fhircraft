@@ -12,7 +12,8 @@ from fhircraft.exceptions import (
 from fhircraft import SUPPORTED_FHIR_RELEASES
 from fhircraft.exceptions import FHIRPathRuntimeError
 from fhircraft.utils import ensure_list
-from fhircraft.fhir.path.collection import FHIRPathCollectionItem
+from fhircraft.fhir.path.accessors import RootAccessor
+from fhircraft.fhir.path.collection import FHIRPathCollection, FHIRPathCollectionItem
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRPrimitiveModel
@@ -20,7 +21,6 @@ if TYPE_CHECKING:
 # Get logger name
 logger = logging.getLogger(__name__)
 
-FHIRPathCollection = List["FHIRPathCollectionItem"]
 
 __all__ = [
     "FHIRPathNode",
@@ -34,6 +34,14 @@ __all__ = [
     "RootElement",
     "TypeSpecifier",
 ]
+
+
+def _targets_of(collection: Any) -> tuple:
+    """Writable targets of any collection-like (plain lists derive them from their items)."""
+    targets = getattr(collection, "targets", None)
+    if targets is not None:
+        return targets
+    return tuple(i.accessor for i in collection if i.accessor is not None)
 
 
 class FHIRPathNode(ABC):
@@ -86,7 +94,7 @@ class FHIRPathNode(ABC):
 
             # Evaluate and trace results
             result_collection = self.evaluate(
-                wrapped_data, environment=environment or dict(), create=False
+                wrapped_data, environment=environment or dict()
             )
             trace_step(f"Evaluation completed: {len(result_collection)} results")
 
@@ -98,9 +106,9 @@ class FHIRPathNode(ABC):
                     )
                     if item.canonical_path:
                         trace_step(f"    Canonical Path: {item.canonical_path}", 2)
-                    if item.parent:
+                    if item.accessor is not None and item.accessor.parent is not None:
                         trace_step(
-                            f"    Parent Canonical Path: {item.parent.canonical_path}",
+                            f"    Parent Canonical Path: {item.accessor.parent.canonical_path}",
                             2,
                         )
 
@@ -157,7 +165,7 @@ class FHIRPathNode(ABC):
             debug_data["trace"] = self.trace(data, verbose=True)
 
             # Perform evaluation
-            result_collection = self.__evaluate_wrapped(data, create=False)
+            result_collection = self.__evaluate_wrapped(data)
 
             # Analyze results
             debug_data["result_count"] = len(result_collection)
@@ -174,10 +182,11 @@ class FHIRPathNode(ABC):
                     "canonical_path": (
                         str(item.canonical_path) if item.canonical_path else None
                     ),
-                    "has_parent": item.parent is not None,
-                    "is_writable": item.is_writable is not None,
-                    "element": item.element,
-                    "index": item.index,
+                    "has_parent": item.accessor is not None
+                    and item.accessor.parent is not None,
+                    "is_writable": item.accessor is not None,
+                    "element": item.accessor.element if item.accessor else None,
+                    "index": item.accessor.index if item.accessor else None,
                 }
                 debug_data["collection_items"].append(item_info)
 
@@ -207,7 +216,6 @@ class FHIRPathNode(ABC):
         self,
         collection: FHIRPathCollection,
         environment: dict,
-        create: bool,
     ) -> FHIRPathCollection:
         """
         Evaluates the current object against the provided FHIRPathCollection.
@@ -215,7 +223,6 @@ class FHIRPathNode(ABC):
         Args:
             collection (FHIRPathCollection): The collection of FHIRPath elements to evaluate.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The result of the evaluation as a FHIRPathCollection.
@@ -288,7 +295,7 @@ class FHIRPathNode(ABC):
         super().__init_subclass__(**kwargs)
 
     def _evaluate_wrapped(
-        self, data: Any, environment: dict | None = None, create=False
+        self, data: Any, environment: dict | None = None
     ) -> FHIRPathCollection:
         # Determine %resource and %rootResource from parent tracking if available
         resource = data
@@ -317,8 +324,11 @@ class FHIRPathNode(ABC):
             "%fhirRelease": FHIRPathCollectionItem.wrap(fhir_release),
         } | (environment or dict())
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
-        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
-        return self.evaluate(collection, environment or dict(), create)
+        collection = FHIRPathCollection(
+            FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)
+        )
+        result = self.evaluate(collection, environment or dict())
+        return result if isinstance(result, FHIRPathCollection) else FHIRPathCollection(result)
 
     def _invoke(self, invocation: "FHIRPathNode") -> "FHIRPathNode":
         """
@@ -376,7 +386,6 @@ class Literal(FHIRPathNode):
         self,
         collection: FHIRPathCollection,
         environment: dict,
-        create: bool = False,
     ) -> FHIRPathCollection:
         """
         Simply returns the input collection.
@@ -384,7 +393,6 @@ class Literal(FHIRPathNode):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
@@ -436,40 +444,39 @@ class Element(FHIRPathNode):
             )
         self.name = name
 
-    def _children_of(
-        self, item: FHIRPathCollectionItem, label: str, create: bool
-    ) -> FHIRPathCollection:
-        """Resolve `label` under a single parent item into its child items."""
-        if item.value is None:
-            return []
-        accessor = item.child(None, label).accessor
-        if accessor is None:
-            return []
-        value = accessor.get()
-        if not value and not isinstance(value, bool) and create:
-            accessor.set(accessor.construct())
-            value = accessor.get()
-        return [
-            item.child(child_value, label, index=index)
-            for index, child_value in enumerate(ensure_list(value))
-            if create or child_value is not None
-        ]
-
-    def _get_collection_by_label(
-        self, collection: FHIRPathCollection, label: str, create: bool
-    ) -> FHIRPathCollection:
-        element_collection = []
-        for item in collection:
-            element_collection.extend(self._children_of(item, label, create))
-        return element_collection
-
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
-        element_collection: FHIRPathCollection = []
-        for item in collection:
-            element_collection.extend(self._children_of(item, self.name, create))
-        return element_collection
+        """Navigate to the child element named `self.name` of every input item.
+
+        The accessors of the addressed element are retained in the result's
+        `targets` even when the element is absent, so the location stays
+        writable.
+        """
+        parents = [
+            item.accessor or RootAccessor(item.value)
+            for item in collection
+            if item.value is not None
+        ]
+        if not parents:
+            parents = [t for t in _targets_of(collection)]
+        items: list[FHIRPathCollectionItem] = []
+        targets: list = []
+        for parent in parents:
+            accessor = parent.child(self.name)
+            if accessor is None:
+                continue
+            targets.append(accessor)
+            value = accessor.get()
+            if isinstance(value, list):
+                items.extend(
+                    FHIRPathCollectionItem(child, accessor.at(index))
+                    for index, child in enumerate(value)
+                    if child is not None
+                )
+            elif value is not None:
+                items.append(FHIRPathCollectionItem(value, accessor))
+        return FHIRPathCollection(items, targets=targets)
 
     def __str__(self):
         return self.name
@@ -499,7 +506,7 @@ class Invocation(FHIRPathNode):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Performs the evaluation of the Invocation by applying the left-hand side FHIRPath segment on the given collection to obtain a parent collection.
@@ -508,13 +515,12 @@ class Invocation(FHIRPathNode):
         Args:
             collection (FHIRPathCollection): The collection on which the evaluation is performed.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The resulting child collection after the evaluation process.
         """
-        parent_collection = self.left.evaluate(collection, environment, create)
-        return self.right.evaluate(parent_collection, environment, create)
+        parent_collection = self.left.evaluate(collection, environment)
+        return self.right.evaluate(parent_collection, environment)
 
     def __eq__(self, other):
         return (
@@ -543,7 +549,7 @@ class This(FHIRPathNode):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Simply returns the input collection.
@@ -551,7 +557,6 @@ class This(FHIRPathNode):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -584,7 +589,7 @@ class RootElement(FHIRPathNode):
         self.type = type
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluate the input collection to assert that the entries are valid FHIR resources of the given type.
@@ -592,7 +597,6 @@ class RootElement(FHIRPathNode):
         Args:
             collection (Collection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (Collection): The same collection after validation.
@@ -647,7 +651,7 @@ class TypeSpecifier(FHIRPathNode):
         self.namespace: str | None = namespace
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluate the input collection to assert that the entries are valid FHIR resources of the given type.
@@ -657,7 +661,6 @@ class TypeSpecifier(FHIRPathNode):
         Args:
             collection (Collection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (Collection): The same collection after validation.

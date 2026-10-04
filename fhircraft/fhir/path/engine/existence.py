@@ -34,7 +34,7 @@ class Empty(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if the input collection is empty (`{}`) and `False` otherwise.
@@ -42,7 +42,6 @@ class Empty(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -62,7 +61,7 @@ class Exists(FHIRPathFunction):
         self.criteria = criteria
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if the collection has any elements, and `False` otherwise.
@@ -75,13 +74,12 @@ class Exists(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         if self.criteria:
-            collection = Where(self.criteria).evaluate(collection, environment, create)
+            collection = Where(self.criteria).evaluate(collection, environment)
         return [FHIRPathCollectionItem.wrap(len(collection) > 0)]
 
     def __str__(self):
@@ -107,7 +105,7 @@ class All(FHIRPathFunction):
         self.criteria = criteria
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if for every element in the input collection, criteria evaluates to `True`.
@@ -116,7 +114,6 @@ class All(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -177,7 +174,7 @@ class AllTrue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `True`. If any
@@ -186,7 +183,6 @@ class AllTrue(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -200,7 +196,7 @@ class AnyTrue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `True`.
@@ -209,7 +205,6 @@ class AnyTrue(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -223,7 +218,7 @@ class AllFalse(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `False`.
@@ -232,7 +227,6 @@ class AllFalse(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -246,7 +240,7 @@ class AnyFalse(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `False`. If all
@@ -255,7 +249,6 @@ class AnyFalse(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -275,7 +268,7 @@ class SubsetOf(FHIRPathFunction):
         self.other = other
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if all items in the input collection are members of the collection passed as the
@@ -284,7 +277,6 @@ class SubsetOf(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -297,7 +289,7 @@ class SubsetOf(FHIRPathFunction):
         if len(collection) == 0:
             return [FHIRPathCollectionItem.wrap(True)]
         other_collection = (
-            self.other.evaluate(collection, environment, create)
+            self.other.evaluate(collection, environment)
             if isinstance(self.other, FHIRPathNode)
             else self.other
         )
@@ -325,7 +317,7 @@ class SupersetOf(FHIRPathFunction):
         self.other = other
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true if all items in the collection passed as the other argument are
@@ -334,7 +326,6 @@ class SupersetOf(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -347,7 +338,7 @@ class SupersetOf(FHIRPathFunction):
         if len(collection) == 0:
             return [FHIRPathCollectionItem.wrap(True)]
         other_collection = (
-            self.other.evaluate(collection, environment, create)
+            self.other.evaluate(collection, environment)
             if isinstance(self.other, FHIRPathNode)
             else self.other
         )
@@ -369,7 +360,7 @@ class Count(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
@@ -378,7 +369,6 @@ class Count(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -392,7 +382,7 @@ class Distinct(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the unique items in the input collection. If the input collection is empty (`[]`), the result is empty.
@@ -401,7 +391,6 @@ class Distinct(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -415,7 +404,7 @@ class IsDistinct(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if all the items in the input collection are distinct.
@@ -424,7 +413,6 @@ class IsDistinct(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection

@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 import pytest
 
 from fhircraft.fhir.path.engine.environment import *
@@ -34,7 +35,7 @@ class MockObservation(FHIRBaseModel):
 def test_env_variable_returns_value():
     value = 42
     collection = [FHIRPathCollectionItem(value="another-value")]
-    result = EnvironmentVariable("%variable").evaluate(collection, {"%variable": value})
+    result = EnvironmentVariable("%variable").evaluate(FHIRPathCollection(collection), {"%variable": value})
     result = result[0].value if len(result) == 1 else result
     assert result == value
 
@@ -42,7 +43,7 @@ def test_env_variable_returns_value():
 def test_env_variable_raises_error_out_of_context():
     collection = [FHIRPathCollectionItem(value="another-value")]
     with pytest.raises(FHIRPathException):
-        EnvironmentVariable("%variable").evaluate(collection, dict())
+        EnvironmentVariable("%variable").evaluate(FHIRPathCollection(collection), dict())
 
 
 def test_env_variable_string_representation():
@@ -101,14 +102,14 @@ def test_default_ucum_variable_is_set():
 def test_contextual_this_returns_value():
     value = 42
     collection = [FHIRPathCollectionItem(value="another-value")]
-    result = ContextualThis().evaluate(collection, {"$this": value})
+    result = ContextualThis().evaluate(FHIRPathCollection(collection), {"$this": value})
     result = result[0].value if len(result) == 1 else result
     assert result == value
 
 
 def test_contextual_this_fallback_value():
     collection = [FHIRPathCollectionItem(value="another-value")]
-    result = ContextualThis().evaluate(collection, dict())
+    result = ContextualThis().evaluate(FHIRPathCollection(collection), dict())
     assert result == collection
 
 
@@ -124,7 +125,7 @@ def test_contextual_this_string_representation():
 def test_contextual_index_returns_value():
     value = 1
     collection = [FHIRPathCollectionItem(value="another-value")]
-    result = ContextualIndex().evaluate(collection, {"$index": value})
+    result = ContextualIndex().evaluate(FHIRPathCollection(collection), {"$index": value})
     result = result[0].value if len(result) == 1 else result
     assert result == value
 
@@ -132,7 +133,7 @@ def test_contextual_index_returns_value():
 def test_contextual_index_raises_error_out_of_context():
     collection = [FHIRPathCollectionItem(value="another-value")]
     with pytest.raises(FHIRPathException):
-        ContextualIndex().evaluate(collection, dict())
+        ContextualIndex().evaluate(FHIRPathCollection(collection), dict())
 
 
 def test_contextual_index_string_representation():
@@ -147,7 +148,7 @@ def test_contextual_index_string_representation():
 def test_contextual_total_returns_value():
     value = 1
     collection = [FHIRPathCollectionItem(value="another-value")]
-    result = ContextualTotal().evaluate(collection, {"$total": value})
+    result = ContextualTotal().evaluate(FHIRPathCollection(collection), {"$total": value})
     result = result[0].value if len(result) == 1 else result
     assert result == value
 
@@ -155,7 +156,7 @@ def test_contextual_total_returns_value():
 def test_contextual_total_raises_error_out_of_context():
     collection = [FHIRPathCollectionItem(value="another-value")]
     with pytest.raises(FHIRPathException):
-        ContextualTotal().evaluate(collection, dict())
+        ContextualTotal().evaluate(FHIRPathCollection(collection), dict())
 
 
 def test_contextual_total_string_representation():

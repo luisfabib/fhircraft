@@ -41,7 +41,7 @@ class Aggregate(FHIRPathFunction):
             self.init = FHIRPathCollectionItem.wrap(init[0]).value
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection.
@@ -53,7 +53,6 @@ class Aggregate(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -64,7 +63,7 @@ class Aggregate(FHIRPathFunction):
             context = _get_expression_context(context, item, index)
             context["$total"] = context.get("$total", self.init if self.init else [])
             # Evaluate the expression
-            result = self.expression.evaluate([item], context, create=create)
+            result = self.expression.evaluate([item], context)
             # Update the total variable for the next iteration
             context["$total"] = result[0].value
         result = context.get("$total")

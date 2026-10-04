@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from collections import namedtuple
 
 import pytest
@@ -123,13 +124,13 @@ def test_is_returns_correct_boolean(left, type_specifier, expected):
     resource = namedtuple("Resource", ["left"])(left=left)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Is(Element("left"), TypeSpecifier(type_specifier)).evaluate(
-        collection, env
+        FHIRPathCollection(collection), env
     )
     assert result[0].value == expected
 
 
 def test_is_returns_empty_for_empty_collection():
-    result = Is(Element("left"), TypeSpecifier("string")).evaluate([], env)
+    result = Is(Element("left"), TypeSpecifier("string")).evaluate(FHIRPathCollection([]), env)
     assert result == []
 
 
@@ -142,12 +143,12 @@ def test_is_string_representation():
 @pytest.mark.parametrize("left, type_specifier, expected", test_cases)
 def test_legacy_is_returns_correct_boolean(left, type_specifier, expected):
     collection = [FHIRPathCollectionItem(value=left)]
-    result = LegacyIs(TypeSpecifier(type_specifier)).evaluate(collection, env)
+    result = LegacyIs(TypeSpecifier(type_specifier)).evaluate(FHIRPathCollection(collection), env)
     assert result[0].value == expected
 
 
 def test_legacy_is_returns_empty_for_empty_collection():
-    result = LegacyIs(TypeSpecifier("string")).evaluate([], env)
+    result = LegacyIs(TypeSpecifier("string")).evaluate(FHIRPathCollection([]), env)
     assert result == []
 
 
@@ -165,12 +166,12 @@ def test_legacy_is_string_representation():
 @pytest.mark.parametrize("expected, type_specifier, equal", test_cases)
 def test_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
-    result = As(This(), TypeSpecifier(type_specifier)).evaluate(collection, env)
+    result = As(This(), TypeSpecifier(type_specifier)).evaluate(FHIRPathCollection(collection), env)
     assert result[0].value == expected if equal else result == []
 
 
 def test_as_returns_empty_for_empty_collection():
-    result = As(This(), TypeSpecifier("string")).evaluate([], env)
+    result = As(This(), TypeSpecifier("string")).evaluate(FHIRPathCollection([]), env)
     assert result == []
 
 
@@ -183,12 +184,12 @@ def test_as_string_representation():
 @pytest.mark.parametrize("expected, type_specifier, equal", test_cases)
 def test_legacy_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
-    result = LegacyAs(TypeSpecifier(type_specifier)).evaluate(collection, env)
+    result = LegacyAs(TypeSpecifier(type_specifier)).evaluate(FHIRPathCollection(collection), env)
     assert result[0].value == expected if equal else result == []
 
 
 def test_legacy_as_returns_empty_for_empty_collection():
-    result = LegacyAs(TypeSpecifier("string")).evaluate([], env)
+    result = LegacyAs(TypeSpecifier("string")).evaluate(FHIRPathCollection([]), env)
     assert result == []
 
 
