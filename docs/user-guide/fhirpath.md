@@ -40,7 +40,7 @@ for name in patient.name:
         break
 
 # With FHIRPath, express your intent directly:
-official_family_name = patient.evaluate("Patient.name.where(use='official').family")[0] # (1)!
+official_family_name = patient.query("Patient.name.where(use='official').family")[0] # (1)!
 ```
 
 1. This expresses the same logic as the loop above but more clearly and concisely.
@@ -69,9 +69,9 @@ patient = fhir.Patient(
 ) # (1)!
 
 # Query directly on the resource using built-in methods
-family_names = patient.evaluate("Patient.name.family") # (2)!
-gender = patient.evaluate("Patient.gender") # (3)!
-has_phone = patient.evaluate("Patient.telecom.where(system='phone').exists()") # (4)!
+family_names = patient.query("Patient.name.family") # (2)!
+gender = patient.query("Patient.gender") # (3)!
+has_phone = patient.query("Patient.telecom.where(system='phone').exists()") # (4)!
 
 assert family_names == ["Johnson"]
 assert gender == ["female"]
@@ -122,7 +122,7 @@ Healthcare data often contains fields with variable cardinality - some fields ma
 
 | Method | Purpose | Returns |
 |--------|---------|---------|
-| `model.evaluate(expression, environment=None)` | Get all values matching an expression | `List[Any]` |
+| `model.query(expression, environment=None)` | Get all values matching an expression | `List[Any]` |
 
 Cardinality checks are expressed in FHIRPath itself, so they compose with the rest of the expression:
 
@@ -141,18 +141,18 @@ Cardinality checks are expressed in FHIRPath itself, so they compose with the re
         ]
     ) # (1)!
 
-    all_phones = patient.evaluate("Patient.telecom.where(system='phone').value") # (2)!
+    all_phones = patient.query("Patient.telecom.where(system='phone').value") # (2)!
     assert all_phones == ["555-0123", "555-0456"]
 
-    assert patient.evaluate("Patient.gender") == [] # (3)!
+    assert patient.query("Patient.gender") == [] # (3)!
 
-    first_name = patient.evaluate("Patient.name.given.first()") # (4)!
-    last_phone = patient.evaluate("Patient.telecom.where(system='phone').value.last()") # (5)!
+    first_name = patient.query("Patient.name.given.first()") # (4)!
+    last_phone = patient.query("Patient.telecom.where(system='phone').value.last()") # (5)!
     assert first_name == ["John"]
     assert last_phone == ["555-0456"]
 
-    assert patient.evaluate("Patient.birthDate.exists()") == [False] # (6)!
-    assert patient.evaluate("Patient.telecom.where(system='phone').count()") == [2] # (7)!
+    assert patient.query("Patient.birthDate.exists()") == [False] # (6)!
+    assert patient.query("Patient.telecom.where(system='phone').count()") == [2] # (7)!
     ```
 
     1. This creates a patient with multiple names and contact methods.
@@ -192,10 +192,10 @@ Each operation is atomic: if it fails, the model is left unchanged.
     patient.patch.move("Patient.name", 0, 1) # (4)!
     patient.patch.delete("Patient.telecom.where(system='fax')") # (5)!
 
-    assert patient.evaluate("Patient.name.family") == ["Doe", "Smith"]
-    assert patient.evaluate("Patient.address.line") == ["1 Main St"]
-    assert patient.evaluate("Patient.gender") == ["female"]
-    assert patient.evaluate("Patient.telecom") == []
+    assert patient.query("Patient.name.family") == ["Doe", "Smith"]
+    assert patient.query("Patient.address.line") == ["1 Main St"]
+    assert patient.query("Patient.gender") == ["female"]
+    assert patient.query("Patient.telecom") == []
     ```
 
     1. This appends a new name; the dictionary is converted into a `HumanName`.
@@ -230,19 +230,19 @@ patient = fhir.Patient(
 )
 name = patient.name[0]
 
-print(type(name.evaluate("%context")[0])) # (1)!
+print(type(name.query("%context")[0])) # (1)!
 #> <class 'fhircraft.fhir.resources.datatypes.R5.complex.human_name.HumanName'>
 
-print(type(patient.evaluate("%resource")[0])) # (2)!  
+print(type(patient.query("%resource")[0])) # (2)!  
 #> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
-print(type(patient.evaluate("%rootResource")[0])) # (3)!
+print(type(patient.query("%rootResource")[0])) # (3)!
 #> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
-print(patient.evaluate("%ucum")[0]) # (4)!
+print(patient.query("%ucum")[0]) # (4)!
 #> http://unitsofmeasure.org
 
-print(patient.evaluate("%fhirRelease")[0]) # (5)!
+print(patient.query("%fhirRelease")[0]) # (5)!
 #> R5
 ```
 
@@ -258,7 +258,7 @@ You can define custom environment variables to pass additional context into your
 
 For example, if working with a US-specific profile that requires a `%usZip` variable 
 ```python
-expr = patient.evaluate(
+expr = patient.query(
     expression="Patient.address.where(postalCode.matches(%usZip))", # (1)!
     environment={
         "%usZip": "[0-9]{5}(-[0-9]{4}){0,1}"  # (2)!
@@ -299,15 +299,15 @@ FHIRPath provides contextual variables that give you access to the current evalu
     ) # (1)!
 
     # Filter names using $this to reference the current name object
-    official_names = patient.evaluate("Patient.name.where($this.use = 'official')") # (2)!
+    official_names = patient.query("Patient.name.where($this.use = 'official')") # (2)!
 
     # Use $this for complex conditions
-    short_nicknames = patient.evaluate("Patient.name.where($this.use = 'nickname' and $this.given.length() <= 2)") # (3)!
+    short_nicknames = patient.query("Patient.name.where($this.use = 'nickname' and $this.given.length() <= 2)") # (3)!
     ```
 
     1. This creates a patient with multiple name entries using different use codes.
     2. This filters names where the current name object has use='official'.
-    3. This combines multiple conditions using $this to reference the current name being evaluated.
+    3. This combines multiple conditions using $this to reference the current name being queried.
 
 !!! example "Using `$index` for Position-Based Logic"
 
@@ -323,10 +323,10 @@ FHIRPath provides contextual variables that give you access to the current evalu
     ) # (1)!
 
     # Get the first contact method using index
-    first_contact = patient.evaluate("Patient.telecom.where($index = 0)") # (2)!
+    first_contact = patient.query("Patient.telecom.where($index = 0)") # (2)!
 
     # Get even-positioned items (0, 2, 4, etc.)
-    even_contacts = patient.evaluate("Patient.telecom.where($index mod 2 = 0)") # (3)!
+    even_contacts = patient.query("Patient.telecom.where($index mod 2 = 0)") # (3)!
     ```
 
     1. This creates a patient with multiple contact methods.
@@ -410,8 +410,8 @@ When no namespace is specified, FHIRPath defaults to the `FHIR` namespace. The n
 
 ```python
 # These are equivalent - FHIR is the default namespace
-is_patient_explicit = patient.evaluate("Patient is FHIR.Patient")[0] # (1)!
-is_patient_implicit = patient.evaluate("Patient is Patient")[0] # (2)!
+is_patient_explicit = patient.query("Patient is FHIR.Patient")[0] # (1)!
+is_patient_implicit = patient.query("Patient is Patient")[0] # (2)!
 
 print(f"Explicit namespace: {is_patient_explicit}")
 #> Explicit namespace: True
@@ -419,11 +419,11 @@ print(f"Implicit namespace: {is_patient_implicit}")
 #> Implicit namespace: True
 
 # Check for complex types with explicit namespace
-has_name = patient.evaluate("Patient.name.first() is FHIR.HumanName") == [True] # (3)!
+has_name = patient.query("Patient.name.first() is FHIR.HumanName") == [True] # (3)!
 print(f"Has HumanName: {has_name}")
 
 # Use namespace for primitive types
-birth_is_date = patient.evaluate("Patient.birthDate is FHIR.date") == [True] # (4)!
+birth_is_date = patient.query("Patient.birthDate is FHIR.date") == [True] # (4)!
 print(f"Birth date is FHIR.date: {birth_is_date}")
 ```
 
@@ -444,13 +444,13 @@ FHIRPath provides `is` and `as` operators for type checking and casting. These o
 ```python
 patient = fhir.Patient(id="ID1234") # (1)!
 
-print(patient.evaluate("Patient.id is id")[0])
+print(patient.query("Patient.id is id")[0])
 #> True
 
-print(patient.evaluate("Patient.id is FHIR.id")[0])
+print(patient.query("Patient.id is FHIR.id")[0])
 #> True
 
-print(patient.evaluate("Patient.id is FHIR.integer")[0])
+print(patient.query("Patient.id is FHIR.integer")[0])
 #> False
 ```
 
@@ -490,7 +490,7 @@ configure(terminology_service=MyTerminologyService())
 **Per-evaluation via environment variable** — passes a service only for a specific expression, overriding the global one:
 
 ```python
-result = patient.evaluate(
+result = patient.query(
     "Patient.gender.memberOf('http://hl7.org/fhir/ValueSet/administrative-gender')",
     environment={"%terminologyService": MyTerminologyService()}
 )

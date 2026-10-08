@@ -127,8 +127,8 @@ Execute FHIRPath expressions directly on FHIR resource instances to extract, fil
 
 ```python
 # Query patient data with FHIRPath
-family_names = patient.evaluate("Patient.name.family")
-has_phone = patient.evaluate("Patient.telecom.where(system='phone').exists()")[0]
+family_names = patient.query("Patient.name.family")
+has_phone = patient.query("Patient.telecom.where(system='phone').exists()")[0]
 
 # Modify data using FHIRPatch operations addressed by FHIRPath
 patient.patch.replace("Patient.gender", "female")

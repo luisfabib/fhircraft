@@ -139,7 +139,7 @@ class FHIRPathCollection(list[FHIRPathCollectionItem]):
             current = target.get()
             target.insert(value, len(current) if isinstance(current, list) else 0)
 
-    def insert(self, value: Any, at: int) -> None:
+    def insert(self, value: Any, at: Any) -> None:
         """Insert *value* at position *at* of the addressed list element."""
         for target in self._require_targets():
             target.at(None).insert(value, at)

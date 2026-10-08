@@ -9,7 +9,7 @@ class FHIRPathMixin:
     """
     Adds a FHIRPath interface to a model.
 
-    - ``model.evaluate(expression)`` returns the matching values as a list.
+    - ``model.query(expression)`` returns the matching values as a list.
     - ``model.patch.<operation>(expression, ...)`` modifies the model through
       FHIRPath-addressed patch operations (see `FHIRPatch`).
     """
@@ -20,7 +20,7 @@ class FHIRPathMixin:
             environment["%fhirRelease"] = FHIRPathCollectionItem.wrap(release)
         return environment
 
-    def evaluate(self, expression: str, environment: dict | None = None) -> List[Any]:
+    def query(self, expression: str, environment: dict | None = None) -> List[Any]:
         """
         Evaluate a FHIRPath expression against this model.
 

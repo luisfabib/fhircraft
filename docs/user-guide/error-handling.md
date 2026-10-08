@@ -128,13 +128,13 @@ patient = fhir.Patient(
 
 # A malformed expression fails at parse time
 try:
-    patient.evaluate("Patient.name.where(use = ")  # (1)!
+    patient.query("Patient.name.where(use = ")  # (1)!
 except FHIRPathParsingError as e:
     print(f"Fix the expression: {e.message}")
 
 # A valid expression that returns multiple values fails at runtime
 try:
-    patient.evaluate("Patient.name.single()")  # (2)!
+    patient.query("Patient.name.single()")  # (2)!
 except FHIRPathException as e:
     print(f"Adjust the query: {e.message}")
 ```
@@ -161,7 +161,7 @@ except FHIRPathException as e:
     # Capture only FHIRPath warnings
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always", FHIRPathWarning)
-        result = patient.evaluate("Patient.name")
+        result = patient.query("Patient.name")
 
     for w in caught:
         print(f"FHIRPath warning: {w.message}")

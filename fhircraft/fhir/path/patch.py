@@ -45,7 +45,6 @@ class FHIRPatch:
             self._model,
             {**self._model._generate_fhirpath_environment(), **(environment or {})},
         )
-        print(self._model.model_dump())
         if must_exist and not collection:
             raise FHIRPathEvaluationError(
                 f"Expression '{expression}' does not match any element"

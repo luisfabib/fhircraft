@@ -80,11 +80,11 @@ patient = fhir.Patient(
 )
 
 # Get all family names
-first_name = patient.evaluate('Patient.name.given.first()')
+first_name = patient.query('Patient.name.given.first()')
 assert first_name == ["Alice"] # (1)!
 
 # Check if patient is female
-is_female = patient.evaluate("Patient.gender = 'female'")
+is_female = patient.query("Patient.gender = 'female'")
 assert is_female == [True] # (2)!
 ```
 1. This uses a FHIRPath expression to extract all middle names from the patient's name elements and returns them as a list.
