@@ -139,3 +139,10 @@ def test_patch__failed_operation_is_rolled_back(patient):
     with pytest.raises(FHIRPathEvaluationError):
         patient.patch.insert("Patient.name", {"family": "X"}, 9)
     assert patient.model_dump() == before
+
+
+def test_patch__fluent_chained_operations(patient):
+    patient.patch.add("Patient.name", {"family": "Mid"}).replace(
+        "Patient.name.family[1]", "Roe"
+    ).delete("Patient.name.where(family='Doe')")
+    assert patient.evaluate("Patient.name.family") == ["Roe", "Mid"]

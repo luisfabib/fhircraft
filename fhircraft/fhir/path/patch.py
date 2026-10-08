@@ -40,11 +40,12 @@ class FHIRPatch:
         operation: Callable[[FHIRPathCollection], None],
         *,
         must_exist: bool = False,
-    ) -> None:
+    ) -> "FHIRPatch":
         collection = parse_fhirpath(expression)._evaluate_wrapped(
             self._model,
             {**self._model._generate_fhirpath_environment(), **(environment or {})},
         )
+        print(self._model.model_dump())
         if must_exist and not collection:
             raise FHIRPathEvaluationError(
                 f"Expression '{expression}' does not match any element"
@@ -56,38 +57,45 @@ class FHIRPatch:
             if snapshot is not None:
                 collection.restore(snapshot)
             raise
+        return self
 
-    def add(self, expression: str, value: Any, environment: dict | None = None) -> None:
+    def add(
+        self, expression: str, value: Any, environment: dict | None = None
+    ) -> "FHIRPatch":
         """Add *value* at the location: appended for repeating elements, assigned otherwise.
 
         The location need not exist yet; missing parents are created.
         """
-        self._apply(expression, environment, lambda c: c.add(value))
+        return self._apply(expression, environment, lambda c: c.add(value))
 
     def insert(
         self, expression: str, value: Any, index: int, environment: dict | None = None
-    ) -> None:
+    ) -> "FHIRPatch":
         """Insert *value* at position *index* of the repeating element addressed."""
-        self._apply(expression, environment, lambda c: c.insert(value, index))
+        return self._apply(expression, environment, lambda c: c.insert(value, index))
 
     def replace(
         self, expression: str, value: Any, environment: dict | None = None
-    ) -> None:
+    ) -> "FHIRPatch":
         """Replace the value at every matched location.
 
         Raises:
             FHIRPathEvaluationError: If the expression matches nothing.
         """
-        self._apply(expression, environment, lambda c: c.set(value), must_exist=True)
+        return self._apply(
+            expression, environment, lambda c: c.set(value), must_exist=True
+        )
 
-    def delete(self, expression: str, environment: dict | None = None) -> None:
+    def delete(self, expression: str, environment: dict | None = None) -> "FHIRPatch":
         """Delete every matched element.
 
         Raises:
             FHIRPathEvaluationError: If the expression matches nothing, or an
                 element is required.
         """
-        self._apply(expression, environment, lambda c: c.delete(), must_exist=True)
+        return self._apply(
+            expression, environment, lambda c: c.delete(), must_exist=True
+        )
 
     def move(
         self,
@@ -95,6 +103,8 @@ class FHIRPatch:
         source: int,
         destination: int,
         environment: dict | None = None,
-    ) -> None:
+    ) -> "FHIRPatch":
         """Move the entry at *source* to *destination* within the repeating element addressed."""
-        self._apply(expression, environment, lambda c: c.move(source, destination))
+        return self._apply(
+            expression, environment, lambda c: c.move(source, destination)
+        )
