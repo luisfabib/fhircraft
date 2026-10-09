@@ -28,8 +28,8 @@ import sys
 from html.parser import HTMLParser
 from xml.etree import ElementTree as ET
 from pydantic import ValidationError
-from typing import Callable
 from fhircraft.config import get_config
+from fhircraft.fhir.path.accessors import ElementAccessor
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathNode,
@@ -46,8 +46,6 @@ from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.terminology import TerminologyService
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type_by_url
-from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
-from fhircraft.utils import ensure_list
 from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive
 from fhircraft.exceptions import FHIRPathWarning
 
@@ -91,11 +89,16 @@ class Extension(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         return Invocation(
             Element("extension"),
-            Where(Equals(Element("url"), [FHIRPathCollectionItem.wrap(self.url)])),
+            Where(
+                Equals(
+                    Element("url"),
+                    FHIRPathCollection([FHIRPathCollectionItem.wrap(self.url)]),
+                )
+            ),
         ).evaluate(collection, environment)
 
     def __str__(self):
@@ -123,14 +126,15 @@ class TypeChoice(FHIRPathNode):
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
-        return [
+        return FHIRPathCollection(
             FHIRPathCollectionItem(
-                getattr(item.value, field), element=field, parent=item
+                getattr(item.value, field),
+                accessor=ElementAccessor.for_container(item.value, field),
             )
-            for item in collection
+            for item in collection._items
             for field in item.value.__class__.model_fields.keys()
             if field.startswith(self.type_choice_name) and getattr(item.value, field)
-        ]
+        )
 
     def __str__(self):
         return f"{self.type_choice_name}[x]"
@@ -165,12 +169,12 @@ class HasValue(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         if len(collection) != 1:
             has_primitive_value = False
         else:
-            value = collection[0].value
+            value = collection[0]
             if isinstance(value, Date):
                 value = value.to_date()
             elif isinstance(value, Time):
@@ -178,7 +182,7 @@ class HasValue(FHIRPathFunction):
             elif isinstance(value, DateTime):
                 value = value.to_datetime()
             has_primitive_value = value is not None and is_fhir_primitive(value)
-        return [FHIRPathCollectionItem.wrap(has_primitive_value)]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(has_primitive_value)])
 
 
 class GetValue(FHIRPathFunction):
@@ -198,12 +202,12 @@ class GetValue(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         if len(collection) != 1:
-            return []
+            return FHIRPathCollection()
         else:
-            value = collection[0].value
+            value = collection[0]
             if isinstance(value, Date):
                 value = value.to_date()
             elif isinstance(value, Time):
@@ -212,7 +216,7 @@ class GetValue(FHIRPathFunction):
                 value = value.to_datetime()
 
             has_primitive_value = value is not None and is_fhir_primitive(value)
-            return (
+            return FHIRPathCollection(
                 [FHIRPathCollectionItem.wrap(getattr(value, "value", value))]
                 if has_primitive_value
                 else []
@@ -240,13 +244,12 @@ class Resolve(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         from fhircraft.fhir.resources.base import StringBase
 
-        output_collection = []
-        for item in collection:
-            value = item.value
+        output_collection = FHIRPathCollection()
+        for value in collection:
             if not (
                 (isinstance(value, dict) and (resource_url := value.get("reference")))
                 or (
@@ -498,38 +501,35 @@ class HtmlChecks(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            bool
+            FHIRPathCollection: A collection containing a single boolean value indicating whether the XHTML content meets the rules.
 
         Raises:
             FHIRPathException: If the collection is not a single item.
         """
-
-        collection = ensure_list(collection)
-
         if len(collection) != 1:
-            return []  # Return empty for non-single collections
+            return FHIRPathCollection()  # Return empty for non-single collections
 
-        item = collection[0]
+        value = collection[0]
 
         # Check if the item is an XHTML string
-        if not isinstance(item.value, str):
-            return []  # Return empty for non-string values
+        if not isinstance(value, str):
+            return FHIRPathCollection()  # Return empty for non-string values
 
-        xhtml_content = item.value.strip()
+        xhtml_content = value.strip()
 
         if not xhtml_content:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
         try:
             # Basic XML well-formedness check
             try:
                 ET.fromstring(xhtml_content)
             except ET.ParseError:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
             # Check if it starts with a div element
             if not re.match(r"^\s*<div\s", xhtml_content, re.IGNORECASE):
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
             # Validate HTML structure and content
             validator = self.XHTMLValidator()
@@ -537,22 +537,22 @@ class HtmlChecks(FHIRPathFunction):
 
             # Check validation results
             if validator.errors:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
             # Check if div has non-whitespace content
             if not validator.has_content:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
             # Check for HTML entities (not allowed, should use Unicode)
             if re.search(
                 r"&(?!#\d+;|#x[0-9a-fA-F]+;|amp;|lt;|gt;|quot;|apos;)", xhtml_content
             ):
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
 
         except Exception:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
 
 class LowBoundary(FHIRPathFunction):
@@ -573,13 +573,13 @@ class LowBoundary(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         if not collection:
-            return []
+            return FHIRPathCollection()
 
-        result = []
-        for item in collection:
+        result = FHIRPathCollection()
+        for item in collection._items:
             value = item.value
 
             if isinstance(value, str):
@@ -665,13 +665,13 @@ class HighBoundary(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         if not collection:
-            return []
+            return FHIRPathCollection()
 
-        result = []
-        for item in collection:
+        result = FHIRPathCollection()
+        for item in collection._items:
             value = item.value
 
             if isinstance(value, str):
@@ -758,7 +758,7 @@ class ElementDefinition(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         raise NotImplementedError(
             "Evaluation of the FHIRPath elementDefinition() function is not supported."
@@ -801,13 +801,13 @@ class Slice(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         warnings.warn(
             "Evaluation of the FHIRPath slice() function is not supported. Returning an empty collection.",
             FHIRPathWarning,
         )
-        return []
+        return FHIRPathCollection()
 
 
 class CheckModifiers(FHIRPathFunction):
@@ -836,7 +836,7 @@ class CheckModifiers(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         raise NotImplementedError(
             "Evaluation of the FHIRPath checkModifiers() function is not supported."
@@ -870,10 +870,10 @@ class ConformsTo(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         if len(collection) != 1:
-            return []
+            return FHIRPathCollection()
         fhir_release: None = environment.get("%fhirRelease")
         if isinstance(fhir_release, FHIRPathCollectionItem):
             fhir_release = fhir_release.value
@@ -884,17 +884,17 @@ class ConformsTo(FHIRPathFunction):
         try:
             get_fhir_type_by_url(
                 self.structure, release=fhir_release, fail_if_not_found=True
-            ).model_validate(collection[0].value)
+            ).model_validate(collection[0])
         except AttributeError:
             warnings.warn(
                 f"Could not resolve structure definition '{self.structure}' for conformsTo() function."
                 f" Current implementation is limited to core resources. Returning empty result.",
                 FHIRPathWarning,
             )
-            return []
+            return FHIRPathCollection()
         except ValidationError as e:
-            return [FHIRPathCollectionItem.wrap(False)]
-        return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
 
 
 class MemberOf(FHIRPathFunction):
@@ -929,15 +929,15 @@ class MemberOf(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         from fhircraft.fhir.resources.datatypes import utils as type_utils
 
         if len(collection) != 1:
-            return []
+            return FHIRPathCollection()
         service = _get_terminology_service(environment)
         if service is None:
-            return []
+            return FHIRPathCollection()
         release = environment.get("%fhirRelease")
         if isinstance(release, FHIRPathCollectionItem):
             release = release.value
@@ -946,7 +946,7 @@ class MemberOf(FHIRPathFunction):
             raise FHIRPathException(
                 "The %fhirRelease environment variable is required for evaluating memberOf()."
             )
-        codeable = collection[0].value
+        codeable = collection[0]
         if isinstance(codeable, str):
             code = codeable
             system, version = None, None
@@ -956,12 +956,12 @@ class MemberOf(FHIRPathFunction):
             version = codeable.version
         elif type_utils.is_fhir_complex_type(codeable, "CodeableConcept", release):
             if len(codeable.coding) == 0:
-                return []
+                return FHIRPathCollection()
             code = codeable.coding[0].code
             system = codeable.coding[0].system
             version = codeable.coding[0].version
         else:
-            return []
+            return FHIRPathCollection()
         try:
             result = service.validate_valueset_code(
                 url=self.valueset, code=code, system=system, version=version
@@ -971,10 +971,10 @@ class MemberOf(FHIRPathFunction):
                 f"Error during terminology service call in memberOf() function: {e}. Skipping evaluation of memberOf().",
                 FHIRPathWarning,
             )
-            return []
+            return FHIRPathCollection()
         if result is None:
-            return []
-        return [FHIRPathCollectionItem.wrap(bool(result))]
+            return FHIRPathCollection()
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(bool(result))])
 
 
 def _evaluate_subsumtion(code, collection, environment, invert=False):
@@ -984,10 +984,10 @@ def _evaluate_subsumtion(code, collection, environment, invert=False):
     from fhircraft.fhir.resources.datatypes import utils as type_utils
 
     if len(collection) != 1:
-        return []
+        return FHIRPathCollection()
     service = _get_terminology_service(environment)
     if service is None:
-        return []
+        return FHIRPathCollection()
     release = environment.get("%fhirRelease")
     if isinstance(release, FHIRPathCollectionItem):
         release = release.value
@@ -997,8 +997,8 @@ def _evaluate_subsumtion(code, collection, environment, invert=False):
         )
     given = code.evaluate(collection, environment=environment)
     if len(given) != 1:
-        return []
-    given = given[0].value
+        return FHIRPathCollection()
+    given = given[0]
     if type_utils.is_fhir_complex_type(given, "Coding", release):
         codingsB = [given]
     elif type_utils.is_fhir_complex_type(given, "CodeableConcept", release):
@@ -1012,7 +1012,7 @@ def _evaluate_subsumtion(code, collection, environment, invert=False):
             f"The code argument to {'subsumes()' if not invert else 'subsumedBy()'} must be a Coding or CodeableConcept."
         )
 
-    source = collection[0].value
+    source = collection[0]
     if type_utils.is_fhir_complex_type(source, "CodeableConcept", release):
         if len(source.coding) == 0:
             raise FHIRPathException(
@@ -1022,7 +1022,7 @@ def _evaluate_subsumtion(code, collection, environment, invert=False):
     elif type_utils.is_fhir_complex_type(source, "Coding", release):
         codingsA = [source]
     else:
-        return []
+        return FHIRPathCollection()
     for codingA in codingsA:
         for codingB in codingsB:
             if codingA.system != codingB.system:
@@ -1041,12 +1041,12 @@ def _evaluate_subsumtion(code, collection, environment, invert=False):
                     f"Error during terminology service call in {'subsumes()' if not invert else 'subsumedBy()'} function: {e}. Skipping evaluation of {'subsumes()' if not invert else 'subsumedBy()'}.",
                     FHIRPathWarning,
                 )
-                return []
+                return FHIRPathCollection()
             if result is None:
-                return []
+                return FHIRPathCollection()
             if result is True:
-                return [FHIRPathCollectionItem.wrap(bool(True))]
-    return [FHIRPathCollectionItem.wrap(bool(False))]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(bool(True))])
+    return FHIRPathCollection([FHIRPathCollectionItem.wrap(bool(False))])
 
 
 class Subsumes(FHIRPathFunction):
@@ -1077,7 +1077,7 @@ class Subsumes(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         return _evaluate_subsumtion(
             code=self.code,
@@ -1119,7 +1119,7 @@ class SubsumedBy(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         return _evaluate_subsumtion(
             code=self.code,
@@ -1161,16 +1161,16 @@ class Comparable(FHIRPathFunction):
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): The output collection.
+            FHIRPathCollection: The output collection.
         """
         if len(collection) == 0:
-            return []
+            return FHIRPathCollection()
         elif len(collection) != 1:
             raise FHIRPathException("comparable() requires a singleton collection.")
         query_quantity = self.quantity.single(collection, environment=environment)
-        collection_value = collection[0].value
+        collection_value = collection[0]
         if (collection_value is None) or (query_quantity is None):
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         if collection_value and not Quantity.is_quantity(collection_value):
             raise FHIRPathException(
                 f"Comparable() can only be called on Quantity types, got: {type(collection_value)}"
@@ -1183,8 +1183,10 @@ class Comparable(FHIRPathFunction):
                 f"Comparable() input did not evaluate to a Quantity, it was: {type(query_quantity)}"
             )
 
-        return [
-            FHIRPathCollectionItem.wrap(
-                input_quantity.is_compatible_with(query_quantity)
-            )
-        ]
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    input_quantity.is_compatible_with(query_quantity)
+                )
+            ]
+        )

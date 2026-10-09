@@ -71,7 +71,7 @@ class FHIRPatch:
         self, expression: str, value: Any, index: int, environment: dict | None = None
     ) -> "FHIRPatch":
         """Insert *value* at position *index* of the repeating element addressed."""
-        return self._apply(expression, environment, lambda c: c.insert(value, index))
+        return self._apply(expression, environment, lambda c: c.insert_at(value, index))
 
     def replace(
         self, expression: str, value: Any, environment: dict | None = None

@@ -29,9 +29,9 @@ def test_children_returns_correct_elements_model():
     resource = Resource(fieldA=1, fieldB=2, fieldC=3)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Children().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 1
-    assert result[1].value == 2
-    assert result[2].value == 3
+    assert result[0] == 1
+    assert result[1] == 2
+    assert result[2] == 3
 
 
 def test_children_returns_correct_elements_dict():
@@ -43,9 +43,9 @@ def test_children_returns_correct_elements_dict():
     resource = Resource(fieldA=1, fieldB=2, fieldC=3).model_dump()
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Children().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 1
-    assert result[1].value == 2
-    assert result[2].value == 3
+    assert result[0] == 1
+    assert result[1] == 2
+    assert result[2] == 3
 
 
 def test_children_string_representation():
@@ -76,15 +76,15 @@ def test_descendants_returns_correct_elements():
     )
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Descendants().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 1
-    assert result[1].value == 2
-    assert result[2].value == 3
-    assert result[3].value == resource.subfield
-    assert result[4].value == 4
-    assert result[5].value == 5
-    assert result[6].value == 6
-    assert result[5].value == 5
-    assert result[6].value == 6
+    assert result[0] == 1
+    assert result[1] == 2
+    assert result[2] == 3
+    assert result[3] == resource.subfield
+    assert result[4] == 4
+    assert result[5] == 5
+    assert result[6] == 6
+    assert result[5] == 5
+    assert result[6] == 6
 
 
 def test_descendants_string_representation():

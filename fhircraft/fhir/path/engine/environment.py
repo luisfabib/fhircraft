@@ -68,8 +68,8 @@ class EnvironmentVariable(FHIRPathVariable):
             )
         value = environment[self.variable]
         if value is None or value == []:
-            return []
-        return [FHIRPathCollectionItem.wrap(value)]
+            return FHIRPathCollection([])
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
 
 
 class ContextualVariable(FHIRPathNode):
@@ -98,8 +98,8 @@ class ContextualVariable(FHIRPathNode):
             )
         value = environment[self.variable]
         if value is None or value == []:
-            return []
-        return [FHIRPathCollectionItem.wrap(value)]
+            return FHIRPathCollection([])
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
 
     def __str__(self):
         return self.variable
@@ -139,7 +139,9 @@ class ContextualThis(ContextualVariable):
         """
         if self.variable not in environment:
             return collection
-        return [FHIRPathCollectionItem.wrap(environment[self.variable])]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(environment[self.variable])]
+        )
 
 
 class ContextualIndex(ContextualVariable):

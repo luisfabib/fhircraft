@@ -42,10 +42,14 @@ class Union(FHIRPathFunction):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment
             )
-        return [
-            FHIRPathCollectionItem.wrap(item)
-            for item in list(set(self.other_collection) | set(collection))
-        ]
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(item)
+                for item in list(
+                    set(self.other_collection._items) | set(collection._items)
+                )
+            ]
+        )
 
 
 class Combine(FHIRPathFunction):
@@ -78,4 +82,4 @@ class Combine(FHIRPathFunction):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment
             )
-        return collection + self.other_collection
+        return FHIRPathCollection(collection._items + self.other_collection._items)

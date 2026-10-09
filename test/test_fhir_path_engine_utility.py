@@ -47,8 +47,8 @@ def test_trace_logs_collection_with_fhirpath(caplog):
 
 def test_today_returns_current_date():
     result = Today().evaluate(FHIRPathCollection([]), env)
-    assert isinstance(result[0].value, Date)
-    assert result[0].value == Date(value_date=datetime.datetime.now().date())
+    assert isinstance(result[0], Date)
+    assert result[0] == Date(value_date=datetime.datetime.now().date())
 
 
 def test_today_string_representation():
@@ -63,9 +63,9 @@ def test_today_string_representation():
 
 def test_now_returns_datetime_with_timezone_offset():
     result = Now().evaluate(FHIRPathCollection([]), env)
-    assert isinstance(result[0].value, DateTime)
-    assert result[0].value.hour_shift is not None
-    assert result[0].value.minute_shift is not None
+    assert isinstance(result[0], DateTime)
+    assert result[0].hour_shift is not None
+    assert result[0].minute_shift is not None
 
 
 def test_now_string_representation():
@@ -80,7 +80,7 @@ def test_now_string_representation():
 
 def test_timeofday_returns_current_time():
     result = TimeOfDay().evaluate(FHIRPathCollection([]), env)
-    assert isinstance(result[0].value, Time)
+    assert isinstance(result[0], Time)
 
 
 def test_timeofday_string_representation():

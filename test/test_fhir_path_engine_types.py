@@ -126,7 +126,7 @@ def test_is_returns_correct_boolean(left, type_specifier, expected):
     result = Is(Element("left"), TypeSpecifier(type_specifier)).evaluate(
         FHIRPathCollection(collection), env
     )
-    assert result[0].value == expected
+    assert result[0] == expected
 
 
 def test_is_returns_empty_for_empty_collection():
@@ -144,7 +144,7 @@ def test_is_string_representation():
 def test_legacy_is_returns_correct_boolean(left, type_specifier, expected):
     collection = [FHIRPathCollectionItem(value=left)]
     result = LegacyIs(TypeSpecifier(type_specifier)).evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == expected
+    assert result[0] == expected
 
 
 def test_legacy_is_returns_empty_for_empty_collection():
@@ -167,7 +167,7 @@ def test_legacy_is_string_representation():
 def test_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
     result = As(This(), TypeSpecifier(type_specifier)).evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == expected if equal else result == []
+    assert result[0] == expected if equal else result == []
 
 
 def test_as_returns_empty_for_empty_collection():
@@ -185,7 +185,7 @@ def test_as_string_representation():
 def test_legacy_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
     result = LegacyAs(TypeSpecifier(type_specifier)).evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == expected if equal else result == []
+    assert result[0] == expected if equal else result == []
 
 
 def test_legacy_as_returns_empty_for_empty_collection():

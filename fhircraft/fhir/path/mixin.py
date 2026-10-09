@@ -1,5 +1,4 @@
-from typing import Any, List
-
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 from fhircraft.fhir.path.patch import FHIRPatch
 from fhircraft.fhir.path.utils import parse_fhirpath
@@ -20,7 +19,9 @@ class FHIRPathMixin:
             environment["%fhirRelease"] = FHIRPathCollectionItem.wrap(release)
         return environment
 
-    def query(self, expression: str, environment: dict | None = None) -> List[Any]:
+    def query(
+        self, expression: str, environment: dict | None = None
+    ) -> FHIRPathCollection:
         """
         Evaluate a FHIRPath expression against this model.
 
@@ -31,10 +32,9 @@ class FHIRPathMixin:
         Returns:
             The values matched by the expression; empty list if there are none.
         """
-        collection = parse_fhirpath(expression)._evaluate_wrapped(
+        return parse_fhirpath(expression)._evaluate_wrapped(
             self, {**self._generate_fhirpath_environment(), **(environment or {})}
         )
-        return [item.value for item in collection]
 
     @property
     def patch(self) -> FHIRPatch:

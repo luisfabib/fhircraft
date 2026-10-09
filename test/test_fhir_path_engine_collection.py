@@ -41,7 +41,7 @@ def test_in_returns_empty_if_left_empty():
     )
     collection = [FHIRPathCollectionItem(value=resource)]
     result = In(FHIRPathCollection([]), Element("right")).evaluate(FHIRPathCollection(collection), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == []
 
 
@@ -51,7 +51,7 @@ def test_in_returns_false_if_right_empty():
     )
     collection = [FHIRPathCollectionItem(value=resource)]
     result = In(FHIRPathCollection([FHIRPathCollectionItem(value="B")]), FHIRPathCollection([])).evaluate(FHIRPathCollection(collection), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == False
 
 
@@ -63,7 +63,7 @@ def test_in_checks_membership_correctly():
     result = In(FHIRPathCollection([FHIRPathCollectionItem(value="B")]), Element("right")).evaluate(
         FHIRPathCollection(collection), env
     )
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == True
 
 
@@ -83,7 +83,7 @@ def test_contains_returns_empty_if_right_empty():
     )
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Contains(Element("right"), FHIRPathCollection([])).evaluate(FHIRPathCollection(collection), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == []
 
 
@@ -93,7 +93,7 @@ def test_contains_returns_false_if_left_empty():
     )
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Contains(FHIRPathCollection([]), FHIRPathCollection([FHIRPathCollectionItem(value="B")])).evaluate(FHIRPathCollection(collection), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == False
 
 
@@ -105,7 +105,7 @@ def test_contains_checks_containership_correctly():
     result = Contains(Element("right"), FHIRPathCollection([FHIRPathCollectionItem(value="B")])).evaluate(
         FHIRPathCollection(collection), env
     )
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == True
 
 

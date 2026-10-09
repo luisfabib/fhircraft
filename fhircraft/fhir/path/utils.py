@@ -5,7 +5,7 @@ expressions and collections.
 
 import re
 import threading
-from typing import Any, Dict, Union, TYPE_CHECKING
+from typing import Any, Dict, Iterable, Union, TYPE_CHECKING
 
 from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
@@ -106,9 +106,11 @@ def _evaluate_fhirpath_collection(
         FHIRPathCollection: The resulting collection after evaluation.
     """
     return (
-        [item for item in fhir_path.evaluate(collection, environment)]
+        fhir_path.evaluate(collection, environment)
         if isinstance(fhir_path, FHIRPathNode)
-        else [FHIRPathCollectionItem.wrap(item) for item in ensure_list(fhir_path)]
+        else FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(item) for item in ensure_list(fhir_path)]
+        )
     )
 
 
@@ -117,7 +119,7 @@ def _evaluate_left_right_expressions(
     right: Union["FHIRPathNode", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
     environment: dict,
-) -> tuple["FHIRPathCollection", "FHIRPathCollection"]:
+) -> tuple[FHIRPathCollection, FHIRPathCollection]:
     """
     Evaluates the given left and right FHIRPath expressions or collections against the provided collection,
     optionally creating new elements, and returns the resulting collections of values.
@@ -130,12 +132,8 @@ def _evaluate_left_right_expressions(
     Returns:
         tuple[FHIRPathCollection, FHIRPathCollection]: A tuple containing the evaluated left and right collections of values.
     """
-    left_collection = _evaluate_fhirpath_collection(
-        left, collection, environment
-    )
-    right_collection = _evaluate_fhirpath_collection(
-        right, collection, environment
-    )
+    left_collection = _evaluate_fhirpath_collection(left, collection, environment)
+    right_collection = _evaluate_fhirpath_collection(right, collection, environment)
     return left_collection, right_collection
 
 
@@ -162,16 +160,18 @@ def _evaluate_and_prepare_collection_values(
         tuple[Any | None, Any | None]: A tuple containing the prepared left and right values for comparison, or None if prevented by empty collections.
     """
 
-    def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
+    def _get_collection_values(
+        collection: FHIRPathCollection,
+    ) -> list[Any]:
         from fhircraft.fhir.path.engine.literals import Quantity
 
         return [
             (
                 Quantity.parse_quantity(data)
-                if Quantity.is_quantity(data := item.value) and data.value is not None
+                if Quantity.is_quantity(data := value) and data.value is not None
                 else data
             )
-            for item in collection
+            for value in collection
         ]
 
     left_collection, right_collection = _evaluate_left_right_expressions(

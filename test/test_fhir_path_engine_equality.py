@@ -139,7 +139,7 @@ def test_equivalent_returns_correct_boolean(left, right, expected):
         FHIRPathCollection([FHIRPathCollectionItem(value=left)] if left is not None else []),
         FHIRPathCollection([FHIRPathCollectionItem(value=right)] if right is not None else []),
     ).evaluate(FHIRPathCollection([]), env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    assert result == [expected]
 
 
 def test_equivalent_string_representation():

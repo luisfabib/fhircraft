@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import operator
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any, Iterable, Self, SupportsIndex
 
 from fhircraft.exceptions import FHIRPathEvaluationError
 from fhircraft.fhir.path.accessors import (
@@ -13,9 +14,13 @@ from fhircraft.fhir.path.accessors import (
 )
 from fhircraft.utils import ensure_list
 
-__all__ = ["FHIRPathCollectionItem", "FHIRPathCollection", "Collection"]
+__all__ = [
+    "FHIRPathCollectionItem",
+    "FHIRPathCollection",
+    "Collection",
+]
 
-#: A FHIRPath collection is just an ordered list of items.
+#: A plain collection of FHIRPath result values.
 Collection = list
 
 
@@ -78,28 +83,30 @@ class FHIRPathCollectionItem:
         return f"<CollectionItem {self.canonical_path} = {self.value!r}>"
 
 
-class FHIRPathCollection(list[FHIRPathCollectionItem]):
-    """A list of items plus the writable locations the expression addressed.
+class FHIRPathCollection(list[Any]):
+    """A list of result values with private provenance and writable locations.
 
-    ``targets`` outlive the items: ``Patient.name[0].given[2]`` on an empty
-    resource yields no items but still carries the accessor where a value
-    could be added.  When not given explicitly, targets are the accessors of
-    the items, so any plain list of items behaves like a collection.
+    Iteration and indexing expose values; ``_items`` keeps the corresponding
+    accessor records for engine operations. ``targets`` outlive the values:
+    ``Patient.name[0].given[2]`` on an empty resource can still carry the
+    accessor where a value could be added.
     """
 
     def __init__(
         self,
-        items: Iterable[FHIRPathCollectionItem] = (),
+        items: Iterable[Any] = (),
         *,
         targets: Iterable[ElementAccessor] | None = None,
     ) -> None:
-        super().__init__(items)
+        wrapped_items = tuple(FHIRPathCollectionItem.wrap(item) for item in items)
+        super().__init__(item.value for item in wrapped_items)
+        self._items = wrapped_items
         self._targets = None if targets is None else tuple(targets)
 
     @property
     def accessors(self) -> tuple[ElementAccessor, ...]:
         """Accessors of the existing items, in order."""
-        return tuple(i.accessor for i in self if i.accessor is not None)
+        return tuple(i.accessor for i in self._items if i.accessor is not None)
 
     @property
     def targets(self) -> tuple[ElementAccessor, ...]:
@@ -108,8 +115,122 @@ class FHIRPathCollection(list[FHIRPathCollectionItem]):
 
     def __getitem__(self, index) -> Any:
         if isinstance(index, slice):
-            return type(self)(list.__getitem__(self, index))
+            return type(self)(self._items[index], targets=self._targets)
         return list.__getitem__(self, index)
+
+    def __setitem__(self, index, value) -> None:
+        if isinstance(index, slice):
+            values = tuple(FHIRPathCollectionItem.wrap(item) for item in value)
+            old_items = self._items
+            selected = range(*index.indices(len(old_items)))
+            old_selected = tuple(old_items[item_index] for item_index in selected)
+            list.__setitem__(self, index, [item.value for item in values])
+            if len(old_selected) == len(values):
+                values = tuple(
+                    FHIRPathCollectionItem(item.value, old.accessor)
+                    for old, item in zip(old_selected, values)
+                )
+            if index.step in (None, 1):
+                start, stop, _ = index.indices(len(old_items))
+                self._items = old_items[:start] + values + old_items[stop:]
+            else:
+                self._items = self._replace_sliced_items(index, values)
+            return
+
+        index = operator.index(index)
+        item_index = index if index >= 0 else len(self._items) + index
+        if not 0 <= item_index < len(self._items):
+            raise IndexError("list assignment index out of range")
+        items = list(self._items)
+        old_item = items[item_index]
+        item = FHIRPathCollectionItem.wrap(value)
+        list.__setitem__(self, index, item.value)
+        items[item_index] = FHIRPathCollectionItem(item.value, old_item.accessor)
+        self._items = tuple(items)
+
+    def _replace_sliced_items(
+        self, index: slice, replacement: tuple[FHIRPathCollectionItem, ...]
+    ) -> tuple[FHIRPathCollectionItem, ...]:
+        items = list(self._items)
+        selected = range(*index.indices(len(items)))
+        for item_index, item in zip(selected, replacement):
+            items[item_index] = item
+        return tuple(items)
+
+    def __delitem__(self, index) -> None:
+        list.__delitem__(self, index)
+        items = list(self._items)
+        del items[index]
+        self._items = tuple(items)
+
+    def append(self, value: Any) -> None:
+        item = FHIRPathCollectionItem.wrap(value)
+        list.append(self, item.value)
+        self._items += (item,)
+
+    def extend(self, values: Iterable[Any]) -> None:
+        if isinstance(values, FHIRPathCollection):
+            self._targets = tuple(
+                list(self._targets or [])
+                + [target for target in (values._targets or [])]
+            )
+            values = [item.value for item in values._items]
+        items = tuple(FHIRPathCollectionItem.wrap(value) for value in values)
+        list.extend(self, (item.value for item in items))
+        self._items += items
+
+    def insert(self, index: SupportsIndex, value: Any) -> None:
+        index = operator.index(index)
+        item = FHIRPathCollectionItem.wrap(value)
+        list.insert(self, index, item.value)
+        items = list(self._items)
+        items.insert(index, item)
+        self._items = tuple(items)
+
+    def pop(self, index: SupportsIndex = -1) -> Any:
+        index = operator.index(index)
+        value = list.pop(self, index)
+        items = list(self._items)
+        items.pop(index)
+        self._items = tuple(items)
+        return value
+
+    def remove(self, value: Any) -> None:
+        del self[self.index(value)]
+
+    def clear(self) -> None:
+        list.clear(self)
+        self._items = ()
+
+    def reverse(self) -> None:
+        list.reverse(self)
+        self._items = tuple(reversed(self._items))
+
+    def sort(self, *, key=None, reverse: bool = False) -> None:
+        sorted_items = sorted(
+            zip(self, self._items),
+            key=(
+                (lambda pair: key(pair[0])) if key is not None else lambda pair: pair[0]
+            ),
+            reverse=reverse,
+        )
+        list.__setitem__(self, slice(None), [value for value, _ in sorted_items])
+        self._items = tuple(item for _, item in sorted_items)
+
+    def __iadd__(self, values: Iterable[Any]) -> Self:
+        self.extend(values)
+        return self
+
+    def __imul__(self, count: SupportsIndex) -> Self:
+        multiplier = operator.index(count)
+        list.__imul__(self, multiplier)
+        self._items *= max(0, multiplier)
+        return self
+
+    def __eq__(self, value: object) -> bool:
+        if isinstance(value, list):
+            return list(self) == list(value)
+        return super().__eq__(value)
 
     # ------------------------------------------------------------------ #
     # Patch interface
@@ -139,8 +260,8 @@ class FHIRPathCollection(list[FHIRPathCollectionItem]):
             current = target.get()
             target.insert(value, len(current) if isinstance(current, list) else 0)
 
-    def insert(self, value: Any, at: Any) -> None:
-        """Insert *value* at position *at* of the addressed list element."""
+    def insert_at(self, value: Any, at: Any) -> None:
+        """Insert *value* at position *at* of the addressed FHIR list element."""
         for target in self._require_targets():
             target.at(None).insert(value, at)
 
@@ -165,4 +286,4 @@ class FHIRPathCollection(list[FHIRPathCollectionItem]):
             accessor.restore(saved)
 
     def __repr__(self) -> str:
-        return f"FHIRPathCollection({list(self)!r}, targets={len(self.targets)})"
+        return f"FHIRPathCollection({list(self._items)!r}, targets={len(self.targets)})"

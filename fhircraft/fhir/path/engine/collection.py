@@ -72,9 +72,7 @@ class Union(FHIRCollectionOperator):
         left_collection, right_collection = _evaluate_left_right_expressions(
             self.left, self.right, collection, environment
         )
-        return UnionFunction(left_collection).evaluate(
-            right_collection, environment
-        )
+        return UnionFunction(left_collection).evaluate(right_collection, environment)
 
     def __str__(self):
         return f"{self.left} | {self.right}"
@@ -111,19 +109,21 @@ class In(FHIRCollectionOperator):
             self.left, self.right, collection, environment
         )
         if len(left_collection) == 0:
-            return []
+            return FHIRPathCollection([])
         if len(right_collection) == 0:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         if len(left_collection) != 1:
             raise FHIRPathRuntimeError(
                 "Left expression evaluates to a non-singleton collection."
             )
-        value = left_collection[0].value
+        value = left_collection[0]
         check_collection = [
             item.value if isinstance(item, FHIRPathCollectionItem) else item
             for item in right_collection
         ]
-        return [FHIRPathCollectionItem.wrap(value in check_collection)]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(value in check_collection)]
+        )
 
     def __str__(self):
         return f"{self.left} in {self.right}"
@@ -160,19 +160,21 @@ class Contains(FHIRCollectionOperator):
             self.left, self.right, collection, environment
         )
         if len(right_collection) == 0:
-            return []
+            return FHIRPathCollection([])
         if len(left_collection) == 0:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         if len(right_collection) != 1:
             raise FHIRPathRuntimeError(
                 "Right expression evaluates to a non-singleton collection."
             )
-        value = right_collection[0].value
+        value = right_collection[0]
         check_collection = [
             item.value if isinstance(item, FHIRPathCollectionItem) else item
             for item in left_collection
         ]
-        return [FHIRPathCollectionItem.wrap(value in check_collection)]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(value in check_collection)]
+        )
 
     def __str__(self):
         return f"{self.left} contains {self.right}"

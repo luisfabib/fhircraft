@@ -38,7 +38,7 @@ def test_and_returns_correct_logic_boolean(left, right, expected):
         left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
         right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
     ).evaluate(FHIRPathCollection([]), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 
@@ -73,7 +73,7 @@ def test_or_returns_correct_logic_boolean(left, right, expected):
         left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
         right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
     ).evaluate(FHIRPathCollection([]), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 
@@ -108,7 +108,7 @@ def test_xor_returns_correct_logic_boolean(left, right, expected):
         left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
         right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
     ).evaluate(FHIRPathCollection([]), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 
@@ -143,7 +143,7 @@ def test_implies_returns_correct_logic_boolean(left, right, expected):
         left=FHIRPathCollection([FHIRPathCollectionItem(left)] if left is not None else []),
         right=FHIRPathCollection([FHIRPathCollectionItem(right)] if right is not None else []),
     ).evaluate(FHIRPathCollection([]), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 
@@ -167,7 +167,7 @@ not_boolean_logic_cases = (
 @pytest.mark.parametrize("value, expected", not_boolean_logic_cases)
 def test_not_returns_correct_logic_boolean(value, expected):
     result = Not().evaluate(FHIRPathCollection([FHIRPathCollectionItem(value=value)]), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 

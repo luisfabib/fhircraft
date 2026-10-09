@@ -6,7 +6,6 @@ from typing import ClassVar, Optional
 
 import pytest
 from pydantic import BaseModel, ConfigDict, Field
-
 from fhircraft.exceptions import FHIRPathEvaluationError
 from fhircraft.fhir.path.collection import (
     FHIRPathCollection,
@@ -99,18 +98,23 @@ def test_wrap__passes_through_existing_item_unchanged():
 
 
 def test_wrap_all__scalar_list_and_none():
-    assert [i.value for i in FHIRPathCollectionItem.wrap_all("a")] == ["a"]
-    assert [i.value for i in FHIRPathCollectionItem.wrap_all(["a", "b"])] == ["a", "b"]
+    assert [item.value for item in FHIRPathCollectionItem.wrap_all("a")] == ["a"]
+    assert [item.value for item in FHIRPathCollectionItem.wrap_all(["a", "b"])] == [
+        "a",
+        "b",
+    ]
     assert FHIRPathCollectionItem.wrap_all(None) == []
 
 
 def test_canonical_path__uses_accessor(named_patient):
-    (item,) = select(named_patient, "name")[1:2]
+    (item,) = select(named_patient, "name")[1:2]._items
     assert item.canonical_path.endswith("name[1]")
 
 
 def test_canonical_path__nests_multiple_levels(named_patient):
-    item = select(named_patient, "name", "family")[0]
+    result = select(named_patient, "name", "family")
+    assert result._items
+    item = result._items[0]
     assert item.canonical_path.endswith("name[0].family")
 
 
@@ -132,6 +136,36 @@ def test_hash__unhashable_value_does_not_raise():
 
 def test_repr__includes_value(patient):
     assert "p1" in repr(select(patient, "id")[0])
+
+
+# =========================================================================== #
+# FHIRPathCollection
+# =========================================================================== #
+
+
+def test_collection__behaves_as_list(named_patient):
+    result = select(named_patient, "name")
+    assert isinstance(result, FHIRPathCollection)
+    assert all(isinstance(value, HumanName) for value in result)
+    assert all(isinstance(item, FHIRPathCollectionItem) for item in result._items)
+
+
+def test_collection__indexing(named_patient):
+    result = select(named_patient, "name")
+    first_item = result[0]
+    assert isinstance(first_item, HumanName)
+    assert result._items
+    assert first_item == result._items[0].value
+
+
+def test_collection__comparison_against_list(named_patient):
+    result = select(named_patient, "name")
+    assert list(result) == result
+
+
+def test_collection__iterates_values_like_a_list(named_patient):
+    result = select(named_patient, "name")
+    assert tuple(result) == tuple(item.value for item in result._items)
 
 
 # =========================================================================== #
@@ -159,12 +193,41 @@ def test_targets__none_for_literals():
 def test_slice__returns_collection(named_patient):
     result = select(named_patient, "name")[1:]
     assert isinstance(result, FHIRPathCollection)
-    assert result.targets[0].index == 1
+    assert result._items
+    assert result._items[0].accessor
+    assert result._items[0].accessor.index == 1
 
 
 def test_slicing_keeps_accessors(named_patient):
     tail = select(named_patient, "name")[1:]
-    assert tail[0].accessor.index == 1
+    assert tail._items[0].accessor.index == 1
+
+
+def test_collection__consumes_item_generators_once(named_patient):
+    items = (item for item in select(named_patient, "name")._items)
+    result = FHIRPathCollection(items)
+    assert len(result) == 2
+    assert len(result._items) == 2
+    assert all(isinstance(value, HumanName) for value in result)
+
+
+def test_list_mutations_keep_values_and_provenance_aligned(named_patient):
+    result = select(named_patient, "name")
+    assert len(result._items) == 2
+    first_accessor = result._items[0].accessor
+    second_accessor = result._items[1].accessor
+
+    result[0] = HumanName(family="Jones")
+    result.insert(1, HumanName(family="Lee"))
+    result.append(HumanName(family="Taylor"))
+    removed = result.pop(1)
+
+    assert [value.family for value in result] == ["Jones", "Smith", "Taylor"]
+    assert len(result._items) == 3
+    assert result._items[0].accessor is first_accessor
+    assert result._items[1].accessor is second_accessor
+    assert result._items[2].accessor is None
+    assert removed.family == "Lee"
 
 
 # =========================================================================== #
@@ -214,13 +277,13 @@ def test_add__assigns_scalar_field(patient):
 
 def test_insert__at_position(patient):
     patient.telecom = ["a", "c"]
-    select(patient, "telecom").insert("b", 1)
+    select(patient, "telecom").insert_at("b", 1)
     assert patient.telecom == ["a", "b", "c"]
 
 
 def test_insert__raises_for_scalar_field(patient):
     with pytest.raises(FHIRPathEvaluationError):
-        select(patient, "gender").insert("x", 0)
+        select(patient, "gender").insert_at("x", 0)
 
 
 def test_delete__removes_selected_list_entries(named_patient):

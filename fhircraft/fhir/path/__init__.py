@@ -3,9 +3,9 @@ FHIRPath Module
 """
 
 # These imports work after fixing the circular dependency
-from .engine import FHIRPathNode, FHIRPathCollection, FHIRPathCollectionItem
+from .engine import FHIRPathNode
+from .collection import FHIRPathCollection, FHIRPathCollectionItem
 from .mixin import FHIRPathMixin
-from .parser import FHIRPathParser
 from .utils import parse_fhirpath
 
 __all__ = [

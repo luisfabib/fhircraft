@@ -433,9 +433,7 @@ class Evaluate(MappingTransform):
             context = scope.get_instances()
 
         expression = self.resolve_fhirpath_within_context(self.expression, scope)
-        transformed_values = [
-            item.value for item in expression._evaluate_wrapped(context)
-        ]
+        transformed_values = list(expression._evaluate_wrapped(context))
         if len(transformed_values) == 1:
             return transformed_values[0]
         elif len(transformed_values) > 1:

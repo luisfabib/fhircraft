@@ -9,11 +9,13 @@ from fhircraft.exceptions import (
     FHIRPathException,
     FHIRPathWarning,
 )
-from fhircraft import SUPPORTED_FHIR_RELEASES
 from fhircraft.exceptions import FHIRPathRuntimeError
 from fhircraft.utils import ensure_list
 from fhircraft.fhir.path.accessors import RootAccessor
-from fhircraft.fhir.path.collection import FHIRPathCollection, FHIRPathCollectionItem
+from fhircraft.fhir.path.collection import (
+    FHIRPathCollection,
+    FHIRPathCollectionItem,
+)
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRPrimitiveModel
@@ -36,12 +38,14 @@ __all__ = [
 ]
 
 
-def _targets_of(collection: Any) -> tuple:
+def _targets_of(collection: FHIRPathCollection) -> tuple:
     """Writable targets of any collection-like (plain lists derive them from their items)."""
-    targets = getattr(collection, "targets", None)
+    targets = collection.targets
     if targets is not None:
         return targets
-    return tuple(i.accessor for i in collection if i.accessor is not None)
+    return tuple(
+        item.accessor for item in collection._items if item.accessor is not None
+    )
 
 
 class FHIRPathNode(ABC):
@@ -80,9 +84,9 @@ class FHIRPathNode(ABC):
                 trace_step(f"Input data: {repr(data)[:100]}...")
 
             # Wrap data and trace collection creation
-            wrapped_data = [
+            wrapped_data = FHIRPathCollection(
                 FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)
-            ]
+            )
             trace_step(f"Created collection with {len(wrapped_data)} items")
 
             if verbose:
@@ -113,8 +117,7 @@ class FHIRPathNode(ABC):
                         )
 
             # Extract values for final result
-            values = [item.value for item in result_collection]
-            trace_step(f"Final result: {len(values)} values")
+            trace_step(f"Final result: {len(result_collection)} values")
 
         except Exception as e:
             trace_step(f"ERROR during evaluation: {type(e).__name__}: {str(e)}")
@@ -165,13 +168,13 @@ class FHIRPathNode(ABC):
             debug_data["trace"] = self.trace(data, verbose=True)
 
             # Perform evaluation
-            result_collection = self.__evaluate_wrapped(data)
+            result_collection = self._evaluate_wrapped(data)
 
             # Analyze results
             debug_data["result_count"] = len(result_collection)
             debug_data["evaluation_success"] = True
 
-            for item in result_collection:
+            for item in result_collection._items:
                 debug_data["result_types"].append(type(item.value).__name__)
                 debug_data["result_values"].append(repr(item.value)[:100])
 
@@ -251,8 +254,7 @@ class FHIRPathNode(ABC):
         """
 
         collection = self._evaluate_wrapped(data, environment=environment)
-        values = [item.value for item in collection]
-
+        values = collection
         if len(values) == 0:
             return default
         elif len(values) == 1:
@@ -328,14 +330,18 @@ class FHIRPathNode(ABC):
             FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)
         )
         result = self.evaluate(collection, environment or dict())
-        return result if isinstance(result, FHIRPathCollection) else FHIRPathCollection(result)
+        return (
+            result
+            if isinstance(result, FHIRPathCollection)
+            else FHIRPathCollection(result)
+        )
 
     def values(self, data: Any, environment: dict | None = None) -> list[Any]:
         """Evaluate the expression against raw *data* and return the matching values.
 
         Intended for data that is not a Fhircraft model (dictionaries, JSON).
         """
-        return [item.value for item in self._evaluate_wrapped(data, environment)]
+        return list(self._evaluate_wrapped(data, environment))
 
     def _invoke(self, invocation: "FHIRPathNode") -> "FHIRPathNode":
         """
@@ -398,13 +404,13 @@ class Literal(FHIRPathNode):
         Simply returns the input collection.
 
         Args:
-            collection (FHIRPathCollection): The collection of items to be evaluated.
+            collection (FHIRPathCollection): The collection of values to be evaluated.
             environment (dict): The environment context for the evaluation.
 
         Returns:
-            collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
+            FHIRPathCollection: The collection containing the literal value.
         """
-        return [FHIRPathCollectionItem(self.value)]
+        return FHIRPathCollection([FHIRPathCollectionItem(self.value)])
 
     def __str__(self):
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
@@ -462,7 +468,7 @@ class Element(FHIRPathNode):
         """
         parents = [
             item.accessor or RootAccessor(item.value)
-            for item in collection
+            for item in collection._items
             if item.value is not None
         ]
         if not parents:
@@ -608,8 +614,7 @@ class RootElement(FHIRPathNode):
         Returns:
             collection (Collection): The same collection after validation.
         """
-        for item in collection:
-            resource = item.value
+        for resource in collection:
             # Check if resource is of valid type
             if (
                 isinstance(resource, dict)
@@ -673,6 +678,7 @@ class TypeSpecifier(FHIRPathNode):
             collection (Collection): The same collection after validation.
         """
         from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
+        from fhircraft import SUPPORTED_FHIR_RELEASES
 
         namespace = self.namespace or "FHIR"
         if namespace == "FHIR":
@@ -734,7 +740,7 @@ class TypeSpecifier(FHIRPathNode):
             raise NameError(
                 f"Unknown namespace '{self.namespace}' for type specifier '{self.specifier}'"
             )
-        return [FHIRPathCollectionItem(value=resolved_type)]
+        return FHIRPathCollection([FHIRPathCollectionItem(value=resolved_type)])
 
     def __str__(self):
         return (

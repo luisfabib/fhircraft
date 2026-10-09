@@ -50,10 +50,11 @@ def _evaluate_boolean_expressions(
         left_boolean = left_collection
     else:
         if len(left_collection) > 0:
-            if isinstance(left_collection[0].value, BooleanBase):
-                left_boolean = bool(left_collection[0].value.value)
+            left_value = left_collection[0]
+            if isinstance(left_value, BooleanBase):
+                left_boolean = bool(left_value.value)
             else:
-                left_boolean = bool(left_collection[0].value)
+                left_boolean = bool(left_value)
         else:
             left_boolean = None
     right_collection = (
@@ -65,10 +66,11 @@ def _evaluate_boolean_expressions(
         right_boolean = right_collection
     else:
         if len(right_collection) > 0:
-            if isinstance(right_collection[0].value, BooleanBase):
-                right_boolean = bool(right_collection[0].value.value)
+            right_value = right_collection[0]
+            if isinstance(right_value, BooleanBase):
+                right_boolean = bool(right_value.value)
             else:
-                right_boolean = bool(right_collection[0].value)
+                right_boolean = bool(right_value)
         else:
             right_boolean = None
     return left_boolean, right_boolean
@@ -109,19 +111,21 @@ class And(FHIRPathNode):
         )
         if left_boolean is None:
             if right_boolean is True:
-                return []
+                return FHIRPathCollection()
             elif right_boolean is False:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
             elif right_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif right_boolean is None:
             if left_boolean is True:
-                return []
+                return FHIRPathCollection()
             elif left_boolean is False:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
             elif left_boolean is None:
-                return []
-        return [FHIRPathCollectionItem.wrap(left_boolean and right_boolean)]
+                return FHIRPathCollection()
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(left_boolean and right_boolean)]
+        )
 
     def __str__(self):
         return f"{self.left} and {self.right}"
@@ -175,19 +179,21 @@ class Or(FHIRPathNode):
         )
         if left_boolean is None:
             if right_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif right_boolean is False:
-                return []
+                return FHIRPathCollection()
             elif right_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif right_boolean is None:
             if left_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif left_boolean is False:
-                return []
+                return FHIRPathCollection()
             elif left_boolean is None:
-                return []
-        return [FHIRPathCollectionItem.wrap(left_boolean or right_boolean)]
+                return FHIRPathCollection()
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(left_boolean or right_boolean)]
+        )
 
     def __str__(self):
         return f"{self.left} or {self.right}"
@@ -240,8 +246,10 @@ class Xor(FHIRPathNode):
             self.left, self.right, collection, environment
         )
         if left_boolean is None or right_boolean is None:
-            return []
-        return [FHIRPathCollectionItem.wrap(left_boolean ^ right_boolean)]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(left_boolean ^ right_boolean)]
+        )
 
     def __str__(self):
         return f"{self.left} xor {self.right}"
@@ -297,31 +305,31 @@ class Implies(FHIRPathNode):
         )
         if left_boolean is None:
             if right_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif right_boolean is False:
-                return []
+                return FHIRPathCollection()
             elif right_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif right_boolean is None:
             if left_boolean is True:
-                return []
+                return FHIRPathCollection()
             elif left_boolean is False:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif left_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif left_boolean is True:
             if right_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif right_boolean is False:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         elif right_boolean is True:
             if left_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif left_boolean is False:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         elif right_boolean is False and left_boolean is False:
-            return [FHIRPathCollectionItem.wrap(True)]
-        return []
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
+        return FHIRPathCollection()
 
     def __str__(self):
         return f"{self.left} implies {self.right}"
@@ -366,10 +374,10 @@ class Not(FHIRPathFunction):
                 "Cannot assert Not() for a collection that has more than one item."
             )
         elif len(collection) == 0:
-            return []
+            return FHIRPathCollection()
         else:
-            value = collection[0].value
+            value = collection[0]
             if isinstance(value, FHIRPrimitiveModel):
                 value = value.value
             boolean = bool(value)
-            return [FHIRPathCollectionItem.wrap(not boolean)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(not boolean)])

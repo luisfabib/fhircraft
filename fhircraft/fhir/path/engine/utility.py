@@ -62,9 +62,7 @@ class Trace(FHIRPathFunction):
         """
         log_collection = collection
         if self.projection:
-            log_collection = Select(self.projection).evaluate(
-                collection, environment
-            )
+            log_collection = Select(self.projection).evaluate(collection, environment)
         if not isinstance(
             name := self.name.single(collection, environment=environment), str
         ):
@@ -90,7 +88,9 @@ class Now(FHIRPathFunction):
             DateTime: The current date and time, including timezone offset.
         """
         now = datetime.datetime.now(tz=datetime.timezone.utc)
-        return [FHIRPathCollectionItem(DateTime(value_datetime=now))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem(DateTime(value_datetime=now))]
+        )
 
 
 class TimeOfDay(FHIRPathFunction):
@@ -107,7 +107,9 @@ class TimeOfDay(FHIRPathFunction):
         Returns:
             Time: The current time.
         """
-        return [FHIRPathCollectionItem(Time(value_time=datetime.datetime.now().time()))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem(Time(value_time=datetime.datetime.now().time()))]
+        )
 
 
 class Today(FHIRPathFunction):
@@ -124,4 +126,6 @@ class Today(FHIRPathFunction):
         Returns:
             Date: The current date.
         """
-        return [FHIRPathCollectionItem(Date(value_date=datetime.datetime.now().date()))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem(Date(value_date=datetime.datetime.now().date()))]
+        )

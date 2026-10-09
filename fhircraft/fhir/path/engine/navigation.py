@@ -34,7 +34,7 @@ class Children(FHIRPathFunction):
             FHIRPathCollection: The output collection.
         """
         children_collection = []
-        for item in collection:
+        for item in collection._items:
             if isinstance(item.value, BaseModel):
                 fields = type(item.value).model_fields
             elif isinstance(item.value, dict):
@@ -43,9 +43,9 @@ class Children(FHIRPathFunction):
                 fields = []
             for field in fields:
                 children_collection.extend(
-                    Element(field).evaluate([item], environment)
+                    Element(field).evaluate(FHIRPathCollection([item]), environment)
                 )
-        return children_collection
+        return FHIRPathCollection(children_collection)
 
 
 class Descendants(FHIRPathFunction):

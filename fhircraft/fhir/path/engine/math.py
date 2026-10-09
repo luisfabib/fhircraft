@@ -1,5 +1,22 @@
 """The tree navigation module contains the object representations of the math category FHIRPath operators/functions."""
 
+from math import ceil, exp, floor, log, sqrt
+from typing import Callable
+
+from fhircraft.fhir.path.engine.core import (
+    FHIRPathNode,
+    FHIRPathCollection,
+    FHIRPathCollectionItem,
+    FHIRPathFunction,
+    Literal,
+)
+from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.exceptions import FHIRPathRuntimeError
+from fhircraft.fhir.path.utils import (
+    _evaluate_and_prepare_collection_values,
+    _get_expression_context,
+)
+
 __all__ = [
     "Addition",
     "Subtraction",
@@ -18,23 +35,6 @@ __all__ = [
     "Power",
     "Round",
 ]
-
-from math import ceil, exp, floor, log, sqrt
-from typing import Callable
-
-from fhircraft.fhir.path.engine.core import (
-    FHIRPathNode,
-    FHIRPathCollection,
-    FHIRPathCollectionItem,
-    FHIRPathFunction,
-    Literal,
-)
-from fhircraft.fhir.path.engine.literals import Quantity
-from fhircraft.exceptions import FHIRPathRuntimeError
-from fhircraft.fhir.path.utils import (
-    _evaluate_and_prepare_collection_values,
-    _get_expression_context,
-)
 
 
 class FHIRMathOperator(FHIRPathNode):
@@ -101,17 +101,23 @@ class Addition(FHIRMathOperator):
             self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(left_value, (str, StringBase)) and isinstance(
             right_value, (str, StringBase)
         ):
-            return [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            )
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot add {type(left_value).__name__} and {type(right_value).__name__}."
@@ -153,13 +159,17 @@ class Subtraction(FHIRMathOperator):
             self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot subtract {type(left_value).__name__} and {type(right_value).__name__}."
@@ -202,13 +212,17 @@ class Multiplication(FHIRMathOperator):
             self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot multiply {type(left_value).__name__} and {type(right_value).__name__}."
@@ -253,17 +267,21 @@ class Division(FHIRMathOperator):
             self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         if (Quantity.is_quantity(right_value) and right_value.value == 0) or (
             isinstance(right_value, (int, float)) and right_value == 0
         ):
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
@@ -304,13 +322,13 @@ class Div(FHIRMathOperator):
             self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
             if right_value == 0:
-                return []
-            return [FHIRPathCollectionItem.wrap(left_value // right_value)]  # type: ignore
+                return FHIRPathCollection()
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(left_value // right_value)])  # type: ignore
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot perform truncated division between {type(left_value).__name__} and {type(right_value).__name__}."
@@ -351,11 +369,13 @@ class Mod(FHIRMathOperator):
             self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value % right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value % right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
@@ -374,7 +394,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
 
     def _validate_collection(self, collection: FHIRPathCollection):
         if len(collection) == 0:
-            return []
+            return FHIRPathCollection()
         elif len(collection) > 1:
             raise FHIRPathRuntimeError("Input collection must be a singleton.")
         return collection
@@ -398,7 +418,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         if isinstance(value, (int, float)):
             value = self.math_operation(value)
         elif isinstance(value, (IntegerBase, DecimalBase)) and value.value is not None:
@@ -409,7 +429,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
             raise FHIRPathRuntimeError(
                 f"FHIRPath function {self.__class__.__name__}() cannot compute abs for {value} ({type(value).__name__})."
             )
-        return [FHIRPathCollectionItem.wrap(value)]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
 
 
 class Abs(FHIRPathMathFunction):
@@ -482,7 +502,7 @@ class Log(FHIRPathMathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(
@@ -529,7 +549,7 @@ class Power(FHIRPathMathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         environment = _get_expression_context(environment, value, index=0)
 
         if not isinstance(
@@ -577,7 +597,7 @@ class Round(FHIRPathMathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(

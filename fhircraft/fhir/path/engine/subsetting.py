@@ -12,8 +12,6 @@ __all__ = [
     "Exclude",
 ]
 
-from typing import List, Optional, Union
-
 from fhircraft.fhir.path.engine.core import (
     _targets_of,
     FHIRPathNode,
@@ -74,9 +72,9 @@ class Index(FHIRPathNode):
             return FHIRPathCollection(items, targets=[slot])
         if len(targets) == 1 and targets[0].index is not None and self.index == 0:
             # Index zero of a single (possibly absent) slot is that slot.
-            return FHIRPathCollection(list(collection)[:1], targets=targets)
+            return FHIRPathCollection(collection._items[:1], targets=targets)
         if collection and -len(collection) <= self.index < len(collection):
-            return FHIRPathCollection([collection[self.index]])
+            return FHIRPathCollection([collection._items[self.index]])
         return FHIRPathCollection()
 
     def __eq__(self, other):
@@ -189,7 +187,7 @@ class Tail(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        return ensure_list(collection[1:])
+        return FHIRPathCollection(collection._items[1:])
 
 
 class Skip(FHIRPathFunction):
@@ -226,8 +224,8 @@ class Skip(FHIRPathFunction):
                 "Skip() argument must evaluate to an integer number."
             )
         if num <= 0:
-            return []
-        return ensure_list(collection[num:])
+            return FHIRPathCollection()
+        return FHIRPathCollection(collection._items[num:])
 
 
 class Take(FHIRPathFunction):
@@ -260,11 +258,11 @@ class Take(FHIRPathFunction):
             num := self.num.single(collection, environment=environment), int
         ):
             raise FHIRPathException(
-                "Skip() argument must evaluate to an integer number."
+                "Take() argument must evaluate to an integer number."
             )
         if num <= 0:
-            return []
-        return ensure_list(collection[:num])
+            return FHIRPathCollection()
+        return FHIRPathCollection(collection._items[:num])
 
 
 class Intersect(FHIRPathFunction):
@@ -296,7 +294,9 @@ class Intersect(FHIRPathFunction):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment
             )
-        return [item for item in collection if item in self.other_collection]
+        return FHIRPathCollection(
+            [item for item in collection._items if item in self.other_collection._items]
+        )
 
 
 class Exclude(FHIRPathFunction):
@@ -328,4 +328,10 @@ class Exclude(FHIRPathFunction):
             self.other_collection = self.other_collection.evaluate(
                 collection, environment
             )
-        return [item for item in collection if item not in self.other_collection]
+        return FHIRPathCollection(
+            [
+                item
+                for item in collection._items
+                if item not in self.other_collection._items
+            ]
+        )

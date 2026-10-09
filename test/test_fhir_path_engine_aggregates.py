@@ -25,7 +25,7 @@ aggregate_cases = (
 def test_aggregate_returns_correct_sum(values, init, expected):
     collection = [FHIRPathCollectionItem(value=val) for val in values]
     result = Aggregate(Addition(ContextualThis(), ContextualTotal()), Literal(init)).evaluate(FHIRPathCollection(collection), env)
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 def test_aggregate_string_representation():

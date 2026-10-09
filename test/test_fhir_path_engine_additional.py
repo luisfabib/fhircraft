@@ -97,7 +97,7 @@ def test_extension_selects_correct_extension_by_url():
     )
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Extension("http://domain.org/extension2").evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == resource.extension[1]
+    assert result[0] == resource.extension[1]
 
 
 # -------------
@@ -121,14 +121,14 @@ has_value_cases = (
 def test_hasvalue_returns_false_for_empty_collection():
     collection = []
     result = HasValue().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == False
+    assert result[0] == False
 
 
 @pytest.mark.parametrize("value", has_value_cases)
 def test_hasvalue_returns_true_for_singleton_collection_with_primitive_value(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = HasValue().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_hasvalue_returns_false_for_singleton_collection_without_primitive_value():
@@ -138,19 +138,19 @@ def test_hasvalue_returns_false_for_singleton_collection_without_primitive_value
         )
     ]
     result = HasValue().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_hasvalue_returns_true_for_singleton_collection_without_value():
     collection = [FHIRPathCollectionItem(value=None)]
     result = HasValue().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_hasvalue_returns_false_for_collection_with_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = HasValue().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == False
+    assert result[0] == False
 
 
 # -------------
@@ -187,7 +187,7 @@ def test_getvalue_returns_value_for_singleton_collection_with_primitive_value(va
     result = GetValue().evaluate(FHIRPathCollection(collection), env)
     if isinstance(value, FHIRPrimitiveModel):
         value = value.value
-    assert result[0].value == value
+    assert result[0] == value
 
 
 def test_getvalue_returns_empty_for_singleton_collection_without_primitive_value():
@@ -231,7 +231,7 @@ def test_htmlchecks_invalid_xhtml():
     """
     collection = [FHIRPathCollectionItem(value=html_snippet)]
     result = HtmlChecks().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_htmlchecks_invalid_empty_div():
@@ -240,7 +240,7 @@ def test_htmlchecks_invalid_empty_div():
     """
     collection = [FHIRPathCollectionItem(value=html_snippet)]
     result = HtmlChecks().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_htmlchecks_valid_xhtml():
@@ -249,7 +249,7 @@ def test_htmlchecks_valid_xhtml():
     """
     collection = [FHIRPathCollectionItem(value=html_snippet)]
     result = HtmlChecks().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == True
+    assert result[0] == True
 
 
 # -------------
@@ -267,7 +267,7 @@ def test_lowboundary_integer_precision():
     """Test low boundary for integer values"""
     collection = [FHIRPathCollectionItem(value=10)]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 10
+    assert result[0] == 10
 
 
 def test_lowboundary_float_precision():
@@ -275,47 +275,47 @@ def test_lowboundary_float_precision():
     # Single decimal place
     collection = [FHIRPathCollectionItem(value=1.5)]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 1.5 - sys.float_info.epsilon
+    assert result[0] == 1.5 - sys.float_info.epsilon
 
     # Two decimal places
     collection = [FHIRPathCollectionItem(value=1.25)]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 1.25 - sys.float_info.epsilon
+    assert result[0] == 1.25 - sys.float_info.epsilon
 
 
 def test_lowboundary_year_only():
     """Test low boundary for year-only date strings"""
     collection = [FHIRPathCollectionItem(value="2018")]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-01-01T00:00:00.000"
+    assert result[0] == "2018-01-01T00:00:00.000"
 
 
 def test_lowboundary_year_month():
     """Test low boundary for year-month date strings"""
     collection = [FHIRPathCollectionItem(value="2018-03")]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-03-01T00:00:00.000"
+    assert result[0] == "2018-03-01T00:00:00.000"
 
 
 def test_lowboundary_full_date():
     """Test low boundary for full date strings"""
     collection = [FHIRPathCollectionItem(value="2018-03-15")]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-03-15T00:00:00.000"
+    assert result[0] == "2018-03-15T00:00:00.000"
 
 
 def test_lowboundary_complete_datetime():
     """Test low boundary for complete datetime strings (should return as-is)"""
     collection = [FHIRPathCollectionItem(value="2018-03-15T14:30:45.123Z")]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-03-15T14:30:45.123Z"
+    assert result[0] == "2018-03-15T14:30:45.123Z"
 
 
 def test_lowboundary_non_datetime_string():
     """Test low boundary for non-datetime strings (should return as-is)"""
     collection = [FHIRPathCollectionItem(value="not-a-date")]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "not-a-date"
+    assert result[0] == "not-a-date"
 
 
 def test_lowboundary_fhirpath_quantity():
@@ -325,8 +325,8 @@ def test_lowboundary_fhirpath_quantity():
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
 
-    assert result[0].value.value == 10.5 - sys.float_info.epsilon
-    assert result[0].value.unit == "kg"
+    assert result[0].value == 10.5 - sys.float_info.epsilon
+    assert result[0].unit == "kg"
 
 
 def test_lowboundary_r4_quantity():
@@ -338,8 +338,8 @@ def test_lowboundary_r4_quantity():
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
 
-    assert result[0].value.value == 10.5 - sys.float_info.epsilon
-    assert result[0].value.unit == "kg"
+    assert result[0].value == 10.5 - sys.float_info.epsilon
+    assert result[0].unit == "kg"
 
 
 def test_lowboundary_r4_age():
@@ -350,8 +350,8 @@ def test_lowboundary_r4_age():
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = LowBoundary().evaluate(FHIRPathCollection(collection), env)
 
-    assert result[0].value.value == 42 - sys.float_info.epsilon
-    assert result[0].value.unit == "a"
+    assert result[0].value == 42 - sys.float_info.epsilon
+    assert result[0].unit == "a"
 
 
 # -------------
@@ -369,7 +369,7 @@ def test_highboundary_integer_precision():
     """Test high boundary for integer values"""
     collection = [FHIRPathCollectionItem(value=10)]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 10
+    assert result[0] == 10
 
 
 def test_highboundary_float_precision():
@@ -377,19 +377,19 @@ def test_highboundary_float_precision():
     # Single decimal place
     collection = [FHIRPathCollectionItem(value=1.5)]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 1.5 + sys.float_info.epsilon
+    assert result[0] == 1.5 + sys.float_info.epsilon
 
     # Two decimal places
     collection = [FHIRPathCollectionItem(value=1.25)]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 1.25 + sys.float_info.epsilon
+    assert result[0] == 1.25 + sys.float_info.epsilon
 
 
 def test_highboundary_year_only():
     """Test high boundary for year-only date strings"""
     collection = [FHIRPathCollectionItem(value="2018")]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-12-31T23:59:59.999"
+    assert result[0] == "2018-12-31T23:59:59.999"
 
 
 def test_highboundary_year_month():
@@ -397,38 +397,38 @@ def test_highboundary_year_month():
     # Regular month
     collection = [FHIRPathCollectionItem(value="2018-03")]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-03-31T23:59:59.999"
+    assert result[0] == "2018-03-31T23:59:59.999"
 
     # February in non-leap year
     collection = [FHIRPathCollectionItem(value="2018-02")]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-02-28T23:59:59.999"
+    assert result[0] == "2018-02-28T23:59:59.999"
 
     # February in leap year
     collection = [FHIRPathCollectionItem(value="2020-02")]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2020-02-29T23:59:59.999"
+    assert result[0] == "2020-02-29T23:59:59.999"
 
 
 def test_highboundary_full_date():
     """Test high boundary for full date strings"""
     collection = [FHIRPathCollectionItem(value="2018-03-15")]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-03-15T23:59:59.999"
+    assert result[0] == "2018-03-15T23:59:59.999"
 
 
 def test_highboundary_complete_datetime():
     """Test high boundary for complete datetime strings (should return as-is)"""
     collection = [FHIRPathCollectionItem(value="2018-03-15T14:30:45.123Z")]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "2018-03-15T14:30:45.123Z"
+    assert result[0] == "2018-03-15T14:30:45.123Z"
 
 
 def test_highboundary_non_datetime_string():
     """Test high boundary for non-datetime strings (should return as-is)"""
     collection = [FHIRPathCollectionItem(value="not-a-date")]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == "not-a-date"
+    assert result[0] == "not-a-date"
 
 
 def test_highboundary_fhirpath_quantity():
@@ -438,8 +438,8 @@ def test_highboundary_fhirpath_quantity():
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
 
-    assert result[0].value.value == 10.5 + sys.float_info.epsilon
-    assert result[0].value.unit == "kg"
+    assert result[0].value == 10.5 + sys.float_info.epsilon
+    assert result[0].unit == "kg"
 
 
 def test_highboundary_r4_quantity():
@@ -451,8 +451,8 @@ def test_highboundary_r4_quantity():
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
 
-    assert result[0].value.value == 10.5 + sys.float_info.epsilon
-    assert result[0].value.unit == "kg"
+    assert result[0].value == 10.5 + sys.float_info.epsilon
+    assert result[0].unit == "kg"
 
 
 def test_highboundary_r4_age():
@@ -463,8 +463,8 @@ def test_highboundary_r4_age():
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = HighBoundary().evaluate(FHIRPathCollection(collection), env)
 
-    assert result[0].value.value == 42 + sys.float_info.epsilon
-    assert result[0].value.unit == "a"
+    assert result[0].value == 42 + sys.float_info.epsilon
+    assert result[0].unit == "a"
 
 
 # -------------
@@ -505,7 +505,7 @@ def test_comparable_same_units_with_fhirpath():
     result = Comparable(EnvironmentVariable("%quantity")).evaluate(
         FHIRPathCollection(collection), {"%quantity": Quantity(value=12, unit="mg")}
     )
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_comparable_r4_fhir_quantity():
@@ -600,7 +600,7 @@ def test_resolve_with_internal_reference():
     resource = {"contained": [contained_resource]}
     collection = [FHIRPathCollectionItem(value="#123")]
     result = Resolve().evaluate(FHIRPathCollection(collection), {"%resource": resource})
-    assert result[0].value == contained_resource
+    assert result[0] == contained_resource
 
 
 def test_resolve_with_unresolvable_internal_reference():
@@ -619,7 +619,7 @@ def test_resolve_ignores_non_reference_items():
         FHIRPathCollectionItem(value=123),
     ]
     result = Resolve().evaluate(FHIRPathCollection(collection), {"%resource": resource})
-    assert result[0].value == contained_resource
+    assert result[0] == contained_resource
 
 
 # -------------
@@ -658,7 +658,7 @@ def test_conformsto_returns_true_for_conforming_resource():
     result = ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
         FHIRPathCollection(collection), {"%fhirRelease": "R4"}
     )
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_conformsto_returns_false_for_non_conforming_resource():
@@ -670,7 +670,7 @@ def test_conformsto_returns_false_for_non_conforming_resource():
     result = ConformsTo("http://hl7.org/fhir/StructureDefinition/Patient").evaluate(
         FHIRPathCollection(collection), {"%fhirRelease": "R4"}
     )
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_conformsto_returns_empty_for_unresolvable_structure_definition():
@@ -701,7 +701,7 @@ def test_memberof_returns_false_for_invalid_code(terminology_service):
         FHIRPathCollection(collection),
         {"%fhirRelease": "R4", "%terminologyService": terminology_service},
     )
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_memberof_returns_false_for_invalid_coding(terminology_service):
@@ -710,7 +710,7 @@ def test_memberof_returns_false_for_invalid_coding(terminology_service):
         FHIRPathCollection(collection),
         {"%fhirRelease": "R4", "%terminologyService": terminology_service},
     )
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_memberof_returns_false_for_invalid_codeableconcept(terminology_service):
@@ -723,7 +723,7 @@ def test_memberof_returns_false_for_invalid_codeableconcept(terminology_service)
         FHIRPathCollection(collection),
         {"%fhirRelease": "R4", "%terminologyService": terminology_service},
     )
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_memberof_returns_true_for_valid_code(terminology_service):
@@ -733,7 +733,7 @@ def test_memberof_returns_true_for_valid_code(terminology_service):
         FHIRPathCollection(collection),
         {"%fhirRelease": "R4", "%terminologyService": terminology_service},
     )
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_memberof_returns_true_for_valid_coding(terminology_service):
@@ -742,7 +742,7 @@ def test_memberof_returns_true_for_valid_coding(terminology_service):
         FHIRPathCollection(collection),
         {"%fhirRelease": "R4", "%terminologyService": terminology_service},
     )
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_memberof_returns_true_for_valid_codeableconcept(terminology_service):
@@ -755,7 +755,7 @@ def test_memberof_returns_true_for_valid_codeableconcept(terminology_service):
         FHIRPathCollection(collection),
         {"%fhirRelease": "R4", "%terminologyService": terminology_service},
     )
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_memberof_returns_empty_for_unresolvable_valueset(terminology_service):
@@ -805,7 +805,7 @@ def test_subsumes_returns_true_for_subsuming_code(terminology_service):
             "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
         },
     )
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_subsumes_returns_false_for_non_subsuming_code(terminology_service):
@@ -820,7 +820,7 @@ def test_subsumes_returns_false_for_non_subsuming_code(terminology_service):
             "%otherCoding": R4_Coding(system="http://loinc.org", code="parent"),
         },
     )
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_subsumes_returns_empty_when_service_returns_none(terminology_service):
@@ -920,7 +920,7 @@ def test_subsumedby_returns_true_for_subsumed_code(terminology_service):
             "%otherCoding": R4_Coding(system="http://loinc.org", code="parent"),
         },
     )
-    assert result[0].value == True
+    assert result[0] == True
 
 
 def test_subsumedby_returns_false_for_non_subsumed_code(terminology_service):
@@ -937,7 +937,7 @@ def test_subsumedby_returns_false_for_non_subsumed_code(terminology_service):
             "%otherCoding": R4_Coding(system="http://loinc.org", code="child"),
         },
     )
-    assert result[0].value == False
+    assert result[0] == False
 
 
 def test_subsumedby_returns_empty_when_service_returns_none(terminology_service):

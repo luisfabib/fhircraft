@@ -1,14 +1,5 @@
 """The filtering module contains the object representations of the filtering-category FHIRPath functions."""
 
-__all__ = [
-    "Where",
-    "Select",
-    "Repeat",
-    "OfType",
-]
-
-from typing import List, Optional, Union
-
 from fhircraft.fhir.path.engine.core import (
     FHIRPathNode,
     FHIRPathCollection,
@@ -18,7 +9,13 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.types import As
 from fhircraft.fhir.path.utils import _get_expression_context
-from fhircraft.utils import ensure_list
+
+__all__ = [
+    "Where",
+    "Select",
+    "Repeat",
+    "OfType",
+]
 
 
 class Where(FHIRPathFunction):
@@ -48,18 +45,20 @@ class Where(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
         expression_collection = [
             self.expression.evaluate(
-                [item], _get_expression_context(environment, item, index)
+                FHIRPathCollection([item]),
+                _get_expression_context(environment, item, index),
             )
-            for index, item in enumerate(collection)
+            for index, item in enumerate(collection._items)
         ]
         checks = [
-            bool(collection[0].value) if len(collection) > 0 else False
+            bool(collection[0]) if len(collection) > 0 else False
             for collection in expression_collection
         ]
-        return [item for item, check in zip(collection, checks) if check]
+        return FHIRPathCollection(
+            [item for item, check in zip(collection._items, checks) if check]
+        )
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.expression.__str__()})"
@@ -103,16 +102,16 @@ class Select(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
-        return [
-            projected_item
-            for index, item in enumerate(collection)
-            for projected_item in ensure_list(
-                self.projection.evaluate(
-                    [item], _get_expression_context(environment, item, index)
-                )
-            )
-        ]
+        return FHIRPathCollection(
+            [
+                projected_item
+                for index, item in enumerate(collection._items)
+                for projected_item in self.projection.evaluate(
+                    FHIRPathCollection([item]),
+                    _get_expression_context(environment, item, index),
+                )._items
+            ]
+        )
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.projection.__str__()})"
@@ -153,15 +152,18 @@ class Repeat(FHIRPathFunction):
             FHIRPathCollection): The output collection.
         """
 
-        def project_recursively(input_collection):
-            output_collection = []
-            for index, item in enumerate(input_collection):
+        def project_recursively(
+            input_collection: FHIRPathCollection,
+        ) -> FHIRPathCollection:
+            output_collection = FHIRPathCollection()
+            for index, item in enumerate(input_collection._items):
                 new_collection = self.projection.evaluate(
-                    [item], _get_expression_context(environment, item, index)
+                    FHIRPathCollection([item]),
+                    _get_expression_context(environment, item, index),
                 )
-                output_collection.extend(new_collection)
+                output_collection.extend(new_collection._items)
                 if len(new_collection) > 0:
-                    output_collection.extend(project_recursively(new_collection))
+                    output_collection.extend(project_recursively(new_collection)._items)
             return output_collection
 
         return project_recursively(collection)
@@ -204,11 +206,10 @@ class OfType(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
-        filtered_collection = []
+        filtered_collection = FHIRPathCollection()
         for item in collection:
             filtered_collection.extend(
-                As(This(), self.type).evaluate([item], environment)
+                As(This(), self.type).evaluate(FHIRPathCollection([item]), environment)
             )
         return filtered_collection
 

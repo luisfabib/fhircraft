@@ -42,7 +42,7 @@ def run(expression: str, resource) -> FHIRPathCollection:
 def test_targets__element_on_existing_value():
     patient = Patient(gender="male")
     result = Element("gender").evaluate(wrap(patient), env)
-    assert [i.value for i in result] == ["male"]
+    assert list(result) == ["male"]
     assert len(result.targets) == 1
     assert result.targets[0].get() == "male"
 
@@ -81,12 +81,16 @@ def test_targets__items_keep_accessor_through_subsetting():
     patient = Patient(name=[Name(family="A"), Name(family="B"), Name(family="C")])
     names = Element("name").evaluate(wrap(patient), env)
     tail = Tail().evaluate(names, env)
-    assert [i.canonical_path.endswith(f"name[{n}]") for n, i in enumerate(tail, 1)] == [
+    assert [
+        item.canonical_path.endswith(f"name[{n}]")
+        for n, item in enumerate(tail._items, 1)
+    ] == [
         True,
         True,
     ]
     first = First().evaluate(names, env)
-    assert first[0].accessor is not None and first[0].accessor.index == 0
+    assert first._items[0].accessor is not None
+    assert first._items[0].accessor.index == 0
 
 
 def test_targets__items_keep_accessor_through_where():
@@ -94,7 +98,8 @@ def test_targets__items_keep_accessor_through_where():
     names = Element("name").evaluate(wrap(patient), env)
     result = Where(parser.parse("family = 'B'")).evaluate(names, env)
     assert len(result) == 1
-    assert result[0].accessor is not None and result[0].accessor.index == 1
+    assert result._items[0].accessor is not None
+    assert result._items[0].accessor.index == 1
 
 
 def test_targets__literal_has_none():
@@ -132,7 +137,7 @@ def test_patch__add_to_nested_list_on_empty_resource():
 
 def test_patch__insert_at_position():
     patient = Patient(name=[Name(family="A"), Name(family="C")])
-    run("name", patient).insert(Name(family="B"), 1)
+    run("name", patient).insert_at(Name(family="B"), 1)
     assert [n.family for n in patient.name] == ["A", "B", "C"]
 
 

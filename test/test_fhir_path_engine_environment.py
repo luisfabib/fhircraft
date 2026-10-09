@@ -36,7 +36,7 @@ def test_env_variable_returns_value():
     value = 42
     collection = [FHIRPathCollectionItem(value="another-value")]
     result = EnvironmentVariable("%variable").evaluate(FHIRPathCollection(collection), {"%variable": value})
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == value
 
 
@@ -103,7 +103,7 @@ def test_contextual_this_returns_value():
     value = 42
     collection = [FHIRPathCollectionItem(value="another-value")]
     result = ContextualThis().evaluate(FHIRPathCollection(collection), {"$this": value})
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == value
 
 
@@ -126,7 +126,7 @@ def test_contextual_index_returns_value():
     value = 1
     collection = [FHIRPathCollectionItem(value="another-value")]
     result = ContextualIndex().evaluate(FHIRPathCollection(collection), {"$index": value})
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == value
 
 
@@ -149,7 +149,7 @@ def test_contextual_total_returns_value():
     value = 1
     collection = [FHIRPathCollectionItem(value="another-value")]
     result = ContextualTotal().evaluate(FHIRPathCollection(collection), {"$total": value})
-    result = result[0].value if len(result) == 1 else result
+    result = result[0] if len(result) == 1 else result
     assert result == value
 
 

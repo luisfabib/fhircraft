@@ -75,7 +75,7 @@ def test_greater_than_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    assert result == [expected]
 
 
 def test_greaterthan_string_representation():
@@ -141,7 +141,7 @@ def test_less_than_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    assert result == [expected]
 
 
 def test_lessthan_string_representation():
@@ -234,7 +234,7 @@ def test_less_equal_than_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    assert result == [expected]
 
 
 def test_lessequalthan_string_representation():
@@ -325,7 +325,7 @@ def test_greater_equal_than_returns_correct_boolean(left, right, expected):
         Element("left"),
         Element("right"),
     ).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    assert result == [expected]
 
 
 def test_greater_equal_than_string_representation():

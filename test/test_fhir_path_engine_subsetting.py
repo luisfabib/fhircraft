@@ -77,7 +77,7 @@ class TestIndexPrimitive(TestCase):
     def test_index_evaluates_correctly(self):
         result = Index(2).evaluate(self.collection, env)
         assert len(result) == 1
-        assert result[0].value == 3
+        assert result[0] == 3
         assert len(self.resource.field) == 3
 
     def test_index_out_of_bounds_keeps_writable_target_without_mutating(self):
@@ -105,7 +105,7 @@ class TestIndexPrimitive(TestCase):
     def test_index_handles_negative_indices(self):
         result = Index(-1).evaluate(self.collection, env)
         assert len(result) == 1
-        assert result[0].value == 3
+        assert result[0] == 3
         assert len(self.resource.field) == 3
 
     def test_index_handles_non_integer_indices(self):
@@ -129,7 +129,7 @@ class TestIndexResources(TestCase):
     def test_index_evaluates_correctly(self):
         result = Index(2).evaluate(self.collection, env)
         assert len(result) == 1
-        assert result[0].value == Coding(code="code-3", system="system-3")
+        assert result[0] == Coding(code="code-3", system="system-3")
         assert self.resource.coding
         assert len(self.resource.coding) == 3
 

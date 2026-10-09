@@ -55,8 +55,8 @@ def test_select_returns_collection_of_projected_elements():
         FHIRPathCollectionItem(value=Resource(field=456)),
     ]
     result = Select(Invocation(This(), Element("field"))).evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == 123
-    assert result[1].value == 456
+    assert result[0] == 123
+    assert result[1] == 456
 
 
 def test_select_string_representation():
@@ -90,7 +90,7 @@ def test_repeat_returns_collection_of_nested_repeating_elements():
         )
     ]
     result = Repeat(Invocation(This(), Element("items"))).evaluate(FHIRPathCollection(collection), env)
-    assert [item.value.label for item in result] == [
+    assert [item.label for item in result] == [
         "1.1",
         "1.2",
         "1.3",
@@ -129,7 +129,7 @@ def test_ofType_returns_filtered_collection_by_type(expected, type):
         FHIRPathCollectionItem(value=Quantity(12, "g")),
     ]
     result = OfType(TypeSpecifier(type)).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    assert result == [expected]
 
 
 def test_ofType_returns_empty_for_empty_collection():

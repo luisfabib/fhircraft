@@ -60,7 +60,7 @@ def test_iif_returns_value_if_criterion_is_true():
     result = Iif(Exists(), FHIRPathCollection([FHIRPathCollectionItem.wrap("return_value")])).evaluate(
         FHIRPathCollection(collection), env
     )
-    assert result == [FHIRPathCollectionItem.wrap("return_value")]
+    assert result == ["return_value"]
 
 
 def test_iif_returns_value_if_criterion_is_false():
@@ -70,7 +70,7 @@ def test_iif_returns_value_if_criterion_is_false():
         FHIRPathCollection([FHIRPathCollectionItem.wrap("return_value")]),
         FHIRPathCollection([FHIRPathCollectionItem.wrap("other_value")]),
     ).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap("other_value")]
+    assert result == ["other_value"]
 
 
 def test_iif_returns_true_if_criterion_is_empty():
@@ -78,7 +78,7 @@ def test_iif_returns_true_if_criterion_is_empty():
     result = Iif(Empty(), FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])).evaluate(
         FHIRPathCollection(collection), env
     )
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_iif_returns_value_if_criterion_is_false_and_no_otherwise():
@@ -92,13 +92,13 @@ def test_iif_returns_value_if_criterion_is_false_and_no_otherwise():
 def test_iif_returns_evaluated_value_if_criterion_is_true():
     collection = [FHIRPathCollectionItem(value=True)]
     result = Iif(Exists(), Empty(), Exists()).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 def test_iif_returns_evaluated_value_if_criterion_is_false():
     collection = []
     result = Iif(Exists(), Empty(), Exists()).evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 def test_iif_returns_evaluated_value_if_criterion_is_false_and_no_otherwise():
@@ -168,7 +168,7 @@ toBoolean_cases = (
 def test_toBoolean_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToBoolean().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result == [expected]
 
 
 def test_toBoolean_raises_error_for_multiple_items():
@@ -196,7 +196,7 @@ def test_convertstoboolean_returns_empty_if_empty():
 def test_convertstoboolean_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToBoolean().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertsToBoolean_cases = (
@@ -236,7 +236,7 @@ convertsToBoolean_cases = (
 def test_convertstoboolean_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToBoolean().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_convertsToBoolean_raises_error_for_multiple_items():
@@ -288,7 +288,7 @@ tointeger_cases = (
 def test_tointeger_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToInteger().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result == [expected]
 
 
 def test_toInteger_raises_error_for_multiple_items():
@@ -316,7 +316,7 @@ def test_convertstointeger_returns_empty_if_empty():
 def test_convertstointeger_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToInteger().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertstointeger_cases = (
@@ -338,7 +338,7 @@ convertstointeger_cases = (
 def test_convertstointeger_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToInteger().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_convertstoInteger_raises_error_for_multiple_items():
@@ -392,7 +392,7 @@ todecimal_cases = (
 def test_todecimal_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDecimal().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result == [expected]
 
 
 def test_toDecimal_raises_error_for_multiple_items():
@@ -420,7 +420,7 @@ def test_convertstodecimal_returns_empty_if_empty():
 def test_convertstodecimal_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDecimal().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertstodecimal_cases = (
@@ -444,7 +444,7 @@ convertstodecimal_cases = (
 def test_convertstodecimal_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToDecimal().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_convertsToDecimal_raises_error_for_multiple_items():
@@ -496,7 +496,7 @@ todate_cases = (
 def test_todate_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDate().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result == [expected]
 
 
 def test_toDate_raises_error_for_multiple_items():
@@ -524,7 +524,7 @@ def test_convertstodate_returns_empty_if_empty():
 def test_convertstodate_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDate().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertstodate_cases = (
@@ -548,7 +548,7 @@ convertstodate_cases = (
 def test_convertstodate_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToDate().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_convertsToDate_raises_error_for_multiple_items():
@@ -600,7 +600,7 @@ todatetime_cases = (
 def test_todatetime_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDateTime().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result == [expected]
 
 
 def test_toDateTime_raises_error_for_multiple_items():
@@ -628,7 +628,7 @@ def test_convertstodatetime_returns_empty_if_empty():
 def test_convertstodatetime_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDateTime().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertstodatetime_cases = (
@@ -652,7 +652,7 @@ convertstodatetime_cases = (
 def test_convertstodatetime_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToDateTime().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_convertsToDateTime_raises_error_for_multiple_items():
@@ -709,7 +709,7 @@ toquantity_cases = (
 def test_toquantity_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToQuantity().evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == expected
+    assert result[0] == expected
 
 
 @pytest.mark.parametrize(
@@ -722,7 +722,7 @@ def test_toquantity_converts_correctly_for_valid_type(value, expected):
 def test_toquantity_converts_to_input_unit(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToQuantity("kg").evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == expected
+    assert result[0] == expected
 
 
 def test_toQuantity_raises_error_for_multiple_items():
@@ -750,7 +750,7 @@ def test_convertstoquantity_returns_empty_if_empty():
 def test_convertstoquantity_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToQuantity().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertstoquantity_cases = (
@@ -776,7 +776,7 @@ convertstoquantity_cases = (
 def test_convertstoquantity_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToQuantity().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 @pytest.mark.parametrize(
@@ -791,7 +791,7 @@ def test_convertstoquantity_returns_true_for_valid_type(value):
 def test_convertstoquantity_returns_correct_conversion(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToQuantity("kg").evaluate(FHIRPathCollection(collection), env)
-    assert result[0].value == expected
+    assert result[0] == expected
 
 
 def test_convertsToQuantity_raises_error_for_multiple_items():
@@ -847,7 +847,7 @@ toString_cases = (
 def test_toString_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToString().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result == [expected]
 
 
 def test_toString_raises_error_for_multiple_items():
@@ -875,7 +875,7 @@ def test_convertstostring_returns_empty_if_empty():
 def test_convertstostring_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value=BaseException)]
     result = ConvertsToString().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertstostring_cases = (
@@ -902,7 +902,7 @@ convertstostring_cases = (
 def test_convertstostring_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToString().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_convertsToString_raises_error_for_multiple_items():
@@ -951,7 +951,7 @@ totime_cases = (
 def test_totime_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToTime().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result == [expected]
 
 
 def test_toTime_raises_error_for_multiple_items():
@@ -979,7 +979,7 @@ def test_convertstotime_returns_empty_if_empty():
 def test_convertstotime_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDateTime().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(False)]
+    assert result == [False]
 
 
 convertstotime_cases = (
@@ -1000,7 +1000,7 @@ convertstotime_cases = (
 def test_convertstotime_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToTime().evaluate(FHIRPathCollection(collection), env)
-    assert result == [FHIRPathCollectionItem.wrap(True)]
+    assert result == [True]
 
 
 def test_convertsToTime_raises_error_for_multiple_items():

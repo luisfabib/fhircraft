@@ -15,8 +15,6 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
-    Literal,
-    RootElement,
     TypeSpecifier,
     This,
 )
@@ -49,11 +47,9 @@ class FHIRTypesOperator(FHIRPathNode):
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} expected a singleton collection for the left expression, instead got a {len(collection)}-items collection."
             )
-        return left_collection[0].value
+        return left_collection[0]
 
-    def _validate_type_specifier(
-        self, value: Any, environment: dict
-    ) -> bool:
+    def _validate_type_specifier(self, value: Any, environment: dict) -> bool:
         """
         Validates the type specifier against the known FHIR types.
         Raises an error if the type specifier is not valid.
@@ -61,7 +57,7 @@ class FHIRTypesOperator(FHIRPathNode):
         # Laxy import to avoid circular dependencies
         from fhircraft.fhir.resources.datatypes import utils as type_utils
 
-        type_: type = self.type_specifier.evaluate([], environment)[0].value
+        type_: type = self.type_specifier.evaluate(FHIRPathCollection(), environment)[0]
         namespace = self.type_specifier.namespace or "FHIR"
         if namespace == "FHIR":
             # Handle the FHIRPath literal types as special cases
@@ -134,12 +130,14 @@ class Is(FHIRTypesOperator):
         """
         value = self._get_singleton_collection_value(collection, environment)
         if value is None:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                self._validate_type_specifier(value, environment)
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    self._validate_type_specifier(value, environment)
+                )
+            ]
+        )
 
     def __str__(self):
         return f"{self.left} is {self.type_specifier}"
@@ -199,11 +197,11 @@ class As(FHIRTypesOperator):
         """
         value = self._get_singleton_collection_value(collection, environment)
         if value is None:
-            return []
+            return FHIRPathCollection()
         return (
-            [FHIRPathCollectionItem.wrap(value)]
+            FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
             if self._validate_type_specifier(value, environment)
-            else []
+            else FHIRPathCollection()
         )
 
     def __str__(self):

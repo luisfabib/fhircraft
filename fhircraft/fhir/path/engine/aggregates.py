@@ -62,11 +62,11 @@ class Aggregate(FHIRPathFunction):
             # Set up the environment for evaluating the expression
             context = _get_expression_context(context, item, index)
             context["$total"] = context.get("$total", self.init if self.init else [])
-            # Evaluate the expression
-            result = self.expression.evaluate([item], context)
             # Update the total variable for the next iteration
-            context["$total"] = result[0].value
+            context["$total"] = self.expression.single(
+                FHIRPathCollection([item]), environment=context
+            )
         result = context.get("$total")
         if result is None:
-            return []
-        return [FHIRPathCollectionItem.wrap(result)]
+            return FHIRPathCollection()
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(result)])
