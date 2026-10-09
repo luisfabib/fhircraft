@@ -143,7 +143,7 @@ These methods are called on the **Python result collection** after evaluation. B
 family_names = patient.query("Patient.name.family")
 assert family_names == ["Johnson"]
 assert family_names.first() == "Johnson"
-assert patient.query("Patient.gender").single() is None
+assert patient.query("Patient.identifier").single() is None
 ```
 
 Use `single()` when the expression is expected to match at most one value. If multiple matches are possible, keep the collection or choose `first()` / `last()` intentionally. An empty result and a single result whose value is `None` both yield `None` from these convenience methods; check the collection length when that distinction matters.
