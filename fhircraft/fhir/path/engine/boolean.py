@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -21,21 +21,19 @@ from fhircraft.exceptions import FHIRPathRuntimeError
 
 
 def _evaluate_boolean_expressions(
-    left: FHIRPath | FHIRPathCollection,
-    right: FHIRPath | FHIRPathCollection,
+    left: FHIRPathNode | FHIRPathCollection,
+    right: FHIRPathNode | FHIRPathCollection,
     collection: FHIRPathCollection,
     environment: dict,
-    create: bool,
 ) -> tuple[bool | None, bool | None]:
     """
     Evaluates the boolean values of two FHIRPath expressions or collections within a given context.
 
     Args:
-        left (FHIRPath | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection.
-        right (FHIRPath | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection.
+        left (FHIRPathNode | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection.
+        right (FHIRPathNode | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection.
         collection (FHIRPathCollection): The context collection used for evaluation.
         environment (dict): The environment context for the evaluation.
-        create (bool): Whether to create missing elements during evaluation.
 
     Returns:
         tuple[bool | None, bool | None]: A tuple containing the boolean values of the left and right operands.
@@ -44,55 +42,59 @@ def _evaluate_boolean_expressions(
     from fhircraft.fhir.resources.base import BooleanBase
 
     left_collection = (
-        left.evaluate(collection, environment, create)
-        if isinstance(left, FHIRPath)
+        left.evaluate(collection, environment)
+        if isinstance(left, FHIRPathNode)
         else left
     )
     if isinstance(left_collection, bool):
         left_boolean = left_collection
     else:
         if len(left_collection) > 0:
-            if isinstance(left_collection[0].value, BooleanBase):
-                left_boolean = bool(left_collection[0].value.value)
+            left_value = left_collection[0]
+            if isinstance(left_value, BooleanBase):
+                left_boolean = bool(left_value.value)
             else:
-                left_boolean = bool(left_collection[0].value)
+                left_boolean = bool(left_value)
         else:
             left_boolean = None
     right_collection = (
-        right.evaluate(collection, environment, create)
-        if isinstance(right, FHIRPath)
+        right.evaluate(collection, environment)
+        if isinstance(right, FHIRPathNode)
         else right
     )
     if isinstance(right_collection, bool):
         right_boolean = right_collection
     else:
         if len(right_collection) > 0:
-            if isinstance(right_collection[0].value, BooleanBase):
-                right_boolean = bool(right_collection[0].value.value)
+            right_value = right_collection[0]
+            if isinstance(right_value, BooleanBase):
+                right_boolean = bool(right_value.value)
             else:
-                right_boolean = bool(right_collection[0].value)
+                right_boolean = bool(right_value)
         else:
             right_boolean = None
     return left_boolean, right_boolean
 
 
-class And(FHIRPath):
+class And(FHIRPathNode):
     """
     A representation of the FHIRPath [`and`](https://hl7.org/fhirpath/N1/#and) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if both operands evaluate to `True`, `False` if either operand evaluates to `False`, and the empty collection (`[]`) otherwise.
@@ -100,29 +102,30 @@ class And(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, environment, create=create
+            self.left, self.right, collection, environment
         )
         if left_boolean is None:
             if right_boolean is True:
-                return []
+                return FHIRPathCollection()
             elif right_boolean is False:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
             elif right_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif right_boolean is None:
             if left_boolean is True:
-                return []
+                return FHIRPathCollection()
             elif left_boolean is False:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
             elif left_boolean is None:
-                return []
-        return [FHIRPathCollectionItem.wrap(left_boolean and right_boolean)]
+                return FHIRPathCollection()
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(left_boolean and right_boolean)]
+        )
 
     def __str__(self):
         return f"{self.left} and {self.right}"
@@ -141,23 +144,25 @@ class And(FHIRPath):
         return hash((self.left, self.right))
 
 
-class Or(FHIRPath):
+class Or(FHIRPathNode):
     """
     A representation of the FHIRPath [`or`](https://hl7.org/fhirpath/N1/#or) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `False` if both operands evaluate to `False`, `True` if either operand evaluates to `True`, and empty (`[]`) otherwise.
@@ -165,29 +170,30 @@ class Or(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, environment, create=create
+            self.left, self.right, collection, environment
         )
         if left_boolean is None:
             if right_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif right_boolean is False:
-                return []
+                return FHIRPathCollection()
             elif right_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif right_boolean is None:
             if left_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif left_boolean is False:
-                return []
+                return FHIRPathCollection()
             elif left_boolean is None:
-                return []
-        return [FHIRPathCollectionItem.wrap(left_boolean or right_boolean)]
+                return FHIRPathCollection()
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(left_boolean or right_boolean)]
+        )
 
     def __str__(self):
         return f"{self.left} or {self.right}"
@@ -206,23 +212,25 @@ class Or(FHIRPath):
         return hash((self.left, self.right))
 
 
-class Xor(FHIRPath):
+class Xor(FHIRPathNode):
     """
     A representation of the FHIRPath [`xor`](https://hl7.org/fhirpath/N1/#xor) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if exactly one of the operands evaluates to `True`, `False` if either both operands evaluate to `True` or both operands evaluate to `False`, and the empty collection (`[]`) otherwise.
@@ -230,17 +238,18 @@ class Xor(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if left_boolean is None or right_boolean is None:
-            return []
-        return [FHIRPathCollectionItem.wrap(left_boolean ^ right_boolean)]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(left_boolean ^ right_boolean)]
+        )
 
     def __str__(self):
         return f"{self.left} xor {self.right}"
@@ -259,23 +268,25 @@ class Xor(FHIRPath):
         return hash((self.left, self.right))
 
 
-class Implies(FHIRPath):
+class Implies(FHIRPathNode):
     """
     A representation of the FHIRPath [`implies`](https://hl7.org/fhirpath/N1/#implies) boolean logic operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the left operand evaluates to `True`, this operator returns the boolean evaluation of the right operand. If the
@@ -285,41 +296,40 @@ class Implies(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if left_boolean is None:
             if right_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif right_boolean is False:
-                return []
+                return FHIRPathCollection()
             elif right_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif right_boolean is None:
             if left_boolean is True:
-                return []
+                return FHIRPathCollection()
             elif left_boolean is False:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif left_boolean is None:
-                return []
+                return FHIRPathCollection()
         elif left_boolean is True:
             if right_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif right_boolean is False:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         elif right_boolean is True:
             if left_boolean is True:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
             elif left_boolean is False:
-                return [FHIRPathCollectionItem.wrap(True)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         elif right_boolean is False and left_boolean is False:
-            return [FHIRPathCollectionItem.wrap(True)]
-        return []
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
+        return FHIRPathCollection()
 
     def __str__(self):
         return f"{self.left} implies {self.right}"
@@ -344,7 +354,7 @@ class Not(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if the input collection evaluates to `False`, and `False` if it evaluates to `True`. Otherwise, the result is empty (`[]`):
@@ -353,7 +363,6 @@ class Not(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -365,10 +374,10 @@ class Not(FHIRPathFunction):
                 "Cannot assert Not() for a collection that has more than one item."
             )
         elif len(collection) == 0:
-            return []
+            return FHIRPathCollection()
         else:
-            value = collection[0].value
+            value = collection[0]
             if isinstance(value, FHIRPrimitiveModel):
                 value = value.value
             boolean = bool(value)
-            return [FHIRPathCollectionItem.wrap(not boolean)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(not boolean)])

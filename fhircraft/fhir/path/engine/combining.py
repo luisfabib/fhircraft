@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -22,11 +22,11 @@ class Union(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to combine with.
     """
 
-    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+    def __init__(self, other_collection: FHIRPathNode | FHIRPathCollection):
         self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Merge the two collections into a single collection, eliminating any duplicate values.
@@ -34,19 +34,22 @@ class Union(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
-        if isinstance(self.other_collection, FHIRPath):
+        if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
-                collection, environment, create
+                collection, environment
             )
-        return [
-            FHIRPathCollectionItem.wrap(item)
-            for item in list(set(self.other_collection) | set(collection))
-        ]
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(item)
+                for item in list(
+                    set(self.other_collection._items) | set(collection._items)
+                )
+            ]
+        )
 
 
 class Combine(FHIRPathFunction):
@@ -57,11 +60,11 @@ class Combine(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to combine with.
     """
 
-    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+    def __init__(self, other_collection: FHIRPathNode | FHIRPathCollection):
         self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Merge the input and other collections into a single collection without eliminating duplicate
@@ -71,13 +74,12 @@ class Combine(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
-        if isinstance(self.other_collection, FHIRPath):
+        if isinstance(self.other_collection, FHIRPathNode):
             self.other_collection = self.other_collection.evaluate(
-                collection, environment, create
+                collection, environment
             )
-        return collection + self.other_collection
+        return FHIRPathCollection(collection._items + self.other_collection._items)

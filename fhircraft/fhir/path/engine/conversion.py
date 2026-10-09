@@ -16,7 +16,7 @@ from fhircraft.fhir.resources.datatypes import (
 )
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -45,28 +45,29 @@ __all__ = [
     "ConvertsToTime",
 ]
 
+
 class Iif(FHIRPathFunction):
     """
     A representation of the FHIRPath [`iif()`](http://hl7.org/fhirpath/N1/#iifcriterion-expression-true-result-collection-otherwise-result-collection-collection) function.
 
     Args:
-        criterion (FHIRPath): The criterion expression,  is expected to evaluate to a `Boolean`.
+        criterion (FHIRPathNode): The criterion expression,  is expected to evaluate to a `Boolean`.
         true_result (Union[FHIRPath, Any]): Value to be returned if `criterion` evaluates to `True`
         otherwise_result (Optional[Union[FHIRPath, Any]]): Value to be returned if `criterion` evaluates to `False`. Defaults to an empty collection.
     """
 
     def __init__(
         self,
-        criterion: FHIRPath,
-        true_result: FHIRPath | FHIRPathCollection,
-        otherwise_result: FHIRPath | FHIRPathCollection = list(),
+        criterion: FHIRPathNode,
+        true_result: FHIRPathNode | FHIRPathCollection,
+        otherwise_result: FHIRPathNode | FHIRPathCollection = FHIRPathCollection(),
     ):
         self.criterion = criterion
         self.true_result = true_result
         self.otherwise_result = otherwise_result
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         This function acts as an immediate if, also known as a conditional operator.
@@ -81,7 +82,6 @@ class Iif(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -112,22 +112,20 @@ class Iif(FHIRPathFunction):
             )
 
         if criterion:
-            if isinstance(self.true_result, FHIRPath):
-                return self.true_result.evaluate(
-                    collection, eval_context(collection), create
-                )
+            if isinstance(self.true_result, FHIRPathNode):
+                return self.true_result.evaluate(collection, eval_context(collection))
             else:
                 return self.true_result
         else:
             if self.otherwise_result:
-                if isinstance(self.otherwise_result, FHIRPath):
+                if isinstance(self.otherwise_result, FHIRPathNode):
                     return self.otherwise_result.evaluate(
-                        collection, eval_context(collection), create
+                        collection, eval_context(collection)
                     )
                 else:
                     return self.otherwise_result
             else:
-                return []
+                return FHIRPathCollection()
 
 
 class FHIRTypeConversionFunction(FHIRPathFunction):
@@ -157,7 +155,7 @@ class ToBoolean(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single `Boolean` if:
@@ -172,7 +170,6 @@ class ToBoolean(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -183,21 +180,21 @@ class ToBoolean(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
+            return FHIRPathCollection()
 
         # Use type_utils for conversion
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
         from fhircraft.fhir.resources.datatypes.utils import to_boolean
 
-        value = collection[0].value
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         result = to_boolean(value)
 
         if result is not None:
-            return [FHIRPathCollectionItem.wrap(result)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(result)])
         else:
-            return []
+            return FHIRPathCollection()
 
 
 class ConvertsToBoolean(FHIRTypeConversionFunction):
@@ -206,7 +203,7 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if the item can be converted to a Boolean, `False` otherwise.
@@ -215,7 +212,6 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -225,12 +221,14 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToBoolean().evaluate(collection, environment, create) != []
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    ToBoolean().evaluate(collection, environment) != []
+                )
+            ]
+        )
 
 
 class ToInteger(FHIRTypeConversionFunction):
@@ -239,7 +237,7 @@ class ToInteger(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single `Integer` if:
@@ -251,7 +249,6 @@ class ToInteger(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -261,21 +258,21 @@ class ToInteger(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
+            return FHIRPathCollection()
 
         # Use type_utils for conversion
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
         from fhircraft.fhir.resources.datatypes.utils import to_integer
 
-        value = collection[0].value
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         result = to_integer(value)
 
         if result is not None:
-            return [FHIRPathCollectionItem.wrap(result)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(result)])
         else:
-            return []
+            return FHIRPathCollection()
 
 
 class ConvertsToInteger(FHIRTypeConversionFunction):
@@ -284,7 +281,7 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if the item can be converted to an Integer, `False` otherwise.
@@ -293,7 +290,6 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -304,12 +300,14 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToInteger().evaluate(collection, environment, create) != []
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    ToInteger().evaluate(collection, environment) != []
+                )
+            ]
+        )
 
 
 class ToDate(FHIRTypeConversionFunction):
@@ -318,7 +316,7 @@ class ToDate(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single date if:
@@ -332,7 +330,6 @@ class ToDate(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -344,8 +341,8 @@ class ToDate(FHIRTypeConversionFunction):
 
         self.validate_collection(collection)
         if not collection:
-            return []
-        value = collection[0].value
+            return FHIRPathCollection()
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         if isinstance(value, str):
@@ -358,21 +355,29 @@ class ToDate(FHIRTypeConversionFunction):
                 value,
             )
             if date_match:
-                return [FHIRPathCollectionItem.wrap(value)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
             elif datetime_match:
-                return [FHIRPathCollectionItem.wrap(datetime_match.group(1))]
+                return FHIRPathCollection(
+                    [FHIRPathCollectionItem.wrap(datetime_match.group(1))]
+                )
             else:
-                return []
+                return FHIRPathCollection()
         elif isinstance(value, datetime):
-            return [FHIRPathCollectionItem.wrap(value.date().isoformat())]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(value.date().isoformat())]
+            )
         elif isinstance(value, date):
-            return [FHIRPathCollectionItem.wrap(value.isoformat())]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(value.isoformat())])
         elif isinstance(value, DateTime):
-            return [FHIRPathCollectionItem.wrap(value.to_datetime().date().isoformat())]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(value.to_datetime().date().isoformat())]
+            )
         elif isinstance(value, Date):
-            return [FHIRPathCollectionItem.wrap(value.to_date().isoformat())]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(value.to_date().isoformat())]
+            )
         else:
-            return []
+            return FHIRPathCollection()
 
 
 class ConvertsToDate(FHIRTypeConversionFunction):
@@ -381,7 +386,7 @@ class ConvertsToDate(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
@@ -395,7 +400,6 @@ class ConvertsToDate(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -405,12 +409,14 @@ class ConvertsToDate(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToDate().evaluate(collection, environment, create) != []
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    ToDate().evaluate(collection, environment) != FHIRPathCollection()
+                )
+            ]
+        )
 
 
 class ToDateTime(FHIRTypeConversionFunction):
@@ -419,7 +425,7 @@ class ToDateTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single datetime if:
@@ -433,7 +439,6 @@ class ToDateTime(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -445,8 +450,8 @@ class ToDateTime(FHIRTypeConversionFunction):
 
         self.validate_collection(collection)
         if not collection:
-            return []
-        value = collection[0].value
+            return FHIRPathCollection()
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         if isinstance(value, str):
@@ -459,27 +464,33 @@ class ToDateTime(FHIRTypeConversionFunction):
                 value,
             )
             if date_match or datetime_match:
-                return [FHIRPathCollectionItem.wrap(value.replace("+00:00", "Z"))]
+                return FHIRPathCollection(
+                    [FHIRPathCollectionItem.wrap(value.replace("+00:00", "Z"))]
+                )
             else:
-                return []
+                return FHIRPathCollection()
         elif isinstance(value, (datetime, date)):
-            return [
-                FHIRPathCollectionItem.wrap(value.isoformat().replace("+00:00", "Z"))
-            ]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(value.isoformat().replace("+00:00", "Z"))]
+            )
         elif isinstance(value, DateTime):
-            return [
-                FHIRPathCollectionItem.wrap(
-                    value.to_datetime().isoformat().replace("+00:00", "Z")
-                )
-            ]
+            return FHIRPathCollection(
+                [
+                    FHIRPathCollectionItem.wrap(
+                        value.to_datetime().isoformat().replace("+00:00", "Z")
+                    )
+                ]
+            )
         elif isinstance(value, Date):
-            return [
-                FHIRPathCollectionItem.wrap(
-                    value.to_date().isoformat().replace("+00:00", "Z")
-                )
-            ]
+            return FHIRPathCollection(
+                [
+                    FHIRPathCollectionItem.wrap(
+                        value.to_date().isoformat().replace("+00:00", "Z")
+                    )
+                ]
+            )
         else:
-            return []
+            return FHIRPathCollection()
 
 
 class ConvertsToDateTime(FHIRTypeConversionFunction):
@@ -488,7 +499,7 @@ class ConvertsToDateTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
@@ -502,7 +513,6 @@ class ConvertsToDateTime(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -512,12 +522,15 @@ class ConvertsToDateTime(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToDateTime().evaluate(collection, environment, create) != []
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    ToDateTime().evaluate(collection, environment)
+                    != FHIRPathCollection()
+                )
+            ]
+        )
 
 
 class ToDecimal(FHIRTypeConversionFunction):
@@ -526,7 +539,7 @@ class ToDecimal(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single decimal if:
@@ -539,7 +552,6 @@ class ToDecimal(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -551,19 +563,19 @@ class ToDecimal(FHIRTypeConversionFunction):
 
         self.validate_collection(collection)
         if not collection:
-            return []
-        value = collection[0].value
+            return FHIRPathCollection()
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         if isinstance(value, (int, float, bool)):
-            return [FHIRPathCollectionItem.wrap(float(value))]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(float(value))])
         elif isinstance(value, str):
             if re.match(r"(\+|-)?\d+(\.\d+)?", value):
-                return [FHIRPathCollectionItem.wrap(float(value))]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(float(value))])
             else:
-                return []
+                return FHIRPathCollection()
         else:
-            return []
+            return FHIRPathCollection()
 
 
 class ConvertsToDecimal(FHIRTypeConversionFunction):
@@ -572,7 +584,7 @@ class ConvertsToDecimal(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
@@ -585,7 +597,6 @@ class ConvertsToDecimal(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -595,12 +606,15 @@ class ConvertsToDecimal(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToDecimal().evaluate(collection, environment, create) != []
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    ToDecimal().evaluate(collection, environment)
+                    != FHIRPathCollection()
+                )
+            ]
+        )
 
 
 class ToQuantity(FHIRTypeConversionFunction):
@@ -615,7 +629,7 @@ class ToQuantity(FHIRTypeConversionFunction):
             self.unit = None
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single quantity if:
@@ -629,7 +643,6 @@ class ToQuantity(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -641,8 +654,8 @@ class ToQuantity(FHIRTypeConversionFunction):
 
         self.validate_collection(collection)
         if not collection:
-            return []
-        value = collection[0].value
+            return FHIRPathCollection()
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         if isinstance(value, (bool, int, float)):
@@ -657,17 +670,17 @@ class ToQuantity(FHIRTypeConversionFunction):
                     unit=quantity_match.group(4),
                 )
             else:
-                return []
+                return FHIRPathCollection()
         elif Quantity.is_quantity(value) and value is not None:
             qty = Quantity.parse_quantity(value)
         else:
-            return []
+            return FHIRPathCollection()
         if self.unit is not None:
             if qty.unit == "":
                 qty.unit = self.unit
             else:
                 qty = qty.convert_to(self.unit)
-        return [FHIRPathCollectionItem.wrap(qty)]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(qty)])
 
 
 class ConvertsToQuantity(FHIRTypeConversionFunction):
@@ -682,7 +695,7 @@ class ConvertsToQuantity(FHIRTypeConversionFunction):
             self.unit = None
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
@@ -696,7 +709,6 @@ class ConvertsToQuantity(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -706,16 +718,18 @@ class ConvertsToQuantity(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
+            return FHIRPathCollection()
         try:
-            return [
-                FHIRPathCollectionItem.wrap(
-                    ToQuantity(self.unit).evaluate(collection, environment, create)
-                    != []
-                )
-            ]
+            return FHIRPathCollection(
+                [
+                    FHIRPathCollectionItem.wrap(
+                        ToQuantity(self.unit).evaluate(collection, environment)
+                        != FHIRPathCollection()
+                    )
+                ]
+            )
         except ValueError:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
 
 
 class ToString(FHIRTypeConversionFunction):
@@ -724,7 +738,7 @@ class ToString(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single string if:
@@ -737,7 +751,6 @@ class ToString(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -749,19 +762,23 @@ class ToString(FHIRTypeConversionFunction):
 
         self.validate_collection(collection)
         if not collection:
-            return []
-        value = collection[0].value
+            return FHIRPathCollection()
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
         if isinstance(value, bool):
-            return [FHIRPathCollectionItem.wrap("true" if value else "false")]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap("true" if value else "false")]
+            )
         elif isinstance(value, (str, int, float)):
-            return [FHIRPathCollectionItem.wrap(str(value))]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(str(value))])
         elif Quantity.is_quantity(value) and value is not None:
             value = Quantity.parse_quantity(value)
-            return [FHIRPathCollectionItem.wrap(f"{value.value} {value.unit}")]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(f"{value.value} {value.unit}")]
+            )
         else:
-            return []
+            return FHIRPathCollection()
 
 
 class ConvertsToString(FHIRTypeConversionFunction):
@@ -770,7 +787,7 @@ class ConvertsToString(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
@@ -783,7 +800,6 @@ class ConvertsToString(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -793,12 +809,14 @@ class ConvertsToString(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToString().evaluate(collection, environment, create) != []
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    ToString().evaluate(collection, environment) != FHIRPathCollection()
+                )
+            ]
+        )
 
 
 class ToTime(FHIRTypeConversionFunction):
@@ -807,7 +825,7 @@ class ToTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single time if:
@@ -820,7 +838,6 @@ class ToTime(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -832,8 +849,8 @@ class ToTime(FHIRTypeConversionFunction):
 
         self.validate_collection(collection)
         if not collection:
-            return []
-        value = collection[0].value
+            return FHIRPathCollection()
+        value = collection[0]
         if isinstance(value, FHIRPrimitiveModel):
             value = value.value
 
@@ -843,21 +860,23 @@ class ToTime(FHIRTypeConversionFunction):
                 value,
             )
             if time_match:
-                return [FHIRPathCollectionItem.wrap(value)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
             else:
-                return []
+                return FHIRPathCollection()
         elif isinstance(value, time):
-            return [
-                FHIRPathCollectionItem.wrap(value.isoformat().replace("+00:00", "Z"))
-            ]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(value.isoformat().replace("+00:00", "Z"))]
+            )
         elif isinstance(value, Time):
-            return [
-                FHIRPathCollectionItem.wrap(
-                    value.to_time().isoformat().replace("+00:00", "Z")
-                )
-            ]
+            return FHIRPathCollection(
+                [
+                    FHIRPathCollectionItem.wrap(
+                        value.to_time().isoformat().replace("+00:00", "Z")
+                    )
+                ]
+            )
         else:
-            return []
+            return FHIRPathCollection()
 
 
 class ConvertsToTime(FHIRTypeConversionFunction):
@@ -866,7 +885,7 @@ class ConvertsToTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
@@ -879,7 +898,6 @@ class ConvertsToTime(FHIRTypeConversionFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -889,9 +907,11 @@ class ConvertsToTime(FHIRTypeConversionFunction):
         """
         self.validate_collection(collection)
         if not collection:
-            return []
-        return [
-            FHIRPathCollectionItem.wrap(
-                ToTime().evaluate(collection, environment, create) != []
-            )
-        ]
+            return FHIRPathCollection()
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    ToTime().evaluate(collection, environment) != FHIRPathCollection()
+                )
+            ]
+        )

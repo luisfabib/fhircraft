@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from collections import namedtuple
 
 import pytest
@@ -17,16 +18,16 @@ env = {"%fhirRelease": "R4"}
 
 def test_where_returns_empty_for_empty_collection():
     collection = []
-    result = Where(LessThan(This(), [FHIRPathCollectionItem.wrap(1)])).evaluate(
-        collection, env
+    result = Where(LessThan(This(), FHIRPathCollection([FHIRPathCollectionItem.wrap(1)]))).evaluate(
+        FHIRPathCollection(collection), env
     )
     assert result == []
 
 
 def test_where_returns_valid_items_in_collection_where_true():
     collection = [FHIRPathCollectionItem(value=4), FHIRPathCollectionItem(value=1)]
-    result = Where(LessThan(This(), [FHIRPathCollectionItem.wrap(3)])).evaluate(
-        collection, env
+    result = Where(LessThan(This(), FHIRPathCollection([FHIRPathCollectionItem.wrap(3)]))).evaluate(
+        FHIRPathCollection(collection), env
     )
     assert result == [collection[1]]
 
@@ -43,7 +44,7 @@ def test_where_string_representation():
 
 def test_select_returns_empty_for_empty_collection():
     collection = []
-    result = Select(Invocation(This(), Element("field"))).evaluate(collection, env)
+    result = Select(Invocation(This(), Element("field"))).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -53,9 +54,9 @@ def test_select_returns_collection_of_projected_elements():
         FHIRPathCollectionItem(value=Resource(field=123)),
         FHIRPathCollectionItem(value=Resource(field=456)),
     ]
-    result = Select(Invocation(This(), Element("field"))).evaluate(collection, env)
-    assert result[0].value == 123
-    assert result[1].value == 456
+    result = Select(Invocation(This(), Element("field"))).evaluate(FHIRPathCollection(collection), env)
+    assert result[0] == 123
+    assert result[1] == 456
 
 
 def test_select_string_representation():
@@ -70,7 +71,7 @@ def test_select_string_representation():
 
 def test_repeat_returns_empty_for_empty_collection():
     collection = []
-    result = Repeat(Invocation(This(), Element("field"))).evaluate(collection, env)
+    result = Repeat(Invocation(This(), Element("field"))).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 
@@ -88,8 +89,8 @@ def test_repeat_returns_collection_of_nested_repeating_elements():
             )
         )
     ]
-    result = Repeat(Invocation(This(), Element("items"))).evaluate(collection, env)
-    assert [item.value.label for item in result] == [
+    result = Repeat(Invocation(This(), Element("items"))).evaluate(FHIRPathCollection(collection), env)
+    assert [item.label for item in result] == [
         "1.1",
         "1.2",
         "1.3",
@@ -127,13 +128,13 @@ def test_ofType_returns_filtered_collection_by_type(expected, type):
         FHIRPathCollectionItem(value=Date("@2024")),
         FHIRPathCollectionItem(value=Quantity(12, "g")),
     ]
-    result = OfType(TypeSpecifier(type)).evaluate(collection, env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    result = OfType(TypeSpecifier(type)).evaluate(FHIRPathCollection(collection), env)
+    assert result == [expected]
 
 
 def test_ofType_returns_empty_for_empty_collection():
     collection = []
-    result = OfType(TypeSpecifier("String")).evaluate(collection, env)
+    result = OfType(TypeSpecifier("String")).evaluate(FHIRPathCollection(collection), env)
     assert result == []
 
 

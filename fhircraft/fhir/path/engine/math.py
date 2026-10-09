@@ -1,5 +1,22 @@
 """The tree navigation module contains the object representations of the math category FHIRPath operators/functions."""
 
+from math import ceil, exp, floor, log, sqrt
+from typing import Callable
+
+from fhircraft.fhir.path.engine.core import (
+    FHIRPathNode,
+    FHIRPathCollection,
+    FHIRPathCollectionItem,
+    FHIRPathFunction,
+    Literal,
+)
+from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.exceptions import FHIRPathRuntimeError
+from fhircraft.fhir.path.utils import (
+    _evaluate_and_prepare_collection_values,
+    _get_expression_context,
+)
+
 __all__ = [
     "Addition",
     "Subtraction",
@@ -19,31 +36,16 @@ __all__ = [
     "Round",
 ]
 
-from math import ceil, exp, floor, log, sqrt
-from typing import Callable
 
-from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
-    FHIRPathCollection,
-    FHIRPathCollectionItem,
-    FHIRPathFunction,
-    Literal,
-)
-from fhircraft.fhir.path.engine.literals import Quantity
-from fhircraft.exceptions import FHIRPathRuntimeError
-from fhircraft.fhir.path.utils import (
-    _evaluate_and_prepare_collection_values,
-    _get_expression_context,
-)
-
-
-class FHIRMathOperator(FHIRPath):
+class FHIRMathOperator(FHIRPathNode):
     """
     Abstract class definition for the category of math FHIRPath operators.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -70,12 +72,12 @@ class Addition(FHIRMathOperator):
     A representation of the FHIRPath [`+`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         For Integer, Decimal, and quantity, adds the operands. For strings, concatenates the right
@@ -86,7 +88,6 @@ class Addition(FHIRMathOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -97,20 +98,26 @@ class Addition(FHIRMathOperator):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase, StringBase
 
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(left_value, (str, StringBase)) and isinstance(
             right_value, (str, StringBase)
         ):
-            return [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            )
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value + right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot add {type(left_value).__name__} and {type(right_value).__name__}."
@@ -125,12 +132,12 @@ class Subtraction(FHIRMathOperator):
     A representation of the FHIRPath [`-`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Subtracts the right operand from the left operand (supported for Integer, Decimal, and Quantity).
@@ -139,7 +146,6 @@ class Subtraction(FHIRMathOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -150,16 +156,20 @@ class Subtraction(FHIRMathOperator):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value - right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot subtract {type(left_value).__name__} and {type(right_value).__name__}."
@@ -174,12 +184,12 @@ class Multiplication(FHIRMathOperator):
     A representation of the FHIRPath [`*`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication
@@ -189,7 +199,6 @@ class Multiplication(FHIRMathOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -200,16 +209,20 @@ class Multiplication(FHIRMathOperator):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value * right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot multiply {type(left_value).__name__} and {type(right_value).__name__}."
@@ -224,12 +237,12 @@ class Division(FHIRMathOperator):
     A representation of the FHIRPath [`/`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Divides the left operand by the right operand (supported for Integer, Decimal, and Quantity).
@@ -241,7 +254,6 @@ class Division(FHIRMathOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -252,20 +264,24 @@ class Division(FHIRMathOperator):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         if (Quantity.is_quantity(right_value) and right_value.value == 0) or (
             isinstance(right_value, (int, float)) and right_value == 0
         ):
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            )
         elif Quantity.is_quantity(left_value) and Quantity.is_quantity(right_value):
-            return [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
@@ -280,12 +296,12 @@ class Div(FHIRMathOperator):
     A representation of the FHIRPath [`div`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Performs truncated division of the left operand by the right operand (supported for Integer and Decimal).
@@ -293,7 +309,6 @@ class Div(FHIRMathOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -304,16 +319,16 @@ class Div(FHIRMathOperator):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
             if right_value == 0:
-                return []
-            return [FHIRPathCollectionItem.wrap(left_value // right_value)]  # type: ignore
+                return FHIRPathCollection()
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(left_value // right_value)])  # type: ignore
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot perform truncated division between {type(left_value).__name__} and {type(right_value).__name__}."
@@ -328,12 +343,12 @@ class Mod(FHIRMathOperator):
     A representation of the FHIRPath [`mod`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
@@ -341,7 +356,6 @@ class Mod(FHIRMathOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -352,14 +366,16 @@ class Mod(FHIRMathOperator):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         left_value, right_value = _evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create
+            self, self.left, self.right, collection, environment
         )
         if left_value is None or right_value is None:
-            return []
+            return FHIRPathCollection()
         elif isinstance(
             left_value, (int, float, IntegerBase, DecimalBase)
         ) and isinstance(right_value, (int, float, IntegerBase, DecimalBase)):
-            return [FHIRPathCollectionItem.wrap(left_value % right_value)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(left_value % right_value)]
+            )
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
@@ -378,13 +394,13 @@ class FHIRPathMathFunction(FHIRPathFunction):
 
     def _validate_collection(self, collection: FHIRPathCollection):
         if len(collection) == 0:
-            return []
+            return FHIRPathCollection()
         elif len(collection) > 1:
             raise FHIRPathRuntimeError("Input collection must be a singleton.")
         return collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Computes the computed value based on its argument (supported for Integer, Decimal and Quantity values).
@@ -392,7 +408,6 @@ class FHIRPathMathFunction(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -403,7 +418,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         if isinstance(value, (int, float)):
             value = self.math_operation(value)
         elif isinstance(value, (IntegerBase, DecimalBase)) and value.value is not None:
@@ -414,7 +429,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
             raise FHIRPathRuntimeError(
                 f"FHIRPath function {self.__class__.__name__}() cannot compute abs for {value} ({type(value).__name__})."
             )
-        return [FHIRPathCollectionItem.wrap(value)]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
 
 
 class Abs(FHIRPathMathFunction):
@@ -465,11 +480,11 @@ class Log(FHIRPathMathFunction):
         base (int | Literal): The base of the logarithm. Must be an integer greater than 1.
     """
 
-    def __init__(self, base: int | FHIRPath):
-        self.base = Literal(base) if not isinstance(base, FHIRPath) else base
+    def __init__(self, base: int | FHIRPathNode):
+        self.base = Literal(base) if not isinstance(base, FHIRPathNode) else base
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Computes the logarithm of the input value to the specified base.
@@ -477,7 +492,6 @@ class Log(FHIRPathMathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -488,7 +502,7 @@ class Log(FHIRPathMathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(
@@ -502,7 +516,7 @@ class Log(FHIRPathMathFunction):
                 "The base argument of the log function must be an integer greater than 1."
             )
         self.math_operation = lambda x: log(x, base)
-        return super().evaluate(collection, environment, create)
+        return super().evaluate(collection, environment)
 
 
 class Power(FHIRPathMathFunction):
@@ -513,20 +527,19 @@ class Power(FHIRPathMathFunction):
         exponent (int | float | Literal): The exponent to which the input value is raised.
     """
 
-    def __init__(self, exponent: int | float | FHIRPath):
+    def __init__(self, exponent: int | float | FHIRPathNode):
         self.exponent = (
-            Literal(exponent) if not isinstance(exponent, FHIRPath) else exponent
+            Literal(exponent) if not isinstance(exponent, FHIRPathNode) else exponent
         )
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Computes the input value raised to the specified exponent.
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
         Returns:
             FHIRPathCollection: The output collection.
 
@@ -536,7 +549,7 @@ class Power(FHIRPathMathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         environment = _get_expression_context(environment, value, index=0)
 
         if not isinstance(
@@ -549,7 +562,7 @@ class Power(FHIRPathMathFunction):
                 "The exponent argument of the power function must be a number."
             )
         self.math_operation = lambda x: pow(x, exponent)
-        return super().evaluate(collection, environment, create)
+        return super().evaluate(collection, environment)
 
 
 class Round(FHIRPathMathFunction):
@@ -560,13 +573,13 @@ class Round(FHIRPathMathFunction):
         precision (int): The number of decimal places to round to.
     """
 
-    def __init__(self, precision: int | FHIRPath):
+    def __init__(self, precision: int | FHIRPathNode):
         self.precision = (
-            Literal(precision) if not isinstance(precision, FHIRPath) else precision
+            Literal(precision) if not isinstance(precision, FHIRPathNode) else precision
         )
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Rounds the input value to the specified precision.
@@ -574,7 +587,6 @@ class Round(FHIRPathMathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -585,7 +597,7 @@ class Round(FHIRPathMathFunction):
         from fhircraft.fhir.resources.base import IntegerBase, DecimalBase
 
         collection = self._validate_collection(collection)
-        value = collection[0].value
+        value = collection[0]
         environment = _get_expression_context(environment, value, index=0)
         if (
             not isinstance(
@@ -602,7 +614,7 @@ class Round(FHIRPathMathFunction):
                 "The precision argument of the round function must be a non-negative integer."
             )
         self.math_operation = lambda x: round(x, precision)
-        return super().evaluate(collection, environment, create)
+        return super().evaluate(collection, environment)
 
 
 class Sqrt(FHIRPathMathFunction):

@@ -12,7 +12,7 @@ import logging
 from typing import Optional
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
@@ -33,15 +33,17 @@ class Trace(FHIRPathFunction):
     A representation of the FHIRPath [`trace()`](http://hl7.org/fhirpath/N1/#tracename-string-projection-expression-collection) function.
 
     Attributes:
-        name  (str | FHIRPath): Subtring query or FHIRPath to evaluate for the trace name.
+        name  (str | FHIRPathNode): Subtring query or FHIRPath to evaluate for the trace name.
     """
 
-    def __init__(self, name: FHIRPath | str, projection: Optional[FHIRPath] = None):
+    def __init__(
+        self, name: FHIRPathNode | str, projection: Optional[FHIRPathNode] = None
+    ):
         self.name = Literal(name) if isinstance(name, str) else name
         self.projection = projection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Adds a `String` representation of the input collection to the diagnostic log, using the `name` argument
@@ -54,16 +56,13 @@ class Trace(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The input collection.
         """
         log_collection = collection
         if self.projection:
-            log_collection = Select(self.projection).evaluate(
-                collection, environment, create
-            )
+            log_collection = Select(self.projection).evaluate(collection, environment)
         if not isinstance(
             name := self.name.single(collection, environment=environment), str
         ):
@@ -80,7 +79,7 @@ class Now(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the current date and time, including timezone offset.
@@ -89,7 +88,9 @@ class Now(FHIRPathFunction):
             DateTime: The current date and time, including timezone offset.
         """
         now = datetime.datetime.now(tz=datetime.timezone.utc)
-        return [FHIRPathCollectionItem(DateTime(value_datetime=now))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem(DateTime(value_datetime=now))]
+        )
 
 
 class TimeOfDay(FHIRPathFunction):
@@ -98,7 +99,7 @@ class TimeOfDay(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the current time.
@@ -106,7 +107,9 @@ class TimeOfDay(FHIRPathFunction):
         Returns:
             Time: The current time.
         """
-        return [FHIRPathCollectionItem(Time(value_time=datetime.datetime.now().time()))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem(Time(value_time=datetime.datetime.now().time()))]
+        )
 
 
 class Today(FHIRPathFunction):
@@ -115,7 +118,7 @@ class Today(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the current date.
@@ -123,4 +126,6 @@ class Today(FHIRPathFunction):
         Returns:
             Date: The current date.
         """
-        return [FHIRPathCollectionItem(Date(value_date=datetime.datetime.now().date()))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem(Date(value_date=datetime.datetime.now().date()))]
+        )

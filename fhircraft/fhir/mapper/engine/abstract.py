@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from fhircraft.fhir.mapper.engine.scope import MappingScope
 from typing import Any
 import re
-from fhircraft.fhir.path import FHIRPath, parse_fhirpath
+from fhircraft.fhir.path import FHIRPathNode, parse_fhirpath
 
 
 class FHIRMappingEngineComponent(ABC):
@@ -17,7 +17,7 @@ class FHIRMappingEngineComponent(ABC):
 
     def resolve_fhirpath_within_context(
         self, expression: str, scope: "MappingScope"
-    ) -> FHIRPath:
+    ) -> FHIRPathNode:
         """Resolve FHIRPath expressions within the given context."""
         for variable_name, variable_path in scope.variables.items():
             expression = re.sub(

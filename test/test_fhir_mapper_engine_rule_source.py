@@ -14,7 +14,7 @@ from fhircraft.exceptions import (
     MapperSourceProcessingError,
 )
 from fhircraft.fhir.path import engine as fp
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path.engine.core import FHIRPathNode
 
 # ============================================================================
 # Helpers & Fixtures
@@ -54,7 +54,7 @@ def mock_scope():
 @pytest.fixture
 def mock_fhirpath():
     """Mock FHIRPath object with common methods."""
-    path = Mock(spec=FHIRPath)
+    path = Mock(spec=FHIRPathNode)
     path.count.return_value = 1
     path._invoke.return_value = path  # Default to returning self
     path.single.return_value = True
@@ -136,7 +136,7 @@ def test_process__with_element_path(
     rule_source_factory,
 ):
     mock_source_definition.element = "name"
-    mock_element_path = Mock(spec=FHIRPath)
+    mock_element_path = Mock(spec=FHIRPathNode)
     mock_element_path.count.return_value = 2
     mock_fhirpath._invoke.return_value = mock_element_path
     mock_scope.resolve_fhirpath.return_value = mock_fhirpath

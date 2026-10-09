@@ -1,16 +1,7 @@
 """The filtering module contains the object representations of the filtering-category FHIRPath functions."""
 
-__all__ = [
-    "Where",
-    "Select",
-    "Repeat",
-    "OfType",
-]
-
-from typing import List, Optional, Union
-
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathFunction,
     This,
@@ -18,7 +9,13 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.types import As
 from fhircraft.fhir.path.utils import _get_expression_context
-from fhircraft.utils import ensure_list
+
+__all__ = [
+    "Where",
+    "Select",
+    "Repeat",
+    "OfType",
+]
 
 
 class Where(FHIRPathFunction):
@@ -26,14 +23,14 @@ class Where(FHIRPathFunction):
     Representation of the FHIRPath [`where()`](http://hl7.org/fhirpath/N1/#wherecriteria-expression-collection) function.
 
     Attributes:
-        expression (FHIRPath): Expression to evaluate for each collection item.
+        expression (FHIRPathNode): Expression to evaluate for each collection item.
     """
 
-    def __init__(self, expression: FHIRPath):
+    def __init__(self, expression: FHIRPathNode):
         self.expression = expression
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only those elements in the input collection for which
@@ -44,23 +41,24 @@ class Where(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
         expression_collection = [
             self.expression.evaluate(
-                [item], _get_expression_context(environment, item, index), create
+                FHIRPathCollection([item]),
+                _get_expression_context(environment, item, index),
             )
-            for index, item in enumerate(collection)
+            for index, item in enumerate(collection._items)
         ]
         checks = [
-            bool(collection[0].value) if len(collection) > 0 else False
+            bool(collection[0]) if len(collection) > 0 else False
             for collection in expression_collection
         ]
-        return [item for item, check in zip(collection, checks) if check]
+        return FHIRPathCollection(
+            [item for item, check in zip(collection._items, checks) if check]
+        )
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.expression.__str__()})"
@@ -80,14 +78,14 @@ class Select(FHIRPathFunction):
     Representation of the FHIRPath [`select()`](http://hl7.org/fhirpath/N1/#selectprojection-expression-collection) function.
 
     Attributes:
-        projection (FHIRPath): Expression to evaluate for each collection item.
+        projection (FHIRPathNode): Expression to evaluate for each collection item.
     """
 
-    def __init__(self, projection: FHIRPath):
+    def __init__(self, projection: FHIRPathNode):
         self.projection = projection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluates the projection expression for each item in the input collection. The result of each
@@ -100,21 +98,20 @@ class Select(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
-        return [
-            projected_item
-            for index, item in enumerate(collection)
-            for projected_item in ensure_list(
-                self.projection.evaluate(
-                    [item], _get_expression_context(environment, item, index), create
-                )
-            )
-        ]
+        return FHIRPathCollection(
+            [
+                projected_item
+                for index, item in enumerate(collection._items)
+                for projected_item in self.projection.evaluate(
+                    FHIRPathCollection([item]),
+                    _get_expression_context(environment, item, index),
+                )._items
+            ]
+        )
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.projection.__str__()})"
@@ -134,14 +131,14 @@ class Repeat(FHIRPathFunction):
     Representation of the FHIRPath [`repeat()`](http://hl7.org/fhirpath/N1/#repeatprojection-expression-collection) function.
 
     Attributes:
-        projection (FHIRPath): Expression to evaluate for each collection item.
+        projection (FHIRPathNode): Expression to evaluate for each collection item.
     """
 
-    def __init__(self, projection: FHIRPath):
+    def __init__(self, projection: FHIRPathNode):
         self.projection = projection
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         A version of select that will repeat the projection and add it to the output collection, as
@@ -150,21 +147,23 @@ class Repeat(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
 
-        def project_recursively(input_collection):
-            output_collection = []
-            for index, item in enumerate(input_collection):
+        def project_recursively(
+            input_collection: FHIRPathCollection,
+        ) -> FHIRPathCollection:
+            output_collection = FHIRPathCollection()
+            for index, item in enumerate(input_collection._items):
                 new_collection = self.projection.evaluate(
-                    [item], _get_expression_context(environment, item, index), create
+                    FHIRPathCollection([item]),
+                    _get_expression_context(environment, item, index),
                 )
-                output_collection.extend(new_collection)
+                output_collection.extend(new_collection._items)
                 if len(new_collection) > 0:
-                    output_collection.extend(project_recursively(new_collection))
+                    output_collection.extend(project_recursively(new_collection)._items)
             return output_collection
 
         return project_recursively(collection)
@@ -194,7 +193,7 @@ class OfType(FHIRPathFunction):
         self.type = _type
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection that contains all items in the input collection that are of the given type
@@ -203,16 +202,14 @@ class OfType(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
-        filtered_collection = []
+        filtered_collection = FHIRPathCollection()
         for item in collection:
             filtered_collection.extend(
-                As(This(), self.type).evaluate([item], environment, create)
+                As(This(), self.type).evaluate(FHIRPathCollection([item]), environment)
             )
         return filtered_collection
 

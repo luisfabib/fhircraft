@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     This,
@@ -14,7 +14,7 @@ from fhircraft.fhir.path.engine.core import (
 from fhircraft.exceptions import FHIRPathException
 
 
-class FHIRPathVariable(FHIRPath):
+class FHIRPathVariable(FHIRPathNode):
     """
     Abstract class for FHIRPath contextual and environmental variables
 
@@ -50,7 +50,7 @@ class EnvironmentVariable(FHIRPathVariable):
         self.variable = variable
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment.
@@ -58,7 +58,6 @@ class EnvironmentVariable(FHIRPathVariable):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
@@ -69,11 +68,11 @@ class EnvironmentVariable(FHIRPathVariable):
             )
         value = environment[self.variable]
         if value is None or value == []:
-            return []
-        return [FHIRPathCollectionItem.wrap(value)]
+            return FHIRPathCollection([])
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
 
 
-class ContextualVariable(FHIRPath):
+class ContextualVariable(FHIRPathNode):
     """
     A base class for FHIRPath contextual variables such as `$this`, `$index`, and `$total`.
     """
@@ -81,7 +80,7 @@ class ContextualVariable(FHIRPath):
     variable: str
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment.
@@ -89,7 +88,6 @@ class ContextualVariable(FHIRPath):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
@@ -100,8 +98,8 @@ class ContextualVariable(FHIRPath):
             )
         value = environment[self.variable]
         if value is None or value == []:
-            return []
-        return [FHIRPathCollectionItem.wrap(value)]
+            return FHIRPathCollection([])
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(value)])
 
     def __str__(self):
         return self.variable
@@ -125,7 +123,7 @@ class ContextualThis(ContextualVariable):
     variable = "$this"
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment. For `$this`, if the variable is not defined in the current context
@@ -135,14 +133,15 @@ class ContextualThis(ContextualVariable):
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
         if self.variable not in environment:
             return collection
-        return [FHIRPathCollectionItem.wrap(environment[self.variable])]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(environment[self.variable])]
+        )
 
 
 class ContextualIndex(ContextualVariable):

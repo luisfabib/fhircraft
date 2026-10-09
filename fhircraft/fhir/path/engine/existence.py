@@ -1,5 +1,17 @@
 """The filtering module contains the object representations of the existence-category FHIRPath functions."""
 
+from typing import Callable
+
+from fhircraft.fhir.path.engine.core import (
+    FHIRPathNode,
+    FHIRPathCollection,
+    FHIRPathCollectionItem,
+    FHIRPathFunction,
+)
+from fhircraft.fhir.path.engine.filtering import Where
+from fhircraft.exceptions import FHIRPathException
+from fhircraft.fhir.path.utils import _get_expression_context
+
 __all__ = [
     "Empty",
     "Exists",
@@ -15,18 +27,6 @@ __all__ = [
     "IsDistinct",
 ]
 
-from typing import Callable
-
-from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
-    FHIRPathCollection,
-    FHIRPathCollectionItem,
-    FHIRPathFunction,
-)
-from fhircraft.fhir.path.engine.filtering import Where
-from fhircraft.exceptions import FHIRPathException
-from fhircraft.fhir.path.utils import _get_expression_context
-
 
 class Empty(FHIRPathFunction):
     """
@@ -34,7 +34,7 @@ class Empty(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if the input collection is empty (`{}`) and `False` otherwise.
@@ -42,12 +42,11 @@ class Empty(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
-        return [FHIRPathCollectionItem.wrap(len(collection) == 0)]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(len(collection) == 0)])
 
 
 class Exists(FHIRPathFunction):
@@ -55,14 +54,14 @@ class Exists(FHIRPathFunction):
     Representation of the FHIRPath [`exists()`](http://hl7.org/fhirpath/N1/#existscriteria-expression-boolean) function.
 
     Attributes:
-        criteria (FHIRPath): Optional criteria to be applied to the collection prior to the determination of the exists
+        criteria (FHIRPathNode): Optional criteria to be applied to the collection prior to the determination of the exists
     """
 
-    def __init__(self, criteria: FHIRPath | None = None):
+    def __init__(self, criteria: FHIRPathNode | None = None):
         self.criteria = criteria
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if the collection has any elements, and `False` otherwise.
@@ -75,14 +74,13 @@ class Exists(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         if self.criteria:
-            collection = Where(self.criteria).evaluate(collection, environment, create)
-        return [FHIRPathCollectionItem.wrap(len(collection) > 0)]
+            collection = Where(self.criteria).evaluate(collection, environment)
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(len(collection) > 0)])
 
     def __str__(self):
         return f'{self.__class__.__name__.lower()}({self.criteria.__str__() if self.criteria else ""})'
@@ -100,14 +98,14 @@ class All(FHIRPathFunction):
     Representation of the FHIRPath [`all()`](https://hl7.org/fhirpath/N1/#allcriteria-expression-boolean) function.
 
     Attributes:
-        criteria (FHIRPath): Criteria to be applied to the collection prior to the evalution.
+        criteria (FHIRPathNode): Criteria to be applied to the collection prior to the evalution.
     """
 
-    def __init__(self, criteria: FHIRPath | FHIRPathCollection):
+    def __init__(self, criteria: FHIRPathNode | FHIRPathCollection):
         self.criteria = criteria
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if for every element in the input collection, criteria evaluates to `True`.
@@ -116,32 +114,33 @@ class All(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         if len(collection) == 0:
-            return [FHIRPathCollectionItem.wrap(True)]
-        return [
-            FHIRPathCollectionItem.wrap(
-                all(
-                    [
-                        (
-                            self.criteria.single(
-                                [item],
-                                environment=_get_expression_context(
-                                    environment, item, index
-                                ),
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    all(
+                        [
+                            (
+                                self.criteria.single(
+                                    [item],
+                                    environment=_get_expression_context(
+                                        environment, item, index
+                                    ),
+                                )
+                                if isinstance(self.criteria, FHIRPathNode)
+                                else item.value == self.criteria
                             )
-                            if isinstance(self.criteria, FHIRPath)
-                            else item.value == self.criteria
-                        )
-                        for index, item in enumerate(collection)
-                    ]
+                            for index, item in enumerate(collection._items)
+                        ]
+                    )
                 )
-            )
-        ]
+            ]
+        )
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.criteria.__str__()})"
@@ -159,16 +158,16 @@ def _all_or_any_boolean(
     values = []
     if len(collection) == 0:
         if op == any:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         else:
-            return [FHIRPathCollectionItem.wrap(True)]
-    for item in collection:
-        if not isinstance(item.value, bool):
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
+    for value in collection:
+        if not isinstance(value, bool):
             raise FHIRPathException(
-                f"The collection evaluated by allTrue() has a non-boolean value: {item.value}"
+                f"The collection evaluated by allTrue() has a non-boolean value: {value}"
             )
-        values.append(item.value == boolean)
-    return [FHIRPathCollectionItem.wrap(op(values))]
+        values.append(value == boolean)
+    return FHIRPathCollection([FHIRPathCollectionItem.wrap(op(values))])
 
 
 class AllTrue(FHIRPathFunction):
@@ -177,7 +176,7 @@ class AllTrue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `True`. If any
@@ -186,7 +185,6 @@ class AllTrue(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -200,7 +198,7 @@ class AnyTrue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `True`.
@@ -209,7 +207,6 @@ class AnyTrue(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -223,7 +220,7 @@ class AllFalse(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `False`.
@@ -232,7 +229,6 @@ class AllFalse(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -246,7 +242,7 @@ class AnyFalse(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `False`. If all
@@ -255,7 +251,6 @@ class AnyFalse(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -271,11 +266,11 @@ class SubsetOf(FHIRPathFunction):
         other (Union[FHIRPathCollection, FHIRPath]): other collection to which to determine whether input is a subset of.
     """
 
-    def __init__(self, other: FHIRPathCollection | FHIRPath):
+    def __init__(self, other: FHIRPathCollection | FHIRPathNode):
         self.other = other
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if all items in the input collection are members of the collection passed as the
@@ -284,7 +279,6 @@ class SubsetOf(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -295,19 +289,19 @@ class SubsetOf(FHIRPathFunction):
             is empty (`[]`), the result is `True`, otherwise if the other collection is empty, the result is `False`.
         """
         if len(collection) == 0:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         other_collection = (
-            self.other.evaluate(collection, environment, create)
-            if isinstance(self.other, FHIRPath)
+            self.other.evaluate(collection, environment)
+            if isinstance(self.other, FHIRPathNode)
             else self.other
         )
         if len(other_collection) == 0:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         for item in collection:
             if item not in other_collection:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         else:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.other == other.other
@@ -321,11 +315,11 @@ class SupersetOf(FHIRPathFunction):
         other (Union[FHIRPathCollection, FHIRPath]): Other collection to which to determine whether input is a superset of.
     """
 
-    def __init__(self, other: FHIRPathCollection | FHIRPath):
+    def __init__(self, other: FHIRPathCollection | FHIRPathNode):
         self.other = other
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true if all items in the collection passed as the other argument are
@@ -334,7 +328,6 @@ class SupersetOf(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
@@ -345,19 +338,19 @@ class SupersetOf(FHIRPathFunction):
             is empty (`[]`), the result is `True`, otherwise if the other collection is empty, the result is `False`.
         """
         if len(collection) == 0:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         other_collection = (
-            self.other.evaluate(collection, environment, create)
-            if isinstance(self.other, FHIRPath)
+            self.other.evaluate(collection, environment)
+            if isinstance(self.other, FHIRPathNode)
             else self.other
         )
         if len(other_collection) == 0:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         for item in other_collection:
             if item not in collection:
-                return [FHIRPathCollectionItem.wrap(False)]
+                return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         else:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.other == other.other
@@ -369,7 +362,7 @@ class Count(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
@@ -378,12 +371,11 @@ class Count(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
-        return [FHIRPathCollectionItem.wrap(len(collection))]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(len(collection))])
 
 
 class Distinct(FHIRPathFunction):
@@ -392,7 +384,7 @@ class Distinct(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the unique items in the input collection. If the input collection is empty (`[]`), the result is empty.
@@ -401,12 +393,13 @@ class Distinct(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
-        return list(set(collection))
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(item) for item in set(collection)]
+        )
 
 
 class IsDistinct(FHIRPathFunction):
@@ -415,7 +408,7 @@ class IsDistinct(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` if all the items in the input collection are distinct.
@@ -424,11 +417,10 @@ class IsDistinct(FHIRPathFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
-        return [
-            FHIRPathCollectionItem.wrap(len(list(set(collection))) == len(collection))
-        ]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(len(list(set(collection))) == len(collection))]
+        )

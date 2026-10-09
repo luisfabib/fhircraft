@@ -2,7 +2,7 @@
 
 from fhircraft.fhir.path.engine.combining import Union as UnionFunction
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
 )
@@ -15,13 +15,16 @@ __all__ = [
     "In",
 ]
 
-class FHIRCollectionOperator(FHIRPath):
+
+class FHIRCollectionOperator(FHIRPathNode):
     """
     Abstract class definition for the category of collection FHIRPath operators.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
@@ -48,12 +51,12 @@ class Union(FHIRCollectionOperator):
     A representation of the FHIRPath [`|`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Merge the two collections into a single collection, eliminating any duplicate values to
@@ -62,17 +65,14 @@ class Union(FHIRCollectionOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create=create
+            self.left, self.right, collection, environment
         )
-        return UnionFunction(left_collection).evaluate(
-            right_collection, environment, create
-        )
+        return UnionFunction(left_collection).evaluate(right_collection, environment)
 
     def __str__(self):
         return f"{self.left} | {self.right}"
@@ -83,12 +83,12 @@ class In(FHIRCollectionOperator):
     A representation of the FHIRPath [`in`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item, this operator returns true if the item is in the
@@ -98,7 +98,6 @@ class In(FHIRCollectionOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -107,22 +106,24 @@ class In(FHIRCollectionOperator):
             FHIRPathRuntimeError: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(left_collection) == 0:
-            return []
+            return FHIRPathCollection([])
         if len(right_collection) == 0:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         if len(left_collection) != 1:
             raise FHIRPathRuntimeError(
                 "Left expression evaluates to a non-singleton collection."
             )
-        value = left_collection[0].value
+        value = left_collection[0]
         check_collection = [
             item.value if isinstance(item, FHIRPathCollectionItem) else item
             for item in right_collection
         ]
-        return [FHIRPathCollectionItem.wrap(value in check_collection)]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(value in check_collection)]
+        )
 
     def __str__(self):
         return f"{self.left} in {self.right}"
@@ -133,12 +134,12 @@ class Contains(FHIRCollectionOperator):
     A representation of the FHIRPath [`contains`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         If the right operand is a collection with a single item, this operator returns true if the item is in the
@@ -148,7 +149,6 @@ class Contains(FHIRCollectionOperator):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -157,22 +157,24 @@ class Contains(FHIRCollectionOperator):
             FHIRPathException: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(right_collection) == 0:
-            return []
+            return FHIRPathCollection([])
         if len(left_collection) == 0:
-            return [FHIRPathCollectionItem.wrap(False)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(False)])
         if len(right_collection) != 1:
             raise FHIRPathRuntimeError(
                 "Right expression evaluates to a non-singleton collection."
             )
-        value = right_collection[0].value
+        value = right_collection[0]
         check_collection = [
             item.value if isinstance(item, FHIRPathCollectionItem) else item
             for item in left_collection
         ]
-        return [FHIRPathCollectionItem.wrap(value in check_collection)]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(value in check_collection)]
+        )
 
     def __str__(self):
         return f"{self.left} contains {self.right}"

@@ -6,6 +6,22 @@ To use these functions over a collection with multiple items, one may use filter
     Patient.name.given.select(substring(0))
 """
 
+import re
+from typing import Any, List, Optional
+
+from fhircraft.fhir.path.engine.core import (
+    FHIRPathNode,
+    FHIRPathCollection,
+    FHIRPathCollectionItem,
+    FHIRPathFunction,
+    Literal,
+)
+from fhircraft.exceptions import FHIRPathException
+from fhircraft.fhir.path.utils import (
+    _evaluate_and_prepare_collection_values,
+    _get_expression_context,
+)
+
 __all__ = [
     "IndexOf",
     "Substring",
@@ -20,24 +36,7 @@ __all__ = [
     "ToChars",
     "Length",
     "Concatenation",
-
 ]
-
-import re
-from typing import Any, List, Optional
-
-from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
-    FHIRPathCollection,
-    FHIRPathCollectionItem,
-    FHIRPathFunction,
-    Literal,
-)
-from fhircraft.exceptions import FHIRPathException
-from fhircraft.fhir.path.utils import (
-    _evaluate_and_prepare_collection_values,
-    _get_expression_context,
-)
 
 
 class StringManipulationFunction(FHIRPathFunction):
@@ -69,7 +68,7 @@ class StringManipulationFunction(FHIRPathFunction):
             raise FHIRPathException(
                 f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
-        value = collection[0].value
+        value = collection[0]
         if (
             isinstance(value, (R4_String, R4B_String, R5_String))
             and value.value is not None
@@ -79,7 +78,7 @@ class StringManipulationFunction(FHIRPathFunction):
             return value
         else:
             raise FHIRPathException(
-                f"FHIRPath function {self.__str__()} expected a string, instead got a {type(collection[0].value)}"
+                f"FHIRPath function {self.__str__()} expected a string, instead got a {type(collection[0])}"
             )
 
 
@@ -88,20 +87,20 @@ class IndexOf(StringManipulationFunction):
     A representation of the FHIRPath [`indexOf()`](https://hl7.org/fhirpath/N1/#indexofsubstring-string-integer) function.
 
     Attributes:
-        substring (str | FHIRPath): Subtring query or FHIRPath that resolves to a string..
+        substring (str | FHIRPathNode): Subtring query or FHIRPath that resolves to a string..
     """
 
-    def __init__(self, substring: str | FHIRPath):
+    def __init__(self, substring: str | FHIRPathNode):
         if isinstance(substring, str):
             substring = Literal(substring)
-        if not isinstance(substring, FHIRPath):
+        if not isinstance(substring, FHIRPathNode):
             raise FHIRPathException(
                 "IndexOf() argument must be a literal string or a valid FHIRPath."
             )
         self.substring = substring
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the 0-based index of the first position substring is found in the input string,
@@ -112,7 +111,6 @@ class IndexOf(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -125,10 +123,10 @@ class IndexOf(StringManipulationFunction):
         from fhircraft.fhir.resources.base import StringBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Get string value
-        string_item = collection[0].value
+        string_item = collection[0]
         # Update the evaluation context
         environment = _get_expression_context(environment, item=string_item, index=0)
         if not isinstance(
@@ -140,7 +138,9 @@ class IndexOf(StringManipulationFunction):
             raise FHIRPathException(
                 "IndexOf() argument must resolve in a non-empty string."
             )
-        return [FHIRPathCollectionItem.wrap(collection[0].value.find(substring))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(collection[0].find(substring))]
+        )
 
 
 class Substring(StringManipulationFunction):
@@ -148,16 +148,18 @@ class Substring(StringManipulationFunction):
     A representation of the FHIRPath [`substring()`](https://hl7.org/fhirpath/N1/#substringstart-integer-length-integer-string) function.
 
     Attributes:
-        start (int | FHIRPath): Start index of the substring  or FHIRPath that resolves to an integer.
-        end (Optional[int | FHIRPath]): Optional, end index of the substring  or FHIRPath that resolves to an integer.
+        start (int | FHIRPathNode): Start index of the substring  or FHIRPath that resolves to an integer.
+        end (Optional[int | FHIRPathNode]): Optional, end index of the substring  or FHIRPath that resolves to an integer.
     """
 
-    def __init__(self, start: int | FHIRPath, end: int | FHIRPath | None = None):
-        self.start: FHIRPath = Literal(start) if isinstance(start, int) else start
-        self.end: FHIRPath | None = Literal(end) if isinstance(end, int) else end
+    def __init__(
+        self, start: int | FHIRPathNode, end: int | FHIRPathNode | None = None
+    ):
+        self.start: FHIRPathNode = Literal(start) if isinstance(start, int) else start
+        self.end: FHIRPathNode | None = Literal(end) if isinstance(end, int) else end
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the part of the string starting at position start (zero-based). If length is given, will
@@ -172,7 +174,6 @@ class Substring(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -185,7 +186,7 @@ class Substring(StringManipulationFunction):
         from fhircraft.fhir.resources.base import IntegerBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Update the evaluation context
         environment = _get_expression_context(
@@ -211,15 +212,21 @@ class Substring(StringManipulationFunction):
             and not isinstance(end, (int, IntegerBase))
             or (isinstance(end, IntegerBase) and (end := end.value) is None)
         ):
-            raise FHIRPathException("Substring() end argument must resolve to an integer.")
+            raise FHIRPathException(
+                "Substring() end argument must resolve to an integer."
+            )
 
         if start > len(string_item) - 1:
-            return []
+            return FHIRPathCollection()
         # Apply substring extraction
         if end is None:
-            return [FHIRPathCollectionItem.wrap(string_item[start:])]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(string_item[start:])]
+            )
         else:
-            return [FHIRPathCollectionItem.wrap(string_item[start:end])]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(string_item[start:end])]
+            )
 
 
 class StartsWith(StringManipulationFunction):
@@ -227,20 +234,20 @@ class StartsWith(StringManipulationFunction):
     A representation of the FHIRPath [`startsWith()`](https://hl7.org/fhirpath/N1/#startswithprefix-string-boolean) function.
 
     Attributes:
-        prefix (str | FHIRPath): String prefix to query or FHIRPath that resolves to a string..
+        prefix (str | FHIRPathNode): String prefix to query or FHIRPath that resolves to a string..
     """
 
-    def __init__(self, prefix: str | FHIRPath):
+    def __init__(self, prefix: str | FHIRPathNode):
         if isinstance(prefix, str):
             prefix = Literal(prefix)
-        if not isinstance(prefix, FHIRPath):
+        if not isinstance(prefix, FHIRPathNode):
             raise FHIRPathException(
                 "StartsWith() argument must be a string literal or a valid FHIRPath."
             )
         self.prefix = prefix
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true when the input string starts with the given prefix.
@@ -250,7 +257,6 @@ class StartsWith(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -263,7 +269,7 @@ class StartsWith(StringManipulationFunction):
         from fhircraft.fhir.resources.base import StringBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Update the evaluation context
         environment = _get_expression_context(
@@ -276,9 +282,11 @@ class StartsWith(StringManipulationFunction):
         ) or (isinstance(prefix, StringBase) and (prefix := prefix.value) is None):
             raise FHIRPathException("StartsWith() argument must resolve to a string.")
         if not prefix:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         # Check for prefix presence
-        return [FHIRPathCollectionItem.wrap(string_item.startswith(prefix))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(string_item.startswith(prefix))]
+        )
 
 
 class EndsWith(StringManipulationFunction):
@@ -286,20 +294,20 @@ class EndsWith(StringManipulationFunction):
     A representation of the FHIRPath [`endsWith()`](https://hl7.org/fhirpath/N1/#endswithsuffix-string-boolean) function.
 
     Attributes:
-        suffix (str | FHIRPath): String suffix to query  or FHIRPath that resolves to a string.
+        suffix (str | FHIRPathNode): String suffix to query  or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, suffix: str | FHIRPath):
+    def __init__(self, suffix: str | FHIRPathNode):
         if isinstance(suffix, str):
             suffix = Literal(suffix)
-        if not isinstance(suffix, FHIRPath):
+        if not isinstance(suffix, FHIRPathNode):
             raise FHIRPathException(
                 "EndsWith() argument must be a string literal or a valid FHIRPath."
             )
         self.suffix = suffix
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true when the input string ends with the given suffix.
@@ -309,7 +317,6 @@ class EndsWith(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -322,7 +329,7 @@ class EndsWith(StringManipulationFunction):
         from fhircraft.fhir.resources.base import StringBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Update the evaluation context
         environment = _get_expression_context(
@@ -335,9 +342,11 @@ class EndsWith(StringManipulationFunction):
         ) or (isinstance(suffix, StringBase) and (suffix := suffix.value) is None):
             raise FHIRPathException("EndsWith() argument must resolve to a string.")
         if not suffix:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         # Check for suffix presence
-        return [FHIRPathCollectionItem.wrap(string_item.endswith(suffix))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(string_item.endswith(suffix))]
+        )
 
 
 class Contains(StringManipulationFunction):
@@ -345,20 +354,20 @@ class Contains(StringManipulationFunction):
     A representation of the FHIRPath [`contains()`](https://hl7.org/fhirpath/N1/#containssubstring-string-boolean) function.
 
     Attributes:
-        substring (str | FHIRPath): Substring to query or FHIRPath that resolves to a string.
+        substring (str | FHIRPathNode): Substring to query or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, substring: str | FHIRPath):
+    def __init__(self, substring: str | FHIRPathNode):
         if isinstance(substring, str):
             substring = Literal(substring)
-        if not isinstance(substring, FHIRPath):
+        if not isinstance(substring, FHIRPathNode):
             raise FHIRPathException(
                 "Contains() argument must be a string literal or a valid FHIRPath."
             )
         self.substring = substring
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true when the given substring is a substring of the input string.
@@ -368,7 +377,6 @@ class Contains(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -386,7 +394,7 @@ class Contains(StringManipulationFunction):
         from fhircraft.fhir.resources.base import StringBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Update the evaluation context
         environment = _get_expression_context(
@@ -401,9 +409,11 @@ class Contains(StringManipulationFunction):
         ):
             raise FHIRPathException("Contains() argument must resolve to a string.")
         if not substring:
-            return [FHIRPathCollectionItem.wrap(True)]
+            return FHIRPathCollection([FHIRPathCollectionItem.wrap(True)])
         # Check for substring presence
-        return [FHIRPathCollectionItem.wrap(substring in string_item)]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(substring in string_item)]
+        )
 
 
 class Upper(StringManipulationFunction):
@@ -412,7 +422,7 @@ class Upper(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the input string with all characters converted to upper case.
@@ -421,7 +431,6 @@ class Upper(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -431,10 +440,10 @@ class Upper(StringManipulationFunction):
             FHIRPathException: If the item in the input collection is not a string.
         """
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Apply upper case transformation
-        return [FHIRPathCollectionItem.wrap(string_item.upper())]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(string_item.upper())])
 
 
 class Lower(StringManipulationFunction):
@@ -443,7 +452,7 @@ class Lower(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the input string with all characters converted to lower case.
@@ -452,7 +461,6 @@ class Lower(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -462,10 +470,10 @@ class Lower(StringManipulationFunction):
             FHIRPathException: If the item in the input collection is not a string.
         """
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Apply lower case transformation
-        return [FHIRPathCollectionItem.wrap(string_item.lower())]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(string_item.lower())])
 
 
 class Replace(StringManipulationFunction):
@@ -473,14 +481,14 @@ class Replace(StringManipulationFunction):
     A representation of the FHIRPath [`replace()`](https://hl7.org/fhirpath/N1/#replacepattern-string-substitution-string-string) function.
 
     Attributes:
-        pattern (str | FHIRPath): Substring to substitute or FHIRPath that resolves to a string.
-        substitution (str | FHIRPath): String to substitute `pattern` with or FHIRPath that resolves to a string.
+        pattern (str | FHIRPathNode): Substring to substitute or FHIRPath that resolves to a string.
+        substitution (str | FHIRPathNode): String to substitute `pattern` with or FHIRPath that resolves to a string.
     """
 
     def __init__(
         self,
-        pattern: str | FHIRPath | FHIRPathCollection,
-        substitution: str | FHIRPath | FHIRPathCollection,
+        pattern: str | FHIRPathNode | FHIRPathCollection,
+        substitution: str | FHIRPathNode | FHIRPathCollection,
     ):
         if isinstance(pattern, str):
             self.pattern = Literal(pattern)
@@ -493,7 +501,7 @@ class Replace(StringManipulationFunction):
                 )
             else:
                 self.pattern = Literal(None)
-        elif isinstance(pattern, FHIRPath):
+        elif isinstance(pattern, FHIRPathNode):
             self.pattern = pattern
         else:
             raise FHIRPathException(
@@ -513,7 +521,7 @@ class Replace(StringManipulationFunction):
                 )
             else:
                 self.substitution = Literal(None)
-        elif isinstance(substitution, FHIRPath):
+        elif isinstance(substitution, FHIRPathNode):
             self.substitution = substitution
         else:
             raise FHIRPathException(
@@ -521,7 +529,7 @@ class Replace(StringManipulationFunction):
             )
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the input string with all instances of `pattern` replaced with `substitution`.
@@ -533,7 +541,6 @@ class Replace(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -545,23 +552,26 @@ class Replace(StringManipulationFunction):
         from fhircraft.fhir.resources.base import StringBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Update the evaluation context
         environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Validate pattern and substitution
-        if self.substitution.is_empty(
-            collection, environment=environment
-        ) or self.pattern.is_empty(collection, environment=environment):
-            return []
+        if (
+            len(self.substitution.evaluate(collection, environment=environment)) == 0
+            or len(self.pattern.evaluate(collection, environment=environment)) == 0
+        ):
+            return FHIRPathCollection()
         # Get pattern and substitution values
         if not isinstance(
             pattern := self.pattern.single(collection, environment=environment),
             (str, StringBase),
         ) or (isinstance(pattern, StringBase) and (pattern := pattern.value) is None):
-            raise FHIRPathException("Replace() pattern argument must resolve to a string.")
+            raise FHIRPathException(
+                "Replace() pattern argument must resolve to a string."
+            )
         if not isinstance(
             substitution := self.substitution.single(
                 collection, environment=environment
@@ -575,7 +585,9 @@ class Replace(StringManipulationFunction):
                 "Replace() substitution argument must resolve to a string."
             )
         # Apply replacement
-        return [FHIRPathCollectionItem.wrap(string_item.replace(pattern, substitution))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(string_item.replace(pattern, substitution))]
+        )
 
 
 class Matches(StringManipulationFunction):
@@ -583,20 +595,20 @@ class Matches(StringManipulationFunction):
     A representation of the FHIRPath [`matches()`](https://hl7.org/fhirpath/N1/#matchesregex-string-boolean) function.
 
     Attributes:
-        regex (str | FHIRPath): Regular expression to match or FHIRPath that resolves to a string.
+        regex (str | FHIRPathNode): Regular expression to match or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, regex: str | FHIRPath):
+    def __init__(self, regex: str | FHIRPathNode):
         if isinstance(regex, str):
             regex = Literal(regex)
-        if not isinstance(regex, FHIRPath):
+        if not isinstance(regex, FHIRPathNode):
             raise FHIRPathException(
                 "Matches() argument must be a string literal or valid FHIRPath."
             )
         self.regex = regex
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns `True` when the value matches the given regular expression. Regular expressions
@@ -607,7 +619,6 @@ class Matches(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -619,22 +630,24 @@ class Matches(StringManipulationFunction):
         from fhircraft.fhir.resources.base import StringBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Update the evaluation context
         environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Get regex value
-        if self.regex.is_empty(collection, environment=environment):
-            return []
+        if len(self.regex.evaluate(collection, environment=environment)) == 0:
+            return FHIRPathCollection()
         if not isinstance(
             regex := self.regex.single(collection, environment=environment),
             (str, StringBase),
         ) or (isinstance(regex, StringBase) and (regex := regex.value) is None):
             raise FHIRPathException("Matches() argument must resolve to a string.")
         # Apply regex match
-        return [FHIRPathCollectionItem.wrap(bool(re.match(regex, string_item)))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(bool(re.match(regex, string_item)))]
+        )
 
 
 class ReplaceMatches(StringManipulationFunction):
@@ -642,20 +655,20 @@ class ReplaceMatches(StringManipulationFunction):
     A representation of the FHIRPath [`replaceMatches()`](https://hl7.org/fhirpath/N1/#replacematchesregex-string-substitution-string-string) function.
 
     Attributes:
-        regex (str | FHIRPath): Regular expression to substitute or FHIRPath that resolves to a string.
-        substitution (str | FHIRPath): String to substitute `regex` with or FHIRPath that resolves to a string.
+        regex (str | FHIRPathNode): Regular expression to substitute or FHIRPath that resolves to a string.
+        substitution (str | FHIRPathNode): String to substitute `regex` with or FHIRPath that resolves to a string.
     """
 
-    def __init__(self, regex: str | FHIRPath, substitution: str | FHIRPath):
+    def __init__(self, regex: str | FHIRPathNode, substitution: str | FHIRPathNode):
         if isinstance(regex, str):
             regex = Literal(regex)
-        if not isinstance(regex, FHIRPath):
+        if not isinstance(regex, FHIRPathNode):
             raise FHIRPathException(
                 "ReplaceMatches() regex argument must be a string literal or valid FHIRPath."
             )
         if isinstance(substitution, str):
             substitution = Literal(substitution)
-        if not isinstance(substitution, FHIRPath):
+        if not isinstance(substitution, FHIRPathNode):
             raise FHIRPathException(
                 "ReplaceMatches() substitution argument must be a string literal or valid FHIRPath."
             )
@@ -663,7 +676,7 @@ class ReplaceMatches(StringManipulationFunction):
         self.substitution = substitution
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Matches the input using the regular expression in regex and replaces each match with the
@@ -673,7 +686,6 @@ class ReplaceMatches(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -685,17 +697,18 @@ class ReplaceMatches(StringManipulationFunction):
         from fhircraft.fhir.resources.base import StringBase
 
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
         # Update the evaluation context
         environment = _get_expression_context(
             environment, item=FHIRPathCollectionItem.wrap(string_item), index=0
         )
         # Validate pattern and substitution
-        if self.regex.is_empty(
-            collection, environment=environment
-        ) or self.substitution.is_empty(collection, environment=environment):
-            return []
+        if (
+            len(self.regex.evaluate(collection, environment=environment)) == 0
+            or len(self.substitution.evaluate(collection, environment=environment)) == 0
+        ):
+            return FHIRPathCollection()
         if not isinstance(
             regex := self.regex.single(collection, environment=environment),
             (str, StringBase),
@@ -715,7 +728,9 @@ class ReplaceMatches(StringManipulationFunction):
             raise FHIRPathException(
                 "ReplaceMatches() substitution argument must resolve to a string."
             )
-        return [FHIRPathCollectionItem.wrap(re.sub(regex, substitution, string_item))]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(re.sub(regex, substitution, string_item))]
+        )
 
 
 class Length(StringManipulationFunction):
@@ -724,7 +739,7 @@ class Length(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the length of the input string. If the input collection is empty (`[]`), the result is empty.
@@ -732,7 +747,6 @@ class Length(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -742,9 +756,9 @@ class Length(StringManipulationFunction):
             FHIRPathException: If the item in the input collection is not a string.
         """
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
-        return [FHIRPathCollectionItem.wrap(len(string_item))]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(len(string_item))])
 
 
 class ToChars(StringManipulationFunction):
@@ -753,7 +767,7 @@ class ToChars(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns the list of characters in the input string. If the input collection is empty (`[]`), the result is empty.
@@ -761,7 +775,6 @@ class ToChars(StringManipulationFunction):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -771,28 +784,32 @@ class ToChars(StringManipulationFunction):
             FHIRPathException: If the item in the input collection is not a string.
         """
         if not collection:
-            return []
+            return FHIRPathCollection()
         string_item = self.validate_collection(collection)
-        return [FHIRPathCollectionItem.wrap(character) for character in string_item]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(character) for character in string_item]
+        )
 
 
-class Concatenation(FHIRPath):
+class Concatenation(FHIRPathNode):
     """
     A representation of the FHIRPath [`&`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         For strings, will concatenate the strings, where an empty operand is taken to be the empty string.
@@ -804,7 +821,6 @@ class Concatenation(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -818,12 +834,13 @@ class Concatenation(FHIRPath):
             self.right,
             collection,
             environment,
-            create,
             prevent_all_empty=False,
         )
         left_value = left_value or ""
         right_value = right_value or ""
-        return [FHIRPathCollectionItem.wrap(f"{left_value}{right_value}")]
+        return FHIRPathCollection(
+            [FHIRPathCollectionItem.wrap(f"{left_value}{right_value}")]
+        )
 
     def __str__(self):
         return f"{self.left} & {self.right}"

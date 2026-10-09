@@ -266,7 +266,7 @@ from fhircraft import override_config
 
 with override_config(terminology_service=MyTerminologyService()):
     # All FHIRPath evaluations in this block use the staging service
-    result = fhir.Observation(status="final", code={"coding":[{"code":"LP-12292"}]}).fhirpath_single(
+    result = fhir.Observation(status="final", code={"coding":[{"code":"LP-12292"}]}).query(
         "Observation.code.memberOf('http://example.org/ValueSet/LabCodes')"
     )
 

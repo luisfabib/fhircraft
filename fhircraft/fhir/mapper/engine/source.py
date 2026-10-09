@@ -9,7 +9,7 @@ from fhircraft.exceptions import (
 from fhircraft.fhir.path import engine as fhirpath
 import logging
 
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path.engine.core import FHIRPathNode
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class RuleSource(FHIRMappingEngineComponent):
         self.variable = (
             str(source.variable) if source.variable else f"source-{id(source)}"
         )
-        self.resolved_path: Optional[FHIRPath] = None
+        self.resolved_path: Optional[FHIRPathNode] = None
         self.iteration_count = 0
         self.condition = (
             source.condition if source.condition else fhirpath.Literal(True)
@@ -112,7 +112,7 @@ class RuleSource(FHIRMappingEngineComponent):
 
     def _check_where_condition(self, scope: "MappingScope") -> bool:
         """Check where condition."""
-        if not isinstance(self.condition, FHIRPath):
+        if not isinstance(self.condition, FHIRPathNode):
             condition_fhirpath = self.resolve_fhirpath_within_context(
                 str(self.condition), scope
             )
@@ -122,7 +122,7 @@ class RuleSource(FHIRMappingEngineComponent):
 
     def _check_assertion_condition(self, scope: "MappingScope") -> bool:
         """Check assertion condition."""
-        if not isinstance(self.assertion, FHIRPath):
+        if not isinstance(self.assertion, FHIRPathNode):
             assertion_fhirpath = self.resolve_fhirpath_within_context(
                 str(self.assertion), scope
             )

@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from fhircraft.fhir.path.engine.core import Element, FHIRPathCollectionItem
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, Time, DateTime
@@ -18,7 +19,7 @@ def test_trace_logs_collection_and_returns_input(caplog):
         FHIRPathCollectionItem(value="item1"),
         FHIRPathCollectionItem(value="item2"),
     ]
-    result = Trace("TestTrace").evaluate(collection, env)
+    result = Trace("TestTrace").evaluate(FHIRPathCollection(collection), env)
     assert result == collection
 
 
@@ -34,7 +35,7 @@ def test_trace_logs_collection_with_fhirpath(caplog):
         FHIRPathCollectionItem(value="item2"),
     ]
     result = Trace(EnvironmentVariable("%name")).evaluate(
-        collection, {"%name": "DynamicTrace"}
+        FHIRPathCollection(collection), {"%name": "DynamicTrace"}
     )
     assert result == collection
 
@@ -45,9 +46,9 @@ def test_trace_logs_collection_with_fhirpath(caplog):
 
 
 def test_today_returns_current_date():
-    result = Today().evaluate([], env)
-    assert isinstance(result[0].value, Date)
-    assert result[0].value == Date(value_date=datetime.datetime.now().date())
+    result = Today().evaluate(FHIRPathCollection([]), env)
+    assert isinstance(result[0], Date)
+    assert result[0] == Date(value_date=datetime.datetime.now().date())
 
 
 def test_today_string_representation():
@@ -61,10 +62,10 @@ def test_today_string_representation():
 
 
 def test_now_returns_datetime_with_timezone_offset():
-    result = Now().evaluate([], env)
-    assert isinstance(result[0].value, DateTime)
-    assert result[0].value.hour_shift is not None
-    assert result[0].value.minute_shift is not None
+    result = Now().evaluate(FHIRPathCollection([]), env)
+    assert isinstance(result[0], DateTime)
+    assert result[0].hour_shift is not None
+    assert result[0].minute_shift is not None
 
 
 def test_now_string_representation():
@@ -78,8 +79,8 @@ def test_now_string_representation():
 
 
 def test_timeofday_returns_current_time():
-    result = TimeOfDay().evaluate([], env)
-    assert isinstance(result[0].value, Time)
+    result = TimeOfDay().evaluate(FHIRPathCollection([]), env)
+    assert isinstance(result[0], Time)
 
 
 def test_timeofday_string_representation():

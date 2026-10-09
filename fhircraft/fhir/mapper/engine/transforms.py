@@ -7,7 +7,7 @@ from fhircraft.fhir.path import engine as fp
 from fhircraft.exceptions import MapperTargetProcessingError
 import uuid
 
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path.engine.core import FHIRPathNode
 
 if TYPE_CHECKING:
     from fhircraft.fhir.mapper.engine.scope import MappingScope
@@ -140,7 +140,7 @@ class Cast(MappingTransform):
 
     source: str
     type_specifier: str | None
-    type_conversion_function: Type[fp.FHIRPath] | None
+    type_conversion_function: Type[fp.FHIRPathNode] | None
 
     def __init__(
         self,
@@ -224,7 +224,9 @@ class Append(MappingTransform):
             MapperTargetProcessingError: If no parameters are provided, or if a parameter does not have a valid type (`valueId` or `valueString`).
         """
         if len(parameters) < 1:
-            raise MapperTargetProcessingError("Append transform requires at least one parameter")
+            raise MapperTargetProcessingError(
+                "Append transform requires at least one parameter"
+            )
         self.elements = []
         for parameter in parameters:
             if not (parameter.valueId or parameter.valueString):
@@ -271,11 +273,15 @@ class Reference(MappingTransform):
         ],
     ):
         if len(parameters) != 1:
-            raise MapperTargetProcessingError("Reference transform requires exactly one parameter")
+            raise MapperTargetProcessingError(
+                "Reference transform requires exactly one parameter"
+            )
         if param := parameters[0].valueId:
             self.source = str(param)
         else:
-            raise MapperTargetProcessingError("Reference transform parameter must be of type Id")
+            raise MapperTargetProcessingError(
+                "Reference transform parameter must be of type Id"
+            )
 
     def process(self, scope: "MappingScope") -> str:
         """
@@ -310,7 +316,9 @@ class UUID(MappingTransform):
         ],
     ):
         if len(parameters) != 0:
-            raise MapperTargetProcessingError("UUID transform does not take any parameters")
+            raise MapperTargetProcessingError(
+                "UUID transform does not take any parameters"
+            )
 
     def process(self, scope: "MappingScope") -> Any:
         """
@@ -423,8 +431,9 @@ class Evaluate(MappingTransform):
             context = scope.resolve_fhirpath(self.source).single(scope.get_instances())
         else:
             context = scope.get_instances()
+
         expression = self.resolve_fhirpath_within_context(self.expression, scope)
-        transformed_values = expression.values(context)
+        transformed_values = list(expression._evaluate_wrapped(context))
         if len(transformed_values) == 1:
             return transformed_values[0]
         elif len(transformed_values) > 1:
@@ -436,10 +445,10 @@ class Evaluate(MappingTransform):
 class CodeableConcept(MappingTransform):
     """Implements the 'cc' transform, which creates a CodeableConcept from parameters."""
 
-    text: fp.FHIRPath | str | None = None
-    code: fp.FHIRPath | str | None = None
-    system: fp.FHIRPath | str | None = None
-    display: fp.FHIRPath | str | None = None
+    text: fp.FHIRPathNode | str | None = None
+    code: fp.FHIRPathNode | str | None = None
+    system: fp.FHIRPathNode | str | None = None
+    display: fp.FHIRPathNode | str | None = None
 
     def __init__(
         self,
@@ -528,9 +537,9 @@ class CodeableConcept(MappingTransform):
 class Coding(MappingTransform):
     """Implements the 'c' transform, which creates a Coding from parameters."""
 
-    code: fp.FHIRPath | str | None = None
-    system: fp.FHIRPath | str | None = None
-    display: fp.FHIRPath | str | None = None
+    code: fp.FHIRPathNode | str | None = None
+    system: fp.FHIRPathNode | str | None = None
+    display: fp.FHIRPathNode | str | None = None
 
     def __init__(
         self,
@@ -599,11 +608,11 @@ class Coding(MappingTransform):
 class Quantity(MappingTransform):
     """Implements the 'qty' transform, which creates a Quantity"""
 
-    text: fp.FHIRPath | str | None = None
-    value: fp.FHIRPath | str | None = None
-    unit: fp.FHIRPath | str | None = None
-    system: fp.FHIRPath | str | None = None
-    code: fp.FHIRPath | str | None = None
+    text: fp.FHIRPathNode | str | None = None
+    value: fp.FHIRPathNode | str | None = None
+    unit: fp.FHIRPathNode | str | None = None
+    system: fp.FHIRPathNode | str | None = None
+    code: fp.FHIRPathNode | str | None = None
 
     def __init__(
         self,
@@ -723,9 +732,9 @@ class Quantity(MappingTransform):
 class Identifier(MappingTransform):
     """Implements the 'id' transform, which creates an Identifier"""
 
-    system: fp.FHIRPath | str
-    value: fp.FHIRPath | str
-    type: fp.FHIRPath | str
+    system: fp.FHIRPathNode | str
+    value: fp.FHIRPathNode | str
+    type: fp.FHIRPathNode | str
 
     def __init__(
         self,
@@ -793,8 +802,8 @@ class Identifier(MappingTransform):
 class ContactPoint(MappingTransform):
     """Implements the 'cp' transform, which creates a ContactPoint"""
 
-    system: fp.FHIRPath | str | None = None
-    value: fp.FHIRPath | str
+    system: fp.FHIRPathNode | str | None = None
+    value: fp.FHIRPathNode | str
 
     def __init__(
         self,

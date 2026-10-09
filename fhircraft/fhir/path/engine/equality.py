@@ -8,11 +8,12 @@ __all__ = [
 ]
 
 import re
+from typing import Any
 
 from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import (
-    FHIRPath,
+    FHIRPathNode,
     FHIRPathCollection,
     FHIRPathCollectionItem,
 )
@@ -20,23 +21,25 @@ from fhircraft.fhir.path.engine.literals import TypePrecisionError
 from fhircraft.fhir.path.utils import _evaluate_left_right_expressions
 
 
-class Equals(FHIRPath):
+class Equals(FHIRPathNode):
     """
     A representation of the FHIRPath [`=`](https://hl7.org/fhirpath/N1/#equals) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment, create: bool = False
+        self, collection: FHIRPathCollection, environment
     ) -> FHIRPathCollection:
         """
         Returns true if the left collection is equal to the right collection:
@@ -60,29 +63,28 @@ class Equals(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(left_collection) == 0 or len(right_collection) == 0:
-            return []
+            return FHIRPathCollection([])
         elif len(left_collection) == 1 and len(right_collection) == 1:
             try:
                 equals = left_collection[0] == right_collection[0]
             except TypePrecisionError:
-                return []
+                return FHIRPathCollection([])
         elif len(left_collection) != len(right_collection):
             equals = False
         else:
             try:
                 equals = all(l == r for l, r in zip(left_collection, right_collection))
             except TypePrecisionError:
-                return []
-        return [FHIRPathCollectionItem.wrap(equals)]
+                return FHIRPathCollection([])
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(equals)])
 
     def __str__(self):
         return f"{self.left} = {self.right}"
@@ -101,23 +103,25 @@ class Equals(FHIRPath):
         return hash((self.left, self.right))
 
 
-class Equivalent(FHIRPath):
+class Equivalent(FHIRPathNode):
     """
     A representation of the FHIRPath [`~`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         Returns true if the collections are the same. In particular, comparing empty collections for equivalence { } ~ { } will result in true.
@@ -137,14 +141,13 @@ class Equivalent(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
 
         left_collection, right_collection = _evaluate_left_right_expressions(
-            self.left, self.right, collection, environment, create
+            self.left, self.right, collection, environment
         )
         if len(left_collection) == 0 and len(right_collection) == 0:
             equivalent = True
@@ -158,11 +161,11 @@ class Equivalent(FHIRPath):
             remaining_right = list(right_collection)
             equivalent = True
 
-            for left_item in left_collection:
+            for left in left_collection:
                 found_equivalent = False
-                for i, right_item in enumerate(remaining_right):
+                for i, right in enumerate(remaining_right):
                     # Use equivalence logic based on FHIRPath specification
-                    if self._is_equivalent(left_item, right_item):
+                    if self._is_equivalent(left, right):
                         remaining_right.pop(i)
                         found_equivalent = True
                         break
@@ -171,7 +174,7 @@ class Equivalent(FHIRPath):
                     equivalent = False
                     break
 
-        return [FHIRPathCollectionItem.wrap(equivalent)]
+        return FHIRPathCollection([FHIRPathCollectionItem.wrap(equivalent)])
 
     def __str__(self):
         return f"{self.left} ~ {self.right}"
@@ -189,48 +192,43 @@ class Equivalent(FHIRPath):
     def __hash__(self):
         return hash((self.left, self.right))
 
-    def _is_equivalent(
-        self, left_item: FHIRPathCollectionItem, right_item: FHIRPathCollectionItem
-    ) -> bool:
+    def _is_equivalent(self, left: Any, right: Any) -> bool:
         """
         Check if two FHIRPathCollectionItems are equivalent according to FHIRPath rules.
 
         Args:
-            left_item: The left item to compare
-            right_item: The right item to compare
+            left: The left item to compare
+            right: The right item to compare
 
         Returns:
             bool: True if the items are equivalent, False otherwise
         """
         from fhircraft.fhir.resources.base import FHIRPrimitiveModel
 
-        left_value = left_item.value
-        right_value = right_item.value
-
-        if isinstance(left_value, FHIRPrimitiveModel):
-            left_value = left_value.value
-        if isinstance(right_value, FHIRPrimitiveModel):
-            right_value = right_value.value
+        if isinstance(left, FHIRPrimitiveModel):
+            left = left.value
+        if isinstance(right, FHIRPrimitiveModel):
+            right = right.value
         # Handle None values
-        if left_value is None and right_value is None:
+        if left is None and right is None:
             return True
-        if left_value is None or right_value is None:
+        if left is None or right is None:
             return False
 
         # Type checking - must be same type or implicitly convertible
-        if type(left_value) != type(right_value):
+        if type(left) != type(right):
             return False
 
         # String equivalence: case-insensitive and normalized whitespace
-        if isinstance(left_value, str):
-            left_value = re.sub(r"\s+", " ", left_value).strip().lower()
-            right_value = re.sub(r"\s+", " ", right_value).strip().lower()
-            return left_value == right_value
+        if isinstance(left, str):
+            left = re.sub(r"\s+", " ", left).strip().lower()
+            right = re.sub(r"\s+", " ", right).strip().lower()
+            return left == right
 
         # Numeric equivalence
-        elif isinstance(left_value, (int, float)):
+        elif isinstance(left, (int, float)):
             # For floats: compare rounded to the least precise operand
-            if isinstance(left_value, float):
+            if isinstance(left, float):
                 # Get decimal places for each operand
                 def decimal_places(val: float) -> int:
                     s = f"{val:.16f}".rstrip("0").rstrip(".")
@@ -238,48 +236,50 @@ class Equivalent(FHIRPath):
                         return len(s.split(".")[-1])
                     return 0
 
-                left_decimals = decimal_places(left_value)
-                right_decimals = decimal_places(right_value)
+                left_decimals = decimal_places(left)
+                right_decimals = decimal_places(right)
                 precision = min(left_decimals, right_decimals)
                 # Round both to the least precise
-                return round(left_value, precision) == round(right_value, precision)
-            return left_value == right_value
+                return round(left, precision) == round(right, precision)
+            return left == right
 
         # Boolean equivalence
-        elif isinstance(left_value, bool):
-            return left_value == right_value
+        elif isinstance(left, bool):
+            return left == right
 
         # For complex types and other cases, fall back to regular equality
         else:
-            if isinstance(left_value, BaseModel) and isinstance(right_value, BaseModel):
-                left_value = left_value.model_dump(exclude={"id"}, exclude_unset=True)
-                right_value = right_value.model_dump(exclude={"id"}, exclude_unset=True)
-            if isinstance(left_value, dict):
-                left_value.pop("id", None)
-                right_value.pop("id", None)
+            if isinstance(left, BaseModel) and isinstance(right, BaseModel):
+                left = left.model_dump(exclude={"id"}, exclude_unset=True)
+                right = right.model_dump(exclude={"id"}, exclude_unset=True)
+            if isinstance(left, dict):
+                left.pop("id", None)
+                right.pop("id", None)
             try:
-                return left_value == right_value
+                return left == right
             except TypePrecisionError:
                 return False
 
 
-class NotEquals(FHIRPath):
+class NotEquals(FHIRPathNode):
     """
     A representation of the FHIRPath [`!=`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The converse of the equals operator, returning true if equal returns false; false if equal
@@ -289,18 +289,18 @@ class NotEquals(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
             environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         if equals_collection := Equals(self.left, self.right).evaluate(
-            collection, environment, create
+            collection, environment
         ):
-            equality = equals_collection[0].value
-            return [FHIRPathCollectionItem.wrap(not equality)]
+            return FHIRPathCollection(
+                [FHIRPathCollectionItem.wrap(not equals_collection[0])]
+            )
         else:
-            return []
+            return FHIRPathCollection([])
 
     def __str__(self):
         return f"{self.left} != {self.right}"
@@ -319,23 +319,25 @@ class NotEquals(FHIRPath):
         return hash((self.left, self.right))
 
 
-class NotEquivalent(FHIRPath):
+class NotEquivalent(FHIRPathNode):
     """
     A representation of the FHIRPath [`!~`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath | FHIRPathCollection): Left operand.
-        right (FHIRPath | FHIRPathCollection): Right operand.
+        left (FHIRPathNode | FHIRPathCollection): Left operand.
+        right (FHIRPathNode | FHIRPathCollection): Right operand.
     """
 
     def __init__(
-        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+        self,
+        left: FHIRPathNode | FHIRPathCollection,
+        right: FHIRPathNode | FHIRPathCollection,
     ):
         self.left = left
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict
     ) -> FHIRPathCollection:
         """
         The converse of the equivalent operator, returning true if equivalent returns
@@ -344,17 +346,22 @@ class NotEquivalent(FHIRPath):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
 
         Returns:
             (FHIRPathCollection): The output collection.
         """
-        return [
-            FHIRPathCollectionItem.wrap(
-                not Equivalent(self.left, self.right)
-                .evaluate(collection, environment, create)[0]
-                .value
-            )
-        ]
+        return FHIRPathCollection(
+            [
+                FHIRPathCollectionItem.wrap(
+                    not (
+                        Equivalent(self.left, self.right).evaluate(
+                            collection, environment
+                        )
+                    )[0]
+                )
+            ]
+        )
 
     def __str__(self):
         return f"{self.left} !~ {self.right}"

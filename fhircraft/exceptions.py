@@ -60,8 +60,6 @@ class FhircraftWarning(Warning):
     raising an exception.
     """
 
-    pass
-
 
 # ============================================================================
 # Mapper Exceptions
@@ -78,73 +76,49 @@ class MapperException(FhircraftException):
 class MapperWarning(FhircraftWarning):
     """Warning raised for non-critical issues encountered during mapping operations."""
 
-    pass
-
 
 class MapperLexingError(MapperException):
     """Raised when FHIR Mapping Language parsing fails."""
-
-    pass
 
 
 class MapperParsingError(MapperException):
     """Raised when FHIR Mapping Language syntax or parsing fails."""
 
-    pass
-
 
 class MapperValidationError(MapperException):
     """Raised when input data validation fails."""
-
-    pass
 
 
 class MapperScopeError(MapperException):
     """Raised when something accessing or modifying the mapping scope fails."""
 
-    pass
-
 
 class MapperDigestionError(MapperException):
     """Raised during the digestion of StructureMap definitions."""
-
-    pass
 
 
 class MapperGroupProcessingError(MapperException):
     """Raised when group processing fails."""
 
-    pass
-
 
 class MapperRuleProcessingError(MapperException):
     """Raised when rule processing fails."""
-
-    pass
 
 
 class MapperSourceProcessingError(MapperException):
     """Raised when source/input processing fails."""
 
-    pass
-
 
 class MapperTargetProcessingError(MapperException):
     """Raised when target/output processing fails."""
-
-    pass
 
 
 class MapperExecutionError(MapperException):
     """Raised when mapping execution fails."""
 
-    pass
-
 
 class MapperRegistryNotFoundError(MapperException, FileNotFoundError):
     """Raised when a required StructureMap cannot be resolved."""
-
-    pass
 
 
 # ============================================================================
@@ -167,7 +141,14 @@ class FHIRPathParsingError(FHIRPathException):
     or cannot interpret a given FHIRPath expression.
     """
 
-    pass
+
+class FHIRPathEvaluationError(FHIRPathException):
+    """
+    Exception raised for errors encountered during the evaluation of FHIRPath expressions.
+
+    This error is typically thrown when the FHIRPath engine encounters invalid operations,
+    type mismatches, or other issues while evaluating a given FHIRPath expression.
+    """
 
 
 class FHIRPathLexingError(FHIRPathException):
@@ -178,8 +159,6 @@ class FHIRPathLexingError(FHIRPathException):
     or cannot interpret a given FHIRPath expression.
     """
 
-    pass
-
 
 class FHIRPathRuntimeError(FHIRPathException, RuntimeError):
     """
@@ -189,8 +168,6 @@ class FHIRPathRuntimeError(FHIRPathException, RuntimeError):
     such as invalid operations, type mismatches, or other runtime-specific problems.
     """
 
-    pass
-
 
 class FHIRPathTypeError(FHIRPathException):
     """
@@ -199,8 +176,6 @@ class FHIRPathTypeError(FHIRPathException):
     This typically occurs when attempting incompatible operations on values of different types.
     """
 
-    pass
-
 
 class FHIRPathOperationError(FHIRPathException):
     """
@@ -208,8 +183,6 @@ class FHIRPathOperationError(FHIRPathException):
 
     This can occur when trying to call functions that don't exist or with incompatible arguments.
     """
-
-    pass
 
 
 class FHIRPathWarning(FhircraftWarning):
@@ -220,8 +193,6 @@ class FHIRPathWarning(FhircraftWarning):
     that do not necessarily prevent the execution of FHIRPath operations.
     """
 
-    pass
-
 
 # ============================================================================
 # Resources Exceptions
@@ -230,8 +201,6 @@ class FHIRPathWarning(FhircraftWarning):
 
 class FhirValidationWarning(FhircraftWarning):
     """Warning raised for non-critical issues encountered during FHIR resource validation."""
-
-    pass
 
 
 class FhirTypeError(FhircraftException):
@@ -258,43 +227,29 @@ class FactoryException(FhircraftException):
 class FactoryDefinitionIndexError(FactoryException):
     """Raised when a DefinitionIndex navigation or construction operation fails."""
 
-    pass
-
 
 class FactoryDefinitionResolutionError(FactoryException):
     """Raised when a SnapshotResolver or DefinitionIndex operation fails."""
-
-    pass
 
 
 class FactoryBuilderError(FactoryException):
     """Raised when a Builder operation fails."""
 
-    pass
-
 
 class FactoryTypeResolutionError(FactoryException, LookupError):
     """Raised when resolving a FHIR type fails."""
-
-    pass
 
 
 class FactoryAssemblerError(FactoryException, LookupError):
     """Raised when the assembler encounters an error."""
 
-    pass
-
 
 class FactoryWarning(FhircraftWarning):
     """Warning raised for non-critical issues encountered during factory operations."""
 
-    pass
-
 
 class GeneratorWarning(FhircraftWarning):
     """Warning raised for non-critical issues encountered during generator operations."""
-
-    pass
 
 
 # ============================================================================
@@ -312,25 +267,17 @@ class PackageException(FhircraftException):
 class PackageNotFoundError(PackageException):
     """Raised when a package is not found in the registry."""
 
-    pass
-
 
 class PackageResolutionError(PackageException):
     """Raised when package resolution or loading fails."""
-
-    pass
 
 
 class PackageValidationError(PackageException):
     """Raised when package validation fails."""
 
-    pass
-
 
 class PackageValidationWarning(FhircraftWarning):
     """Warning raised for non-critical issues encountered during package validation."""
-
-    pass
 
 
 # Public API list

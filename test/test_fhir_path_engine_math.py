@@ -1,3 +1,4 @@
+from fhircraft.fhir.path.collection import FHIRPathCollection
 from collections import namedtuple
 
 from unittest.mock import patch
@@ -53,8 +54,8 @@ def test_addition_returns_correct_value(left, right, expected):
     result = Addition(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    ).evaluate(FHIRPathCollection(collection), env)
+    assert result == [expected]
 
 
 def test_addition_string_representation():
@@ -93,8 +94,8 @@ def test_subtraction_returns_correct_value(left, right, expected):
     result = Subtraction(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
-    assert result == [FHIRPathCollectionItem(value=expected)]
+    ).evaluate(FHIRPathCollection(collection), env)
+    assert result == [expected]
 
 
 def test_subtraction_string_representation():
@@ -134,8 +135,8 @@ def test_multiplication_returns_correct_value(left, right, expected):
     result = Multiplication(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
-    result = result[0].value if len(result) == 1 else result
+    ).evaluate(FHIRPathCollection(collection), env)
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 
@@ -177,8 +178,8 @@ def test_division_returns_correct_value(left, right, expected):
     result = Division(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
-    result = result[0].value if len(result) == 1 else result
+    ).evaluate(FHIRPathCollection(collection), env)
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 
@@ -208,8 +209,8 @@ def test_div_returns_correct_value(left, right, expected):
     result = Div(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
-    result = result[0].value if len(result) == 1 else result
+    ).evaluate(FHIRPathCollection(collection), env)
+    result = result[0] if len(result) == 1 else result
     assert result == expected
 
 
@@ -237,8 +238,8 @@ def test_mod_returns_correct_value(left, right, expected):
     result = Mod(
         Element("left"),
         Element("right"),
-    ).evaluate(collection, env)
-    assert round(result[0].value, 4) == round(expected, 4)
+    ).evaluate(FHIRPathCollection(collection), env)
+    assert round(result[0], 4) == round(expected, 4)
 
 
 def test_mod_string_representation():
@@ -270,8 +271,8 @@ abs_cases = (
 def test_abs_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Abs()).evaluate(collection, env)
-    assert result[0].value == expected
+    result = Invocation(Element("value"), Abs()).evaluate(FHIRPathCollection(collection), env)
+    assert result[0] == expected
 
 
 def test_abs_string_representation():
@@ -303,8 +304,8 @@ ceiling_cases = (
 def test_ceiling_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Ceiling()).evaluate(collection, env)
-    assert result[0].value == expected
+    result = Invocation(Element("value"), Ceiling()).evaluate(FHIRPathCollection(collection), env)
+    assert result[0] == expected
 
 
 def test_ceiling_string_representation():
@@ -336,12 +337,12 @@ exp_cases = (
 def test_exp_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Exp()).evaluate(collection, env)
+    result = Invocation(Element("value"), Exp()).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_exp_string_representation():
@@ -373,12 +374,12 @@ floor_cases = (
 def test_floor_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Floor()).evaluate(collection, env)
+    result = Invocation(Element("value"), Floor()).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_floor_string_representation():
@@ -404,12 +405,12 @@ ln_cases = (
 def test_ln_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Ln()).evaluate(collection, env)
+    result = Invocation(Element("value"), Ln()).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_ln_string_representation():
@@ -435,12 +436,12 @@ log_cases = (
 def test_log_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Log(10)).evaluate(collection, env)
+    result = Invocation(Element("value"), Log(10)).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_log_string_representation():
@@ -456,7 +457,7 @@ def test_log_uses_evaluation_context():
         "fhircraft.fhir.path.engine.strings.Literal.evaluate",
         wraps=Literal(10).evaluate,
     ) as mock_evaluate:
-        Invocation(Element("value"), Log(10)).evaluate(collection, env)
+        Invocation(Element("value"), Log(10)).evaluate(FHIRPathCollection(collection), env)
         mock_evaluate.assert_called()
         assert mock_evaluate.call_args[0][1]["$this"] == value
 
@@ -465,9 +466,9 @@ def test_log_returns_correct_value_with_fhirpath():
     resource = namedtuple("Resource", ["value"])(value=5)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Invocation(Element("value"), Log(EnvironmentVariable("%base"))).evaluate(
-        collection, {"%base": 10}
+        FHIRPathCollection(collection), {"%base": 10}
     )
-    assert result[0].value == pytest.approx(0.698970004, rel=1e-5)
+    assert result[0] == pytest.approx(0.698970004, rel=1e-5)
 
 
 # -------------
@@ -492,12 +493,12 @@ power_cases = (
 def test_power_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Power(2)).evaluate(collection, env)
+    result = Invocation(Element("value"), Power(2)).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_power_string_representation():
@@ -513,7 +514,7 @@ def test_power_uses_evaluation_context():
         "fhircraft.fhir.path.engine.strings.Literal.evaluate",
         wraps=Literal(10).evaluate,
     ) as mock_evaluate:
-        Invocation(Element("value"), Power(10)).evaluate(collection, env)
+        Invocation(Element("value"), Power(10)).evaluate(FHIRPathCollection(collection), env)
         mock_evaluate.assert_called()
         assert mock_evaluate.call_args[0][1]["$this"] == value
 
@@ -523,8 +524,8 @@ def test_power_returns_correct_value_with_fhirpath():
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Invocation(
         Element("value"), Power(EnvironmentVariable("%exponent"))
-    ).evaluate(collection, {"%exponent": 2})
-    assert result[0].value == pytest.approx(25, rel=1e-5)
+    ).evaluate(FHIRPathCollection(collection), {"%exponent": 2})
+    assert result[0] == pytest.approx(25, rel=1e-5)
 
 
 # -------------
@@ -557,12 +558,12 @@ round_cases = (
 def test_round_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Round(1)).evaluate(collection, env)
+    result = Invocation(Element("value"), Round(1)).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_round_string_representation():
@@ -578,7 +579,7 @@ def test_round_uses_evaluation_context():
         "fhircraft.fhir.path.engine.strings.Literal.evaluate",
         wraps=Literal(10).evaluate,
     ) as mock_evaluate:
-        Invocation(Element("value"), Round(10)).evaluate(collection, env)
+        Invocation(Element("value"), Round(10)).evaluate(FHIRPathCollection(collection), env)
         mock_evaluate.assert_called()
         assert mock_evaluate.call_args[0][1]["$this"] == value
 
@@ -588,8 +589,8 @@ def test_round_returns_correct_value_with_fhirpath():
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Invocation(
         Element("value"), Round(EnvironmentVariable("%precision"))
-    ).evaluate(collection, {"%precision": 2})
-    assert result[0].value == pytest.approx(5.56, rel=1e-5)
+    ).evaluate(FHIRPathCollection(collection), {"%precision": 2})
+    assert result[0] == pytest.approx(5.56, rel=1e-5)
 
 
 # -------------
@@ -610,12 +611,12 @@ sqrt_cases = (
 def test_sqrt_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Sqrt()).evaluate(collection, env)
+    result = Invocation(Element("value"), Sqrt()).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_sqrt_string_representation():
@@ -647,12 +648,12 @@ truncate_cases = (
 def test_truncate_returns_correct_value(value, expected):
     resource = namedtuple("Resource", ["value"])(value=value)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Invocation(Element("value"), Truncate()).evaluate(collection, env)
+    result = Invocation(Element("value"), Truncate()).evaluate(FHIRPathCollection(collection), env)
     if isinstance(expected, Quantity):
-        assert result[0].value.value == pytest.approx(expected.value, rel=1e-5)
-        assert result[0].value.unit == expected.unit
+        assert result[0].value == pytest.approx(expected.value, rel=1e-5)
+        assert result[0].unit == expected.unit
     else:
-        assert result[0].value == pytest.approx(expected, rel=1e-5)
+        assert result[0] == pytest.approx(expected, rel=1e-5)
 
 
 def test_truncate_string_representation():
