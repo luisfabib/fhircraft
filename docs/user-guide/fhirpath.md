@@ -33,14 +33,15 @@ patient = fhir.Patient(
 ) 
 
 # Without FHIRPath, you'd write loops and conditionals:
-official_family_name = None
+official_family_name_manual = None
 for name in patient.name:
     if name.use == "official":
-        official_family_name = name.family
+        official_family_name_manual = name.family
         break
 
 # With FHIRPath, express your intent directly:
-official_family_name = patient.query("Patient.name.where(use='official').family")[0] # (1)!
+official_family_name = patient.query("Patient.name.where(use='official').family").single() # (1)!
+assert official_family_name == official_family_name_manual
 ```
 
 1. This expresses the same logic as the loop above but more clearly and concisely.
@@ -118,13 +119,36 @@ assert family_names == ["Johnson"]
 
 ## Evaluating Expressions
 
-Healthcare data often contains fields with variable cardinality - some fields may be empty, contain a single value, or hold multiple values. A single method covers every case: `evaluate()` always returns a list of the matching values, which is empty when nothing matches. It never raises for missing data and never modifies the model.
+Healthcare data often contains fields with variable cardinality: a query may match no values, one value, or many. Call `model.query(expression, environment=None)` to evaluate an expression without modifying the model. It returns a `FHIRPathCollection`: a list-like result whose items are the matched values themselves, not wrapper objects. It compares and behaves like a regular Python list, so you can iterate over it, index it, slice it, or pass it to code that expects a list.
 
 | Method | Purpose | Returns |
 |--------|---------|---------|
-| `model.query(expression, environment=None)` | Get all values matching an expression | `List[Any]` |
+| `model.query(expression, environment=None)` | Get all values matching an expression | `FHIRPathCollection` (a list of values) |
 
-Cardinality checks are expressed in FHIRPath itself, so they compose with the rest of the expression:
+A query with no matches returns an empty collection (`[]`). For example, `patient.query("Patient.gender")` is `[]` when gender is absent, and `patient.query("Patient.gender") == ["female"]` when it is present.
+
+### Getting one result
+
+For convenience, a `FHIRPathCollection` also provides Python methods to retrieve values directly:
+
+| Method | Result |
+|--------|--------|
+| `results.first()` | First value, or `None` if empty |
+| `results.last()` | Last value, or `None` if empty |
+| `results.single()` | The only value, or `None` if empty; raises `ValueError` if there is more than one |
+
+These methods are called on the **Python result collection** after evaluation. By contrast, FHIRPath functions such as `.first()` inside the expression operate as part of the query and still produce a collection. Use `.single()` on that result when you want the value itself:
+
+```python
+family_names = patient.query("Patient.name.family")
+assert family_names == ["Johnson"]
+assert family_names.first() == "Johnson"
+assert patient.query("Patient.gender").single() is None
+```
+
+Use `single()` when the expression is expected to match at most one value. If multiple matches are possible, keep the collection or choose `first()` / `last()` intentionally. An empty result and a single result whose value is `None` both yield `None` from these convenience methods; check the collection length when that distinction matters.
+
+FHIRPath cardinality functions still compose with the expression itself:
 
 !!! example "Working with Collections"
 
@@ -146,10 +170,10 @@ Cardinality checks are expressed in FHIRPath itself, so they compose with the re
 
     assert patient.query("Patient.gender") == [] # (3)!
 
-    first_name = patient.query("Patient.name.given.first()") # (4)!
-    last_phone = patient.query("Patient.telecom.where(system='phone').value.last()") # (5)!
-    assert first_name == ["John"]
-    assert last_phone == ["555-0456"]
+    first_name = patient.query("Patient.name.given.first()").single() # (4)!
+    last_phone = patient.query("Patient.telecom.where(system='phone').value.last()").single() # (5)!
+    assert first_name == "John"
+    assert last_phone == "555-0456"
 
     assert patient.query("Patient.birthDate.exists()") == [False] # (6)!
     assert patient.query("Patient.telecom.where(system='phone').count()") == [2] # (7)!
@@ -158,8 +182,8 @@ Cardinality checks are expressed in FHIRPath itself, so they compose with the re
     1. This creates a patient with multiple names and contact methods.
     2. This gets all phone numbers as a list, regardless of how many exist.
     3. A missing element yields an empty list.
-    4. `first()` restricts the result to a single value.
-    5. `last()` picks the last phone number of the filtered list.
+    4. FHIRPath `first()` selects the first given name; Python `single()` extracts that one result value.
+    5. FHIRPath `last()` selects the final phone number; Python `single()` extracts that one result value.
     6. `exists()` tests for presence.
     7. `count()` counts the matches.
 
@@ -230,19 +254,19 @@ patient = fhir.Patient(
 )
 name = patient.name[0]
 
-print(type(name.query("%context")[0])) # (1)!
+print(type(name.query("%context").single())) # (1)!
 #> <class 'fhircraft.fhir.resources.datatypes.R5.complex.human_name.HumanName'>
 
-print(type(patient.query("%resource")[0])) # (2)!  
+print(type(patient.query("%resource").single())) # (2)!
 #> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
-print(type(patient.query("%rootResource")[0])) # (3)!
+print(type(patient.query("%rootResource").single())) # (3)!
 #> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
-print(patient.query("%ucum")[0]) # (4)!
+print(patient.query("%ucum").single()) # (4)!
 #> http://unitsofmeasure.org
 
-print(patient.query("%fhirRelease")[0]) # (5)!
+print(patient.query("%fhirRelease").single()) # (5)!
 #> R5
 ```
 

@@ -341,3 +341,33 @@ def test_index__out_of_range_has_target_and_no_mutation(patient):
     assert patient.telecom == []
     result.set("x")
     assert patient.telecom[-1] == "x" or "x" in patient.telecom
+
+
+# =========================================================================== #
+# Utilities
+# =========================================================================== #
+
+
+def test_first__returns_first_item(patient):
+    patient.telecom = ["a", "b", "c"]
+    result = select(patient, "telecom")
+    assert result.first() == "a"
+
+
+def test_last__returns_last_item(patient):
+    patient.telecom = ["a", "b", "c"]
+    result = select(patient, "telecom")
+    assert result.last() == "c"
+
+
+def test_single__returns_single_item(patient):
+    patient.telecom = ["a"]
+    result = select(patient, "telecom")
+    assert result.single() == "a"
+
+
+def test_single__raises_for_multiple_items(patient):
+    patient.telecom = ["a", "b"]
+    result = select(patient, "telecom")
+    with pytest.raises(ValueError):
+        result.single()

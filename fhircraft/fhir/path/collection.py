@@ -103,6 +103,30 @@ class FHIRPathCollection(list[Any]):
         self._items = wrapped_items
         self._targets = None if targets is None else tuple(targets)
 
+    # -------------------------------------------------
+    # Collection Utilities
+    # -------------------------------------------------
+
+    def first(self) -> Any:
+        """Return the first item in the collection, or None if the collection is empty."""
+        return self[0] if self._items else None
+
+    def last(self) -> Any:
+        """Return the last item in the collection, or None if the collection is empty."""
+        return self[-1] if self._items else None
+
+    def single(self) -> Any:
+        """Return the single item in the collection, or None if the collection is empty.
+
+        Raises:
+            ValueError: If the collection contains more than one item.
+        """
+        if not self._items:
+            return None
+        if len(self._items) > 1:
+            raise ValueError("Collection contains more than one item")
+        return self[0]
+
     @property
     def accessors(self) -> tuple[ElementAccessor, ...]:
         """Accessors of the existing items, in order."""
@@ -112,6 +136,10 @@ class FHIRPathCollection(list[Any]):
     def targets(self) -> tuple[ElementAccessor, ...]:
         """Writable locations addressed by the expression, whether or not they hold a value."""
         return self.accessors if self._targets is None else self._targets
+
+    # -------------------------------------------------
+    # List overrides
+    # -------------------------------------------------
 
     def __getitem__(self, index) -> Any:
         if isinstance(index, slice):
@@ -232,9 +260,9 @@ class FHIRPathCollection(list[Any]):
             return list(self) == list(value)
         return super().__eq__(value)
 
-    # ------------------------------------------------------------------ #
+    # ------------------------------------------------------------------
     # Patch interface
-    # ------------------------------------------------------------------ #
+    # ------------------------------------------------------------------
 
     def _require_targets(self) -> tuple[ElementAccessor, ...]:
         targets = self.targets
